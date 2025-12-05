@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Metal Workout Builder 2</title>
+<title>Workout Builder</title>
 
 <style>
   :root {
@@ -13,557 +13,421 @@
     --bg:#ffffff;
     --card:#f8f9fb;
     --pill:#e8eeff;
+    --disabled:#c0c7d1;
   }
 
-  * { box-sizing:border-box; }
-
   body {
-    font-family:-apple-system,BlinkMacSystemFont,"SF Pro",Segoe UI,Roboto,sans-serif;
-    background:var(--bg);
-    color:var(--ink);
-    margin:0;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro", Segoe UI, Roboto, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
   }
 
   .container {
-    padding:24px;
-    max-width:500px;
-    margin:auto;
+    padding: 24px;
+    max-width: 480px;
+    margin: auto;
   }
 
   .weather {
-    font-size:15px;
-    color:var(--sub);
-    margin-bottom:16px;
+    font-size: 15px;
+    color: var(--sub);
+    margin-bottom: 16px;
   }
 
   h1 {
-    font-size:28px;
-    font-weight:700;
-    margin:0 0 8px;
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 6px;
   }
 
-  .subtitle {
-    font-size:16px;
-    color:var(--sub);
-    margin:0 0 16px;
+  h2 {
+    font-size: 17px;
+    color: var(--sub);
+    margin: 6px 0 20px;
   }
 
-  /* Mode selector -------------------------------------------------- */
-  .modes {
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px;
-    margin-bottom:16px;
+  /* Radio Button Row */
+  .radio-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
   }
 
-  .mode-option {
-    display:inline-flex;
-    align-items:center;
-    gap:6px;
-    padding:6px 10px;
-    border-radius:999px;
-    border:1px solid #e2e8f0;
-    font-size:14px;
-    cursor:pointer;
-    user-select:none;
+  .radio-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 1.8px solid #d0d7e2;
+    border-radius: 20px;
+    font-size: 16px;
+    cursor: pointer;
+    user-select: none;
+    transition: 0.2s;
   }
 
-  .mode-option input {
-    display:none;
+  .radio-option input {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid #bcc7d6;
+    position: relative;
   }
 
-  .mode-option span.emoji {
-    font-size:16px;
+  .radio-option input:checked {
+    border-color: var(--brand);
   }
 
-  .mode-option span.label {
-    font-size:14px;
+  .radio-option input:checked::after {
+    content:"";
+    position:absolute;
+    inset:4px;
+    border-radius:50%;
+    background: var(--brand);
   }
 
-  .mode-option.active {
-    border-color:var(--brand);
-    background:#e5edff;
-    color:var(--brand);
+  .radio-option.active {
+    border-color: var(--brand);
+    background: #e8eeff;
+    font-weight: 600;
   }
 
-  /* AI glow stage -------------------------------------------------- */
+  /* Disabled locked state */
+  .radio-option.disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  /* AI gradient stage */
   .ai-stage {
-    position:relative;
-    height:160px;
-    margin-top:8px;
-    margin-bottom:16px;
-    display:none;
-    border-radius:100%;
-    overflow:visible;
+    position: relative;
+    height: 160px;
+    margin: 10px 0 20px;
+    display: none;
+    border-radius: 100%;
+    overflow: visible;
   }
 
   .ai-stage::before {
     content:"";
     position:absolute;
-    inset:-20% -15% -20% -15%;
-    filter:blur(84px) saturate(160%) contrast(115%);
+    inset:-20% -15% -25% -15%;
     opacity:0;
-    transition:opacity .25s ease;
+    filter:blur(84px) saturate(160%) contrast(115%);
     background:
       radial-gradient(22rem 22rem at 30% 36%, #3A7BFF77 0, #0000 50%),
       radial-gradient(22rem 22rem at 72% 34%, #7DFF5C77 0, #0000 54%),
       radial-gradient(24rem 20rem at 40% 72%, #FFA43A77 0, #0000 54%),
       radial-gradient(20rem 20rem at 70% 74%, #9B8FFF99 0, #0000 80%);
-    background-blend-mode:screen;
-    animation:meshBreath 2s ease-in-out infinite, meshDrift 3s ease-in-out infinite;
+    background-blend-mode: screen;
+    animation: meshBreath 2s infinite ease-in-out,
+               meshDrift 3s infinite ease-in-out;
+    transition: opacity .25s ease;
   }
 
-  .ai-stage.show::before { opacity:.9; }
+  .ai-stage.show::before { opacity: 0.85; }
 
   @keyframes meshBreath {
-    0%,100% { transform:scale(1); opacity:.7; }
-    50% { transform:scale(1.03); opacity:.3; }
+    0%,100% { transform: scale(1); opacity:.7 }
+    50% { transform: scale(1.05); opacity:.3 }
   }
 
   @keyframes meshDrift {
-    0% { transform:translate3d(0,0,0); }
-    50% { transform:translate3d(2%,-1.5%,0); }
-    100% { transform:translate3d(0,0,0); }
+    0% { transform: translate3d(0,0,0); }
+    50% { transform: translate3d(2%,-1.5%,0); }
+    100% { transform: translate3d(0,0,0); }
   }
 
-  /* Workout card --------------------------------------------------- */
-  #output {
-    margin-top:12px;
-    display:none;
-  }
-
+  /* Workout card */
   .workout-card {
-    background:var(--card);
-    border-radius:16px;
-    padding:20px;
+    background: var(--card);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
   }
 
-  .workout-title {
-    font-size:17px;
-    font-weight:700;
-    margin-bottom:8px;
+  .section-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 6px;
   }
 
-  .workout-list {
-    list-style:none;
-    padding-left:0;
-    margin:0;
-  }
-
-  .workout-list li {
-    font-size:16px;
-    color:var(--ink);
-    display:flex;
-    align-items:center;
-    gap:8px;
-    margin-bottom:6px;
+  .type-line {
+    font-size: 16px;
+    margin-bottom: 6px;
+    display: flex;
+    gap: 8px;
   }
 
   .pill {
-    background:var(--pill);
-    color:var(--brand);
-    padding:3px 10px;
-    border-radius:12px;
-    font-size:12px;
-    font-weight:600;
+    background: var(--pill);
+    color: var(--brand);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
   }
 
-  /* Button ---------------------------------------------------------- */
   .create-btn {
-    position:fixed;
-    bottom:28px;
-    left:50%;
-    transform:translateX(-50%);
-    width:calc(100% - 48px);
-    max-width:480px;
-    height:56px;
-    background:var(--brand);
-    color:#fff;
-    border:none;
-    border-radius:28px;
-    font-size:18px;
-    font-weight:600;
-    cursor:pointer;
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 48px);
+    max-width: 480px;
+    height: 56px;
+    background: var(--brand);
+    color: white;
+    border: none;
+    border-radius: 28px;
+    font-size: 18px;
+    font-weight: 600;
   }
-  .create-btn:disabled { opacity:0.7; }
+
+  .create-btn:disabled { opacity: 0.6; }
 </style>
 </head>
 <body>
+
 <div class="container">
-  <div class="weather" id="weather">Loading weather...</div>
+
+  <div class="weather">Enable location for weather</div>
 
   <h1>Welcome back Jy</h1>
-  <p class="subtitle">What would you like to train?</p>
+  <h2>What would you like to train?</h2>
 
-  <div class="modes" id="modes">
-    <label class="mode-option" data-mode="pull">
+  <div class="radio-row">
+    <label class="radio-option" id="optPull">
       <input type="radio" name="mode" value="pull">
-      <span class="emoji">✊</span>
-      <span class="label">Pull</span>
+      Pull
     </label>
-    <label class="mode-option" data-mode="push">
+
+    <label class="radio-option" id="optPush">
       <input type="radio" name="mode" value="push">
-      <span class="emoji">✋</span>
-      <span class="label">Push</span>
+      Push
     </label>
-    <label class="mode-option" data-mode="legs">
+
+    <label class="radio-option" id="optLegs">
       <input type="radio" name="mode" value="legs">
-      <span class="emoji">🦵</span>
-      <span class="label">Legs</span>
+      Legs
     </label>
-    <label class="mode-option" data-mode="fullbody">
-      <input type="radio" name="mode" value="fullbody">
-      <span class="emoji">🔥</span>
-      <span class="label">Full Body</span>
+
+    <label class="radio-option" id="optFull">
+      <input type="radio" name="mode" value="full">
+      Full Body
     </label>
   </div>
 
   <div id="aiStage" class="ai-stage"></div>
 
-  <div id="output">
-    <div class="workout-card">
-      <div id="workoutTitle" class="workout-title"></div>
-      <ul id="workoutList" class="workout-list"></ul>
-    </div>
+  <div id="output" style="display:none;">
+    <div class="workout-card" id="workoutCard"></div>
   </div>
+
 </div>
 
 <button class="create-btn" id="create">Create Workout</button>
 
 <script>
-/* ----------------------------------------------------
-   DEV MODE (?dev=true)
------------------------------------------------------ */
-const params = new URLSearchParams(window.location.search);
-const DEV = params.get("dev") === "true";
+/* UTILITIES */
+const qs = q => document.querySelector(q);
+const all = q => document.querySelectorAll(q);
 
-/* ----------------------------------------------------
-   SOUND
------------------------------------------------------ */
-const Sound = (() => {
-  let ctx = null;
-  function ensure() {
-    if (!ctx) {
-      const AC = window.AudioContext || window.webkitAudioContext;
-      if (!AC) return;
-      ctx = new AC();
-    }
-    if (ctx.state === "suspended") ctx.resume();
-    return ctx;
-  }
-  document.addEventListener("pointerdown", ensure, { once:true });
+const metals = ["Metacon", "EMOM", "Ladder", "AMRAP", "Tabata"];
 
-  function beep(freq=880,dur=.15,type="sine",vol=.25,when=0){
-    if (!ensure()) return;
-    const t = ctx.currentTime + when;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = type;
-    osc.frequency.setValueAtTime(freq,t);
-    gain.gain.setValueAtTime(0.0001,t);
-    gain.gain.exponentialRampToValueAtTime(vol,t+.02);
-    gain.gain.exponentialRampToValueAtTime(0.0001,t+dur);
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.start(t); osc.stop(t+dur+.02);
-  }
-  return { beep };
-})();
+const radioOptions = {
+  pull: qs("#optPull"),
+  push: qs("#optPush"),
+  legs: qs("#optLegs"),
+  full: qs("#optFull")
+};
 
-/* ----------------------------------------------------
-   DOM
------------------------------------------------------ */
-const createBtn = document.getElementById("create");
-const aiStage  = document.getElementById("aiStage");
-const output   = document.getElementById("output");
-const titleEl  = document.getElementById("workoutTitle");
-const listEl   = document.getElementById("workoutList");
-const modesEl  = document.getElementById("modes");
+const createBtn = qs("#create");
+const output = qs("#output");
+const aiStage = qs("#aiStage");
+const workoutCard = qs("#workoutCard");
 
-/* ----------------------------------------------------
-   HELPERS
------------------------------------------------------ */
-const metalTypes = ["Metacon","EMOM","Tabata","AMRAP","Ladder"];
+const DEV = new URLSearchParams(location.search).get("dev") === "true";
 
-function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-function chance(p){ return Math.random() < p; }
-
-function todayString(){
+/* WEEKLY LOCK STORAGE */
+function getWeekKey() {
   const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+  const firstJan = new Date(d.getFullYear(), 0, 1);
+  const week = Math.ceil(((d - firstJan) / 86400000 + firstJan.getDay()+1) / 7);
+  return `week-${d.getFullYear()}-${week}`;
 }
 
-/* state: selected mode */
-let selectedMode = "fullbody";
+function loadLocks() {
+  return JSON.parse(localStorage.getItem("locks") || "{}");
+}
 
-/* ----------------------------------------------------
-   MODE RADIO UI
------------------------------------------------------ */
-function setSelectedMode(mode){
-  selectedMode = mode;
-  document.querySelectorAll(".mode-option").forEach(lbl => {
-    const m = lbl.getAttribute("data-mode");
-    const input = lbl.querySelector("input");
-    if (m === mode){
-      lbl.classList.add("active");
+function saveLocks(locks) {
+  localStorage.setItem("locks", JSON.stringify(locks));
+}
+
+function resetIfNewWeek() {
+  const stored = localStorage.getItem("weekKey");
+  const nowKey = getWeekKey();
+  if (stored !== nowKey) {
+    localStorage.setItem("weekKey", nowKey);
+    saveLocks({});
+  }
+}
+
+resetIfNewWeek();
+
+/* RADIO UI LOGIC */
+function refreshRadioStates() {
+  const locks = loadLocks();
+
+  for (let key in radioOptions) {
+    const el = radioOptions[key];
+    const input = el.querySelector("input");
+
+    el.classList.remove("active", "disabled");
+    input.disabled = false;
+
+    if (locks[key] && !DEV) {
       input.checked = true;
-    } else {
-      lbl.classList.remove("active");
-      input.checked = false;
+      input.disabled = true;
+      el.classList.add("disabled");
+      continue;
     }
-  });
+
+    if (input.checked) {
+      el.classList.add("active");
+    }
+  }
 }
 
-modesEl.addEventListener("click", e => {
-  const label = e.target.closest(".mode-option");
-  if (!label) return;
-  const mode = label.getAttribute("data-mode");
-  setSelectedMode(mode);
+all("input[name='mode']").forEach(r => {
+  r.addEventListener("change", () => {
+    refreshRadioStates();
+  });
 });
 
-setSelectedMode("fullbody");
+refreshRadioStates();
 
-/* ----------------------------------------------------
-   STORAGE (live only, not in DEV)
------------------------------------------------------ */
-const STORAGE_KEY = "metalWorkoutV3";
+/* WORKOUT BUILDER */
+function pick(arr) {
+  return arr[Math.floor(Math.random()*arr.length)];
+}
 
-function saveWorkout(data){
+function maybeWeighted() {
+  return Math.random() < 0.2;
+}
+
+function maybeAbs() {
+  return Math.random() < 0.5;
+}
+
+function line(name) {
+  let txt = name;
+  if (maybeAbs()) txt += " + Abs";
+  return txt;
+}
+
+function makeWorkout(mode) {
+  let result = "";
+
+  if (mode === "pull") {
+    result += `<div class='section-title'>Pull Day</div>`;
+    result += `<div class='type-line'>Pull Strength ${maybeWeighted() ? "<span class='pill'>Weighted</span>" : ""}</div>`;
+    const m1 = pick(metals);
+    const m2 = pick(metals);
+    result += `<div class='type-line'>${line(m1)} ${maybeWeighted() ? "<span class='pill'>Weighted</span>" : ""}</div>`;
+    result += `<div class='type-line'>${line(m2)} ${maybeWeighted() ? "<span class='pill'>Weighted</span>" : ""}</div>`;
+  }
+
+  if (mode === "push") {
+    result += `<div class='section-title'>Push Day</div>`;
+    result += `<div class='type-line'>Push Strength ${maybeWeighted() ? "<span class='pill'>Weighted</span>" : ""}</div>`;
+    const m1 = pick(metals);
+    const m2 = pick(metals);
+    result += `<div class='type-line'>${line(m1)} ${maybeWeighted() ? "<span class='pill'>Weighted</span>" : ""}</div>`;
+    result += `<div class='type-line'>${line(m2)} ${maybeWeighted() ? "<span class='pill'>Weighted</span>" : ""}</div>`;
+  }
+
+  if (mode === "legs") {
+    result += `<div class='section-title'>Legs Day</div>`;
+    const count = Math.random() < 0.5 ? 2 : 3;
+    for (let i=0;i<count;i++) {
+      const m = pick(metals);
+      result += `<div class='type-line'>${line(m)} ${maybeWeighted() ? "<span class='pill'>Weighted</span>" : ""}</div>`;
+    }
+  }
+
+  if (mode === "full") {
+    result += `<div class='section-title'>Full Body Day</div>`;
+    const heavy = Math.random() < 0.5;
+    if (heavy) {
+      result += `<div class='type-line'>Push Strength ${maybeWeighted() ? "<span class='pill'>Weighted</span>" : ""}</div>`;
+      result += `<div class='type-line'>Pull Strength ${maybeWeighted() ? "<span class='pill'>Weighted</span>" : ""}</div>`;
+    }
+    const m = pick(metals);
+    result += `<div class='type-line'>${line(m)} ${maybeWeighted() ? "<span class='pill'>Weighted</span>" : ""}</div>`;
+  }
+
+  workoutCard.innerHTML = result;
+}
+
+/* LOCK MODE FOR WEEK */
+function lockMode(mode) {
   if (DEV) return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  const locks = loadLocks();
+  locks[mode] = true;
+  saveLocks(locks);
 }
 
-function loadWorkout(){
-  if (DEV) return null;
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) return null;
-  try{
-    const data = JSON.parse(raw);
-    if (!data || data.date !== todayString()) return null;
-    return data;
-  } catch(e){
-    return null;
-  }
-}
+/* BUTTON LOGIC */
+createBtn.addEventListener("click", () => {
+  let selected = qs("input[name='mode']:checked");
+  if (!selected) return;
+  const mode = selected.value;
 
-function hasGeneratedToday(){
-  return !!loadWorkout();
-}
-
-/* ----------------------------------------------------
-   RENDER
------------------------------------------------------ */
-function renderWorkout(data){
-  titleEl.textContent = data.title;
-  listEl.innerHTML = "";
-  data.items.forEach(item => {
-    const li = document.createElement("li");
-    li.textContent = item.text;
-    if (item.weighted){
-      const pill = document.createElement("span");
-      pill.className = "pill";
-      pill.textContent = "Weighted";
-      li.appendChild(pill);
-    }
-    listEl.appendChild(li);
-  });
-  output.style.display = "block";
-}
-
-/* ----------------------------------------------------
-   WORKOUT GENERATION LOGIC
------------------------------------------------------ */
-function makeMetalItem(){
-  const base = pick(metalTypes);
-  const withAbs = chance(0.5);
-  const text = base + (withAbs ? " + Abs" : "");
-  const weighted = chance(0.2);
-  return { text, weighted, type:"metal" };
-}
-
-function generateForMode(mode){
-  const date = todayString();
-  let title = "";
-  let items = [];
-
-  if (mode === "push"){
-    title = "✋ Push Day";
-    // Always heavy at start
-    items.push({ text:"Push Strength", weighted:true, type:"strength" });
-    items.push(makeMetalItem());
-    items.push(makeMetalItem());
-  }
-  else if (mode === "pull"){
-    title = "✊ Pull Day";
-    items.push({ text:"Pull Strength", weighted:true, type:"strength" });
-    items.push(makeMetalItem());
-    items.push(makeMetalItem());
-  }
-  else if (mode === "legs"){
-    title = "🦵 Legs Day";
-    const count = chance(0.5) ? 2 : 3;
-    for (let i=0;i<count;i++) items.push(makeMetalItem());
-  }
-  else { // fullbody
-    title = "🔥 Full Body Day";
-    const heavyOn = chance(0.5);
-    if (heavyOn){
-      // both heavies + 1 metal (always 3 items)
-      items.push({ text:"Push Strength", weighted:true, type:"strength" });
-      items.push({ text:"Pull Strength", weighted:true, type:"strength" });
-      items.push(makeMetalItem());
-    } else {
-      // no heavies: 3 metals
-      for (let i=0;i<3;i++) items.push(makeMetalItem());
-    }
-  }
-
-  const data = { date, mode, title, items };
-  return data;
-}
-
-/* ----------------------------------------------------
-   TIME & LOCK
------------------------------------------------------ */
-function canGenerateNow(){
-  if (DEV) return true;
-  const now = new Date();
-  const limit = new Date();
-  limit.setHours(17,30,0,0);
-  return now >= limit;
-}
-
-function restoreWorkoutIfAny(){
-  const data = loadWorkout();
-  if (!data) return false;
-  setSelectedMode(data.mode || "fullbody");
-  renderWorkout(data);
-  createBtn.style.display = "none";
-  return true;
-}
-
-function updateButtonState(){
-  if (DEV){
-    createBtn.style.display = "block";
-    createBtn.disabled = false;
-    createBtn.textContent = "Create Workout (DEV)";
-    return;
-  }
-
-  if (restoreWorkoutIfAny()) return;
-
-  if (hasGeneratedToday()){
-    createBtn.style.display = "none";
-    return;
-  }
-
-  if (!canGenerateNow()){
-    createBtn.disabled = true;
-    createBtn.textContent = "Available at 5:30 PM";
-    createBtn.style.display = "block";
-  } else {
-    createBtn.disabled = false;
-    createBtn.textContent = "Create Workout";
-    createBtn.style.display = "block";
-  }
-}
-
-/* ----------------------------------------------------
-   FLOW
------------------------------------------------------ */
-function startGenerate(){
-  if (!canGenerateNow() || (!DEV && hasGeneratedToday())) return;
-
+  /* Animate */
   output.style.display = "none";
   aiStage.style.display = "block";
   aiStage.classList.add("show");
-
   createBtn.disabled = true;
-  createBtn.textContent = DEV ? "Generating (DEV)..." : "Generating...";
+  createBtn.textContent = DEV ? "Generating..." : "Generating...";
 
   setTimeout(() => {
-    const data = generateForMode(selectedMode);
-    renderWorkout(data);
-    saveWorkout(data);
+    makeWorkout(mode);
 
     aiStage.classList.remove("show");
     aiStage.style.display = "none";
+    output.style.display = "block";
 
-    if (!DEV){
-      createBtn.style.display = "none";
-    } else {
-      createBtn.disabled = false;
-      createBtn.textContent = "Create Workout (DEV)";
-    }
+    if (!DEV) lockMode(mode);
 
-    Sound.beep();
+    refreshRadioStates();
+    createBtn.disabled = false;
+    createBtn.textContent = DEV ? "Create Workout (DEV)" : "Create Workout";
   }, 900);
-}
+});
 
-createBtn.addEventListener("click", startGenerate);
-
-/* ----------------------------------------------------
-   WEATHER
------------------------------------------------------ */
-async function getWeatherEmoji(cond){
-  cond = cond.toLowerCase();
-  if (cond.includes("clear")) return "☀️";
-  if (cond.includes("cloud")) return "⛅";
-  if (cond.includes("rain")) return "🌧️";
-  if (cond.includes("drizzle")) return "🌦️";
-  if (cond.includes("thunder")) return "🌩️";
-  if (cond.includes("snow")) return "❄️";
-  if (cond.includes("fog") || cond.includes("mist")) return "🌫️";
-  return "🌡️";
-}
-
-const weatherMap = {
-  0:"Clear sky",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",
-  45:"Fog",48:"Fog",
-  51:"Drizzle",53:"Drizzle",55:"Drizzle",
-  61:"Rain",63:"Rain",65:"Rain",
-  71:"Snow",73:"Snow",75:"Snow",
-  80:"Rain shower",81:"Rain shower",82:"Rain shower",
-  95:"Thunderstorm",96:"Thunderstorm",99:"Thunderstorm"
-};
-
-function weatherCodeToText(code){ return weatherMap[code] || "Unknown"; }
-
-async function updateWeatherUI(){
-  const el = document.getElementById("weather");
-  el.textContent = "Enable location for weather";
-
-  if (!navigator.geolocation) {
-    el.textContent = "Weather unavailable";
-    return;
-  }
-
+/* WEATHER */
+async function updateWeatherUI() {
+  const el = qs(".weather");
   navigator.geolocation.getCurrentPosition(async pos => {
-    const lat = pos.coords.latitude;
-    const lon = pos.coords.longitude;
-    try{
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`;
-      const res = await fetch(url);
-      const data = await res.json();
-      const temp = Math.round(data.current_weather.temperature);
-
-      const rev = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
-      const r = await rev.json();
-      const city = r.address.city || r.address.town || r.address.village || r.address.county || "your area";
-
-      const cond = weatherCodeToText(data.current_weather.weathercode);
-      const emoji = await getWeatherEmoji(cond);
-
-      el.innerHTML = `${emoji} ${temp}°C ${city}`;
-    } catch(e){
+    try {
+      const lat = pos.coords.latitude, lon = pos.coords.longitude;
+      const w = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`);
+      const j = await w.json();
+      const temp = Math.round(j.current_weather.temperature);
+      el.textContent = `${temp}°C`;
+    } catch {
       el.textContent = "Weather unavailable";
     }
-  }, () => {
-    el.textContent = "Enable location for weather";
-  });
+  }, () => el.textContent = "Enable location for weather");
 }
-
 updateWeatherUI();
-updateButtonState();
 </script>
+
 </body>
 </html>
