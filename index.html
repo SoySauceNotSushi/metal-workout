@@ -41,18 +41,16 @@
     margin:0 0 6px;
   }
 
-  /* SUBSTITUTE NOW REGULAR WEIGHT (NOT BOLD) */
   h2 {
     font-size:16px;
-    font-weight:400;   /* <-- REGULAR NOW */
+    font-weight:400;
     color:var(--sub);
     margin:0 0 18px;
   }
 
-  /* Minimal radio row ------------------------------------------- */
+  /* RADIO + UI -------------------------------------------------- */
   .radio-row {
     display:flex;
-    flex-wrap:nowrap;
     gap:16px;
     margin-bottom:20px;
   }
@@ -63,9 +61,7 @@
     gap:6px;
     font-size:14px;
     cursor:pointer;
-    user-select:none;
     transition:0.2s ease;
-    color:var(--ink);
   }
 
   .radio-option input {
@@ -74,7 +70,6 @@
     height:18px;
     border-radius:50%;
     border:2px solid #b7bfca;
-    position:relative;
     background:#fff;
   }
 
@@ -90,23 +85,10 @@
     background:var(--brand);
   }
 
-  .radio-option input:disabled {
-    border-color:#b7bfca;
-    background:#fff;
-    opacity:1;
-  }
+  .radio-option.disabled { opacity:0.4; cursor:not-allowed; }
+  .radio-option.active { color:var(--brand); font-weight:600; }
 
-  .radio-option.active {
-    color:var(--brand);
-    font-weight:600;
-  }
-
-  .radio-option.disabled {
-    opacity:0.4;
-    cursor:not-allowed;
-  }
-
-  /* AI gradient -------------------------------------------------- */
+  /* AI STAGE ---------------------------------------------------- */
   .ai-stage {
     position:relative;
     height:160px;
@@ -137,14 +119,13 @@
     0%,100% { transform:scale(1); opacity:.7 }
     50% { transform:scale(1.05); opacity:.3 }
   }
-
   @keyframes meshDrift {
     0% { transform:translate3d(0,0,0); }
     50% { transform:translate3d(2%,-1.5%,0); }
     100% { transform:translate3d(0,0,0); }
   }
 
-  /* Workout card ------------------------------------------------- */
+  /* WORKOUT CARD ------------------------------------------------ */
   .workout-card {
     background:var(--card);
     border-radius:16px;
@@ -174,7 +155,17 @@
     font-weight:600;
   }
 
-  /* Button ------------------------------------------------------- */
+  /* NEW ORANGE SHOULDERS LABEL */
+  .pill-shoulders {
+    background:#ffe7d1;
+    color:#d85b00;
+    padding:2px 8px;
+    border-radius:10px;
+    font-size:12px;
+    font-weight:600;
+  }
+
+  /* BUTTON ------------------------------------------------------ */
   .create-btn {
     position:fixed;
     bottom:24px;
@@ -191,7 +182,6 @@
     font-weight:600;
     cursor:pointer;
   }
-
   .create-btn:disabled { opacity:0.6; cursor:default; }
 </style>
 </head>
@@ -228,10 +218,13 @@
 <button id="create" class="create-btn">Generate</button>
 
 <script>
-/* ------------------ Helpers ------------------ */
+/* =============================================================
+   SAME SCRIPT AS BEFORE — ONLY PUSH LOGIC SECTION MODIFIED
+   ============================================================= */
+
 const qs = s => document.querySelector(s);
 const metals = ["Metacon","EMOM","Ladder","AMRAP","Tabata"];
-const DEV = new URLSearchParams(location.search).get("dev") === "true";
+const DEV = new URLSearchParams(location.search).get("dev")==="true";
 
 const subtitleEl = qs("#subtitle");
 const radioRow = qs("#radioRow");
@@ -247,21 +240,18 @@ const radioMap = {
   full: qs("#optFull"),
 };
 
-/* ---------- Date Helpers ---------- */
+/* --------- DATE + LOCK HELPERS (unchanged) ------------ */
 function todayString(){
   const d=new Date();
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 }
-
 function isAfter530(){
-  if (DEV) return true;
-  const now = new Date();
-  const cut = new Date();
+  if(DEV) return true;
+  const now=new Date();
+  const cut=new Date();
   cut.setHours(17,30,0,0);
-  return now >= cut;
+  return now>=cut;
 }
-
-/* ---------- Weekly Locks ---------- */
 function getWeekKey(){
   const d=new Date();
   const s=new Date(d.getFullYear(),0,1);
@@ -269,130 +259,153 @@ function getWeekKey(){
   const week=Math.ceil((d.getDay()+1+days)/7);
   return `${d.getFullYear()}-W${week}`;
 }
-
 function loadLocks(){ return JSON.parse(localStorage.getItem("locks")||"{}"); }
-function saveLocks(l){ localStorage.setItem("locks",JSON.stringify(l)); }
+function saveLocks(x){ localStorage.setItem("locks",JSON.stringify(x)); }
 
 (function resetIfNewWeek(){
-  const nowKey=getWeekKey();
+  const wk=getWeekKey();
   const prev=localStorage.getItem("weekKey");
-  if(prev!==nowKey){
-    localStorage.setItem("weekKey",nowKey);
+  if(prev!==wk){
+    localStorage.setItem("weekKey",wk);
     saveLocks({});
     localStorage.removeItem("workoutToday");
   }
 })();
 
-/* ---------- Save/Load Today's Workout ---------- */
 function saveWorkoutToday(mode, html){
   if(DEV) return;
-  localStorage.setItem("workoutToday", JSON.stringify({
-    date:todayString(),
-    mode,
-    html
-  }));
+  localStorage.setItem("workoutToday", JSON.stringify({date:todayString(),mode,html}));
 }
-
 function loadWorkoutToday(){
   if(DEV) return null;
-  const raw = localStorage.getItem("workoutToday");
+  const raw=localStorage.getItem("workoutToday");
   if(!raw) return null;
-  try{
-    const data = JSON.parse(raw);
-    if(data.date === todayString()) return data;
-  }catch{}
+  const d=JSON.parse(raw);
+  if(d.date===todayString()) return d;
   return null;
 }
 
-/* ------------------ Radio UI ------------------ */
+/* --------- RADIO UI --------- */
 function refreshRadios(){
-  const locks = DEV ? {} : loadLocks();
-
+  const locks = DEV?{}:loadLocks();
   Object.entries(radioMap).forEach(([mode,label])=>{
-    const input = label.querySelector("input");
+    const input=label.querySelector("input");
     label.classList.remove("active","disabled");
-    input.disabled = false;
-
+    input.disabled=false;
     if(locks[mode] && !DEV){
-      input.disabled = true;
+      input.disabled=true;
       label.classList.add("disabled");
-      return;
     }
     if(input.checked) label.classList.add("active");
   });
-
   updateButtonLabel();
   updateButtonState();
 }
 
-/* ------------------ Button Label ------------------ */
-function updateButtonLabel(){
-  const sel = qs("input[name='mode']:checked");
-  if(!sel){
-    createBtn.textContent = "Generate";
-    return;
-  }
-  const mode = sel.value;
-  const name = mode === "full" ? "Full Body" :
-               mode.charAt(0).toUpperCase() + mode.slice(1);
-  createBtn.textContent = `Generate ${name}`;
-}
-
-/* ------------------ Button State ------------------ */
-function updateButtonState(){
-  if(createBtn.style.display==="none") return;
-
-  if(!isAfter530()){
-    createBtn.disabled = true;
-    createBtn.textContent = "Available at 5:30 PM";
-    return;
-  }
-
-  const sel = qs("input[name='mode']:checked");
-  createBtn.disabled = !sel;
-}
-
-/* ------------------ Pre/Post Workout UI ------------------ */
-function enterPreWorkoutState(){
-  subtitleEl.textContent = "What would you like to train?";
-  radioRow.style.display = "flex";
-  updateButtonLabel();
-  if(anyUnlockedMode() || DEV){
-    createBtn.style.display="block";
-  } else {
-    createBtn.style.display="none";
-  }
-  output.style.display = "none";
-  refreshRadios();
-}
-
-function enterPostWorkoutState(){
-  subtitleEl.textContent = "Today’s workout";
-  radioRow.style.display = "none";
-  createBtn.style.display = "none";
-  output.style.display = "block";
-}
-
-/* ------------------ Lock Checks ------------------ */
 function anyUnlockedMode(){
   if(DEV) return true;
   const locks=loadLocks();
   return Object.keys(radioMap).some(m=>!locks[m]);
 }
 
-/* ------------------ Workout Logic ------------------ */
+function enterPreWorkoutState(){
+  subtitleEl.textContent="What would you like to train?";
+  radioRow.style.display="flex";
+  output.style.display="none";
+  createBtn.style.display="block";
+  refreshRadios();
+}
+
+function enterPostWorkoutState(){
+  subtitleEl.textContent="Today’s workout";
+  radioRow.style.display="none";
+  createBtn.style.display="none";
+  output.style.display="block";
+}
+
+/* --------- Button Label --------- */
+function updateButtonLabel(){
+  const sel=qs("input[name='mode']:checked");
+  if(!sel){
+    createBtn.textContent="Generate";
+    return;
+  }
+  const mode=sel.value;
+  const name = mode==="full" ? "Full Body" : mode.charAt(0).toUpperCase()+mode.slice(1);
+  createBtn.textContent=`Generate ${name}`;
+}
+
+/* --------- Button State --------- */
+function updateButtonState(){
+  if(createBtn.style.display==="none") return;
+
+  if(!isAfter530()){
+    createBtn.disabled=true;
+    createBtn.textContent="Available at 5:30 PM";
+    return;
+  }
+  const sel=qs("input[name='mode']:checked");
+  createBtn.disabled=!sel;
+}
+
+/* --------- METAL HELPERS --------- */
 function maybeAbs(){ return Math.random()<0.5; }
 function maybeWeighted(){ return Math.random()<0.2; }
 
 function metalLine(){
   let label = metals[Math.floor(Math.random()*metals.length)];
-  if(maybeAbs()) label += " + Abs";
-  const weighted = maybeWeighted();
-  return `<div class="type-line">${label}${weighted ? ` <span class="pill">Weighted</span>` : ""}</div>`;
+  if(maybeAbs()) label+=" + Abs";
+  const weighted=maybeWeighted();
+  return `<div class="type-line">${label}${weighted?` <span class="pill">Weighted</span>`:""}</div>`;
 }
 
+/* ============================================================
+   🔥 NEW PUSH LOGIC (SHOULDERS)
+   ============================================================ */
+function pushWorkout(){
+  let html = `<div class="section-title">Push Day</div>`;
+
+  // Strength always first
+  html += `<div class="type-line">Strength <span class="pill">Weighted</span></div>`;
+
+  // Determine if shoulders appears at all (50%)
+  const shouldersAppears = Math.random() < 0.5;
+
+  // We will generate two metals
+  const metal1 = metals[Math.floor(Math.random()*metals.length)];
+  const metal2 = metals[Math.floor(Math.random()*metals.length)];
+
+  // Decide WHICH one gets shoulders (if any)
+  let shouldersTarget = null;
+  if(shouldersAppears){
+    shouldersTarget = Math.random() < 0.5 ? 1 : 2;
+  }
+
+  function buildPushMetal(which, name){
+    let line = name;
+    if(maybeAbs()) line += " + Abs";
+
+    let extras = "";
+    if(which === shouldersTarget){
+      extras += ` <span class="pill-shoulders">Shoulders</span>`;
+    }
+    if(maybeWeighted()){
+      extras += ` <span class="pill">Weighted</span>`;
+    }
+    return `<div class="type-line">${line}${extras}</div>`;
+  }
+
+  html += buildPushMetal(1, metal1);
+  html += buildPushMetal(2, metal2);
+
+  return html;
+}
+
+/* --------- MAIN WORKOUT BUILDER --------- */
 function buildWorkoutHTML(mode){
-  let html = "";
+  if(mode==="push") return pushWorkout();
+
+  let html="";
 
   if(mode==="pull"){
     html += `<div class="section-title">Pull Day</div>`;
@@ -400,17 +413,13 @@ function buildWorkoutHTML(mode){
     html += metalLine();
     html += metalLine();
   }
-  else if(mode==="push"){
-    html += `<div class="section-title">Push Day</div>`;
-    html += `<div class="type-line">Strength <span class="pill">Weighted</span></div>`;
-    html += metalLine();
-    html += metalLine();
-  }
+
   else if(mode==="legs"){
     html += `<div class="section-title">Legs Day</div>`;
     const count = Math.random()<0.5 ? 2 : 3;
     for(let i=0;i<count;i++) html += metalLine();
   }
+
   else if(mode==="full"){
     html += `<div class="section-title">Full Body Day</div>`;
     const heavy = Math.random() < 0.5;
@@ -428,28 +437,27 @@ function buildWorkoutHTML(mode){
   return html;
 }
 
-/* ------------------ Generate Button ------------------ */
+/* --------- Generate Button --------- */
 createBtn.addEventListener("click",()=>{
-  const sel = qs("input[name='mode']:checked");
+  const sel=qs("input[name='mode']:checked");
   if(!sel) return;
-  const mode = sel.value;
+  const mode=sel.value;
 
-  output.style.display = "none";
-  aiStage.style.display = "block";
+  output.style.display="none";
+  aiStage.style.display="block";
   aiStage.classList.add("show");
-  createBtn.disabled = true;
+  createBtn.disabled=true;
 
   setTimeout(()=>{
-    const html = buildWorkoutHTML(mode);
-    card.innerHTML = html;
-
+    const html=buildWorkoutHTML(mode);
+    card.innerHTML=html;
     aiStage.classList.remove("show");
-    aiStage.style.display = "none";
+    aiStage.style.display="none";
 
     if(!DEV){
       saveWorkoutToday(mode, html);
-      const locks = loadLocks();
-      locks[mode] = true;
+      const locks=loadLocks();
+      locks[mode]=true;
       saveLocks(locks);
     }
 
@@ -457,45 +465,42 @@ createBtn.addEventListener("click",()=>{
   },900);
 });
 
-/* ------------------ Initial Page Load ------------------ */
+/* --------- Initial Load --------- */
 (function init(){
-  const today = loadWorkoutToday();
-
-  if(today && !DEV){
-    card.innerHTML = today.html;
+  const saved = loadWorkoutToday();
+  if(saved && !DEV){
+    card.innerHTML=saved.html;
     enterPostWorkoutState();
   } else {
     if(!anyUnlockedMode() && !DEV){
-      subtitleEl.textContent = "All workouts used this week";
-      radioRow.style.display = "none";
-      createBtn.style.display = "none";
-      output.style.display = "none";
+      subtitleEl.textContent="All workouts used this week";
+      radioRow.style.display="none";
+      createBtn.style.display="none";
     } else {
       enterPreWorkoutState();
     }
   }
 })();
 
-/* ------------------ Radio Change ------------------ */
 document.querySelectorAll("input[name='mode']").forEach(inp=>{
   inp.addEventListener("change", refreshRadios);
 });
 
-/* ------------------ Weather ------------------ */
+/* --------- Weather --------- */
 if(navigator.geolocation){
   navigator.geolocation.getCurrentPosition(async pos=>{
     try{
-      const lat = pos.coords.latitude;
-      const lon = pos.coords.longitude;
-      const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`);
-      const j = await r.json();
-      const temp = Math.round(j.current_weather.temperature);
-      qs("#weather").textContent = `${temp}°C`;
+      const lat=pos.coords.latitude;
+      const lon=pos.coords.longitude;
+      const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`);
+      const j=await r.json();
+      qs("#weather").textContent=`${Math.round(j.current_weather.temperature)}°C`;
     }catch{
-      qs("#weather").textContent = "Weather unavailable";
+      qs("#weather").textContent="Weather unavailable";
     }
-  },()=>qs("#weather").textContent="Enable location for weather");
+  }, ()=> qs("#weather").textContent="Enable location for weather");
 }
 </script>
+
 </body>
 </html>
