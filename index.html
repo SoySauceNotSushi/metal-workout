@@ -13,73 +13,71 @@
     --bg:#ffffff;
     --card:#f8f9fb;
     --pill:#e8eeff;
-    --disabled:#c0c7d1;
   }
 
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro", Segoe UI, Roboto, sans-serif;
-    margin: 0;
-    padding: 0;
-    background: var(--bg);
-    color: var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro","SF Pro Text",Segoe UI,Roboto,sans-serif;
+    margin:0;
+    padding:0;
+    color:var(--ink);
+    background:var(--bg);
   }
 
   .container {
-    padding: 24px;
-    max-width: 480px;
-    margin: auto;
+    padding:24px;
+    max-width:480px;
+    margin:auto;
   }
 
   .weather {
-    font-size: 15px;
-    color: var(--sub);
-    margin-bottom: 16px;
+    font-size:15px;
+    color:var(--sub);
+    margin-bottom:14px;
   }
 
   h1 {
-    font-size: 28px;
-    font-weight: 700;
-    margin: 0 0 6px;
+    font-size:28px;
+    font-weight:700;
+    margin:0 0 6px;
   }
 
   h2 {
-    font-size: 17px;
-    color: var(--sub);
-    margin: 6px 0 20px;
+    font-size:16px;
+    color:var(--sub);
+    margin:0 0 18px;
   }
 
-  /* Radio Button Row */
+  /* Minimal radio row --------------------------------------------------- */
   .radio-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 20px;
+    display:flex;
+    flex-wrap:nowrap;
+    gap:16px;
+    margin-bottom:20px;
   }
 
   .radio-option {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    border: 1.8px solid #d0d7e2;
-    border-radius: 20px;
-    font-size: 16px;
-    cursor: pointer;
-    user-select: none;
-    transition: 0.2s;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:14px;
+    cursor:pointer;
+    user-select:none;
+    transition:0.2s ease;
+    color:var(--ink);
   }
 
+  /* Radio circle */
   .radio-option input {
-    appearance: none;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    border: 2px solid #bcc7d6;
-    position: relative;
+    appearance:none;
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    border:2px solid #b7bfca;
+    position:relative;
   }
 
   .radio-option input:checked {
-    border-color: var(--brand);
+    border-color:var(--brand);
   }
 
   .radio-option input:checked::after {
@@ -87,29 +85,28 @@
     position:absolute;
     inset:4px;
     border-radius:50%;
-    background: var(--brand);
+    background:var(--brand);
   }
 
+  /* Blue label when selected */
   .radio-option.active {
-    border-color: var(--brand);
-    background: #e8eeff;
-    font-weight: 600;
+    color:var(--brand);
+    font-weight:600;
   }
 
-  /* Disabled locked state */
+  /* Disabled + checked + dimmed */
   .radio-option.disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
+    opacity:0.40;
+    cursor:not-allowed;
   }
 
-  /* AI gradient stage */
+  /* AI gradient animation --------------------------------------------- */
   .ai-stage {
-    position: relative;
-    height: 160px;
-    margin: 10px 0 20px;
-    display: none;
-    border-radius: 100%;
-    overflow: visible;
+    position:relative;
+    height:160px;
+    margin:12px 0 18px;
+    display:none;
+    border-radius:100%;
   }
 
   .ai-stage::before {
@@ -123,311 +120,269 @@
       radial-gradient(22rem 22rem at 72% 34%, #7DFF5C77 0, #0000 54%),
       radial-gradient(24rem 20rem at 40% 72%, #FFA43A77 0, #0000 54%),
       radial-gradient(20rem 20rem at 70% 74%, #9B8FFF99 0, #0000 80%);
-    background-blend-mode: screen;
-    animation: meshBreath 2s infinite ease-in-out,
-               meshDrift 3s infinite ease-in-out;
-    transition: opacity .25s ease;
+    background-blend-mode:screen;
+    transition:opacity .25s ease;
+    animation:meshBreath 2s ease-in-out infinite, meshDrift 3s ease-in-out infinite;
   }
 
-  .ai-stage.show::before { opacity: 0.85; }
+  .ai-stage.show::before { opacity:.9; }
 
   @keyframes meshBreath {
-    0%,100% { transform: scale(1); opacity:.7 }
-    50% { transform: scale(1.05); opacity:.3 }
+    0%,100% { transform:scale(1); opacity:.7 }
+    50% { transform:scale(1.05); opacity:.3 }
   }
 
   @keyframes meshDrift {
-    0% { transform: translate3d(0,0,0); }
-    50% { transform: translate3d(2%,-1.5%,0); }
-    100% { transform: translate3d(0,0,0); }
+    0% { transform:translate3d(0,0,0); }
+    50% { transform:translate3d(2%,-1.5%,0); }
+    100% { transform:translate3d(0,0,0); }
   }
 
   /* Workout card */
   .workout-card {
-    background: var(--card);
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 20px;
+    background:var(--card);
+    border-radius:16px;
+    padding:20px;
   }
 
   .section-title {
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 6px;
+    font-size:20px;
+    font-weight:700;
+    margin-bottom:6px;
   }
 
   .type-line {
-    font-size: 16px;
-    margin-bottom: 6px;
-    display: flex;
-    gap: 8px;
+    font-size:16px;
+    margin-bottom:6px;
+    display:flex;
+    gap:8px;
+    align-items:center;
   }
 
   .pill {
-    background: var(--pill);
-    color: var(--brand);
-    padding: 2px 8px;
-    border-radius: 10px;
-    font-size: 12px;
-    font-weight: 600;
+    background:var(--pill);
+    color:var(--brand);
+    padding:2px 8px;
+    border-radius:10px;
+    font-size:12px;
+    font-weight:600;
   }
 
+  /* Button */
   .create-btn {
-    position: fixed;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: calc(100% - 48px);
-    max-width: 480px;
-    height: 56px;
-    background: var(--brand);
-    color: white;
-    border: none;
-    border-radius: 28px;
-    font-size: 18px;
-    font-weight: 600;
+    position:fixed;
+    left:50%;
+    bottom:24px;
+    transform:translateX(-50%);
+    width:calc(100% - 48px);
+    max-width:480px;
+    height:56px;
+    background:var(--brand);
+    color:white;
+    border:none;
+    border-radius:28px;
+    font-size:18px;
+    font-weight:600;
+    cursor:pointer;
   }
 
-  .create-btn:disabled { opacity: 0.6; }
+  .create-btn:disabled { opacity:0.6; }
 </style>
 </head>
-<body>
 
+<body>
 <div class="container">
 
-  <div class="weather">Enable location for weather</div>
+  <div class="weather" id="weather">Loading weather…</div>
 
   <h1>Welcome back Jy</h1>
   <h2>What would you like to train?</h2>
 
+  <!-- RADIO ROW -->
   <div class="radio-row">
     <label class="radio-option" id="optPull">
-      <input type="radio" name="mode" value="pull">
-      Pull
+      <input type="radio" name="mode" value="pull"> Pull
     </label>
 
     <label class="radio-option" id="optPush">
-      <input type="radio" name="mode" value="push">
-      Push
+      <input type="radio" name="mode" value="push"> Push
     </label>
 
     <label class="radio-option" id="optLegs">
-      <input type="radio" name="mode" value="legs">
-      Legs
+      <input type="radio" name="mode" value="legs"> Legs
     </label>
 
     <label class="radio-option" id="optFull">
-      <input type="radio" name="mode" value="full">
-      Full Body
+      <input type="radio" name="mode" value="full"> Full body
     </label>
   </div>
 
   <div id="aiStage" class="ai-stage"></div>
 
   <div id="output" style="display:none;">
-    <div class="workout-card" id="workoutCard"></div>
+    <div id="workoutCard" class="workout-card"></div>
   </div>
 
 </div>
 
-<button class="create-btn" id="create">Create Workout</button>
+<button id="create" class="create-btn">Create Workout</button>
 
 <script>
-/* UTILITIES */
-const qs = q => document.querySelector(q);
-const all = q => document.querySelectorAll(q);
+const metals = ["Metacon","EMOM","Ladder","AMRAP","Tabata"];
+const qs = s => document.querySelector(s);
 
-const metals = ["Metacon", "EMOM", "Ladder", "AMRAP", "Tabata"];
-
-const radioOptions = {
+const opt = {
   pull: qs("#optPull"),
   push: qs("#optPush"),
   legs: qs("#optLegs"),
   full: qs("#optFull")
 };
 
-const createBtn = qs("#create");
-const output = qs("#output");
-const aiStage = qs("#aiStage");
-const workoutCard = qs("#workoutCard");
-
 const DEV = new URLSearchParams(location.search).get("dev") === "true";
 
-/* WEEKLY LOCK STORAGE */
-function getWeekKey() {
+/* WEEKLY LOCK SYSTEM ------------------------------------------- */
+function getWeekKey(){
   const d = new Date();
-  const firstJan = new Date(d.getFullYear(), 0, 1);
-  const week = Math.ceil(((d - firstJan) / 86400000 + firstJan.getDay()+1) / 7);
-  return `week-${d.getFullYear()}-${week}`;
+  const oneJan = new Date(d.getFullYear(),0,1);
+  const days = Math.floor((d - oneJan) / 86400000);
+  const week = Math.ceil((d.getDay() + 1 + days)/7);
+  return `${d.getFullYear()}-W${week}`;
 }
 
-function loadLocks() {
-  return JSON.parse(localStorage.getItem("locks") || "{}");
-}
+function loadLocks(){ return JSON.parse(localStorage.getItem("locks")||"{}"); }
+function saveLocks(l){ localStorage.setItem("locks",JSON.stringify(l)); }
 
-function saveLocks(locks) {
-  localStorage.setItem("locks", JSON.stringify(locks));
-}
-
-function resetIfNewWeek() {
-  const stored = localStorage.getItem("weekKey");
+(function checkWeek(){
   const nowKey = getWeekKey();
-  if (stored !== nowKey) {
-    localStorage.setItem("weekKey", nowKey);
+  const prev = localStorage.getItem("weekKey");
+  if (prev !== nowKey){
+    localStorage.setItem("weekKey",nowKey);
     saveLocks({});
   }
-}
+})();
 
-resetIfNewWeek();
-
-/* RADIO UI LOGIC */
-function refreshRadioStates() {
+/* RADIO UI ------------------------------------------------------ */
+function refreshRadios(){
   const locks = loadLocks();
 
-  for (let key in radioOptions) {
-    const el = radioOptions[key];
-    const input = el.querySelector("input");
-
-    el.classList.remove("active", "disabled");
+  Object.entries(opt).forEach(([mode,label])=>{
+    const input = label.querySelector("input");
+    label.classList.remove("active","disabled");
     input.disabled = false;
 
-    if (locks[key] && !DEV) {
+    if (locks[mode] && !DEV){
       input.checked = true;
+      label.classList.add("active","disabled");
       input.disabled = true;
-      el.classList.add("disabled");
-      continue;
+      return;
     }
 
-    if (input.checked) {
-      el.classList.add("active");
+    if (input.checked){
+      label.classList.add("active");
     }
-  }
+  });
 }
 
-all("input[name='mode']").forEach(r => {
-  r.addEventListener("change", () => {
-    refreshRadioStates();
-  });
+document.querySelectorAll("input[name='mode']").forEach(r=>{
+  r.addEventListener("change",refreshRadios);
 });
 
-refreshRadioStates();
+qs("input[value='full']").checked = true;
+refreshRadios();
 
-/* WORKOUT BUILDER */
-function pick(arr) {
-  return arr[Math.floor(Math.random()*arr.length)];
+/* GENERATION ---------------------------------------------------- */
+function maybeAbs(){ return Math.random() < 0.5; }
+
+function makeMetal(){
+  let name = metals[Math.floor(Math.random()*metals.length)];
+  if (maybeAbs()) name += " + Abs";
+  const weighted = Math.random() < 0.2;
+  return `<div class="type-line">${name}${weighted ? `<span class='pill'>Weighted</span>` : ""}</div>`;
 }
 
-function maybeWeighted() {
-  return Math.random() < 0.2;
-}
+function build(mode){
+  let html = "";
 
-function maybeAbs() {
-  return Math.random() < 0.5;
-}
-
-function line(name) {
-  let txt = name;
-  if (maybeAbs()) txt += " + Abs";
-  return txt;
-}
-
-function makeWorkout(mode) {
-  let result = "";
-
-  if (mode === "pull") {
-    result += `<div class='section-title'>Pull Day</div>`;
-    result += `<div class='type-line'>Pull Strength ${maybeWeighted() ? "<span class='pill'>Weighted</span>" : ""}</div>`;
-    const m1 = pick(metals);
-    const m2 = pick(metals);
-    result += `<div class='type-line'>${line(m1)} ${maybeWeighted() ? "<span class='pill'>Weighted</span>" : ""}</div>`;
-    result += `<div class='type-line'>${line(m2)} ${maybeWeighted() ? "<span class='pill'>Weighted</span>" : ""}</div>`;
+  if (mode === "pull"){
+    html += `<div class="section-title">Pull Day</div>`;
+    html += `<div class="type-line">Strength <span class="pill">Weighted</span></div>`;
+    html += makeMetal();
+    html += makeMetal();
   }
 
-  if (mode === "push") {
-    result += `<div class='section-title'>Push Day</div>`;
-    result += `<div class='type-line'>Push Strength ${maybeWeighted() ? "<span class='pill'>Weighted</span>" : ""}</div>`;
-    const m1 = pick(metals);
-    const m2 = pick(metals);
-    result += `<div class='type-line'>${line(m1)} ${maybeWeighted() ? "<span class='pill'>Weighted</span>" : ""}</div>`;
-    result += `<div class='type-line'>${line(m2)} ${maybeWeighted() ? "<span class='pill'>Weighted</span>" : ""}</div>`;
+  if (mode === "push"){
+    html += `<div class="section-title">Push Day</div>`;
+    html += `<div class="type-line">Strength <span class="pill">Weighted</span></div>`;
+    html += makeMetal();
+    html += makeMetal();
   }
 
-  if (mode === "legs") {
-    result += `<div class='section-title'>Legs Day</div>`;
+  if (mode === "legs"){
+    html += `<div class="section-title">Legs Day</div>`;
     const count = Math.random() < 0.5 ? 2 : 3;
-    for (let i=0;i<count;i++) {
-      const m = pick(metals);
-      result += `<div class='type-line'>${line(m)} ${maybeWeighted() ? "<span class='pill'>Weighted</span>" : ""}</div>`;
-    }
+    for (let i=0;i<count;i++) html += makeMetal();
   }
 
-  if (mode === "full") {
-    result += `<div class='section-title'>Full Body Day</div>`;
+  if (mode === "full"){
+    html += `<div class="section-title">Full Body Day</div>`;
     const heavy = Math.random() < 0.5;
-    if (heavy) {
-      result += `<div class='type-line'>Push Strength ${maybeWeighted() ? "<span class='pill'>Weighted</span>" : ""}</div>`;
-      result += `<div class='type-line'>Pull Strength ${maybeWeighted() ? "<span class='pill'>Weighted</span>" : ""}</div>`;
+    if (heavy){
+      html += `<div class="type-line">Push Strength <span class="pill">Weighted</span></div>`;
+      html += `<div class="type-line">Pull Strength <span class="pill">Weighted</span></div>`;
     }
-    const m = pick(metals);
-    result += `<div class='type-line'>${line(m)} ${maybeWeighted() ? "<span class='pill'>Weighted</span>" : ""}</div>`;
+    html += makeMetal();
   }
 
-  workoutCard.innerHTML = result;
+  qs("#workoutCard").innerHTML = html;
 }
 
-/* LOCK MODE FOR WEEK */
-function lockMode(mode) {
-  if (DEV) return;
-  const locks = loadLocks();
-  locks[mode] = true;
-  saveLocks(locks);
-}
-
-/* BUTTON LOGIC */
-createBtn.addEventListener("click", () => {
-  let selected = qs("input[name='mode']:checked");
+/* BUTTON + ANIMATION ------------------------------------------- */
+qs("#create").addEventListener("click",()=>{
+  const selected = qs("input[name='mode']:checked");
   if (!selected) return;
   const mode = selected.value;
 
-  /* Animate */
-  output.style.display = "none";
-  aiStage.style.display = "block";
-  aiStage.classList.add("show");
-  createBtn.disabled = true;
-  createBtn.textContent = DEV ? "Generating..." : "Generating...";
+  const ai = qs("#aiStage");
+  const out = qs("#output");
+  const btn = qs("#create");
 
-  setTimeout(() => {
-    makeWorkout(mode);
+  out.style.display="none";
+  ai.style.display="block";
+  ai.classList.add("show");
+  btn.disabled=true;
 
-    aiStage.classList.remove("show");
-    aiStage.style.display = "none";
-    output.style.display = "block";
+  setTimeout(()=>{
+    build(mode);
 
-    if (!DEV) lockMode(mode);
+    ai.classList.remove("show");
+    ai.style.display="none";
+    out.style.display="block";
 
-    refreshRadioStates();
-    createBtn.disabled = false;
-    createBtn.textContent = DEV ? "Create Workout (DEV)" : "Create Workout";
-  }, 900);
+    if (!DEV){
+      const locks = loadLocks();
+      locks[mode] = true;
+      saveLocks(locks);
+    }
+
+    refreshRadios();
+    btn.disabled=false;
+  },900);
 });
 
-/* WEATHER */
-async function updateWeatherUI() {
-  const el = qs(".weather");
-  navigator.geolocation.getCurrentPosition(async pos => {
-    try {
-      const lat = pos.coords.latitude, lon = pos.coords.longitude;
-      const w = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`);
-      const j = await w.json();
-      const temp = Math.round(j.current_weather.temperature);
-      el.textContent = `${temp}°C`;
-    } catch {
-      el.textContent = "Weather unavailable";
-    }
-  }, () => el.textContent = "Enable location for weather");
-}
-updateWeatherUI();
-</script>
+/* WEATHER ------------------------------------------------------- */
+navigator.geolocation?.getCurrentPosition(async pos=>{
+  try{
+    const lat = pos.coords.latitude, lon = pos.coords.longitude;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`;
+    const r = await fetch(url);
+    const j = await r.json();
+    const temp = Math.round(j.current_weather.temperature);
+    qs("#weather").textContent = `${temp}°C`;
+  } catch{
+    qs("#weather").textContent = "Weather unavailable";
+  }
+},()=>qs("#weather").textContent="Enable location for weather");
 
+</script>
 </body>
 </html>
