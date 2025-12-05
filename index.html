@@ -36,9 +36,9 @@
     font-size:18px;
   }
 
-  .card-title { font-weight:600; font-size:18px; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+  .card-title { font-weight:600; font-size:18px; margin-bottom:8px; display:flex; gap:8px; }
 
-  .type-list div { font-size:16px; margin:4px 0; display:flex; align-items:center; gap:8px; }
+  .type-list div { font-size:16px; margin:4px 0; display:flex; gap:8px; }
 
   .weighted-label {
     background:#e0ecff;
@@ -48,7 +48,6 @@
     font-size:12px;
   }
 
-  /* Countdown */
   #countdownBox {
     width:100%;
     margin-top:40px;
@@ -57,7 +56,6 @@
     color:var(--sub);
   }
 
-  /* Button */
   .fab {
     position:fixed;
     bottom:20px; left:50%; transform:translateX(-50%);
@@ -98,23 +96,19 @@
 /* --------------------------------------------------------
    DEV MODE TOGGLE
 ---------------------------------------------------------*/
-
 const urlParams = new URLSearchParams(window.location.search);
-const DEV_MODE = urlParams.get("dev") === "true";   // Enable via ?dev=true
+const DEV_MODE = urlParams.get("dev") === "true";  
+// const DEV_MODE = true; // manual switch if needed
 
-// Manual override (set to true for local testing)
-// const DEV_MODE = true;
-
-
-/* Fake Date override when dev mode is enabled */
+/* Fake date override for DEV MODE */
 if (DEV_MODE) {
-  console.log("DEV MODE ENABLED — Time forced to 18:00 for testing.");
+  console.log("DEV MODE ENABLED — Time forced to 18:00 and unlimited workouts allowed.");
 
   const RealDate = Date;
   Date = class extends RealDate {
     constructor(...args) {
       if (args.length === 0) {
-        return new RealDate("2025-01-01T18:00:00"); // Always inside workout window
+        return new RealDate("2025-01-01T18:00:00");
       }
       return new RealDate(...args);
     }
@@ -122,25 +116,49 @@ if (DEV_MODE) {
 }
 
 /* --------------------------------------------------------
-   TIME WINDOW SETTINGS
+   TIME SETTINGS
 ---------------------------------------------------------*/
-
 const OPEN_HOUR = 17;
 const OPEN_MIN = 30;
 const RESET_HOUR = 23;
 const RESET_MIN = 0;
 
 /* --------------------------------------------------------
-   METAL TYPES
+   HELPERS
 ---------------------------------------------------------*/
-const metalTypes = ["Metacon", "EMOM", "Tabata", "AMRAP", "Ladder"];
-
 function pick(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
 function chance(p) { return Math.random() < p; }
+function now() { return new Date(); }
 
 /* --------------------------------------------------------
-   WEATHER (unchanged)
+   WEATHER EMOJI SYSTEM
 ---------------------------------------------------------*/
+function weatherCodeToText(code) {
+  if (code === 0) return "Clear";
+  if ([1,2,3].includes(code)) return "Cloudy";
+  if ([45,48].includes(code)) return "Fog";
+  if ([51,53,55].includes(code)) return "Drizzle";
+  if ([61,63,65].includes(code)) return "Rain";
+  if ([66,67].includes(code)) return "Freezing rain";
+  if ([71,73,75].includes(code)) return "Snow";
+  if ([95].includes(code)) return "Thunderstorm";
+  return "Weather";
+}
+
+function weatherEmoji(condition) {
+  switch(condition) {
+    case "Clear": return "☀️";
+    case "Cloudy": return "⛅️";
+    case "Fog": return "🌫️";
+    case "Drizzle": return "🌦️";
+    case "Rain": return "🌧️";
+    case "Freezing rain": return "🧊🌧️";
+    case "Snow": return "❄️";
+    case "Thunderstorm": return "⛈️";
+    default: return "🌡️";
+  }
+}
+
 async function updateWeatherUI() {
   const el = document.getElementById("weather");
 
@@ -165,22 +183,25 @@ async function updateWeatherUI() {
 
       const city = loc.address.city || loc.address.town || loc.address.village || "Your area";
       const temp = weatherData.current_weather.temperature;
+      const condition = weatherCodeToText(weatherData.current_weather.weathercode);
+      const emoji = weatherEmoji(condition);
 
-      el.textContent = `${temp}°C ${city}`;
+      el.textContent = `${emoji} ${temp}°C ${city}`;
     } catch (e) {
       el.textContent = "Weather unavailable";
     }
-  }, () => el.textContent = "Enable location for weather");
+  });
 }
 
 updateWeatherUI();
 
 /* --------------------------------------------------------
-   WORKOUT GENERATION
+   METAL TYPES
 ---------------------------------------------------------*/
+const metalTypes = ["Metacon", "EMOM", "Tabata", "AMRAP", "Ladder"];
 
-function generateMetalTypes(countMin, countMax) {
-  const count = Math.random() < 0.5 ? countMin : countMax;
+function generateMetalTypes(minCount, maxCount) {
+  const count = Math.random() < 0.5 ? minCount : maxCount;
   let out = [];
   for (let i = 0; i < count; i++) {
     let m = pick(metalTypes);
@@ -190,6 +211,9 @@ function generateMetalTypes(countMin, countMax) {
   return out;
 }
 
+/* --------------------------------------------------------
+   WORKOUT GENERATOR
+---------------------------------------------------------*/
 function generateWorkout() {
   const isFullBody = chance(0.5);
 
@@ -218,22 +242,20 @@ function generateWorkout() {
 }
 
 /* --------------------------------------------------------
-   SAVE / LOAD
+   STORAGE
 ---------------------------------------------------------*/
 function saveWorkout(w) { localStorage.setItem("workout", JSON.stringify(w)); }
 function loadWorkout() { return JSON.parse(localStorage.getItem("workout") || "null"); }
 function clearWorkout() { localStorage.removeItem("workout"); }
 
 /* --------------------------------------------------------
-   TIME CHECKS
+   TIME LOGIC
 ---------------------------------------------------------*/
-
-function now() { return new Date(); }
-
 function isOpenWindow() {
   if (DEV_MODE) return true;
 
   const t = now();
+
   const afterOpen =
     t.getHours() > OPEN_HOUR ||
     (t.getHours() === OPEN_HOUR && t.getMinutes() >= OPEN_MIN);
@@ -245,7 +267,6 @@ function isOpenWindow() {
   return afterOpen && beforeReset;
 }
 
-/* RESET at 23:00 */
 function checkForDailyReset() {
   if (DEV_MODE) return;
   const t = now();
@@ -255,40 +276,37 @@ function checkForDailyReset() {
 }
 
 /* --------------------------------------------------------
-   COUNTDOWN LOGIC
+   COUNTDOWN
 ---------------------------------------------------------*/
-
 function updateCountdown() {
+  const box = document.getElementById("countdownBox");
+
   if (DEV_MODE) {
-    document.getElementById("countdownBox").textContent = "";
+    box.textContent = "";
     return;
   }
 
   if (isOpenWindow()) {
-    document.getElementById("countdownBox").textContent = "";
+    box.textContent = "";
     return;
   }
 
   const t = now();
-
   let target = new Date();
   target.setHours(OPEN_HOUR, OPEN_MIN, 0, 0);
 
-  if (t > target) {
-    target.setDate(target.getDate() + 1);
-  }
+  if (t > target) target.setDate(target.getDate() + 1);
 
   const diff = target - t;
   let sec = Math.floor(diff / 1000);
   let hrs = Math.floor(sec / 3600); sec %= 3600;
   let mins = Math.floor(sec / 60); sec %= 60;
 
-  document.getElementById("countdownBox").textContent =
-    `Workout opens in: ${hrs}h ${mins}m ${sec}s`;
+  box.textContent = `Workout opens in: ${hrs}h ${mins}m ${sec}s`;
 }
 
 /* --------------------------------------------------------
-   RENDER WORKOUT
+   RENDER
 ---------------------------------------------------------*/
 function renderWorkout(w) {
   const container = document.getElementById("cards");
@@ -328,12 +346,18 @@ function renderWorkout(w) {
 }
 
 /* --------------------------------------------------------
-   BUTTON LOGIC
+   BUTTON STATE
 ---------------------------------------------------------*/
-
 function updateButtonState() {
   const btn = document.getElementById("createBtn");
   const saved = loadWorkout();
+
+  if (DEV_MODE) {
+    btn.style.display = "flex";
+    btn.disabled = false;
+    btn.textContent = "Create Workout (DEV)";
+    return;
+  }
 
   if (!isOpenWindow()) {
     btn.disabled = true;
@@ -351,9 +375,8 @@ function updateButtonState() {
 }
 
 /* --------------------------------------------------------
-   BUTTON ACTION
+   CREATE BUTTON
 ---------------------------------------------------------*/
-
 document.getElementById("createBtn").addEventListener("click", () => {
   const w = generateWorkout();
   saveWorkout(w);
@@ -364,7 +387,6 @@ document.getElementById("createBtn").addEventListener("click", () => {
 /* --------------------------------------------------------
    INIT
 ---------------------------------------------------------*/
-
 function init() {
   const saved = loadWorkout();
   if (saved) renderWorkout(saved);
