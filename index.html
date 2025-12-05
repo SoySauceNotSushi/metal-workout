@@ -1,227 +1,276 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Metal Workout Builder</title>
-
 <style>
-  :root {
-    --brand:#2453f5;
-    --ink:#0f172a;
-    --sub:#64748b;
-    --bg:#ffffff;
-    --card:#f1f5f9;
-    --pill:#e8eeff;
-  }
-
-  body {
-    font-family:-apple-system, BlinkMacSystemFont, "SF Pro", Segoe UI, Roboto, sans-serif;
-    margin:0; padding:0;
-    background:var(--bg);
-    color:var(--ink);
-  }
-
-  .container { padding:24px; max-width:480px; margin:auto; }
-
-  .weather { font-size:15px; color:var(--sub); display:flex; gap:6px; margin-bottom:20px; }
-
-  h1 { font-size:28px; font-weight:700; margin:0 0 22px; }
-
-  .card {
-    background:var(--card);
-    padding:20px;
-    border-radius:16px;
-    margin-bottom:20px;
-    font-size:18px;
-  }
-
-  .card-title { font-weight:600; font-size:18px; margin-bottom:8px; display:flex; gap:8px; }
-
-  .type-list div { font-size:16px; margin:4px 0; display:flex; gap:8px; }
-
-  .weighted-label {
-    background:#e0ecff;
-    color:#2453f5;
-    padding:2px 8px;
-    border-radius:8px;
-    font-size:12px;
-  }
-
-  #countdownBox {
-    width:100%;
-    margin-top:40px;
-    text-align:center;
-    font-size:18px;
-    color:var(--sub);
-  }
-
-  .fab {
-    position:fixed;
-    bottom:20px; left:50%; transform:translateX(-50%);
-    width:90%;
-    background:var(--brand);
-    color:#fff;
-    height:56px;
-    border:none;
-    border-radius:28px;
-    font-size:20px;
-    font-weight:600;
-    display:flex; align-items:center; justify-content:center;
-    cursor:pointer;
-  }
-
-  .fab[disabled] {
-    opacity:0.5;
-    cursor:not-allowed;
-  }
+:root {
+  --bg: #ffffff;
+  --ink: #0f172a;
+  --sub: #64748b;
+  --card: #f1f5f9;
+  --pill: #3b82f6;
+  --brand: #2345f5;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro", system-ui, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+}
+.container {
+  padding: 20px;
+  max-width: 480px;
+  margin: auto;
+}
+.weather {
+  font-size: 16px;
+  color: var(--sub);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+h1 {
+  font-size: 32px;
+  margin: 0 0 20px;
+}
+.block {
+  background: var(--card);
+  padding: 24px;
+  border-radius: 20px;
+  margin-bottom: 24px;
+}
+.block-title {
+  font-size: 22px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.type-pill {
+  display: inline-block;
+  background: #e1ecff;
+  color: #1d4ed8;
+  padding: 4px 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  margin-left: 8px;
+}
+#createBtn {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  height: 60px;
+  background: var(--brand);
+  color: white;
+  border-radius: 40px;
+  border: none;
+  font-size: 20px;
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#countdownWrap {
+  display: none;
+  text-align: center;
+  margin-top: 60px;
+}
+#countdownNumbers {
+  font-size: 38px;
+  font-weight: 700;
+  letter-spacing: 4px;
+}
+.label-row {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 8px;
+  color: var(--sub);
+  font-size: 14px;
+}
+#closedMessage {
+  font-size: 16px;
+  color: var(--sub);
+  margin-top: 8px;
+  display: none;
+}
 </style>
 </head>
 <body>
+
 <div class="container">
 
-  <div class="weather" id="weather">Enable location for weather</div>
+  <div id="weather" class="weather">Enable location for weather</div>
 
   <h1>Hi Jy, welcome back</h1>
 
-  <div id="cards"></div>
+  <div id="closedMessage">Workout is currently closed</div>
 
-  <div id="countdownBox"></div>
+  <div id="countdownWrap">
+    <div id="countdownNumbers">00 00 00</div>
+    <div class="label-row">
+      <div>HOURS</div><div>MINS</div><div>SECS</div>
+    </div>
+  </div>
+
+  <div id="workout"></div>
 
 </div>
 
-<button class="fab" id="createBtn">Create Workout</button>
+<button id="createBtn">Create Workout</button>
 
 <script>
-/* --------------------------------------------------------
-   DEV MODE TOGGLE
----------------------------------------------------------*/
-const urlParams = new URLSearchParams(window.location.search);
-const DEV_MODE = urlParams.get("dev") === "true";
-
-// const DEV_MODE = true; // manual override if needed
-
-if (DEV_MODE) {
-  console.log("DEV MODE ENABLED — Time forced to 18:00, unlimited workouts allowed.");
-
-  const RealDate = Date;
-  Date = class extends RealDate {
-    constructor(...args) {
-      if (args.length === 0) {
-        return new RealDate("2025-01-01T18:00:00");
-      }
-      return new RealDate(...args);
-    }
-  };
-}
-
-/* --------------------------------------------------------
-   TIME SETTINGS
----------------------------------------------------------*/
+/* ------------------------------------------------------
+   SETTINGS
+------------------------------------------------------ */
+const DEV_MODE = false;     // Set true for no restrictions
 const OPEN_HOUR = 17;
-const OPEN_MIN = 30;
-const RESET_HOUR = 23;
-const RESET_MIN = 0;
+const OPEN_MIN  = 30;
 
-function pick(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
-function chance(p) { return Math.random() < p; }
-function now() { return new Date(); }
+const metalTypes = ["Tabata","AMRAP","EMOM","Ladder","Metacon"];
 
-/* --------------------------------------------------------
-   WEATHER FIXED 100% ACCURATE EMOJI SYSTEM
----------------------------------------------------------*/
+/* Utility */
+const chance = (p) => Math.random() < p;
+const now = () => new Date();
 
-function weatherEmojiFromCode(code) {
-  if (code === 0) return "☀️"; // Clear
-  if ([1,2,3].includes(code)) return "⛅️"; // Cloud variations
-  if ([45,48].includes(code)) return "🌫️"; // Fog
-  if ([51,53,55].includes(code)) return "🌦️"; // Drizzle
-  if ([61,63,65].includes(code)) return "🌧️"; // Rain
-  if ([66,67].includes(code)) return "🌨️"; // Freezing rain
-  if ([71,73,75,77].includes(code)) return "❄️"; // Snow forms
-  if ([80,81,82].includes(code)) return "🌧️"; // Rain showers
-  if ([95,96,99].includes(code)) return "⛈️"; // Thunderstorms
-  return "🌡️"; // fallback
+/* ------------------------------------------------------
+   WEATHER EMOJI
+------------------------------------------------------ */
+function weatherCodeToText(code){
+  if(code===0) return "Clear";
+  if([1,2,3].includes(code)) return "Partly cloudy";
+  if([45,48].includes(code)) return "Fog";
+  if([51,53,55].includes(code)) return "Drizzle";
+  if([61,63,65].includes(code)) return "Rain";
+  if([66,67].includes(code)) return "Freezing rain";
+  if([71,73,75].includes(code)) return "Snow";
+  if(code===95) return "Thunderstorm";
+  return "Weather";
+}
+function weatherEmoji(txt){
+  if(txt==="Clear") return "☀️";
+  if(txt==="Partly cloudy") return "⛅️";
+  if(txt==="Fog") return "🌫️";
+  if(txt==="Drizzle") return "🌦️";
+  if(txt==="Rain") return "🌧️";
+  if(txt==="Freezing rain") return "🧊🌧️";
+  if(txt==="Snow") return "❄️";
+  if(txt==="Thunderstorm") return "⛈️";
+  return "🌡️";
 }
 
-async function updateWeatherUI() {
-  const el = document.getElementById("weather");
+/* ------------------------------------------------------
+   WORKOUT STORAGE
+------------------------------------------------------ */
+function saveWorkout(w){ localStorage.setItem("workout", JSON.stringify(w)); }
+function loadWorkout(){
+  let w = localStorage.getItem("workout");
+  if(!w) return null;
+  w = JSON.parse(w);
+  return w;
+}
+function clearWorkout(){ localStorage.removeItem("workout"); }
 
-  if (!navigator.geolocation) {
-    el.textContent = "Location unavailable";
+/* Reset after midnight */
+setInterval(() => {
+  const t = now();
+  if(t.getHours() === 0 && t.getMinutes() < 2){
+    clearWorkout();
+  }
+}, 60_000);
+
+/* ------------------------------------------------------
+   TIME WINDOW
+------------------------------------------------------ */
+function isOpenWindow(){
+  if(DEV_MODE) return true;
+  const t = now();
+  const start = new Date(t);
+  start.setHours(OPEN_HOUR, OPEN_MIN, 0, 0);
+  return t >= start;
+}
+
+/* ------------------------------------------------------
+   COUNTDOWN UI
+------------------------------------------------------ */
+function updateCountdown(){
+  const wrap = document.getElementById("countdownWrap");
+  const msg  = document.getElementById("closedMessage");
+  const nums = document.getElementById("countdownNumbers");
+
+  if(DEV_MODE){
+    wrap.style.display = "none";
+    msg.style.display  = "none";
+    return;
+  }
+  if(isOpenWindow()){
+    wrap.style.display = "none";
+    msg.style.display  = "none";
     return;
   }
 
-  navigator.geolocation.getCurrentPosition(async pos => {
-    try {
-      const { latitude, longitude } = pos.coords;
+  wrap.style.display = "block";
+  msg.style.display  = "block";
 
-      const weatherRes = await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`
-      );
-      const w = await weatherRes.json();
+  let t = now();
+  let target = new Date();
+  target.setHours(OPEN_HOUR, OPEN_MIN, 0, 0);
+  if(t > target) target.setDate(target.getDate()+1);
 
-      const rev = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
-      );
-      const loc = await rev.json();
+  let diff = target - t;
+  let sec = Math.floor(diff/1000);
+  let hr  = Math.floor(sec/3600); sec%=3600;
+  let mn  = Math.floor(sec/60);   sec%=60;
 
-      const city =
-        loc.address.city ||
-        loc.address.town ||
-        loc.address.village ||
-        "Your area";
+  const pad = n => (n<10?"0"+n:n);
 
-      const temp = w.current_weather.temperature;
-      const emoji = weatherEmojiFromCode(w.current_weather.weathercode);
-
-      el.textContent = `${emoji} ${temp}°C ${city}`;
-    } catch (e) {
-      el.textContent = "Weather unavailable";
-    }
-  });
+  nums.textContent = `${pad(hr)}   ${pad(mn)}   ${pad(sec)}`;
 }
 
-updateWeatherUI();
-
-/* --------------------------------------------------------
-   METAL TYPES
----------------------------------------------------------*/
-const metalTypes = ["Metacon", "EMOM", "Tabata", "AMRAP", "Ladder"];
-
-function generateMetalTypes(minCount, maxCount) {
-  const count = Math.random() < 0.5 ? minCount : maxCount;
+/* ------------------------------------------------------
+   METAL TYPE GENERATOR
+------------------------------------------------------ */
+function generateMetalTypes(min, max){
+  let count = Math.floor(Math.random()*(max-min+1))+min;
+  let copy = [...metalTypes];
   let out = [];
-  for (let i = 0; i < count; i++) {
-    let m = pick(metalTypes);
-    let weighted = chance(0.2);
-    out.push({ name:m, weighted });
+  for(let i=0; i<count; i++){
+    let pick = copy.splice(Math.floor(Math.random()*copy.length),1)[0];
+    out.push(pick);
   }
   return out;
 }
 
-/* --------------------------------------------------------
-   WORKOUT GENERATOR WITH FIXED SPLIT LOGIC
----------------------------------------------------------*/
-function generateWorkout() {
-  const isFullBody = chance(0.5);
-  let workout = { mode: isFullBody ? "full" : "split", blocks: [] };
+/* ------------------------------------------------------
+   WORKOUT GENERATOR
+------------------------------------------------------ */
+function generateWorkout(){
+  let workout = { blocks: [] };
 
-  if (isFullBody) {
-    workout.blocks.push({
-      title:"🔥 Full Body",
+  /* Decide fullbody or split */
+  let fullbody = chance(0.5);
+
+  if(fullbody){
+    let count = chance(0.5) ? 2 : 3;
+    workout.blocks = [{
+      title:"🔥 Full body",
       abs:false,
-      types:generateMetalTypes(2,3)
-    });
+      types: generateMetalTypes(count,count)
+    }];
   } else {
-    // FIXED SPLIT: Never allow (2,2)
+    // SPLIT MODE — never both have 2
     let upperCount, lowerCount;
 
-    if (chance(0.33)) {
-      upperCount = 1;
-      lowerCount = 1;
+    if(chance(0.33)){
+      upperCount = 1; lowerCount = 1;
     } else {
-      if (chance(0.5)) {
+      if(chance(0.5)){
         upperCount = 2; lowerCount = 1;
       } else {
         upperCount = 1; lowerCount = 2;
@@ -233,7 +282,6 @@ function generateWorkout() {
       abs: chance(0.5),
       types: generateMetalTypes(upperCount, upperCount)
     });
-
     workout.blocks.push({
       title:"🦵 Lower Body",
       abs: chance(0.5),
@@ -241,135 +289,56 @@ function generateWorkout() {
     });
   }
 
-  return workout;
+  saveWorkout(workout);
+  renderWorkout(workout);
 }
 
-/* --------------------------------------------------------
-   STORAGE
----------------------------------------------------------*/
-function saveWorkout(w) { localStorage.setItem("workout", JSON.stringify(w)); }
-function loadWorkout() { return JSON.parse(localStorage.getItem("workout") || "null"); }
-function clearWorkout() { localStorage.removeItem("workout"); }
-
-/* --------------------------------------------------------
-   TIME CHECKS
----------------------------------------------------------*/
-function isOpenWindow() {
-  if (DEV_MODE) return true;
-
-  const t = now();
-
-  const afterOpen =
-    t.getHours() > OPEN_HOUR ||
-    (t.getHours() === OPEN_HOUR && t.getMinutes() >= OPEN_MIN);
-
-  const beforeReset =
-    t.getHours() < RESET_HOUR ||
-    (t.getHours() === RESET_HOUR && t.getMinutes() < RESET_MIN);
-
-  return afterOpen && beforeReset;
-}
-
-function checkForDailyReset() {
-  if (DEV_MODE) return;
-  const t = now();
-  if (t.getHours() === RESET_HOUR && t.getMinutes() === RESET_MIN) {
-    clearWorkout();
-  }
-}
-
-/* --------------------------------------------------------
-   COUNTDOWN
----------------------------------------------------------*/
-function updateCountdown() {
-  const box = document.getElementById("countdownBox");
-
-  if (DEV_MODE) {
-    box.textContent = "";
-    return;
-  }
-
-  if (isOpenWindow()) {
-    box.textContent = "";
-    return;
-  }
-
-  const t = now();
-  let target = new Date();
-  target.setHours(OPEN_HOUR, OPEN_MIN, 0, 0);
-
-  if (t > target) target.setDate(target.getDate() + 1);
-
-  const diff = target - t;
-
-  let sec = Math.floor(diff / 1000);
-  let hrs = Math.floor(sec / 3600); sec %= 3600;
-  let mins = Math.floor(sec / 60); sec %= 60;
-
-  box.textContent = `Workout opens in: ${hrs}h ${mins}m ${sec}s`;
-}
-
-/* --------------------------------------------------------
-   RENDER
----------------------------------------------------------*/
-function renderWorkout(w) {
-  const container = document.getElementById("cards");
-  container.innerHTML = "";
-
-  if (!w) return;
+/* ------------------------------------------------------
+   RENDER WORKOUT
+------------------------------------------------------ */
+function renderWorkout(w){
+  const wrap = document.getElementById("workout");
+  wrap.innerHTML = "";
 
   w.blocks.forEach(b => {
-    const div = document.createElement("div");
-    div.className = "card";
+    let div = document.createElement("div");
+    div.className = "block";
 
-    const title = document.createElement("div");
-    title.className = "card-title";
-    title.textContent = b.title + (b.abs ? " + Abs" : "");
-    div.appendChild(title);
+    let t = document.createElement("div");
+    t.className = "block-title";
+    t.textContent = b.title + (b.abs ? " + Abs" : "");
+    div.appendChild(t);
 
-    const list = document.createElement("div");
-    list.className = "type-list";
-
-    b.types.forEach(t => {
-      const row = document.createElement("div");
-      row.textContent = t.name;
-
-      if (t.weighted) {
-        const span = document.createElement("span");
-        span.className = "weighted-label";
-        span.textContent = "Weighted";
-        row.appendChild(span);
-      }
-
-      list.appendChild(row);
+    b.types.forEach(type=>{
+      let p = document.createElement("div");
+      p.style.fontSize = "18px";
+      p.style.marginTop = "10px";
+      p.textContent = type;
+      div.appendChild(p);
     });
 
-    div.appendChild(list);
-    container.appendChild(div);
+    wrap.appendChild(div);
   });
 }
 
-/* --------------------------------------------------------
-   BUTTON LOGIC
----------------------------------------------------------*/
-function updateButtonState() {
+/* ------------------------------------------------------
+   BUTTON STATE
+------------------------------------------------------ */
+function updateButtonState(){
   const btn = document.getElementById("createBtn");
   const saved = loadWorkout();
 
-  if (DEV_MODE) {
+  if(DEV_MODE){
     btn.style.display = "flex";
     btn.disabled = false;
     btn.textContent = "Create Workout (DEV)";
     return;
   }
-
-  if (!isOpenWindow()) {
-    btn.disabled = true;
-    btn.textContent = "Locked";
+  if(!isOpenWindow()){
+    btn.style.display = "none";
     return;
   }
-
-  if (saved) {
+  if(saved){
     btn.style.display = "none";
   } else {
     btn.style.display = "flex";
@@ -378,31 +347,55 @@ function updateButtonState() {
   }
 }
 
-/* --------------------------------------------------------
-   BUTTON ACTION
----------------------------------------------------------*/
-document.getElementById("createBtn").addEventListener("click", () => {
-  const w = generateWorkout();
-  saveWorkout(w);
-  renderWorkout(w);
-  updateButtonState();
-});
+/* ------------------------------------------------------
+   WEATHER FETCH
+------------------------------------------------------ */
+async function updateWeather(){
+  const el = document.getElementById("weather");
+  if(!navigator.geolocation){
+    el.textContent = "Enable location for weather";
+    return;
+  }
 
-/* --------------------------------------------------------
-   INIT
----------------------------------------------------------*/
-function init() {
-  const saved = loadWorkout();
-  if (saved) renderWorkout(saved);
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    try{
+      let lat = pos.coords.latitude;
+      let lon = pos.coords.longitude;
 
-  updateButtonState();
-  updateCountdown();
-  setInterval(updateCountdown, 1000);
-  setInterval(checkForDailyReset, 60000);
+      let w = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+      let wj = await w.json();
+      let temp = wj.current_weather.temperature;
+      let cond = weatherCodeToText(wj.current_weather.weathercode);
+      let emoji = weatherEmoji(cond);
+
+      let rev = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+      let r = await rev.json();
+      let city = r.address.city || r.address.town || r.address.village || "Your area";
+
+      el.textContent = `${emoji} ${temp}°C ${city}`;
+    }catch(e){
+      el.textContent = "Weather unavailable";
+    }
+  },()=>{
+    el.textContent = "Enable location for weather";
+  });
 }
 
-init();
+/* ------------------------------------------------------
+   INIT
+------------------------------------------------------ */
+document.getElementById("createBtn").onclick = ()=>{
+  generateWorkout();
+  updateButtonState();
+};
 
+let saved = loadWorkout();
+if(saved) renderWorkout(saved);
+
+updateWeather();
+updateButtonState();
+updateCountdown();
+setInterval(updateCountdown,1000);
 </script>
 </body>
-</html>
+</html>>
