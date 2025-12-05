@@ -166,7 +166,6 @@
     flex-wrap:wrap;
   }
 
-  /* Pills ------------------------------------------------------- */
   .pill {
     padding:2px 8px;
     border-radius:10px;
@@ -190,8 +189,9 @@
     color:var(--pill-green-text);
   }
 
-  /* BUTTONS ----------------------------------------------------- */
-  .create-btn {
+  /* FIXED BOTTOM BUTTONS --------------------------------------- */
+  .create-btn,
+  .complete-btn {
     position:fixed;
     bottom:24px;
     left:50%;
@@ -208,26 +208,9 @@
     cursor:pointer;
   }
 
-  .create-btn:disabled { opacity:0.6; cursor:default; }
-
-  .complete-btn {
-    margin-top:14px;
-    width:100%;
-    height:46px;
-    border-radius:24px;
-    border:none;
-    background:#0f172a;
-    color:#f9fafb;
-    font-size:15px;
-    font-weight:600;
-    cursor:pointer;
-  }
-
-  .completed-message {
-    margin-top:12px;
-    text-align:center;
-    font-size:14px;
-    color:var(--sub);
+  .create-btn:disabled {
+    opacity:0.6;
+    cursor:default;
   }
 
   .hidden { display:none !important; }
@@ -283,18 +266,17 @@
 
   <div id="output" style="display:none;">
     <div id="workoutCard" class="workout-card"></div>
-    <button id="completeBtn" class="complete-btn hidden">Workout completed</button>
-    <div id="completedMessage" class="completed-message hidden"></div>
   </div>
 </div>
 
 <button id="create" class="create-btn">Generate</button>
+<button id="completeBtn" class="complete-btn hidden">Push Day Completed</button>
 
 <script>
 const qs = s => document.querySelector(s);
 const DEV = new URLSearchParams(location.search).get("dev")==="true";
 
-/* SOUND: soft chime ----------------------------------------- */
+/* ========== SOUND (soft chime) ========== */
 const Sound = (() => {
   let ctx = null;
   function ensure() {
@@ -312,43 +294,39 @@ const Sound = (() => {
     const ac = ensure();
     if (!ac) return;
     const now = ac.currentTime;
-    const freqs = [880, 1320];
-    freqs.forEach((f, i) => {
-      const osc = ac.createOscillator();
-      const gain = ac.createGain();
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(f, now + i*0.12);
-      gain.gain.setValueAtTime(0, now + i*0.12);
-      gain.gain.linearRampToValueAtTime(0.18, now + i*0.12 + 0.02);
-      gain.gain.linearRampToValueAtTime(0, now + i*0.12 + 0.25);
-      osc.connect(gain);
-      gain.connect(ac.destination);
-      osc.start(now + i*0.12);
-      osc.stop(now + i*0.12 + 0.3);
+    [880,1320].forEach((f,i)=>{
+      const osc=ac.createOscillator();
+      const gain=ac.createGain();
+      osc.type="sine";
+      osc.frequency.setValueAtTime(f,now+i*0.12);
+      gain.gain.setValueAtTime(0,now+i*0.12);
+      gain.gain.linearRampToValueAtTime(0.18,now+i*0.12+0.02);
+      gain.gain.linearRampToValueAtTime(0,now+i*0.12+0.25);
+      osc.connect(gain); gain.connect(ac.destination);
+      osc.start(now+i*0.12); osc.stop(now+i*0.12+0.3);
     });
   }
-
   return { chime };
 })();
 
-/* CONFETTI -------------------------------------------------- */
-function launchConfetti() {
-  const colors = ["#f97316","#fb7185","#22c55e","#38bdf8","#eab308"];
-  const count = 70;
-  for (let i=0;i<count;i++) {
-    const el = document.createElement("div");
-    el.className = "confetti-piece";
-    el.style.left = Math.random()*100 + "vw";
-    el.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
-    el.style.animationDuration = (0.8 + Math.random()*0.6).toFixed(2) + "s";
-    el.style.transform = `translate3d(0,0,0) rotateZ(${Math.random()*360}deg)`;
+/* ========== CONFETTI ========== */
+function launchConfetti(){
+  const colors=["#f97316","#fb7185","#22c55e","#38bdf8","#eab308"];
+  const count=70;
+  for(let i=0;i<count;i++){
+    const el=document.createElement("div");
+    el.className="confetti-piece";
+    el.style.left=Math.random()*100+"vw";
+    el.style.backgroundColor=colors[Math.floor(Math.random()*colors.length)];
+    el.style.animationDuration=(0.8+Math.random()*0.6).toFixed(2)+"s";
+    el.style.transform=`translate3d(0,0,0) rotateZ(${Math.random()*360}deg)`;
     document.body.appendChild(el);
     setTimeout(()=>el.remove(),1600);
   }
 }
 
-/* METALS + PILL HELPERS ------------------------------------- */
-const metals = ["Metacon","EMOM","Ladder","AMRAP","Tabata"];
+/* ========== METALS + PILLS ========== */
+const metals=["Metacon","EMOM","Ladder","AMRAP","Tabata"];
 const maybeAbs = () => Math.random()<0.5;
 const maybeWeighted = () => Math.random()<0.25;
 
@@ -357,19 +335,15 @@ function pillShoulders(){ return `<span class="pill pill-shoulders">Shoulders</s
 function pillBiceps(){ return `<span class="pill pill-biceps">Biceps</span>` }
 function pillAbs(){ return `<span class="pill pill-abs">Abs</span>` }
 
-function assemblePills(weight, special, abs){
-  let out = "";
-  if(weight) out += pillWeighted() + " ";
-  if(special) out += special + " ";
-  if(abs) out += pillAbs();
+function assemblePills(weight,special,abs){
+  let out="";
+  if(weight) out+=pillWeighted()+" ";
+  if(special) out+=special+" ";
+  if(abs) out+=pillAbs();
   return out.trim();
 }
+function metalLabel(){ return metals[Math.floor(Math.random()*metals.length)]; }
 
-function metalLabel(){
-  return metals[Math.floor(Math.random()*metals.length)];
-}
-
-/* TITLES ----------------------------------------------------- */
 function modeTitle(mode){
   if(mode==="pull") return "Pull Day";
   if(mode==="push") return "Push Day";
@@ -378,90 +352,83 @@ function modeTitle(mode){
   return "Workout";
 }
 
-/* WORKOUT BUILDERS ------------------------------------------- */
+/* ========== WORKOUT BUILDERS ========== */
 function buildPushHTML(){
-  let h = `<div class="section-title">Push Day</div>`;
-  h += `<div class="type-line">Strength ${pillWeighted()}</div>`;
+  let h=`<div class="section-title">Push Day</div>`;
+  h+=`<div class="type-line">Strength ${pillWeighted()}</div>`;
 
-  const addShoulders = Math.random()<0.5;
-  const shouldersSlot = addShoulders ? (Math.random()<0.5?1:2) : 0;
+  const addShoulders=Math.random()<0.5;
+  const shouldersSlot=addShoulders?(Math.random()<0.5?1:2):0;
 
   for(let i=1;i<=2;i++){
-    const label = metalLabel();
-    const weighted = maybeWeighted();
-    const abs = maybeAbs();
+    const label=metalLabel();
+    const weighted=maybeWeighted();
+    const abs=maybeAbs();
     const special = (i===shouldersSlot ? pillShoulders() : "");
     const pills = assemblePills(weighted,special,abs);
-    h += `<div class="type-line">${label} ${pills}</div>`;
+    h+=`<div class="type-line">${label} ${pills}</div>`;
   }
   return h;
 }
 
 function buildPullHTML(){
-  let h = `<div class="section-title">Pull Day</div>`;
-  h += `<div class="type-line">Strength ${pillWeighted()}</div>`;
+  let h=`<div class="section-title">Pull Day</div>`;
+  h+=`<div class="type-line">Strength ${pillWeighted()}</div>`;
 
-  const addBiceps = Math.random()<0.5;
-  const bicepsSlot = addBiceps ? (Math.random()<0.5?1:2) : 0;
+  const addBiceps=Math.random()<0.5;
+  const bicepsSlot=addBiceps?(Math.random()<0.5?1:2):0;
 
   for(let i=1;i<=2;i++){
-    const label = metalLabel();
-    const weighted = maybeWeighted();
-    const abs = maybeAbs();
-    const special = (i===bicepsSlot ? pillBiceps() : "");
+    const label=metalLabel();
+    const weighted=maybeWeighted();
+    const abs=maybeAbs();
+    const special=(i===bicepsSlot?pillBiceps():"");
     const pills = assemblePills(weighted,special,abs);
-    h += `<div class="type-line">${label} ${pills}</div>`;
+    h+=`<div class="type-line">${label} ${pills}</div>`;
   }
   return h;
 }
 
 function buildLegsHTML(){
-  let h = `<div class="section-title">Legs Day</div>`;
-  const count = Math.random()<0.5 ? 2 : 3;
+  let h=`<div class="section-title">Legs Day</div>`;
+  const count=Math.random()<0.5?2:3;
   for(let i=0;i<count;i++){
-    const label = metalLabel();
-    const weighted = maybeWeighted();
-    const abs = maybeAbs();
+    const label=metalLabel();
+    const weighted=maybeWeighted();
+    const abs=maybeAbs();
     const pills = assemblePills(weighted,"",abs);
-    h += `<div class="type-line">${label} ${pills}</div>`;
+    h+=`<div class="type-line">${label} ${pills}</div>`;
   }
   return h;
 }
 
 function buildFullHTML(){
-  let h = `<div class="section-title">Full Body Day</div>`;
-  const heavy = Math.random()<0.5;
+  let h=`<div class="section-title">Full Body Day</div>`;
+  const heavy=Math.random()<0.5;
   if(heavy){
-    h += `<div class="type-line">Push Strength ${pillWeighted()}</div>`;
-    h += `<div class="type-line">Pull Strength ${pillWeighted()}</div>`;
-    const label = metalLabel();
-    const weighted = maybeWeighted();
-    const abs = maybeAbs();
+    h+=`<div class="type-line">Push Strength ${pillWeighted()}</div>`;
+    h+=`<div class="type-line">Pull Strength ${pillWeighted()}</div>`;
+    const label=metalLabel();
+    const weighted=maybeWeighted();
+    const abs=maybeAbs();
     const pills = assemblePills(weighted,"",abs);
-    h += `<div class="type-line">${label} ${pills}</div>`;
-  } else {
+    h+=`<div class="type-line">${label} ${pills}</div>`;
+  }else{
     for(let i=0;i<3;i++){
-      const label = metalLabel();
-      const weighted = maybeWeighted();
-      const abs = maybeAbs();
+      const label=metalLabel();
+      const weighted=maybeWeighted();
+      const abs=maybeAbs();
       const pills = assemblePills(weighted,"",abs);
-      h += `<div class="type-line">${label} ${pills}</div>`;
+      h+=`<div class="type-line">${label} ${pills}</div>`;
     }
   }
   return h;
 }
 
-/* DATE + LOCKS + COMPLETION ---------------------------------- */
+/* ========== DATE + LOCKS + STORAGE ========== */
 function todayString(){
   const d=new Date();
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-}
-function isAfter530(){
-  if(DEV) return true;
-  const now=new Date();
-  const cut=new Date();
-  cut.setHours(17,30,0,0);
-  return now>=cut;
 }
 function getWeekKey(){
   const d=new Date();
@@ -472,35 +439,37 @@ function getWeekKey(){
 }
 function loadLocks(){ return JSON.parse(localStorage.getItem("locks")||"{}"); }
 function saveLocks(l){ localStorage.setItem("locks",JSON.stringify(l)); }
-function saveWorkoutToday(mode, html){
+
+function saveWorkoutToday(mode,html){
   if(DEV) return;
-  localStorage.setItem("workoutToday", JSON.stringify({date:todayString(), mode, html}));
+  localStorage.setItem("workoutToday",JSON.stringify({date:todayString(),mode,html}));
 }
 function loadWorkoutToday(){
   if(DEV) return null;
   const raw=localStorage.getItem("workoutToday");
   if(!raw) return null;
   try{
-    const data=JSON.parse(raw);
-    if(data.date===todayString()) return data;
+    const d=JSON.parse(raw);
+    if(d.date===todayString()) return d;
   }catch{}
   return null;
 }
 function saveCompletedToday(mode){
   if(DEV) return;
-  localStorage.setItem("completedToday", JSON.stringify({date:todayString(), mode}));
+  localStorage.setItem("completedToday",JSON.stringify({date:todayString(),mode}));
 }
 function loadCompletedToday(){
   if(DEV) return null;
   const raw=localStorage.getItem("completedToday");
   if(!raw) return null;
   try{
-    const data=JSON.parse(raw);
-    if(data.date===todayString()) return data;
+    const d=JSON.parse(raw);
+    if(d.date===todayString()) return d;
   }catch{}
   return null;
 }
 
+/* reset weekly */
 (function resetWeekIfNeeded(){
   const nowKey=getWeekKey();
   const prev=localStorage.getItem("weekKey");
@@ -512,24 +481,75 @@ function loadCompletedToday(){
   }
 })();
 
-/* UI DOM refs ------------------------------------------------- */
-const subtitleEl = qs("#subtitle");
-const radioRow = qs("#radioRow");
-const createBtn = qs("#create");
-const aiStage = qs("#aiStage");
-const output = qs("#output");
-const card = qs("#workoutCard");
-const completeBtn = qs("#completeBtn");
-const completedMsg = qs("#completedMessage");
+/* ========== COUNTDOWN TO NEXT WORKOUT ========== */
+let countdownInterval=null;
 
-const radioMap = {
-  pull: qs("#optPull"),
-  push: qs("#optPush"),
-  legs: qs("#optLegs"),
-  full: qs("#optFull")
+function stopCountdown(){
+  if(countdownInterval){
+    clearInterval(countdownInterval);
+    countdownInterval=null;
+  }
+}
+
+/* if completed=true -> always tomorrow 17:30; else -> today 17:30 if in future, otherwise null (available now) */
+function getNextWorkoutTime(completed){
+  const now=new Date();
+  const target=new Date();
+  if(completed){
+    target.setDate(target.getDate()+1);
+    target.setHours(17,30,0,0);
+    return target;
+  }else{
+    target.setHours(17,30,0,0);
+    if(now<target) return target;
+    return null; // already open
+  }
+}
+
+function startCountdown(target){
+  if(DEV) return; // skip in dev
+  stopCountdown();
+  const btn=createBtn;
+  btn.disabled=true;
+  btn.style.display="block";
+
+  function tick(){
+    const now=new Date();
+    let diff=target-now;
+    if(diff<=0){
+      stopCountdown();
+      // new window opened → clear today's state and re-init UI
+      localStorage.removeItem("workoutToday");
+      localStorage.removeItem("completedToday");
+      init();
+      return;
+    }
+    const totalSec=Math.floor(diff/1000);
+    const h=String(Math.floor(totalSec/3600)).padStart(2,"0");
+    const m=String(Math.floor((totalSec%3600)/60)).padStart(2,"0");
+    const s=String(totalSec%60).padStart(2,"0");
+    btn.textContent=`Next workout in ${h}:${m}:${s}`;
+  }
+  tick();
+  countdownInterval=setInterval(tick,1000);
+}
+
+/* ========== UI ELEMENTS ========== */
+const subtitleEl=qs("#subtitle");
+const radioRow=qs("#radioRow");
+const aiStage=qs("#aiStage");
+const output=qs("#output");
+const card=qs("#workoutCard");
+const createBtn=qs("#create");
+const completeBtn=qs("#completeBtn");
+
+const radioMap={
+  pull:qs("#optPull"),
+  push:qs("#optPush"),
+  legs:qs("#optLegs"),
+  full:qs("#optFull")
 };
 
-/* UI Helpers -------------------------------------------------- */
 function anyUnlocked(){
   if(DEV) return true;
   const locks=loadLocks();
@@ -543,70 +563,75 @@ function updateButtonLabel(){
     return;
   }
   const mode=sel.value;
-  const label = mode==="full" ? "Full Body" : mode.charAt(0).toUpperCase()+mode.slice(1);
-  createBtn.textContent = `Generate ${label}`;
-}
-
-function updateButtonState(){
-  if(createBtn.style.display==="none") return;
-  if(!isAfter530()){
-    createBtn.disabled=true;
-    createBtn.textContent="Available at 5:30 PM";
-    return;
-  }
-  const sel=document.querySelector("input[name='mode']:checked");
-  createBtn.disabled=!sel;
+  const label=mode==="full"?"Full Body":mode.charAt(0).toUpperCase()+mode.slice(1);
+  createBtn.textContent=`Generate ${label}`;
 }
 
 function refreshRadios(){
-  const locks = DEV?{}:loadLocks();
+  const locks=DEV?{}:loadLocks();
   Object.entries(radioMap).forEach(([mode,label])=>{
-    const input = label.querySelector("input");
+    const input=label.querySelector("input");
     label.classList.remove("active","disabled");
-    input.disabled = false;
+    input.disabled=false;
     if(locks[mode] && !DEV){
-      input.disabled = true;
+      input.disabled=true;
       label.classList.add("disabled");
     }
     if(input.checked) label.classList.add("active");
   });
   updateButtonLabel();
-  updateButtonState();
 }
 
-function enterPreWorkout(){
+/* PRE state: no workout yet */
+function enterPreState(){
+  stopCountdown();
   subtitleEl.textContent="What would you like to train?";
-  radioRow.style.display="flex";
   output.style.display="none";
-  if(anyUnlocked() || DEV){
-    createBtn.style.display="block";
-  } else {
-    createBtn.style.display="none";
-  }
   completeBtn.classList.add("hidden");
-  completedMsg.classList.add("hidden");
-  refreshRadios();
+  radioRow.style.display="flex";
+  createBtn.style.display="block";
+
+  const target=getNextWorkoutTime(false);
+  if(target){
+    // locked by time (before 5:30 today)
+    document.querySelectorAll("input[name='mode']").forEach(i=>{
+      i.checked=false;
+    });
+    Object.values(radioMap).forEach(l=>l.classList.remove("active"));
+    startCountdown(target);
+  }else{
+    // free to generate
+    createBtn.disabled=true;
+    createBtn.textContent="Generate";
+    refreshRadios();
+  }
 }
 
-function enterPostWorkout(mode, isCompleted){
+/* AFTER workout generated, before completed */
+function enterWorkoutView(mode){
+  stopCountdown();
   subtitleEl.textContent="Today’s workout";
   radioRow.style.display="none";
-  createBtn.style.display="none";
   output.style.display="block";
-  const title = modeTitle(mode);
+  createBtn.style.display="none";
 
-  if(isCompleted){
-    completeBtn.classList.add("hidden");
-    completedMsg.textContent = `${title} completed — come back tomorrow`;
-    completedMsg.classList.remove("hidden");
-  } else {
-    completeBtn.textContent = `${title} completed`;
-    completeBtn.classList.remove("hidden");
-    completedMsg.classList.add("hidden");
-  }
+  const title=modeTitle(mode);
+  completeBtn.textContent=`${title} completed`;
+  completeBtn.classList.remove("hidden");
 }
 
-/* Generate click ---------------------------------------------- */
+/* AFTER completed -> locked timer until tomorrow 5:30 */
+function enterCompletedView(mode){
+  stopCountdown();
+  subtitleEl.textContent="Workout completed";
+  radioRow.style.display="none";
+  output.style.display="none";
+  completeBtn.classList.add("hidden");
+  const target=getNextWorkoutTime(true);
+  startCountdown(target);
+}
+
+/* ========== BUTTON HANDLERS ========== */
 createBtn.addEventListener("click",()=>{
   const sel=document.querySelector("input[name='mode']:checked");
   if(!sel) return;
@@ -629,59 +654,65 @@ createBtn.addEventListener("click",()=>{
     aiStage.style.display="none";
 
     if(!DEV){
-      saveWorkoutToday(mode, html);
+      saveWorkoutToday(mode,html);
       const locks=loadLocks();
       locks[mode]=true;
       saveLocks(locks);
     }
 
-    enterPostWorkout(mode, false);
+    enterWorkoutView(mode);
   },900);
 });
 
-/* Completion button ------------------------------------------- */
 completeBtn.addEventListener("click",()=>{
-  const todayData = loadWorkoutToday();
-  const mode = todayData?.mode || "workout";
-  const title = modeTitle(mode);
-
+  const todayData=loadWorkoutToday();
+  const mode=todayData?.mode || "workout";
   launchConfetti();
   Sound.chime();
-
-  completeBtn.classList.add("hidden");
-  completedMsg.textContent = `${title} completed — come back tomorrow`;
-  completedMsg.classList.remove("hidden");
-
   saveCompletedToday(mode);
+  enterCompletedView(mode);
 });
 
-/* Init -------------------------------------------------------- */
-(function init(){
-  const todayData = loadWorkoutToday();
-  const completedData = loadCompletedToday();
+/* ========== INIT ========== */
+function init(){
+  const todayData=loadWorkoutToday();
+  const completedData=loadCompletedToday();
 
   if(todayData && !DEV){
-    card.innerHTML = todayData.html;
-    const isCompleted = !!completedData;
-    enterPostWorkout(todayData.mode, isCompleted);
-  } else {
+    if(completedData){
+      enterCompletedView(todayData.mode);
+    }else{
+      card.innerHTML=todayData.html;
+      enterWorkoutView(todayData.mode);
+    }
+  }else{
     if(!anyUnlocked() && !DEV){
-      subtitleEl.textContent = "All workouts used this week";
-      radioRow.style.display = "none";
-      createBtn.style.display = "none";
-      output.style.display = "none";
-    } else {
-      enterPreWorkout();
+      subtitleEl.textContent="All workouts used this week";
+      radioRow.style.display="none";
+      output.style.display="none";
+      createBtn.style.display="none";
+      completeBtn.classList.add("hidden");
+    }else{
+      enterPreState();
     }
   }
-})();
+}
 
-/* Radio changes ----------------------------------------------- */
 document.querySelectorAll("input[name='mode']").forEach(inp=>{
-  inp.addEventListener("change", refreshRadios);
+  inp.addEventListener("change",()=>{
+    refreshRadios();
+    // only enable generate if time window is open
+    const target=getNextWorkoutTime(false);
+    if(!target){ // open
+      const sel=document.querySelector("input[name='mode']:checked");
+      createBtn.disabled=!sel;
+    }
+  });
 });
 
-/* Weather ----------------------------------------------------- */
+init();
+
+/* ========== WEATHER (simple) ========== */
 if(navigator.geolocation){
   navigator.geolocation.getCurrentPosition(async pos=>{
     try{
@@ -690,9 +721,9 @@ if(navigator.geolocation){
       const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`);
       const j=await r.json();
       const temp=Math.round(j.current_weather.temperature);
-      qs("#weather").textContent = `${temp}°C`;
+      qs("#weather").textContent=`${temp}°C`;
     }catch{
-      qs("#weather").textContent = "Weather unavailable";
+      qs("#weather").textContent="Weather unavailable";
     }
   },()=>qs("#weather").textContent="Enable location for weather");
 }
