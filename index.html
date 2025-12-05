@@ -16,49 +16,46 @@
   }
 
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro", Segoe UI, Roboto, sans-serif;
-    background: var(--bg);
-    color: var(--ink);
-    margin: 0;
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro",Segoe UI,Roboto,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    margin:0;
   }
 
   .container {
-    padding: 24px;
-    max-width: 500px;
-    margin: auto;
+    padding:24px;
+    max-width:500px;
+    margin:auto;
   }
 
   .weather {
-    font-size: 15px;
-    color: var(--sub);
-    margin-bottom: 16px;
+    font-size:15px;
+    color:var(--sub);
+    margin-bottom:16px;
   }
 
   h1 {
-    font-size: 28px;
-    font-weight: 700;
-    margin: 0;
-    margin-bottom: 20px;
+    font-size:28px;
+    font-weight:700;
+    margin:0 0 20px;
   }
 
-  /* -------------------------------------------------------
-     AI GLOW STAGE
-  ------------------------------------------------------- */
+  /* AI glow stage */
   .ai-stage {
-    position: relative;
-    height: 160px;
-    margin-top: 8px;
-    margin-bottom: 16px;
-    display: none;
-    border-radius: 100%;
-    overflow: visible;
+    position:relative;
+    height:160px;
+    margin-top:8px;
+    margin-bottom:16px;
+    display:none;
+    border-radius:100%;
+    overflow:visible;
   }
 
   .ai-stage::before {
     content:"";
     position:absolute;
     inset:-20% -15% -20% -15%;
-    filter: blur(84px) saturate(160%) contrast(115%);
+    filter:blur(84px) saturate(160%) contrast(115%);
     opacity:0;
     transition:opacity .25s ease;
     background:
@@ -66,18 +63,16 @@
       radial-gradient(22rem 22rem at 72% 34%, #7DFF5C77 0, #0000 54%),
       radial-gradient(24rem 20rem at 40% 72%, #FFA43A77 0, #0000 54%),
       radial-gradient(20rem 20rem at 70% 74%, #9B8FFF99 0, #0000 80%);
-    background-blend-mode: screen;
-    animation: meshBreath 2s ease-in-out infinite,
-               meshDrift 3s ease-in-out infinite;
+    background-blend-mode:screen;
+    animation:meshBreath 2s ease-in-out infinite,
+             meshDrift 3s ease-in-out infinite;
   }
 
-  .ai-stage.show::before {
-    opacity: .9;
-  }
+  .ai-stage.show::before { opacity:.9; }
 
   @keyframes meshBreath {
     0%,100% { transform:scale(1); opacity:.7 }
-    50%     { transform:scale(1.03); opacity:.3 }
+    50% { transform:scale(1.03); opacity:.3 }
   }
 
   @keyframes meshDrift {
@@ -86,88 +81,75 @@
     100% { transform:translate3d(0,0,0); }
   }
 
-  /* -------------------------------------------------------
-     WORKOUT CARD
-  ------------------------------------------------------- */
+  /* Workout card */
   #output {
-    margin-top: 12px;
-    display: none;
+    margin-top:12px;
+    display:none;
   }
 
   .workout-card {
-    background: var(--card);
-    border-radius: 16px;
-    padding: 20px;
+    background:var(--card);
+    border-radius:16px;
+    padding:20px;
   }
 
   .section-title {
-    font-weight: 700;
-    font-size: 17px;
-    margin-bottom: 4px;
+    font-weight:700;
+    font-size:17px;
+    margin-bottom:4px;
   }
 
   .type {
-    font-size: 16px;
-    color: var(--sub);
-    margin-bottom: 12px;
+    font-size:16px;
+    color:var(--sub);
+    margin-bottom:12px;
   }
 
   .pill {
-    background: var(--pill);
-    color: var(--brand);
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
+    background:var(--pill);
+    color:var(--brand);
+    padding:3px 10px;
+    border-radius:12px;
+    font-size:12px;
+    font-weight:600;
   }
 
   hr {
-    border: none;
-    border-bottom: 1px solid #e2e8f0;
-    margin: 12px 0;
+    border:none;
+    border-bottom:1px solid #e2e8f0;
+    margin:12px 0;
   }
 
-  /* -------------------------------------------------------
-     CREATE BUTTON
-  ------------------------------------------------------- */
+  /* Button */
   .create-btn {
-    position: fixed;
-    bottom: 28px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: calc(100% - 48px);
-    max-width: 480px;
-    height: 56px;
-    background: var(--brand);
-    color: #fff;
-    border: none;
-    border-radius: 28px;
-    font-size: 18px;
-    font-weight: 600;
-    cursor: pointer;
+    position:fixed;
+    bottom:28px;
+    left:50%;
+    transform:translateX(-50%);
+    width:calc(100% - 48px);
+    max-width:480px;
+    height:56px;
+    background:var(--brand);
+    color:#fff;
+    border:none;
+    border-radius:28px;
+    font-size:18px;
+    font-weight:600;
+    cursor:pointer;
   }
-  .create-btn:disabled { opacity:0.7; }
+  .create-btn:disabled { opacity:.7; }
 </style>
 </head>
 
 <body>
 <div class="container">
   <div class="weather" id="weather">Loading weather...</div>
-
   <h1>Hi Jy, welcome back</h1>
 
   <div id="aiStage" class="ai-stage"></div>
 
   <div id="output">
-    <div class="workout-card">
-      <div id="upperLabel" class="section-title"></div>
-      <div id="upperType" class="type"></div>
-
-      <hr>
-
-      <div id="lowerLabel" class="section-title"></div>
-      <div id="lowerType" class="type"></div>
-    </div>
+    <div class="workout-card" id="card"></div>
   </div>
 </div>
 
@@ -175,10 +157,10 @@
 
 <script>
 /* ----------------------------------------------------
-   DEV MODE
+   DEV MODE (?dev=true)
 ----------------------------------------------------- */
-const urlParams = new URLSearchParams(window.location.search);
-const DEV = urlParams.get("dev") === "true";
+const params = new URLSearchParams(window.location.search);
+const DEV = params.get("dev") === "true";
 
 /* ----------------------------------------------------
    SOUND
@@ -187,192 +169,234 @@ const Sound = (() => {
   let ctx = null;
   function ensure() {
     if (!ctx) {
-      const A = window.AudioContext || window.webkitAudioContext;
-      if (!A) return;
-      ctx = new A();
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      ctx = new AC();
     }
     if (ctx.state === "suspended") ctx.resume();
     return ctx;
   }
   document.addEventListener("pointerdown", ensure, { once:true });
 
-  function beep(f=880,d=.15,t="sine",v=.25,w=0){
-    if(!ensure())return;
-    const T = ctx.currentTime + w;
-    const o = ctx.createOscillator(), g = ctx.createGain();
-    o.type=t;
-    o.frequency.setValueAtTime(f,T);
-    g.gain.setValueAtTime(0.0001,T);
-    g.gain.exponentialRampToValueAtTime(v,T+.02);
-    g.gain.exponentialRampToValueAtTime(0.0001,T+d);
-    o.connect(g); g.connect(ctx.destination);
-    o.start(T); o.stop(T+d+.02);
+  function beep(freq=880,dur=.15,type="sine",vol=.25,when=0){
+    if (!ensure()) return;
+    const t = ctx.currentTime + when;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq,t);
+    gain.gain.setValueAtTime(0.0001,t);
+    gain.gain.exponentialRampToValueAtTime(vol,t+.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(t); osc.stop(t+dur+.02);
   }
   return { beep };
 })();
 
 /* ----------------------------------------------------
-   WORKOUT GENERATOR
+   HELPERS
 ----------------------------------------------------- */
-const metalTypes=["Metacon","EMOM","Tabata","AMRAP","Ladder"];
-const upperLabel=document.getElementById("upperLabel");
-const lowerLabel=document.getElementById("lowerLabel");
-const upperType=document.getElementById("upperType");
-const lowerType=document.getElementById("lowerType");
+const metalTypes = ["Metacon","EMOM","Tabata","AMRAP","Ladder"];
+const createBtn = document.getElementById("create");
+const aiStage = document.getElementById("aiStage");
+const output = document.getElementById("output");
+const card = document.getElementById("card");
 
-function pick(a){return a[Math.floor(Math.random()*a.length)];}
-function chance(p){return Math.random()<p;}
-
-function saveWorkout(data){
-  if(!DEV) localStorage.setItem("workoutData",JSON.stringify(data));
-}
-
-function loadWorkout(){
-  if(DEV) return null;
-  const s=localStorage.getItem("workoutData");
-  return s?JSON.parse(s):null;
-}
-
-function generateWorkout(){
-  const upper=pick(metalTypes);
-  const lower=pick(metalTypes.filter(t=>t!==upper));
-  const uw=chance(0.2);
-  const lw=chance(0.2);
-
-  const upperAbs=chance(0.5);
-  const lowerAbs=chance(0.5);
-
-  const upperText=upperAbs?"💪 Upper Body + Abs":"💪 Upper Body";
-  const lowerText=lowerAbs?"🦵 Lower Body + Abs":"🦵 Lower Body";
-
-  const upperHTML=upper+(uw?` <span class="pill">Weighted</span>`:"");
-  const lowerHTML=lower+(lw?` <span class="pill">Weighted</span>`:"");
-
-  upperLabel.innerHTML=upperText;
-  lowerLabel.innerHTML=lowerText;
-  upperType.innerHTML=upperHTML;
-  lowerType.innerHTML=lowerHTML;
-
-  saveWorkout({
-    date:todayString(),
-    upperText,
-    lowerText,
-    upperHTML,
-    lowerHTML
-  });
-}
-
-/* ----------------------------------------------------
-   TIME + DAILY LOCK
------------------------------------------------------ */
-const createBtn=document.getElementById("create");
-const aiStage=document.getElementById("aiStage");
-const output=document.getElementById("output");
+function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+function chance(p){ return Math.random() < p; }
 
 function todayString(){
-  const d=new Date();
+  const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 }
 
+/* ----------------------------------------------------
+   STORAGE HELPERS (live only, not in DEV)
+----------------------------------------------------- */
+function saveWorkout(data){
+  if (DEV) return;
+  localStorage.setItem("workoutData", JSON.stringify(data));
+  localStorage.setItem("generatedDate", todayString());
+}
+
+function loadWorkout(){
+  if (DEV) return null;
+  try {
+    const s = localStorage.getItem("workoutData");
+    if (!s) return null;
+    const data = JSON.parse(s);
+    if (!data || !data.mode) return null;
+    if (data.date !== todayString()) return null;
+    return data;
+  } catch(e){
+    return null;
+  }
+}
+
 function hasGeneratedToday(){
-  if(DEV) return false;
-  return localStorage.getItem("generatedDate")===todayString();
+  if (DEV) return false;
+  return localStorage.getItem("generatedDate") === todayString();
 }
 
-function lockGeneration(){
-  if(!DEV) localStorage.setItem("generatedDate",todayString());
+/* ----------------------------------------------------
+   RENDER WORKOUT CARD
+----------------------------------------------------- */
+function renderWorkout(data){
+  let html = "";
+
+  if (data.mode === "full") {
+    html += `<div class="section-title">${data.title}</div>`;
+    data.lines.forEach(line => {
+      html += `<div class="type">${line.label}${line.weighted ? ' <span class="pill">Weighted</span>' : ""}</div>`;
+    });
+  } else if (data.mode === "split") {
+    html += `<div class="section-title">${data.upperTitle}</div>`;
+    html += `<div class="type">${data.upperType.label}${data.upperType.weighted ? ' <span class="pill">Weighted</span>' : ""}</div>`;
+    html += `<hr>`;
+    html += `<div class="section-title">${data.lowerTitle}</div>`;
+    html += `<div class="type">${data.lowerType.label}${data.lowerType.weighted ? ' <span class="pill">Weighted</span>' : ""}</div>`;
+  }
+
+  card.innerHTML = html;
+  output.style.display = "block";
 }
 
+/* ----------------------------------------------------
+   GENERATE WORKOUT (full or split 50/50)
+----------------------------------------------------- */
+function generateWorkout(){
+  const isFull = Math.random() < 0.5;
+  let data;
+
+  if (isFull) {
+    // FULL BODY MODE
+    const m1 = pick(metalTypes);
+    let m2 = pick(metalTypes);
+    // small nudge to differ
+    if (m2 === m1) m2 = pick(metalTypes);
+
+    const title = chance(0.5) ? "🔥 Full Body + Abs" : "🔥 Full Body";
+
+    data = {
+      date: todayString(),
+      mode: "full",
+      title,
+      lines: [
+        { label: m1, weighted: chance(0.2) },
+        { label: m2, weighted: chance(0.2) }
+      ]
+    };
+
+  } else {
+    // SPLIT UPPER / LOWER MODE
+    const upper = pick(metalTypes);
+    const lower = pick(metalTypes.filter(t => t !== upper));
+
+    const upperTitle = chance(0.5) ? "💪 Upper Body + Abs" : "💪 Upper Body";
+    const lowerTitle = chance(0.5) ? "🦵 Lower Body + Abs" : "🦵 Lower Body";
+
+    data = {
+      date: todayString(),
+      mode: "split",
+      upperTitle,
+      lowerTitle,
+      upperType: { label: upper, weighted: chance(0.2) },
+      lowerType: { label: lower, weighted: chance(0.2) }
+    };
+  }
+
+  renderWorkout(data);
+  saveWorkout(data);
+  return data;
+}
+
+/* ----------------------------------------------------
+   BUTTON / FLOW LOGIC
+----------------------------------------------------- */
 function canGenerateNow(){
-  if(DEV) return true;
-  const now=new Date();
-  const limit=new Date();
+  if (DEV) return true;
+  const now = new Date();
+  const limit = new Date();
   limit.setHours(17,30,0,0);
-  return now>=limit;
+  return now >= limit;
 }
 
-function restoreWorkout(){
-  if(DEV) return false;
-  const data=loadWorkout();
-  if(!data || data.date!==todayString()) return false;
-
-  upperLabel.innerHTML=data.upperText;
-  lowerLabel.innerHTML=data.lowerText;
-  upperType.innerHTML=data.upperHTML;
-  lowerType.innerHTML=data.lowerHTML;
-
-  output.style.display="block";
-  createBtn.style.display="none";
+function restoreWorkoutIfAny(){
+  if (DEV) return false;
+  const data = loadWorkout();
+  if (!data) return false;
+  renderWorkout(data);
+  createBtn.style.display = "none";
   return true;
 }
 
-function updateButton(){
-  if(restoreWorkout()) return;
+function updateButtonState(){
+  if (restoreWorkoutIfAny()) return;
 
-  if(hasGeneratedToday()){
-    createBtn.style.display="none";
+  if (hasGeneratedToday()){
+    // generated today but couldn't restore (corrupt) – just hide button
+    createBtn.style.display = "none";
     return;
   }
 
-  if(!canGenerateNow()){
-    createBtn.disabled=true;
-    createBtn.textContent="Available at 5:30 PM";
-    createBtn.style.display="block";
+  if (!canGenerateNow()){
+    createBtn.disabled = true;
+    createBtn.textContent = "Available at 5:30 PM";
+    createBtn.style.display = "block";
   } else {
-    createBtn.disabled=false;
-    createBtn.textContent=DEV?"Create Workout (DEV)":"Create Workout";
-    createBtn.style.display="block";
+    createBtn.disabled = false;
+    createBtn.textContent = DEV ? "Create Workout (DEV)" : "Create Workout";
+    createBtn.style.display = "block";
   }
 }
 
 function startGenerate(){
-  if(!canGenerateNow() || hasGeneratedToday()) return;
+  if (!canGenerateNow() || hasGeneratedToday()) return;
 
-  output.style.display="none";
-  aiStage.style.display="block";
+  output.style.display = "none";
+  aiStage.style.display = "block";
   aiStage.classList.add("show");
 
-  createBtn.disabled=true;
-  createBtn.textContent=DEV?"Generating (DEV)...":"Generating...";
+  createBtn.disabled = true;
+  createBtn.textContent = DEV ? "Generating (DEV)..." : "Generating...";
 
-  setTimeout(()=>{
+  setTimeout(() => {
     generateWorkout();
 
     aiStage.classList.remove("show");
-    aiStage.style.display="none";
-    output.style.display="block";
+    aiStage.style.display = "none";
+    output.style.display = "block";
 
-    lockGeneration();
-
-    if(!DEV){
-      createBtn.style.display="none";
+    if (!DEV) {
+      createBtn.style.display = "none";
     } else {
-      createBtn.disabled=false;
-      createBtn.textContent="Create Workout (DEV)";
+      createBtn.disabled = false;
+      createBtn.textContent = "Create Workout (DEV)";
     }
 
     Sound.beep();
-  },1000);
+  }, 1000);
 }
 
-createBtn.addEventListener("click",startGenerate);
+createBtn.addEventListener("click", startGenerate);
 
 /* ----------------------------------------------------
    WEATHER
 ----------------------------------------------------- */
-async function getWeatherEmoji(c){
-  c=c.toLowerCase();
-  if(c.includes("clear"))return"☀️";
-  if(c.includes("cloud"))return"⛅";
-  if(c.includes("rain"))return"🌧️";
-  if(c.includes("drizzle"))return"🌦️";
-  if(c.includes("thunder"))return"🌩️";
-  if(c.includes("snow"))return"❄️";
-  if(c.includes("fog")||c.includes("mist"))return"🌫️";
-  return"🌡️";
+async function getWeatherEmoji(cond){
+  cond = cond.toLowerCase();
+  if (cond.includes("clear")) return "☀️";
+  if (cond.includes("cloud")) return "⛅";
+  if (cond.includes("rain")) return "🌧️";
+  if (cond.includes("drizzle")) return "🌦️";
+  if (cond.includes("thunder")) return "🌩️";
+  if (cond.includes("snow")) return "❄️";
+  if (cond.includes("fog") || cond.includes("mist")) return "🌫️";
+  return "🌡️";
 }
 
-const mapWeather={
+const weatherMap = {
   0:"Clear sky",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",
   45:"Fog",48:"Fog",
   51:"Drizzle",53:"Drizzle",55:"Drizzle",
@@ -382,41 +406,39 @@ const mapWeather={
   95:"Thunderstorm",96:"Thunderstorm",99:"Thunderstorm"
 };
 
-function weatherCodeToText(code){return mapWeather[code]||"Unknown";}
+function weatherCodeToText(code){return weatherMap[code] || "Unknown";}
 
 async function updateWeatherUI(){
-  const el=document.getElementById("weather");
-  el.textContent="Enable location for weather";
+  const el = document.getElementById("weather");
+  el.textContent = "Enable location for weather";
 
-  navigator.geolocation.getCurrentPosition(async pos=>{
-    const lat=pos.coords.latitude;
-    const lon=pos.coords.longitude;
-
+  navigator.geolocation.getCurrentPosition(async pos => {
+    const lat = pos.coords.latitude;
+    const lon = pos.coords.longitude;
     try{
-      const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`;
-      const res=await fetch(url);
-      const data=await res.json();
-      const temp=Math.round(data.current_weather.temperature);
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`;
+      const res = await fetch(url);
+      const data = await res.json();
+      const temp = Math.round(data.current_weather.temperature);
 
-      const rev=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
-      const r=await rev.json();
-      const city=r.address.city||r.address.town||r.address.village||r.address.county||"your area";
+      const rev = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+      const r = await rev.json();
+      const city = r.address.city || r.address.town || r.address.village || r.address.county || "your area";
 
-      const cond=weatherCodeToText(data.current_weather.weathercode);
-      const emoji=await getWeatherEmoji(cond);
+      const cond = weatherCodeToText(data.current_weather.weathercode);
+      const emoji = await getWeatherEmoji(cond);
 
-      el.innerHTML=`${emoji} ${temp}°C ${city}`;
-
-    }catch(e){
-      el.textContent="Weather unavailable";
+      el.innerHTML = `${emoji} ${temp}°C ${city}`;
+    } catch(e){
+      el.textContent = "Weather unavailable";
     }
-  },()=>{
-    el.textContent="Enable location for weather";
+  }, () => {
+    el.textContent = "Enable location for weather";
   });
 }
 
 updateWeatherUI();
-updateButton();
+updateButtonState();
 </script>
 </body>
 </html>
