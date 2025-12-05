@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Metal Workout Builder</title>
+<title>Metal Workout Builder 2</title>
 
 <style>
   :root {
@@ -14,6 +14,8 @@
     --card:#f8f9fb;
     --pill:#e8eeff;
   }
+
+  * { box-sizing:border-box; }
 
   body {
     font-family:-apple-system,BlinkMacSystemFont,"SF Pro",Segoe UI,Roboto,sans-serif;
@@ -37,10 +39,54 @@
   h1 {
     font-size:28px;
     font-weight:700;
-    margin:0 0 20px;
+    margin:0 0 8px;
   }
 
-  /* AI glow stage */
+  .subtitle {
+    font-size:16px;
+    color:var(--sub);
+    margin:0 0 16px;
+  }
+
+  /* Mode selector -------------------------------------------------- */
+  .modes {
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:16px;
+  }
+
+  .mode-option {
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:6px 10px;
+    border-radius:999px;
+    border:1px solid #e2e8f0;
+    font-size:14px;
+    cursor:pointer;
+    user-select:none;
+  }
+
+  .mode-option input {
+    display:none;
+  }
+
+  .mode-option span.emoji {
+    font-size:16px;
+  }
+
+  .mode-option span.label {
+    font-size:14px;
+  }
+
+  .mode-option.active {
+    border-color:var(--brand);
+    background:#e5edff;
+    color:var(--brand);
+  }
+
+  /* AI glow stage -------------------------------------------------- */
   .ai-stage {
     position:relative;
     height:160px;
@@ -64,15 +110,14 @@
       radial-gradient(24rem 20rem at 40% 72%, #FFA43A77 0, #0000 54%),
       radial-gradient(20rem 20rem at 70% 74%, #9B8FFF99 0, #0000 80%);
     background-blend-mode:screen;
-    animation:meshBreath 2s ease-in-out infinite,
-             meshDrift 3s ease-in-out infinite;
+    animation:meshBreath 2s ease-in-out infinite, meshDrift 3s ease-in-out infinite;
   }
 
   .ai-stage.show::before { opacity:.9; }
 
   @keyframes meshBreath {
-    0%,100% { transform:scale(1); opacity:.7 }
-    50% { transform:scale(1.03); opacity:.3 }
+    0%,100% { transform:scale(1); opacity:.7; }
+    50% { transform:scale(1.03); opacity:.3; }
   }
 
   @keyframes meshDrift {
@@ -81,7 +126,7 @@
     100% { transform:translate3d(0,0,0); }
   }
 
-  /* Workout card */
+  /* Workout card --------------------------------------------------- */
   #output {
     margin-top:12px;
     display:none;
@@ -93,16 +138,25 @@
     padding:20px;
   }
 
-  .section-title {
-    font-weight:700;
+  .workout-title {
     font-size:17px;
-    margin-bottom:4px;
+    font-weight:700;
+    margin-bottom:8px;
   }
 
-  .type {
+  .workout-list {
+    list-style:none;
+    padding-left:0;
+    margin:0;
+  }
+
+  .workout-list li {
     font-size:16px;
-    color:var(--sub);
-    margin-bottom:12px;
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:6px;
   }
 
   .pill {
@@ -114,13 +168,7 @@
     font-weight:600;
   }
 
-  hr {
-    border:none;
-    border-bottom:1px solid #e2e8f0;
-    margin:12px 0;
-  }
-
-  /* Button */
+  /* Button ---------------------------------------------------------- */
   .create-btn {
     position:fixed;
     bottom:28px;
@@ -137,19 +185,46 @@
     font-weight:600;
     cursor:pointer;
   }
-  .create-btn:disabled { opacity:.7; }
+  .create-btn:disabled { opacity:0.7; }
 </style>
 </head>
-
 <body>
 <div class="container">
   <div class="weather" id="weather">Loading weather...</div>
-  <h1>Hi Jy, welcome back</h1>
+
+  <h1>Welcome back Jy</h1>
+  <p class="subtitle">What would you like to train?</p>
+
+  <div class="modes" id="modes">
+    <label class="mode-option" data-mode="pull">
+      <input type="radio" name="mode" value="pull">
+      <span class="emoji">✊</span>
+      <span class="label">Pull</span>
+    </label>
+    <label class="mode-option" data-mode="push">
+      <input type="radio" name="mode" value="push">
+      <span class="emoji">✋</span>
+      <span class="label">Push</span>
+    </label>
+    <label class="mode-option" data-mode="legs">
+      <input type="radio" name="mode" value="legs">
+      <span class="emoji">🦵</span>
+      <span class="label">Legs</span>
+    </label>
+    <label class="mode-option" data-mode="fullbody">
+      <input type="radio" name="mode" value="fullbody">
+      <span class="emoji">🔥</span>
+      <span class="label">Full Body</span>
+    </label>
+  </div>
 
   <div id="aiStage" class="ai-stage"></div>
 
   <div id="output">
-    <div class="workout-card" id="card"></div>
+    <div class="workout-card">
+      <div id="workoutTitle" class="workout-title"></div>
+      <ul id="workoutList" class="workout-list"></ul>
+    </div>
   </div>
 </div>
 
@@ -195,15 +270,21 @@ const Sound = (() => {
 })();
 
 /* ----------------------------------------------------
+   DOM
+----------------------------------------------------- */
+const createBtn = document.getElementById("create");
+const aiStage  = document.getElementById("aiStage");
+const output   = document.getElementById("output");
+const titleEl  = document.getElementById("workoutTitle");
+const listEl   = document.getElementById("workoutList");
+const modesEl  = document.getElementById("modes");
+
+/* ----------------------------------------------------
    HELPERS
 ----------------------------------------------------- */
 const metalTypes = ["Metacon","EMOM","Tabata","AMRAP","Ladder"];
-const createBtn = document.getElementById("create");
-const aiStage = document.getElementById("aiStage");
-const output = document.getElementById("output");
-const card = document.getElementById("card");
 
-function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 function chance(p){ return Math.random() < p; }
 
 function todayString(){
@@ -211,23 +292,53 @@ function todayString(){
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 }
 
+/* state: selected mode */
+let selectedMode = "fullbody";
+
 /* ----------------------------------------------------
-   STORAGE HELPERS (live only, not in DEV)
+   MODE RADIO UI
 ----------------------------------------------------- */
+function setSelectedMode(mode){
+  selectedMode = mode;
+  document.querySelectorAll(".mode-option").forEach(lbl => {
+    const m = lbl.getAttribute("data-mode");
+    const input = lbl.querySelector("input");
+    if (m === mode){
+      lbl.classList.add("active");
+      input.checked = true;
+    } else {
+      lbl.classList.remove("active");
+      input.checked = false;
+    }
+  });
+}
+
+modesEl.addEventListener("click", e => {
+  const label = e.target.closest(".mode-option");
+  if (!label) return;
+  const mode = label.getAttribute("data-mode");
+  setSelectedMode(mode);
+});
+
+setSelectedMode("fullbody");
+
+/* ----------------------------------------------------
+   STORAGE (live only, not in DEV)
+----------------------------------------------------- */
+const STORAGE_KEY = "metalWorkoutV3";
+
 function saveWorkout(data){
   if (DEV) return;
-  localStorage.setItem("workoutData", JSON.stringify(data));
-  localStorage.setItem("generatedDate", todayString());
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
 function loadWorkout(){
   if (DEV) return null;
-  try {
-    const s = localStorage.getItem("workoutData");
-    if (!s) return null;
-    const data = JSON.parse(s);
-    if (!data || !data.mode) return null;
-    if (data.date !== todayString()) return null;
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return null;
+  try{
+    const data = JSON.parse(raw);
+    if (!data || data.date !== todayString()) return null;
     return data;
   } catch(e){
     return null;
@@ -235,84 +346,83 @@ function loadWorkout(){
 }
 
 function hasGeneratedToday(){
-  if (DEV) return false;
-  return localStorage.getItem("generatedDate") === todayString();
+  return !!loadWorkout();
 }
 
 /* ----------------------------------------------------
-   RENDER WORKOUT CARD
+   RENDER
 ----------------------------------------------------- */
 function renderWorkout(data){
-  let html = "";
-
-  if (data.mode === "full") {
-    html += `<div class="section-title">${data.title}</div>`;
-    data.lines.forEach(line => {
-      html += `<div class="type">${line.label}${line.weighted ? ' <span class="pill">Weighted</span>' : ""}</div>`;
-    });
-  } else if (data.mode === "split") {
-    html += `<div class="section-title">${data.upperTitle}</div>`;
-    html += `<div class="type">${data.upperType.label}${data.upperType.weighted ? ' <span class="pill">Weighted</span>' : ""}</div>`;
-    html += `<hr>`;
-    html += `<div class="section-title">${data.lowerTitle}</div>`;
-    html += `<div class="type">${data.lowerType.label}${data.lowerType.weighted ? ' <span class="pill">Weighted</span>' : ""}</div>`;
-  }
-
-  card.innerHTML = html;
+  titleEl.textContent = data.title;
+  listEl.innerHTML = "";
+  data.items.forEach(item => {
+    const li = document.createElement("li");
+    li.textContent = item.text;
+    if (item.weighted){
+      const pill = document.createElement("span");
+      pill.className = "pill";
+      pill.textContent = "Weighted";
+      li.appendChild(pill);
+    }
+    listEl.appendChild(li);
+  });
   output.style.display = "block";
 }
 
 /* ----------------------------------------------------
-   GENERATE WORKOUT (full or split 50/50)
+   WORKOUT GENERATION LOGIC
 ----------------------------------------------------- */
-function generateWorkout(){
-  const isFull = Math.random() < 0.5;
-  let data;
+function makeMetalItem(){
+  const base = pick(metalTypes);
+  const withAbs = chance(0.5);
+  const text = base + (withAbs ? " + Abs" : "");
+  const weighted = chance(0.2);
+  return { text, weighted, type:"metal" };
+}
 
-  if (isFull) {
-    // FULL BODY MODE
-    const m1 = pick(metalTypes);
-    let m2 = pick(metalTypes);
-    // small nudge to differ
-    if (m2 === m1) m2 = pick(metalTypes);
+function generateForMode(mode){
+  const date = todayString();
+  let title = "";
+  let items = [];
 
-    const title = chance(0.5) ? "🔥 Full Body + Abs" : "🔥 Full Body";
-
-    data = {
-      date: todayString(),
-      mode: "full",
-      title,
-      lines: [
-        { label: m1, weighted: chance(0.2) },
-        { label: m2, weighted: chance(0.2) }
-      ]
-    };
-
-  } else {
-    // SPLIT UPPER / LOWER MODE
-    const upper = pick(metalTypes);
-    const lower = pick(metalTypes.filter(t => t !== upper));
-
-    const upperTitle = chance(0.5) ? "💪 Upper Body + Abs" : "💪 Upper Body";
-    const lowerTitle = chance(0.5) ? "🦵 Lower Body + Abs" : "🦵 Lower Body";
-
-    data = {
-      date: todayString(),
-      mode: "split",
-      upperTitle,
-      lowerTitle,
-      upperType: { label: upper, weighted: chance(0.2) },
-      lowerType: { label: lower, weighted: chance(0.2) }
-    };
+  if (mode === "push"){
+    title = "✋ Push Day";
+    // Always heavy at start
+    items.push({ text:"Push Strength", weighted:true, type:"strength" });
+    items.push(makeMetalItem());
+    items.push(makeMetalItem());
+  }
+  else if (mode === "pull"){
+    title = "✊ Pull Day";
+    items.push({ text:"Pull Strength", weighted:true, type:"strength" });
+    items.push(makeMetalItem());
+    items.push(makeMetalItem());
+  }
+  else if (mode === "legs"){
+    title = "🦵 Legs Day";
+    const count = chance(0.5) ? 2 : 3;
+    for (let i=0;i<count;i++) items.push(makeMetalItem());
+  }
+  else { // fullbody
+    title = "🔥 Full Body Day";
+    const heavyOn = chance(0.5);
+    if (heavyOn){
+      // both heavies + 1 metal (always 3 items)
+      items.push({ text:"Push Strength", weighted:true, type:"strength" });
+      items.push({ text:"Pull Strength", weighted:true, type:"strength" });
+      items.push(makeMetalItem());
+    } else {
+      // no heavies: 3 metals
+      for (let i=0;i<3;i++) items.push(makeMetalItem());
+    }
   }
 
-  renderWorkout(data);
-  saveWorkout(data);
+  const data = { date, mode, title, items };
   return data;
 }
 
 /* ----------------------------------------------------
-   BUTTON / FLOW LOGIC
+   TIME & LOCK
 ----------------------------------------------------- */
 function canGenerateNow(){
   if (DEV) return true;
@@ -323,19 +433,25 @@ function canGenerateNow(){
 }
 
 function restoreWorkoutIfAny(){
-  if (DEV) return false;
   const data = loadWorkout();
   if (!data) return false;
+  setSelectedMode(data.mode || "fullbody");
   renderWorkout(data);
   createBtn.style.display = "none";
   return true;
 }
 
 function updateButtonState(){
+  if (DEV){
+    createBtn.style.display = "block";
+    createBtn.disabled = false;
+    createBtn.textContent = "Create Workout (DEV)";
+    return;
+  }
+
   if (restoreWorkoutIfAny()) return;
 
   if (hasGeneratedToday()){
-    // generated today but couldn't restore (corrupt) – just hide button
     createBtn.style.display = "none";
     return;
   }
@@ -346,13 +462,16 @@ function updateButtonState(){
     createBtn.style.display = "block";
   } else {
     createBtn.disabled = false;
-    createBtn.textContent = DEV ? "Create Workout (DEV)" : "Create Workout";
+    createBtn.textContent = "Create Workout";
     createBtn.style.display = "block";
   }
 }
 
+/* ----------------------------------------------------
+   FLOW
+----------------------------------------------------- */
 function startGenerate(){
-  if (!canGenerateNow() || hasGeneratedToday()) return;
+  if (!canGenerateNow() || (!DEV && hasGeneratedToday())) return;
 
   output.style.display = "none";
   aiStage.style.display = "block";
@@ -362,13 +481,14 @@ function startGenerate(){
   createBtn.textContent = DEV ? "Generating (DEV)..." : "Generating...";
 
   setTimeout(() => {
-    generateWorkout();
+    const data = generateForMode(selectedMode);
+    renderWorkout(data);
+    saveWorkout(data);
 
     aiStage.classList.remove("show");
     aiStage.style.display = "none";
-    output.style.display = "block";
 
-    if (!DEV) {
+    if (!DEV){
       createBtn.style.display = "none";
     } else {
       createBtn.disabled = false;
@@ -376,7 +496,7 @@ function startGenerate(){
     }
 
     Sound.beep();
-  }, 1000);
+  }, 900);
 }
 
 createBtn.addEventListener("click", startGenerate);
@@ -406,11 +526,16 @@ const weatherMap = {
   95:"Thunderstorm",96:"Thunderstorm",99:"Thunderstorm"
 };
 
-function weatherCodeToText(code){return weatherMap[code] || "Unknown";}
+function weatherCodeToText(code){ return weatherMap[code] || "Unknown"; }
 
 async function updateWeatherUI(){
   const el = document.getElementById("weather");
   el.textContent = "Enable location for weather";
+
+  if (!navigator.geolocation) {
+    el.textContent = "Weather unavailable";
+    return;
+  }
 
   navigator.geolocation.getCurrentPosition(async pos => {
     const lat = pos.coords.latitude;
