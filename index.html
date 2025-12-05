@@ -97,12 +97,12 @@
    DEV MODE TOGGLE
 ---------------------------------------------------------*/
 const urlParams = new URLSearchParams(window.location.search);
-const DEV_MODE = urlParams.get("dev") === "true";  
-// const DEV_MODE = true; // manual switch if needed
+const DEV_MODE = urlParams.get("dev") === "true";
 
-/* Fake date override for DEV MODE */
+// const DEV_MODE = true; // manual override if needed
+
 if (DEV_MODE) {
-  console.log("DEV MODE ENABLED — Time forced to 18:00 and unlimited workouts allowed.");
+  console.log("DEV MODE ENABLED — Time forced to 18:00, unlimited workouts allowed.");
 
   const RealDate = Date;
   Date = class extends RealDate {
@@ -123,40 +123,25 @@ const OPEN_MIN = 30;
 const RESET_HOUR = 23;
 const RESET_MIN = 0;
 
-/* --------------------------------------------------------
-   HELPERS
----------------------------------------------------------*/
 function pick(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
 function chance(p) { return Math.random() < p; }
 function now() { return new Date(); }
 
 /* --------------------------------------------------------
-   WEATHER EMOJI SYSTEM
+   WEATHER FIXED 100% ACCURATE EMOJI SYSTEM
 ---------------------------------------------------------*/
-function weatherCodeToText(code) {
-  if (code === 0) return "Clear";
-  if ([1,2,3].includes(code)) return "Cloudy";
-  if ([45,48].includes(code)) return "Fog";
-  if ([51,53,55].includes(code)) return "Drizzle";
-  if ([61,63,65].includes(code)) return "Rain";
-  if ([66,67].includes(code)) return "Freezing rain";
-  if ([71,73,75].includes(code)) return "Snow";
-  if ([95].includes(code)) return "Thunderstorm";
-  return "Weather";
-}
 
-function weatherEmoji(condition) {
-  switch(condition) {
-    case "Clear": return "☀️";
-    case "Cloudy": return "⛅️";
-    case "Fog": return "🌫️";
-    case "Drizzle": return "🌦️";
-    case "Rain": return "🌧️";
-    case "Freezing rain": return "🧊🌧️";
-    case "Snow": return "❄️";
-    case "Thunderstorm": return "⛈️";
-    default: return "🌡️";
-  }
+function weatherEmojiFromCode(code) {
+  if (code === 0) return "☀️"; // Clear
+  if ([1,2,3].includes(code)) return "⛅️"; // Cloud variations
+  if ([45,48].includes(code)) return "🌫️"; // Fog
+  if ([51,53,55].includes(code)) return "🌦️"; // Drizzle
+  if ([61,63,65].includes(code)) return "🌧️"; // Rain
+  if ([66,67].includes(code)) return "🌨️"; // Freezing rain
+  if ([71,73,75,77].includes(code)) return "❄️"; // Snow forms
+  if ([80,81,82].includes(code)) return "🌧️"; // Rain showers
+  if ([95,96,99].includes(code)) return "⛈️"; // Thunderstorms
+  return "🌡️"; // fallback
 }
 
 async function updateWeatherUI() {
@@ -174,17 +159,21 @@ async function updateWeatherUI() {
       const weatherRes = await fetch(
         `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`
       );
-      const weatherData = await weatherRes.json();
+      const w = await weatherRes.json();
 
       const rev = await fetch(
         `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
       );
       const loc = await rev.json();
 
-      const city = loc.address.city || loc.address.town || loc.address.village || "Your area";
-      const temp = weatherData.current_weather.temperature;
-      const condition = weatherCodeToText(weatherData.current_weather.weathercode);
-      const emoji = weatherEmoji(condition);
+      const city =
+        loc.address.city ||
+        loc.address.town ||
+        loc.address.village ||
+        "Your area";
+
+      const temp = w.current_weather.temperature;
+      const emoji = weatherEmojiFromCode(w.current_weather.weathercode);
 
       el.textContent = `${emoji} ${temp}°C ${city}`;
     } catch (e) {
@@ -212,11 +201,10 @@ function generateMetalTypes(minCount, maxCount) {
 }
 
 /* --------------------------------------------------------
-   WORKOUT GENERATOR
+   WORKOUT GENERATOR WITH FIXED SPLIT LOGIC
 ---------------------------------------------------------*/
 function generateWorkout() {
   const isFullBody = chance(0.5);
-
   let workout = { mode: isFullBody ? "full" : "split", blocks: [] };
 
   if (isFullBody) {
@@ -226,15 +214,30 @@ function generateWorkout() {
       types:generateMetalTypes(2,3)
     });
   } else {
+    // FIXED SPLIT: Never allow (2,2)
+    let upperCount, lowerCount;
+
+    if (chance(0.33)) {
+      upperCount = 1;
+      lowerCount = 1;
+    } else {
+      if (chance(0.5)) {
+        upperCount = 2; lowerCount = 1;
+      } else {
+        upperCount = 1; lowerCount = 2;
+      }
+    }
+
     workout.blocks.push({
       title:"💪 Upper Body",
-      abs:chance(0.5),
-      types:generateMetalTypes(1,2)
+      abs: chance(0.5),
+      types: generateMetalTypes(upperCount, upperCount)
     });
+
     workout.blocks.push({
       title:"🦵 Lower Body",
-      abs:chance(0.5),
-      types:generateMetalTypes(1,2)
+      abs: chance(0.5),
+      types: generateMetalTypes(lowerCount, lowerCount)
     });
   }
 
@@ -249,7 +252,7 @@ function loadWorkout() { return JSON.parse(localStorage.getItem("workout") || "n
 function clearWorkout() { localStorage.removeItem("workout"); }
 
 /* --------------------------------------------------------
-   TIME LOGIC
+   TIME CHECKS
 ---------------------------------------------------------*/
 function isOpenWindow() {
   if (DEV_MODE) return true;
@@ -298,6 +301,7 @@ function updateCountdown() {
   if (t > target) target.setDate(target.getDate() + 1);
 
   const diff = target - t;
+
   let sec = Math.floor(diff / 1000);
   let hrs = Math.floor(sec / 3600); sec %= 3600;
   let mins = Math.floor(sec / 60); sec %= 60;
@@ -346,7 +350,7 @@ function renderWorkout(w) {
 }
 
 /* --------------------------------------------------------
-   BUTTON STATE
+   BUTTON LOGIC
 ---------------------------------------------------------*/
 function updateButtonState() {
   const btn = document.getElementById("createBtn");
@@ -375,7 +379,7 @@ function updateButtonState() {
 }
 
 /* --------------------------------------------------------
-   CREATE BUTTON
+   BUTTON ACTION
 ---------------------------------------------------------*/
 document.getElementById("createBtn").addEventListener("click", () => {
   const w = generateWorkout();
