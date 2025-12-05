@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
+<meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Metal Workout Builder</title>
 
@@ -11,399 +11,372 @@
     --ink:#0f172a;
     --sub:#64748b;
     --bg:#ffffff;
-    --card:#f8f9fb;
+    --card:#f1f5f9;
     --pill:#e8eeff;
   }
 
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro", Segoe UI, Roboto, sans-serif;
-    margin: 0;
-    padding: 0;
-    background: var(--bg);
-    color: var(--ink);
+    font-family:-apple-system, BlinkMacSystemFont, "SF Pro", Segoe UI, Roboto, sans-serif;
+    margin:0; padding:0;
+    background:var(--bg);
+    color:var(--ink);
   }
 
-  .container {
-    padding: 24px;
-    max-width: 480px;
-    margin: auto;
+  .container { padding:24px; max-width:480px; margin:auto; }
+
+  .weather { font-size:15px; color:var(--sub); display:flex; gap:6px; margin-bottom:20px; }
+
+  h1 { font-size:28px; font-weight:700; margin:0 0 22px; }
+
+  .card {
+    background:var(--card);
+    padding:20px;
+    border-radius:16px;
+    margin-bottom:20px;
+    font-size:18px;
   }
 
-  .weather {
-    font-size: 15px;
-    color: var(--sub);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 12px;
+  .card-title { font-weight:600; font-size:18px; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+
+  .type-list div { font-size:16px; margin:4px 0; display:flex; align-items:center; gap:8px; }
+
+  .weighted-label {
+    background:#e0ecff;
+    color:#2453f5;
+    padding:2px 8px;
+    border-radius:8px;
+    font-size:12px;
   }
 
-  h1 {
-    font-size: 28px;
-    font-weight: 700;
-    margin: 0 0 24px;
+  /* Countdown */
+  #countdownBox {
+    width:100%;
+    margin-top:40px;
+    text-align:center;
+    font-size:18px;
+    color:var(--sub);
   }
 
-  .ai-stage {
-    position: relative;
-    height: 180px;
-    margin-top: 12px;
-    margin-bottom: 20px;
-    display: none;
-    overflow: visible;
-    border-radius: 100%;
+  /* Button */
+  .fab {
+    position:fixed;
+    bottom:20px; left:50%; transform:translateX(-50%);
+    width:90%;
+    background:var(--brand);
+    color:#fff;
+    height:56px;
+    border:none;
+    border-radius:28px;
+    font-size:20px;
+    font-weight:600;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
   }
 
-  .ai-stage::before {
-    content:"";
-    position: absolute;
-    inset: -20% -15% -25% -15%;
-    filter: blur(84px) saturate(160%) contrast(115%);
-    opacity: 0;
-    transition: opacity .25s ease;
-    background:
-      radial-gradient(22rem 22rem at 30% 36%, #3A7BFF77 0, #0000 50%),
-      radial-gradient(22rem 22rem at 72% 34%, #7DFF5C77 0, #0000 54%),
-      radial-gradient(24rem 20rem at 40% 72%, #FFA43A77 0, #0000 54%),
-      radial-gradient(20rem 20rem at 70% 74%, #9B8FFF99 0, #0000 80%);
-    background-blend-mode: screen;
-    animation: meshBreath 2s ease-in-out infinite,
-               meshDrift 3s ease-in-out infinite;
+  .fab[disabled] {
+    opacity:0.5;
+    cursor:not-allowed;
   }
-
-  .ai-stage.show::before { opacity: .85; }
-
-  @keyframes meshBreath {
-    0%,100% { transform: scale(1); opacity: .7 }
-    50%     { transform: scale(1.03); opacity: .3 }
-  }
-
-  @keyframes meshDrift {
-    0% { transform: translate3d(0,0,0); }
-    50% { transform: translate3d(2%,-1.5%,0); }
-    100% { transform: translate3d(0,0,0); }
-  }
-
-  .workout-card {
-    background: var(--card);
-    border-radius: 16px;
-    padding: 20px;
-  }
-
-  .section-title {
-    font-weight: 700;
-    font-size: 17px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .type {
-    font-size: 16px;
-    color: var(--sub);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 6px;
-    margin-bottom: 14px;
-  }
-
-  .pill {
-    background: var(--pill);
-    color: var(--brand);
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
-  }
-
-  hr {
-    border: none;
-    border-bottom: 1px solid #e2e8f0;
-    margin: 16px 0;
-  }
-
-  .create-btn {
-    position: fixed;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: calc(100% - 48px);
-    max-width: 480px;
-    height: 56px;
-    background: var(--brand);
-    color: #fff;
-    border: none;
-    border-radius: 28px;
-    font-size: 18px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-  .create-btn:disabled { opacity: 0.7; }
 </style>
 </head>
 <body>
-
 <div class="container">
-  <div class="weather">
-    <span>🌡️</span> Loading weather...
-  </div>
+
+  <div class="weather" id="weather">Enable location for weather</div>
 
   <h1>Hi Jy, welcome back</h1>
 
-  <div id="aiStage" class="ai-stage"></div>
+  <div id="cards"></div>
 
-  <div id="output" style="display:none;">
-    <div class="workout-card">
-      <div class="section-title" id="upperLabel">💪 Upper Body</div>
-      <div class="type" id="upperType"></div>
-
-      <hr>
-
-      <div class="section-title" id="lowerLabel">🦵 Lower Body</div>
-      <div class="type" id="lowerType"></div>
-    </div>
-  </div>
+  <div id="countdownBox"></div>
 
 </div>
 
-<button class="create-btn" id="create">Create Workout</button>
+<button class="fab" id="createBtn">Create Workout</button>
 
 <script>
-/* ----------------------------------------------------
-   SOUND
------------------------------------------------------ */
-const Sound = (() => {
-  let ctx = null;
-  function ensure() {
-    if (!ctx) {
-      const A = window.AudioContext || window.webkitAudioContext;
-      if (!A) return;
-      ctx = new A();
+/* --------------------------------------------------------
+   DEV MODE TOGGLE
+---------------------------------------------------------*/
+
+const urlParams = new URLSearchParams(window.location.search);
+const DEV_MODE = urlParams.get("dev") === "true";   // Enable via ?dev=true
+
+// Manual override (set to true for local testing)
+// const DEV_MODE = true;
+
+
+/* Fake Date override when dev mode is enabled */
+if (DEV_MODE) {
+  console.log("DEV MODE ENABLED — Time forced to 18:00 for testing.");
+
+  const RealDate = Date;
+  Date = class extends RealDate {
+    constructor(...args) {
+      if (args.length === 0) {
+        return new RealDate("2025-01-01T18:00:00"); // Always inside workout window
+      }
+      return new RealDate(...args);
     }
-    if (ctx.state === "suspended") ctx.resume();
-    return ctx;
-  }
-  document.addEventListener("pointerdown", ensure, { once:true });
-
-  function beep(f=880,d=.15,t="sine",v=.25,w=0){
-    if(!ensure())return;
-    const T = ctx.currentTime + w;
-    const o = ctx.createOscillator(), g = ctx.createGain();
-    o.type = t;
-    o.frequency.setValueAtTime(f, T);
-    g.gain.setValueAtTime(0.0001, T);
-    g.gain.exponentialRampToValueAtTime(v, T+.02);
-    g.gain.exponentialRampToValueAtTime(0.0001, T+d);
-    o.connect(g); g.connect(ctx.destination);
-    o.start(T); o.stop(T+d+.02);
-  }
-  return { beep };
-})();
-
-/* ----------------------------------------------------
-   WORKOUT GENERATOR
------------------------------------------------------ */
-const metalTypes = ["Metacon","EMOM","Tabata","AMRAP","Ladder"];
-const upperLabel = document.getElementById("upperLabel");
-const lowerLabel = document.getElementById("lowerLabel");
-const upperType = document.getElementById("upperType");
-const lowerType = document.getElementById("lowerType");
-
-// Save workout
-function saveWorkout(data) {
-  localStorage.setItem("workoutData", JSON.stringify(data));
+  };
 }
 
-// Load workout
-function loadWorkout() {
-  const saved = localStorage.getItem("workoutData");
-  return saved ? JSON.parse(saved) : null;
-}
+/* --------------------------------------------------------
+   TIME WINDOW SETTINGS
+---------------------------------------------------------*/
 
-function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
-function chance(p){ return Math.random() < p; }
+const OPEN_HOUR = 17;
+const OPEN_MIN = 30;
+const RESET_HOUR = 23;
+const RESET_MIN = 0;
 
-function generateWorkout() {
-  const upper = pick(metalTypes);
-  const lower = pick(metalTypes.filter(t => t !== upper));
+/* --------------------------------------------------------
+   METAL TYPES
+---------------------------------------------------------*/
+const metalTypes = ["Metacon", "EMOM", "Tabata", "AMRAP", "Ladder"];
 
-  const uw = chance(0.2);
-  const lw = chance(0.2);
+function pick(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+function chance(p) { return Math.random() < p; }
 
-  const upperAbs = chance(0.5);
-  const lowerAbs = chance(0.5);
+/* --------------------------------------------------------
+   WEATHER (unchanged)
+---------------------------------------------------------*/
+async function updateWeatherUI() {
+  const el = document.getElementById("weather");
 
-  const upperLabelText = upperAbs ? "💪 Upper Body + Abs" : "💪 Upper Body";
-  const lowerLabelText = lowerAbs ? "🦵 Lower Body + Abs" : "🦵 Lower Body";
-
-  const upperHTML = upper + (uw ? ` <span class="pill">Weighted</span>`:"");
-  const lowerHTML = lower + (lw ? ` <span class="pill">Weighted</span>`:"");
-
-  upperLabel.innerHTML = upperLabelText;
-  lowerLabel.innerHTML = lowerLabelText;
-  upperType.innerHTML = upperHTML;
-  lowerType.innerHTML = lowerHTML;
-
-  saveWorkout({
-    date: todayString(),
-    upperLabel: upperLabelText,
-    lowerLabel: lowerLabelText,
-    upperHTML,
-    lowerHTML
-  });
-}
-
-/* ----------------------------------------------------
-   DAILY LOCKOUT + TIME
------------------------------------------------------ */
-const createBtn = document.getElementById("create");
-const aiStage = document.getElementById("aiStage");
-const output = document.getElementById("output");
-
-function todayString() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-}
-
-function hasGeneratedToday() {
-  const stored = localStorage.getItem("generatedDate");
-  return stored === todayString();
-}
-
-function lockGenerationForToday() {
-  localStorage.setItem("generatedDate", todayString());
-}
-
-function canGenerateNow() {
-  const now = new Date();
-  const limit = new Date();
-  limit.setHours(17,30,0,0);
-  return now >= limit;
-}
-
-function restoreWorkoutIfExists() {
-  const data = loadWorkout();
-  if (!data) return false;
-  if (data.date !== todayString()) return false;
-
-  upperLabel.innerHTML = data.upperLabel;
-  lowerLabel.innerHTML = data.lowerLabel;
-  upperType.innerHTML = data.upperHTML;
-  lowerType.innerHTML = data.lowerHTML;
-
-  output.style.display = "block";
-  createBtn.style.display = "none";
-  return true;
-}
-
-function updateButtonState() {
-  if (restoreWorkoutIfExists()) return;
-
-  if (hasGeneratedToday()) {
-    createBtn.style.display = "none";
+  if (!navigator.geolocation) {
+    el.textContent = "Location unavailable";
     return;
   }
 
-  if (!canGenerateNow()) {
-    createBtn.disabled = true;
-    createBtn.textContent = "Available at 5:30 PM";
-    createBtn.style.display = "block";
-  } else {
-    createBtn.disabled = false;
-    createBtn.textContent = "Create Workout";
-    createBtn.style.display = "block";
-  }
-}
-
-function startGenerate() {
-  if (hasGeneratedToday() || !canGenerateNow()) return;
-
-  output.style.display = "none";
-  aiStage.style.display = "block";
-  aiStage.classList.add("show");
-
-  createBtn.disabled = true;
-  createBtn.textContent = "Generating...";
-
-  setTimeout(() => {
-    generateWorkout();
-
-    aiStage.classList.remove("show");
-    aiStage.style.display = "none";
-    output.style.display = "block";
-
-    lockGenerationForToday();
-    createBtn.style.display = "none";
-
-    Sound.beep();
-  }, 1000);
-}
-
-createBtn.addEventListener("click", startGenerate);
-
-/* ----------------------------------------------------
-   WEATHER (unchanged)
------------------------------------------------------ */
-async function getWeatherEmoji(cond) {
-  cond = cond.toLowerCase();
-  if (cond.includes("clear")) return "☀️";
-  if (cond.includes("cloud")) return "⛅";
-  if (cond.includes("rain")) return "🌧️";
-  if (cond.includes("drizzle")) return "🌦️";
-  if (cond.includes("thunder")) return "🌩️";
-  if (cond.includes("snow")) return "❄️";
-  if (cond.includes("fog") || cond.includes("mist")) return "🌫️";
-  return "🌡️";
-}
-
-function weatherCodeToText(code) {
-  const map = {
-    0:"Clear sky",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",
-    45:"Fog",48:"Fog",
-    51:"Drizzle",53:"Drizzle",55:"Drizzle",
-    61:"Rain",63:"Rain",65:"Rain",
-    71:"Snow",73:"Snow",75:"Snow",
-    80:"Rain shower",81:"Rain shower",82:"Rain shower",
-    95:"Thunderstorm",96:"Thunderstorm",99:"Thunderstorm"
-  };
-  return map[code] || "Unknown";
-}
-
-async function updateWeatherUI() {
-  const weatherEl = document.querySelector(".weather");
-  weatherEl.textContent = "Loading weather…";
-
   navigator.geolocation.getCurrentPosition(async pos => {
-    const lat = pos.coords.latitude;
-    const lon = pos.coords.longitude;
-
     try {
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`;
-      const res = await fetch(url);
-      const data = await res.json();
-      const temp = Math.round(data.current_weather.temperature);
+      const { latitude, longitude } = pos.coords;
 
-      const rev = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
-      const r = await rev.json();
-      const city = r.address.city || r.address.town || r.address.village || r.address.county || "Your area";
+      const weatherRes = await fetch(
+        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`
+      );
+      const weatherData = await weatherRes.json();
 
-      const condition = weatherCodeToText(data.current_weather.weathercode);
-      const emoji = await getWeatherEmoji(condition);
+      const rev = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+      );
+      const loc = await rev.json();
 
-      weatherEl.innerHTML = `<span>${emoji}</span> ${temp}°C ${city}`;
+      const city = loc.address.city || loc.address.town || loc.address.village || "Your area";
+      const temp = weatherData.current_weather.temperature;
 
-    } catch (err) {
-      weatherEl.textContent = "Weather unavailable";
+      el.textContent = `${temp}°C ${city}`;
+    } catch (e) {
+      el.textContent = "Weather unavailable";
     }
-  }, () => {
-    weatherEl.textContent = "Enable location for weather";
-  });
+  }, () => el.textContent = "Enable location for weather");
 }
 
 updateWeatherUI();
-updateButtonState();
-</script>
 
+/* --------------------------------------------------------
+   WORKOUT GENERATION
+---------------------------------------------------------*/
+
+function generateMetalTypes(countMin, countMax) {
+  const count = Math.random() < 0.5 ? countMin : countMax;
+  let out = [];
+  for (let i = 0; i < count; i++) {
+    let m = pick(metalTypes);
+    let weighted = chance(0.2);
+    out.push({ name:m, weighted });
+  }
+  return out;
+}
+
+function generateWorkout() {
+  const isFullBody = chance(0.5);
+
+  let workout = { mode: isFullBody ? "full" : "split", blocks: [] };
+
+  if (isFullBody) {
+    workout.blocks.push({
+      title:"🔥 Full Body",
+      abs:false,
+      types:generateMetalTypes(2,3)
+    });
+  } else {
+    workout.blocks.push({
+      title:"💪 Upper Body",
+      abs:chance(0.5),
+      types:generateMetalTypes(1,2)
+    });
+    workout.blocks.push({
+      title:"🦵 Lower Body",
+      abs:chance(0.5),
+      types:generateMetalTypes(1,2)
+    });
+  }
+
+  return workout;
+}
+
+/* --------------------------------------------------------
+   SAVE / LOAD
+---------------------------------------------------------*/
+function saveWorkout(w) { localStorage.setItem("workout", JSON.stringify(w)); }
+function loadWorkout() { return JSON.parse(localStorage.getItem("workout") || "null"); }
+function clearWorkout() { localStorage.removeItem("workout"); }
+
+/* --------------------------------------------------------
+   TIME CHECKS
+---------------------------------------------------------*/
+
+function now() { return new Date(); }
+
+function isOpenWindow() {
+  if (DEV_MODE) return true;
+
+  const t = now();
+  const afterOpen =
+    t.getHours() > OPEN_HOUR ||
+    (t.getHours() === OPEN_HOUR && t.getMinutes() >= OPEN_MIN);
+
+  const beforeReset =
+    t.getHours() < RESET_HOUR ||
+    (t.getHours() === RESET_HOUR && t.getMinutes() < RESET_MIN);
+
+  return afterOpen && beforeReset;
+}
+
+/* RESET at 23:00 */
+function checkForDailyReset() {
+  if (DEV_MODE) return;
+  const t = now();
+  if (t.getHours() === RESET_HOUR && t.getMinutes() === RESET_MIN) {
+    clearWorkout();
+  }
+}
+
+/* --------------------------------------------------------
+   COUNTDOWN LOGIC
+---------------------------------------------------------*/
+
+function updateCountdown() {
+  if (DEV_MODE) {
+    document.getElementById("countdownBox").textContent = "";
+    return;
+  }
+
+  if (isOpenWindow()) {
+    document.getElementById("countdownBox").textContent = "";
+    return;
+  }
+
+  const t = now();
+
+  let target = new Date();
+  target.setHours(OPEN_HOUR, OPEN_MIN, 0, 0);
+
+  if (t > target) {
+    target.setDate(target.getDate() + 1);
+  }
+
+  const diff = target - t;
+  let sec = Math.floor(diff / 1000);
+  let hrs = Math.floor(sec / 3600); sec %= 3600;
+  let mins = Math.floor(sec / 60); sec %= 60;
+
+  document.getElementById("countdownBox").textContent =
+    `Workout opens in: ${hrs}h ${mins}m ${sec}s`;
+}
+
+/* --------------------------------------------------------
+   RENDER WORKOUT
+---------------------------------------------------------*/
+function renderWorkout(w) {
+  const container = document.getElementById("cards");
+  container.innerHTML = "";
+
+  if (!w) return;
+
+  w.blocks.forEach(b => {
+    const div = document.createElement("div");
+    div.className = "card";
+
+    const title = document.createElement("div");
+    title.className = "card-title";
+    title.textContent = b.title + (b.abs ? " + Abs" : "");
+    div.appendChild(title);
+
+    const list = document.createElement("div");
+    list.className = "type-list";
+
+    b.types.forEach(t => {
+      const row = document.createElement("div");
+      row.textContent = t.name;
+
+      if (t.weighted) {
+        const span = document.createElement("span");
+        span.className = "weighted-label";
+        span.textContent = "Weighted";
+        row.appendChild(span);
+      }
+
+      list.appendChild(row);
+    });
+
+    div.appendChild(list);
+    container.appendChild(div);
+  });
+}
+
+/* --------------------------------------------------------
+   BUTTON LOGIC
+---------------------------------------------------------*/
+
+function updateButtonState() {
+  const btn = document.getElementById("createBtn");
+  const saved = loadWorkout();
+
+  if (!isOpenWindow()) {
+    btn.disabled = true;
+    btn.textContent = "Locked";
+    return;
+  }
+
+  if (saved) {
+    btn.style.display = "none";
+  } else {
+    btn.style.display = "flex";
+    btn.disabled = false;
+    btn.textContent = "Create Workout";
+  }
+}
+
+/* --------------------------------------------------------
+   BUTTON ACTION
+---------------------------------------------------------*/
+
+document.getElementById("createBtn").addEventListener("click", () => {
+  const w = generateWorkout();
+  saveWorkout(w);
+  renderWorkout(w);
+  updateButtonState();
+});
+
+/* --------------------------------------------------------
+   INIT
+---------------------------------------------------------*/
+
+function init() {
+  const saved = loadWorkout();
+  if (saved) renderWorkout(saved);
+
+  updateButtonState();
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+  setInterval(checkForDailyReset, 60000);
+}
+
+init();
+
+</script>
 </body>
 </html>
