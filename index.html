@@ -4,23 +4,29 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Metal Workout Builder</title>
+
 <style>
 :root {
   --bg: #ffffff;
   --ink: #0f172a;
   --sub: #64748b;
   --card: #f1f5f9;
-  --pill: #3b82f6;
   --brand: #2345f5;
 }
+
+/* =======================
+   GENERAL
+======================= */
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro", system-ui, sans-serif;
   margin: 0;
   padding: 0;
   background: var(--bg);
   color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro", system-ui, sans-serif;
 }
-.container {
+
+/* Weather + Welcome */
+.header {
   padding: 20px;
   max-width: 480px;
   margin: auto;
@@ -28,14 +34,73 @@ body {
 .weather {
   font-size: 16px;
   color: var(--sub);
-  margin-bottom: 12px;
   display: flex;
   align-items: center;
   gap: 6px;
+  margin-bottom: 12px;
 }
 h1 {
   font-size: 32px;
   margin: 0 0 20px;
+}
+
+/* =======================
+   CENTERED COUNTDOWN
+======================= */
+.center-vertical {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -40%);
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+  padding: 20px;
+  pointer-events: none;
+}
+
+#closedMessage {
+  font-size: 16px;
+  color: var(--sub);
+  display: none;
+  margin-bottom: 20px;
+}
+
+#countdownWrap {
+  display: none;
+}
+
+/* Countdown grid */
+#countdownGrid {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+  margin-top: 10px;
+}
+
+.col {
+  text-align: center;
+}
+
+.num {
+  font-size: 44px;
+  letter-spacing: 2px;
+  font-weight: 400; /* <-- NOT BOLD */
+}
+
+.label {
+  margin-top: 10px;
+  font-size: 15px;
+  color: var(--sub);
+}
+
+/* =======================
+   WORKOUT BLOCKS
+======================= */
+#workout {
+  padding: 20px;
+  max-width: 480px;
+  margin: 140px auto 100px;
 }
 .block {
   background: var(--card);
@@ -46,19 +111,11 @@ h1 {
 .block-title {
   font-size: 22px;
   font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
-.type-pill {
-  display: inline-block;
-  background: #e1ecff;
-  color: #1d4ed8;
-  padding: 4px 10px;
-  border-radius: 10px;
-  font-size: 13px;
-  margin-left: 8px;
-}
+
+/* =======================
+   BUTTON
+======================= */
 #createBtn {
   position: fixed;
   bottom: 30px;
@@ -76,72 +133,61 @@ h1 {
   justify-content: center;
   align-items: center;
 }
-#countdownWrap {
-  display: none;
-  text-align: center;
-  margin-top: 60px;
-}
-#countdownNumbers {
-  font-size: 38px;
-  font-weight: 700;
-  letter-spacing: 4px;
-}
-.label-row {
-  display: flex;
-  justify-content: center;
-  gap: 40px;
-  margin-top: 8px;
-  color: var(--sub);
-  font-size: 14px;
-}
-#closedMessage {
-  font-size: 16px;
-  color: var(--sub);
-  margin-top: 8px;
-  display: none;
-}
 </style>
 </head>
 <body>
 
-<div class="container">
-
+<!-- HEADER CONTENT -->
+<div class="header">
   <div id="weather" class="weather">Enable location for weather</div>
-
   <h1>Hi Jy, welcome back</h1>
-
-  <div id="closedMessage">Workout is currently closed</div>
-
-  <div id="countdownWrap">
-    <div id="countdownNumbers">00 00 00</div>
-    <div class="label-row">
-      <div>HOURS</div><div>MINS</div><div>SECS</div>
-    </div>
-  </div>
-
-  <div id="workout"></div>
-
 </div>
 
+<!-- CENTERED COUNTDOWN -->
+<div class="center-vertical">
+  <div id="closedMessage">Workout will open in</div>
+
+  <div id="countdownWrap">
+    <div id="countdownGrid">
+      <div class="col">
+        <div id="cc-hours" class="num">00</div>
+        <div class="label">HOURS</div>
+      </div>
+
+      <div class="col">
+        <div id="cc-mins" class="num">00</div>
+        <div class="label">MINS</div>
+      </div>
+
+      <div class="col">
+        <div id="cc-secs" class="num">00</div>
+        <div class="label">SECS</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WORKOUT AREA -->
+<div id="workout"></div>
+
+<!-- BUTTON -->
 <button id="createBtn">Create Workout</button>
 
 <script>
-/* ------------------------------------------------------
+/* -----------------------------------------
    SETTINGS
------------------------------------------------------- */
-const DEV_MODE = false;     // Set true for no restrictions
+----------------------------------------- */
+const DEV_MODE = false;
 const OPEN_HOUR = 17;
-const OPEN_MIN  = 30;
+const OPEN_MIN = 30;
 
-const metalTypes = ["Tabata","AMRAP","EMOM","Ladder","Metacon"];
-
-/* Utility */
-const chance = (p) => Math.random() < p;
+const metalTypes = ["Tabata", "AMRAP", "EMOM", "Ladder", "Metacon"];
+const chance = p => Math.random() < p;
 const now = () => new Date();
 
-/* ------------------------------------------------------
-   WEATHER EMOJI
------------------------------------------------------- */
+/* -----------------------------------------
+   WEATHER LOGIC
+----------------------------------------- */
 function weatherCodeToText(code){
   if(code===0) return "Clear";
   if([1,2,3].includes(code)) return "Partly cloudy";
@@ -153,139 +199,155 @@ function weatherCodeToText(code){
   if(code===95) return "Thunderstorm";
   return "Weather";
 }
-function weatherEmoji(txt){
-  if(txt==="Clear") return "☀️";
-  if(txt==="Partly cloudy") return "⛅️";
-  if(txt==="Fog") return "🌫️";
-  if(txt==="Drizzle") return "🌦️";
-  if(txt==="Rain") return "🌧️";
-  if(txt==="Freezing rain") return "🧊🌧️";
-  if(txt==="Snow") return "❄️";
-  if(txt==="Thunderstorm") return "⛈️";
-  return "🌡️";
+function weatherEmoji(t){
+  return {
+    "Clear":"☀️",
+    "Partly cloudy":"⛅️",
+    "Fog":"🌫️",
+    "Drizzle":"🌦️",
+    "Rain":"🌧️",
+    "Freezing rain":"🧊🌧️",
+    "Snow":"❄️",
+    "Thunderstorm":"⛈️"
+  }[t] || "🌡️";
 }
 
-/* ------------------------------------------------------
-   WORKOUT STORAGE
------------------------------------------------------- */
-function saveWorkout(w){ localStorage.setItem("workout", JSON.stringify(w)); }
-function loadWorkout(){
-  let w = localStorage.getItem("workout");
-  if(!w) return null;
-  w = JSON.parse(w);
-  return w;
+async function updateWeather(){
+  const el = document.getElementById("weather");
+  if(!navigator.geolocation){
+    el.textContent = "Enable location for weather";
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    try{
+      let lat = pos.coords.latitude;
+      let lon = pos.coords.longitude;
+
+      let w = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+      let j = await w.json();
+
+      let temp = j.current_weather.temperature;
+      let cond = weatherCodeToText(j.current_weather.weathercode);
+      let emoji = weatherEmoji(cond);
+
+      let r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+      let jr = await r.json();
+      let city = jr.address.city || jr.address.town || jr.address.village || "Your area";
+
+      el.textContent = `${emoji} ${temp}°C ${city}`;
+    }catch(e){
+      el.textContent = "Weather unavailable";
+    }
+  },()=>{
+    el.textContent = "Enable location for weather";
+  });
 }
+
+/* -----------------------------------------
+   STORAGE
+----------------------------------------- */
+function saveWorkout(w){ localStorage.setItem("workout", JSON.stringify(w)); }
+function loadWorkout(){ let w = localStorage.getItem("workout"); return w ? JSON.parse(w) : null; }
 function clearWorkout(){ localStorage.removeItem("workout"); }
 
-/* Reset after midnight */
-setInterval(() => {
-  const t = now();
-  if(t.getHours() === 0 && t.getMinutes() < 2){
-    clearWorkout();
-  }
-}, 60_000);
+/* Reset nightly */
+setInterval(()=>{
+  let t = now();
+  if(t.getHours() === 0 && t.getMinutes() < 2) clearWorkout();
+}, 60000);
 
-/* ------------------------------------------------------
-   TIME WINDOW
------------------------------------------------------- */
+/* -----------------------------------------
+   OPEN WINDOW CHECK
+----------------------------------------- */
 function isOpenWindow(){
   if(DEV_MODE) return true;
   const t = now();
-  const start = new Date(t);
+  const start = new Date();
   start.setHours(OPEN_HOUR, OPEN_MIN, 0, 0);
   return t >= start;
 }
 
-/* ------------------------------------------------------
-   COUNTDOWN UI
------------------------------------------------------- */
+/* -----------------------------------------
+   COUNTDOWN UPDATE
+----------------------------------------- */
 function updateCountdown(){
   const wrap = document.getElementById("countdownWrap");
-  const msg  = document.getElementById("closedMessage");
-  const nums = document.getElementById("countdownNumbers");
+  const msg = document.getElementById("closedMessage");
 
-  if(DEV_MODE){
+  if(DEV_MODE || isOpenWindow()){
     wrap.style.display = "none";
-    msg.style.display  = "none";
-    return;
-  }
-  if(isOpenWindow()){
-    wrap.style.display = "none";
-    msg.style.display  = "none";
+    msg.style.display = "none";
     return;
   }
 
   wrap.style.display = "block";
-  msg.style.display  = "block";
+  msg.style.display = "block";
 
   let t = now();
   let target = new Date();
   target.setHours(OPEN_HOUR, OPEN_MIN, 0, 0);
-  if(t > target) target.setDate(target.getDate()+1);
+  if(t > target) target.setDate(target.getDate() + 1);
 
   let diff = target - t;
   let sec = Math.floor(diff/1000);
-  let hr  = Math.floor(sec/3600); sec%=3600;
-  let mn  = Math.floor(sec/60);   sec%=60;
+  let hr = Math.floor(sec/3600); sec %= 3600;
+  let mn = Math.floor(sec/60); sec %= 60;
 
-  const pad = n => (n<10?"0"+n:n);
+  const pad = n => n < 10 ? "0"+n : n;
 
-  nums.textContent = `${pad(hr)}   ${pad(mn)}   ${pad(sec)}`;
+  document.getElementById("cc-hours").textContent = pad(hr);
+  document.getElementById("cc-mins").textContent  = pad(mn);
+  document.getElementById("cc-secs").textContent  = pad(sec);
 }
 
-/* ------------------------------------------------------
-   METAL TYPE GENERATOR
------------------------------------------------------- */
-function generateMetalTypes(min, max){
-  let count = Math.floor(Math.random()*(max-min+1))+min;
-  let copy = [...metalTypes];
+/* -----------------------------------------
+   METAL SELECTOR
+----------------------------------------- */
+function generateMetalTypes(count){
+  let pool = [...metalTypes];
   let out = [];
-  for(let i=0; i<count; i++){
-    let pick = copy.splice(Math.floor(Math.random()*copy.length),1)[0];
-    out.push(pick);
+  for(let i=0;i<count;i++){
+    out.push(pool.splice(Math.floor(Math.random()*pool.length),1)[0]);
   }
   return out;
 }
 
-/* ------------------------------------------------------
-   WORKOUT GENERATOR
------------------------------------------------------- */
+/* -----------------------------------------
+   WORKOUT GENERATION
+----------------------------------------- */
 function generateWorkout(){
   let workout = { blocks: [] };
 
-  /* Decide fullbody or split */
-  let fullbody = chance(0.5);
-
-  if(fullbody){
+  // Full body or split
+  if(chance(0.5)){
     let count = chance(0.5) ? 2 : 3;
     workout.blocks = [{
-      title:"🔥 Full body",
-      abs:false,
-      types: generateMetalTypes(count,count)
+      title: "🔥 Full Body",
+      abs: false,
+      types: generateMetalTypes(count)
     }];
   } else {
-    // SPLIT MODE — never both have 2
+    // Enforce only one side can have 2 metals
     let upperCount, lowerCount;
 
     if(chance(0.33)){
       upperCount = 1; lowerCount = 1;
     } else {
-      if(chance(0.5)){
-        upperCount = 2; lowerCount = 1;
-      } else {
-        upperCount = 1; lowerCount = 2;
-      }
+      if(chance(0.5)){ upperCount = 2; lowerCount = 1; }
+      else { upperCount = 1; lowerCount = 2; }
     }
 
     workout.blocks.push({
       title:"💪 Upper Body",
-      abs: chance(0.5),
-      types: generateMetalTypes(upperCount, upperCount)
+      abs:chance(0.5),
+      types:generateMetalTypes(upperCount)
     });
+
     workout.blocks.push({
       title:"🦵 Lower Body",
-      abs: chance(0.5),
-      types: generateMetalTypes(lowerCount, lowerCount)
+      abs:chance(0.5),
+      types:generateMetalTypes(lowerCount)
     });
   }
 
@@ -293,14 +355,20 @@ function generateWorkout(){
   renderWorkout(workout);
 }
 
-/* ------------------------------------------------------
+/* -----------------------------------------
    RENDER WORKOUT
------------------------------------------------------- */
+----------------------------------------- */
 function renderWorkout(w){
   const wrap = document.getElementById("workout");
+
+  if(!isOpenWindow() && !DEV_MODE){
+    wrap.innerHTML = "";
+    return;
+  }
+
   wrap.innerHTML = "";
 
-  w.blocks.forEach(b => {
+  w.blocks.forEach(b=>{
     let div = document.createElement("div");
     div.className = "block";
 
@@ -321,9 +389,9 @@ function renderWorkout(w){
   });
 }
 
-/* ------------------------------------------------------
+/* -----------------------------------------
    BUTTON STATE
------------------------------------------------------- */
+----------------------------------------- */
 function updateButtonState(){
   const btn = document.getElementById("createBtn");
   const saved = loadWorkout();
@@ -334,56 +402,23 @@ function updateButtonState(){
     btn.textContent = "Create Workout (DEV)";
     return;
   }
+
   if(!isOpenWindow()){
     btn.style.display = "none";
     return;
   }
+
   if(saved){
     btn.style.display = "none";
   } else {
     btn.style.display = "flex";
     btn.disabled = false;
-    btn.textContent = "Create Workout";
   }
 }
 
-/* ------------------------------------------------------
-   WEATHER FETCH
------------------------------------------------------- */
-async function updateWeather(){
-  const el = document.getElementById("weather");
-  if(!navigator.geolocation){
-    el.textContent = "Enable location for weather";
-    return;
-  }
-
-  navigator.geolocation.getCurrentPosition(async pos=>{
-    try{
-      let lat = pos.coords.latitude;
-      let lon = pos.coords.longitude;
-
-      let w = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
-      let wj = await w.json();
-      let temp = wj.current_weather.temperature;
-      let cond = weatherCodeToText(wj.current_weather.weathercode);
-      let emoji = weatherEmoji(cond);
-
-      let rev = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
-      let r = await rev.json();
-      let city = r.address.city || r.address.town || r.address.village || "Your area";
-
-      el.textContent = `${emoji} ${temp}°C ${city}`;
-    }catch(e){
-      el.textContent = "Weather unavailable";
-    }
-  },()=>{
-    el.textContent = "Enable location for weather";
-  });
-}
-
-/* ------------------------------------------------------
+/* -----------------------------------------
    INIT
------------------------------------------------------- */
+----------------------------------------- */
 document.getElementById("createBtn").onclick = ()=>{
   generateWorkout();
   updateButtonState();
@@ -395,7 +430,8 @@ if(saved) renderWorkout(saved);
 updateWeather();
 updateButtonState();
 updateCountdown();
-setInterval(updateCountdown,1000);
+setInterval(updateCountdown, 1000);
 </script>
+
 </body>
-</html>>
+</html>
