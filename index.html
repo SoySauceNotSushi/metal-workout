@@ -21,7 +21,7 @@
   }
 
   body {
-    font-family:-apple-system,BlinkMacSystemFont,"SF Pro",Segoe UI,Roboto,sans-serif;
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro",Segoe UI,Roboto,sans-serif;
     margin:0;
     padding:0;
     background:var(--bg);
@@ -53,7 +53,7 @@
     margin:0 0 18px;
   }
 
-  /* RADIO ROW */
+  /* RADIO ROW --------------------------------------------------- */
   .radio-row {
     display:flex;
     gap:18px;
@@ -66,6 +66,9 @@
     gap:6px;
     font-size:14px;
     cursor:pointer;
+    user-select:none;
+    color:var(--ink);
+    transition:opacity .2s ease;
   }
 
   .radio-option input {
@@ -76,11 +79,13 @@
     border:2px solid #b7bfca;
     background:#fff;
     position:relative;
+    cursor:pointer;
   }
 
   .radio-option input:checked {
     border-color:var(--brand);
   }
+
   .radio-option input:checked::after {
     content:"";
     position:absolute;
@@ -99,7 +104,7 @@
     color:var(--brand);
   }
 
-  /* AI STAGE GRADIENT */
+  /* AI GRADIENT ------------------------------------------------- */
   .ai-stage {
     height:160px;
     margin:12px 0 18px;
@@ -107,6 +112,7 @@
     border-radius:100%;
     position:relative;
   }
+
   .ai-stage::before {
     content:"";
     position:absolute;
@@ -119,22 +125,25 @@
       radial-gradient(22rem 22rem at 72% 34%, #7DFF5C77 0, #0000 54%),
       radial-gradient(24rem 20rem at 40% 72%, #FFA43A77 0, #0000 54%),
       radial-gradient(20rem 20rem at 70% 74%, #9B8FFF99 0, #0000 80%);
+    background-blend-mode:screen;
     animation:meshBreath 2s ease-in-out infinite,
              meshDrift 3s ease-in-out infinite;
   }
+
   .ai-stage.show::before { opacity:.9; }
 
   @keyframes meshBreath {
     0%,100% { transform:scale(1); opacity:.7 }
     50%     { transform:scale(1.05); opacity:.3 }
   }
+
   @keyframes meshDrift {
-    0% { transform:translate3d(0,0,0); }
-    50% { transform:translate3d(2%,-1.5%,0); }
-    100%{ transform:translate3d(0,0,0); }
+    0%   { transform:translate3d(0,0,0); }
+    50%  { transform:translate3d(2%,-1.5%,0); }
+    100% { transform:translate3d(0,0,0); }
   }
 
-  /* WORKOUT CARD */
+  /* WORKOUT CARD ------------------------------------------------ */
   .workout-card {
     background:var(--card);
     border-radius:16px;
@@ -154,9 +163,10 @@
     display:flex;
     gap:8px;
     align-items:center;
+    flex-wrap:wrap;
   }
 
-  /* Pills ------------------------------------------------ */
+  /* Pills ------------------------------------------------------- */
   .pill {
     padding:2px 8px;
     border-radius:10px;
@@ -168,17 +178,19 @@
     background:var(--pill-blue);
     color:var(--pill-blue-text);
   }
+
   .pill-shoulders,
   .pill-biceps {
     background:var(--pill-orange);
     color:var(--pill-orange-text);
   }
+
   .pill-abs {
     background:var(--pill-green);
     color:var(--pill-green-text);
   }
 
-  /* BUTTON */
+  /* BUTTONS ----------------------------------------------------- */
   .create-btn {
     position:fixed;
     bottom:24px;
@@ -193,11 +205,55 @@
     border-radius:28px;
     font-size:18px;
     font-weight:600;
+    cursor:pointer;
   }
 
-  .create-btn:disabled { opacity:0.6; }
+  .create-btn:disabled { opacity:0.6; cursor:default; }
+
+  .complete-btn {
+    margin-top:14px;
+    width:100%;
+    height:46px;
+    border-radius:24px;
+    border:none;
+    background:#0f172a;
+    color:#f9fafb;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+  }
+
+  .completed-message {
+    margin-top:12px;
+    text-align:center;
+    font-size:14px;
+    color:var(--sub);
+  }
 
   .hidden { display:none !important; }
+
+  /* CONFETTI ---------------------------------------------------- */
+  .confetti-piece {
+    position:fixed;
+    top:-10px;
+    width:6px;
+    height:10px;
+    border-radius:2px;
+    opacity:0.9;
+    pointer-events:none;
+    animation:confettiFall var(--confetti-duration) ease-out forwards;
+  }
+
+  @keyframes confettiFall {
+    0% {
+      transform:translate3d(0,-20px,0) rotateZ(0deg);
+      opacity:1;
+    }
+    100% {
+      transform:translate3d(0,100vh,0) rotateZ(260deg);
+      opacity:0;
+    }
+  }
 </style>
 </head>
 <body>
@@ -227,152 +283,186 @@
 
   <div id="output" style="display:none;">
     <div id="workoutCard" class="workout-card"></div>
+    <button id="completeBtn" class="complete-btn hidden">Workout completed</button>
+    <div id="completedMessage" class="completed-message hidden"></div>
   </div>
 </div>
 
 <button id="create" class="create-btn">Generate</button>
 
 <script>
-/* SHORTCUT */
-const qs=s=>document.querySelector(s);
+const qs = s => document.querySelector(s);
 const DEV = new URLSearchParams(location.search).get("dev")==="true";
 
-/* METALS */
-const metals=["Metacon","EMOM","Ladder","AMRAP","Tabata"];
+/* SOUND: soft chime ----------------------------------------- */
+const Sound = (() => {
+  let ctx = null;
+  function ensure() {
+    if (!ctx) {
+      const A = window.AudioContext || window.webkitAudioContext;
+      if (!A) return null;
+      ctx = new A();
+    }
+    if (ctx.state === "suspended") ctx.resume();
+    return ctx;
+  }
+  document.addEventListener("pointerdown", ensure, { once:true });
 
-/* ABS pill logic */
-const maybeAbs = ()=>Math.random()<0.5;
+  function chime() {
+    const ac = ensure();
+    if (!ac) return;
+    const now = ac.currentTime;
+    const freqs = [880, 1320];
+    freqs.forEach((f, i) => {
+      const osc = ac.createOscillator();
+      const gain = ac.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(f, now + i*0.12);
+      gain.gain.setValueAtTime(0, now + i*0.12);
+      gain.gain.linearRampToValueAtTime(0.18, now + i*0.12 + 0.02);
+      gain.gain.linearRampToValueAtTime(0, now + i*0.12 + 0.25);
+      osc.connect(gain);
+      gain.connect(ac.destination);
+      osc.start(now + i*0.12);
+      osc.stop(now + i*0.12 + 0.3);
+    });
+  }
 
-/* Weighted pill logic */
-const maybeWeighted = ()=>Math.random()<0.25;
+  return { chime };
+})();
 
-/* Helpers */
+/* CONFETTI -------------------------------------------------- */
+function launchConfetti() {
+  const colors = ["#f97316","#fb7185","#22c55e","#38bdf8","#eab308"];
+  const count = 70;
+  for (let i=0;i<count;i++) {
+    const el = document.createElement("div");
+    el.className = "confetti-piece";
+    el.style.left = Math.random()*100 + "vw";
+    el.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
+    el.style.animationDuration = (0.8 + Math.random()*0.6).toFixed(2) + "s";
+    el.style.transform = `translate3d(0,0,0) rotateZ(${Math.random()*360}deg)`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),1600);
+  }
+}
+
+/* METALS + PILL HELPERS ------------------------------------- */
+const metals = ["Metacon","EMOM","Ladder","AMRAP","Tabata"];
+const maybeAbs = () => Math.random()<0.5;
+const maybeWeighted = () => Math.random()<0.25;
+
 function pillWeighted(){ return `<span class="pill pill-weighted">Weighted</span>` }
 function pillShoulders(){ return `<span class="pill pill-shoulders">Shoulders</span>` }
 function pillBiceps(){ return `<span class="pill pill-biceps">Biceps</span>` }
 function pillAbs(){ return `<span class="pill pill-abs">Abs</span>` }
 
-/* Format pill order */
 function assemblePills(weight, special, abs){
-  let result="";
-  if(weight) result+=pillWeighted()+" ";
-  if(special) result+=special+" ";
-  if(abs) result+=pillAbs();
-  return result.trim();
+  let out = "";
+  if(weight) out += pillWeighted() + " ";
+  if(special) out += special + " ";
+  if(abs) out += pillAbs();
+  return out.trim();
 }
 
-/* Build metal label with optional Abs */
 function metalLabel(){
-  let base = metals[Math.floor(Math.random()*metals.length)];
-  return base;
+  return metals[Math.floor(Math.random()*metals.length)];
 }
 
-/* ===========================
-      WORKOUT BUILDERS
-=========================== */
+/* TITLES ----------------------------------------------------- */
+function modeTitle(mode){
+  if(mode==="pull") return "Pull Day";
+  if(mode==="push") return "Push Day";
+  if(mode==="legs") return "Legs Day";
+  if(mode==="full") return "Full Body Day";
+  return "Workout";
+}
 
-/* ----- Push: Strength + 2 metals, max 1 shoulders ----- */
+/* WORKOUT BUILDERS ------------------------------------------- */
 function buildPushHTML(){
-  let h=`<div class="section-title">Push Day</div>`;
+  let h = `<div class="section-title">Push Day</div>`;
+  h += `<div class="type-line">Strength ${pillWeighted()}</div>`;
 
-  h+=`<div class="type-line">Strength ${pillWeighted()}</div>`;
-
-  let addShoulders=Math.random()<0.5;
-  let shouldersSlot = addShoulders ? (Math.random()<0.5?1:2) : 0;
+  const addShoulders = Math.random()<0.5;
+  const shouldersSlot = addShoulders ? (Math.random()<0.5?1:2) : 0;
 
   for(let i=1;i<=2;i++){
-    let label=metalLabel();
-    let w=maybeWeighted();
-    let a=maybeAbs();
-
-    let sp = (i===shouldersSlot ? pillShoulders() : "");
-
-    let pills = assemblePills(w,sp,a);
-
-    h+=`<div class="type-line">${label} ${pills}</div>`;
+    const label = metalLabel();
+    const weighted = maybeWeighted();
+    const abs = maybeAbs();
+    const special = (i===shouldersSlot ? pillShoulders() : "");
+    const pills = assemblePills(weighted,special,abs);
+    h += `<div class="type-line">${label} ${pills}</div>`;
   }
   return h;
 }
 
-/* ----- Pull: Strength + 2 metals, max 1 biceps ----- */
 function buildPullHTML(){
-  let h=`<div class="section-title">Pull Day</div>`;
-  h+=`<div class="type-line">Strength ${pillWeighted()}</div>`;
+  let h = `<div class="section-title">Pull Day</div>`;
+  h += `<div class="type-line">Strength ${pillWeighted()}</div>`;
 
-  let addBiceps=Math.random()<0.5;
-  let bicepsSlot = addBiceps ? (Math.random()<0.5?1:2) : 0;
+  const addBiceps = Math.random()<0.5;
+  const bicepsSlot = addBiceps ? (Math.random()<0.5?1:2) : 0;
 
   for(let i=1;i<=2;i++){
-    let label=metalLabel();
-    let w=maybeWeighted();
-    let a=maybeAbs();
-
-    let sp = (i===bicepsSlot ? pillBiceps() : "");
-    let pills = assemblePills(w,sp,a);
-
-    h+=`<div class="type-line">${label} ${pills}</div>`;
+    const label = metalLabel();
+    const weighted = maybeWeighted();
+    const abs = maybeAbs();
+    const special = (i===bicepsSlot ? pillBiceps() : "");
+    const pills = assemblePills(weighted,special,abs);
+    h += `<div class="type-line">${label} ${pills}</div>`;
   }
   return h;
 }
 
-/* ----- Legs: 2–3 metals ----- */
 function buildLegsHTML(){
-  let h=`<div class="section-title">Legs Day</div>`;
-  let count=Math.random()<0.5?2:3;
-
+  let h = `<div class="section-title">Legs Day</div>`;
+  const count = Math.random()<0.5 ? 2 : 3;
   for(let i=0;i<count;i++){
-    let label=metalLabel();
-    let w=maybeWeighted();
-    let a=maybeAbs();
-    let pills = assemblePills(w,"",a);
-    h+=`<div class="type-line">${label} ${pills}</div>`;
+    const label = metalLabel();
+    const weighted = maybeWeighted();
+    const abs = maybeAbs();
+    const pills = assemblePills(weighted,"",abs);
+    h += `<div class="type-line">${label} ${pills}</div>`;
   }
   return h;
 }
 
-/* ----- Full body: heavy pair OR metals ----- */
 function buildFullHTML(){
-  let h=`<div class="section-title">Full Body Day</div>`;
-  let heavy=Math.random()<0.5;
-
+  let h = `<div class="section-title">Full Body Day</div>`;
+  const heavy = Math.random()<0.5;
   if(heavy){
-    h+=`<div class="type-line">Push Strength ${pillWeighted()}</div>`;
-    h+=`<div class="type-line">Pull Strength ${pillWeighted()}</div>`;
-
-    let label=metalLabel();
-    let w=maybeWeighted();
-    let a=maybeAbs();
-    let pills = assemblePills(w,"",a);
-
-    h+=`<div class="type-line">${label} ${pills}</div>`;
-  }else{
+    h += `<div class="type-line">Push Strength ${pillWeighted()}</div>`;
+    h += `<div class="type-line">Pull Strength ${pillWeighted()}</div>`;
+    const label = metalLabel();
+    const weighted = maybeWeighted();
+    const abs = maybeAbs();
+    const pills = assemblePills(weighted,"",abs);
+    h += `<div class="type-line">${label} ${pills}</div>`;
+  } else {
     for(let i=0;i<3;i++){
-      let label=metalLabel();
-      let w=maybeWeighted();
-      let a=maybeAbs();
-      let pills = assemblePills(w,"",a);
-      h+=`<div class="type-line">${label} ${pills}</div>`;
+      const label = metalLabel();
+      const weighted = maybeWeighted();
+      const abs = maybeAbs();
+      const pills = assemblePills(weighted,"",abs);
+      h += `<div class="type-line">${label} ${pills}</div>`;
     }
   }
   return h;
 }
 
-/* ============= UI STATE LOGIC (unchanged from your working version) ============= */
-
-/* Just reusing your existing behavior — not rewriting it again */
+/* DATE + LOCKS + COMPLETION ---------------------------------- */
 function todayString(){
   const d=new Date();
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 }
 function isAfter530(){
   if(DEV) return true;
-  const n=new Date();
-  const c=new Date();
-  c.setHours(17,30,0,0);
-  return n>=c;
+  const now=new Date();
+  const cut=new Date();
+  cut.setHours(17,30,0,0);
+  return now>=cut;
 }
-
-/* Weekly locks */
 function getWeekKey(){
   const d=new Date();
   const s=new Date(d.getFullYear(),0,1);
@@ -381,68 +471,83 @@ function getWeekKey(){
   return `${d.getFullYear()}-W${week}`;
 }
 function loadLocks(){ return JSON.parse(localStorage.getItem("locks")||"{}"); }
-function saveLocks(x){ localStorage.setItem("locks",JSON.stringify(x)); }
-
-(function resetWeekly(){
-  const now=getWeekKey();
-  const prev=localStorage.getItem("weekKey");
-  if(now!==prev){
-    localStorage.setItem("weekKey",now);
-    localStorage.removeItem("locks");
-    localStorage.removeItem("workoutToday");
-  }
-})();
-
-/* Save today’s workout */
-function saveToday(mode, html){
+function saveLocks(l){ localStorage.setItem("locks",JSON.stringify(l)); }
+function saveWorkoutToday(mode, html){
   if(DEV) return;
-  localStorage.setItem("workoutToday",JSON.stringify({
-    date:todayString(),
-    mode,
-    html
-  }));
+  localStorage.setItem("workoutToday", JSON.stringify({date:todayString(), mode, html}));
 }
-function loadToday(){
+function loadWorkoutToday(){
   if(DEV) return null;
   const raw=localStorage.getItem("workoutToday");
   if(!raw) return null;
-  const obj=JSON.parse(raw);
-  if(obj.date===todayString()) return obj;
+  try{
+    const data=JSON.parse(raw);
+    if(data.date===todayString()) return data;
+  }catch{}
+  return null;
+}
+function saveCompletedToday(mode){
+  if(DEV) return;
+  localStorage.setItem("completedToday", JSON.stringify({date:todayString(), mode}));
+}
+function loadCompletedToday(){
+  if(DEV) return null;
+  const raw=localStorage.getItem("completedToday");
+  if(!raw) return null;
+  try{
+    const data=JSON.parse(raw);
+    if(data.date===todayString()) return data;
+  }catch{}
   return null;
 }
 
-/* Radios and button */
-const radioRow=qs("#radioRow");
-const createBtn=qs("#create");
-const subtitle=qs("#subtitle");
-const output=qs("#output");
-const card=qs("#workoutCard");
-const aiStage=qs("#aiStage");
-const radioMap={
-  pull:qs("#optPull"),
-  push:qs("#optPush"),
-  legs:qs("#optLegs"),
-  full:qs("#optFull")
+(function resetWeekIfNeeded(){
+  const nowKey=getWeekKey();
+  const prev=localStorage.getItem("weekKey");
+  if(prev!==nowKey){
+    localStorage.setItem("weekKey",nowKey);
+    localStorage.removeItem("locks");
+    localStorage.removeItem("workoutToday");
+    localStorage.removeItem("completedToday");
+  }
+})();
+
+/* UI DOM refs ------------------------------------------------- */
+const subtitleEl = qs("#subtitle");
+const radioRow = qs("#radioRow");
+const createBtn = qs("#create");
+const aiStage = qs("#aiStage");
+const output = qs("#output");
+const card = qs("#workoutCard");
+const completeBtn = qs("#completeBtn");
+const completedMsg = qs("#completedMessage");
+
+const radioMap = {
+  pull: qs("#optPull"),
+  push: qs("#optPush"),
+  legs: qs("#optLegs"),
+  full: qs("#optFull")
 };
 
+/* UI Helpers -------------------------------------------------- */
 function anyUnlocked(){
   if(DEV) return true;
   const locks=loadLocks();
   return Object.keys(radioMap).some(m=>!locks[m]);
 }
 
-function updateBtnText(){
+function updateButtonLabel(){
   const sel=document.querySelector("input[name='mode']:checked");
   if(!sel){
     createBtn.textContent="Generate";
     return;
   }
-  const m=sel.value;
-  const label = (m==="full" ? "Full Body" : m.charAt(0).toUpperCase()+m.slice(1));
-  createBtn.textContent=`Generate ${label}`;
+  const mode=sel.value;
+  const label = mode==="full" ? "Full Body" : mode.charAt(0).toUpperCase()+mode.slice(1);
+  createBtn.textContent = `Generate ${label}`;
 }
 
-function updateBtnState(){
+function updateButtonState(){
   if(createBtn.style.display==="none") return;
   if(!isAfter530()){
     createBtn.disabled=true;
@@ -454,46 +559,58 @@ function updateBtnState(){
 }
 
 function refreshRadios(){
-  const locks=DEV?{}:loadLocks();
-
-  Object.entries(radioMap).forEach(([mode,lab])=>{
-    const input=lab.querySelector("input");
-    lab.classList.remove("active","disabled");
-
-    input.disabled=false;
+  const locks = DEV?{}:loadLocks();
+  Object.entries(radioMap).forEach(([mode,label])=>{
+    const input = label.querySelector("input");
+    label.classList.remove("active","disabled");
+    input.disabled = false;
     if(locks[mode] && !DEV){
-      input.disabled=true;
-      lab.classList.add("disabled");
+      input.disabled = true;
+      label.classList.add("disabled");
     }
-
-    if(input.checked) lab.classList.add("active");
+    if(input.checked) label.classList.add("active");
   });
-
-  updateBtnText();
-  updateBtnState();
+  updateButtonLabel();
+  updateButtonState();
 }
 
-/* Entry states */
-function enterPre(){
-  subtitle.textContent="What would you like to train?";
+function enterPreWorkout(){
+  subtitleEl.textContent="What would you like to train?";
   radioRow.style.display="flex";
   output.style.display="none";
-  createBtn.style.display = anyUnlocked()||DEV ? "block":"none";
+  if(anyUnlocked() || DEV){
+    createBtn.style.display="block";
+  } else {
+    createBtn.style.display="none";
+  }
+  completeBtn.classList.add("hidden");
+  completedMsg.classList.add("hidden");
   refreshRadios();
 }
 
-function enterPost(){
-  subtitle.textContent="Today’s workout";
+function enterPostWorkout(mode, isCompleted){
+  subtitleEl.textContent="Today’s workout";
   radioRow.style.display="none";
   createBtn.style.display="none";
   output.style.display="block";
+  const title = modeTitle(mode);
+
+  if(isCompleted){
+    completeBtn.classList.add("hidden");
+    completedMsg.textContent = `${title} completed — come back tomorrow`;
+    completedMsg.classList.remove("hidden");
+  } else {
+    completeBtn.textContent = `${title} completed`;
+    completeBtn.classList.remove("hidden");
+    completedMsg.classList.add("hidden");
+  }
 }
 
-/* Generate button */
+/* Generate click ---------------------------------------------- */
 createBtn.addEventListener("click",()=>{
   const sel=document.querySelector("input[name='mode']:checked");
   if(!sel) return;
-  let mode=sel.value;
+  const mode=sel.value;
 
   aiStage.style.display="block";
   aiStage.classList.add("show");
@@ -503,49 +620,80 @@ createBtn.addEventListener("click",()=>{
   setTimeout(()=>{
     let html="";
     if(mode==="push") html=buildPushHTML();
-    if(mode==="pull") html=buildPullHTML();
-    if(mode==="legs") html=buildLegsHTML();
-    if(mode==="full") html=buildFullHTML();
+    else if(mode==="pull") html=buildPullHTML();
+    else if(mode==="legs") html=buildLegsHTML();
+    else html=buildFullHTML();
 
     card.innerHTML=html;
-
     aiStage.classList.remove("show");
     aiStage.style.display="none";
 
     if(!DEV){
-      saveToday(mode,html);
+      saveWorkoutToday(mode, html);
       const locks=loadLocks();
       locks[mode]=true;
       saveLocks(locks);
     }
 
-    enterPost();
+    enterPostWorkout(mode, false);
   },900);
 });
 
-/* Init */
+/* Completion button ------------------------------------------- */
+completeBtn.addEventListener("click",()=>{
+  const todayData = loadWorkoutToday();
+  const mode = todayData?.mode || "workout";
+  const title = modeTitle(mode);
+
+  launchConfetti();
+  Sound.chime();
+
+  completeBtn.classList.add("hidden");
+  completedMsg.textContent = `${title} completed — come back tomorrow`;
+  completedMsg.classList.remove("hidden");
+
+  saveCompletedToday(mode);
+});
+
+/* Init -------------------------------------------------------- */
 (function init(){
-  const today=loadToday();
-  if(today){
-    card.innerHTML=today.html;
-    enterPost();
-  }else{
-    enterPre();
+  const todayData = loadWorkoutToday();
+  const completedData = loadCompletedToday();
+
+  if(todayData && !DEV){
+    card.innerHTML = todayData.html;
+    const isCompleted = !!completedData;
+    enterPostWorkout(todayData.mode, isCompleted);
+  } else {
+    if(!anyUnlocked() && !DEV){
+      subtitleEl.textContent = "All workouts used this week";
+      radioRow.style.display = "none";
+      createBtn.style.display = "none";
+      output.style.display = "none";
+    } else {
+      enterPreWorkout();
+    }
   }
 })();
 
-document.querySelectorAll("input[name='mode']").forEach(r=>{
-  r.addEventListener("change", refreshRadios);
+/* Radio changes ----------------------------------------------- */
+document.querySelectorAll("input[name='mode']").forEach(inp=>{
+  inp.addEventListener("change", refreshRadios);
 });
 
-/* Weather */
+/* Weather ----------------------------------------------------- */
 if(navigator.geolocation){
-  navigator.geolocation.getCurrentPosition(async p=>{
+  navigator.geolocation.getCurrentPosition(async pos=>{
     try{
-      const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${p.coords.latitude}&longitude=${p.coords.longitude}&current_weather=true&timezone=auto`);
+      const lat=pos.coords.latitude;
+      const lon=pos.coords.longitude;
+      const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`);
       const j=await r.json();
-      qs("#weather").textContent=`${Math.round(j.current_weather.temperature)}°C`;
-    }catch{ qs("#weather").textContent="Weather unavailable"; }
+      const temp=Math.round(j.current_weather.temperature);
+      qs("#weather").textContent = `${temp}°C`;
+    }catch{
+      qs("#weather").textContent = "Weather unavailable";
+    }
   },()=>qs("#weather").textContent="Enable location for weather");
 }
 </script>
