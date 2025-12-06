@@ -460,14 +460,16 @@ function clearRadioSelection(){
   qsa(".opt").forEach(lbl=>lbl.classList.remove("active"));
 }
 
-/* WORKOUT GENERATION LOGIC */
+/* WORKOUT GENERATION */
 const METALS = ["Metacon","EMOM","Ladder","AMRAP","Tabata"];
-const rand          = arr => arr[Math.floor(Math.random()*arr.length)];
+const rand   = arr => arr[Math.floor(Math.random()*arr.length)];
 
 /**
- * Assign "special labels" to metal items:
- * - weighted, abs, shoulders, biceps, kettlebell
- * Each: 50% chance, max once per workout, metals only (no Sets & Reps)
+ * Assign special labels with rules:
+ * - Each label (weighted, abs, shoulders, biceps, kettlebell) has 50% chance
+ * - Max once per workout for each label
+ * - Weighted is NEVER applied on a kettlebell metal
+ * - Strength blocks (Sets & Reps) are excluded from these labels
  */
 function assignSpecialLabels(mode, items){
   const metalIndices = items
@@ -476,66 +478,76 @@ function assignSpecialLabels(mode, items){
 
   if (!metalIndices.length) return;
 
-  function assignFlag(flagName, isEligibleForMode, probability = 0.5){
-    if(Math.random() >= probability) return;
-    const eligible = metalIndices.filter(idx => isEligibleForMode(mode, items[idx]));
+  const used = {
+    weighted: false,
+    abs: false,
+    shoulders: false,
+    biceps: false,
+    kettlebell: false
+  };
+
+  function tryAssign(flag, isEligible){
+    if(used[flag]) return;
+    if(Math.random() >= 0.5) return;
+
+    const eligible = metalIndices.filter(idx => isEligible(items[idx], idx));
     if(!eligible.length) return;
+
     const pick = eligible[Math.floor(Math.random()*eligible.length)];
-    items[pick][flagName] = true;
+    items[pick][flag] = true;
+    used[flag] = true;
   }
 
-  // Weighted: allowed on any metal
-  assignFlag("weighted", () => true, 0.5);
+  // Abs anywhere
+  tryAssign("abs", () => true);
 
-  // Abs: allowed on any metal
-  assignFlag("abs", () => true, 0.5);
+  // Shoulders: Push + Full
+  tryAssign("shoulders", () => mode === "push" || mode === "full");
 
-  // Shoulders: Push + Full only
-  assignFlag("shoulders", (mode) => mode==="push" || mode==="full", 0.5);
+  // Biceps: Pull + Full
+  tryAssign("biceps", () => mode === "pull" || mode === "full");
 
-  // Biceps: Pull + Full only
-  assignFlag("biceps", (mode) => mode==="pull" || mode==="full", 0.5);
+  // Kettlebell: Legs + Full
+  tryAssign("kettlebell", () => mode === "legs" || mode === "full");
 
-  // Kettlebell: Legs + Full only
-  assignFlag("kettlebell", (mode) => mode==="legs" || mode==="full", 0.5);
+  // Weighted: any metal that is NOT kettlebell
+  tryAssign("weighted", (item) => !item.kettlebell);
 }
 
 function buildWorkout(mode){
-  const items=[];
+  const items = [];
 
-  if(mode==="push" || mode==="pull"){
-    // Always first: Sets & Reps (weighted)
-    items.push({label:"Sets & Reps", weighted:true, isStrength:true});
+  if(mode === "push" || mode === "pull"){
+    // First block always Sets & Reps (weighted)
+    items.push({ label: "Sets & Reps", weighted: true, isStrength: true });
 
     const metalCount = 2;
-    for(let i=0;i<metalCount;i++){
+    for (let i = 0; i < metalCount; i++){
       items.push({
         label: rand(METALS),
-        isStrength:false
+        isStrength: false
       });
     }
-  } else if(mode==="legs"){
+  } else if (mode === "legs"){
     const metalCount = Math.random() < 0.5 ? 2 : 3;
-    for(let i=0;i<metalCount;i++){
+    for (let i = 0; i < metalCount; i++){
       items.push({
         label: rand(METALS),
-        isStrength:false
+        isStrength: false
       });
     }
-  } else if(mode==="full"){
+  } else if (mode === "full"){
     const metalCount = Math.random() < 0.5 ? 3 : 4;
-    for(let i=0;i<metalCount;i++){
+    for (let i = 0; i < metalCount; i++){
       items.push({
         label: rand(METALS),
-        isStrength:false
+        isStrength: false
       });
     }
   }
 
-  // Apply shared label logic across all modes
   assignSpecialLabels(mode, items);
-
-  return {mode,items};
+  return { mode, items };
 }
 
 function modeTitle(mode){
@@ -546,11 +558,11 @@ function modeTitle(mode){
   return "Workout";
 }
 
-/* RENDER WORKOUT CARD */
+/* RENDER CARD */
 function renderWorkoutCard(workout){
-  const {mode,items}=workout;
-  dayTitleEl.textContent=modeTitle(mode);
-  linesEl.innerHTML="";
+  const {mode,items} = workout;
+  dayTitleEl.textContent = modeTitle(mode);
+  linesEl.innerHTML = "";
 
   items.forEach(it=>{
     const row=document.createElement("div");
