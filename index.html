@@ -171,6 +171,7 @@
     color:#dc2626;
   }
 
+  /* MAIN GENERATE BUTTON */
   #mainBtn{
     position:fixed;
     left:50%;
@@ -194,6 +195,65 @@
   #mainBtn.disabled{
     opacity:.4;
     pointer-events:none;
+  }
+
+  /* SLIDE TO COMPLETE (ghost, ultra minimal) */
+  #slideWrap{
+    position:fixed;
+    left:50%;
+    bottom:24px;
+    transform:translateX(-50%);
+    width:calc(100% - 48px);
+    max-width:480px;
+    height:56px;
+    display:none;
+    align-items:center;
+    justify-content:flex-start;
+  }
+
+  .slide-track{
+    width:100%;
+    height:56px;
+    display:flex;
+    align-items:center;
+  }
+
+  .slide-knob{
+    width:32px;
+    height:32px;
+    border-radius:999px;
+    background:#ffffff;
+    box-shadow:0 4px 12px rgba(15,23,42,0.18);
+    flex-shrink:0;
+    touch-action:none;
+    transform:translateX(0);
+  }
+
+  .slide-text{
+    margin-left:12px;
+    font-size:16px;
+    color:var(--sub);
+    position:relative;
+    overflow:hidden;
+  }
+
+  .slide-text span{
+    display:inline-block;
+    background:linear-gradient(
+      120deg,
+      rgba(148,163,184,0.4),
+      #ffffff,
+      rgba(148,163,184,0.4)
+    );
+    background-size:200% 100%;
+    -webkit-background-clip:text;
+    color:transparent;
+    animation:shimmer 2.4s infinite;
+  }
+
+  @keyframes shimmer{
+    0%{ background-position:-100% 0; }
+    100%{ background-position:100% 0; }
   }
 
   #bigTimer{
@@ -284,6 +344,16 @@
 </div>
 
 <button id="mainBtn">Generate</button>
+
+<!-- Slide-to-complete control -->
+<div id="slideWrap">
+  <div id="slideTrack" class="slide-track">
+    <div id="slideKnob" class="slide-knob"></div>
+    <div class="slide-text">
+      <span>Slide to complete →</span>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
@@ -392,6 +462,10 @@ const tM         = qs("#tMins");
 const tS         = qs("#tSecs");
 const weatherEl  = qs(".weather");
 
+const slideWrap  = qs("#slideWrap");
+const slideTrack = qs("#slideTrack");
+const slideKnob  = qs("#slideKnob");
+
 let selectedMode   = null;
 let currentWorkout = null;
 let countdownInterval = null;
@@ -469,7 +543,7 @@ const rand   = arr => arr[Math.floor(Math.random()*arr.length)];
  * - Each label (weighted, abs, shoulders, biceps, kettlebell) has 50% chance
  * - Max once per workout for each label
  * - Weighted is NEVER applied on a kettlebell metal
- * - Strength blocks (Sets & Reps) are excluded from these labels
+ * - Strength block (Sets & Reps) is excluded from these labels
  */
 function assignSpecialLabels(mode, items){
   const metalIndices = items
@@ -501,13 +575,13 @@ function assignSpecialLabels(mode, items){
   // Abs anywhere
   tryAssign("abs", () => true);
 
-  // Shoulders: Push + Full
+  // Shoulders: Push + Full only
   tryAssign("shoulders", () => mode === "push" || mode === "full");
 
-  // Biceps: Pull + Full
+  // Biceps: Pull + Full only
   tryAssign("biceps", () => mode === "pull" || mode === "full");
 
-  // Kettlebell: Legs + Full
+  // Kettlebell: Legs + Full only
   tryAssign("kettlebell", () => mode === "legs" || mode === "full");
 
   // Weighted: any metal that is NOT kettlebell
@@ -607,6 +681,13 @@ function renderWorkoutCard(workout){
 }
 
 /* VIEW STATES */
+function hideSlide(){
+  slideWrap.style.display="none";
+  slideWrap.classList.remove("active");
+  slideKnob.style.transition="none";
+  slideKnob.style.transform="translateX(0px)";
+}
+
 function showSelectionState(){
   stopCountdown();
   bigTimer.classList.add("hidden");
@@ -621,6 +702,8 @@ function showSelectionState(){
   mainBtn.onclick=handleGenerate;
   mainBtn.classList.remove("hidden");
   mainBtn.classList.add("disabled");
+
+  hideSlide();
 }
 
 function showPreLockedState(){
@@ -628,6 +711,7 @@ function showPreLockedState(){
   radioRow.style.display="none";
   cardEl.style.display="none";
   mainBtn.classList.add("hidden");
+  hideSlide();
   startBigTimer(getStartTime(false));
 }
 
@@ -641,11 +725,12 @@ function showWorkoutState(workout){
   renderWorkoutCard(workout);
   radioRow.style.display="none";
 
-  const title=modeTitle(workout.mode);
-  mainBtn.textContent=`${title} Completed`;
-  mainBtn.onclick=handleComplete;
-  mainBtn.classList.remove("hidden");
-  mainBtn.classList.remove("disabled");
+  // Hide button, show slide control
+  mainBtn.classList.add("hidden");
+  slideWrap.style.display="flex";
+  slideWrap.classList.add("active");
+  slideKnob.style.transition="none";
+  slideKnob.style.transform="translateX(0px)";
 }
 
 function showCompletedState(){
@@ -653,6 +738,7 @@ function showCompletedState(){
   radioRow.style.display = "none";
   cardEl.style.display = "none";
   mainBtn.classList.add("hidden");
+  hideSlide();
   startBigTimer(getStartTime(true));
 }
 
@@ -661,6 +747,7 @@ function showAllUsedWeekState(){
   radioRow.style.display="none";
   cardEl.style.display="none";
   mainBtn.classList.add("hidden");
+  hideSlide();
   bigTimer.classList.add("hidden");
 }
 
@@ -823,6 +910,7 @@ function handleGenerate(){
 }
 
 function handleComplete(){
+  hideSlide();
   if(window.confetti){
     confetti({
       particleCount:160,
@@ -834,10 +922,76 @@ function handleComplete(){
 
   saveCompletedToday(currentWorkout?.mode || "workout");
   cardEl.style.display="none";
-  mainBtn.classList.add("hidden");
 
   setTimeout(()=>{ showCompletedState(); },600);
 }
+
+/* SLIDER (drag to complete) */
+(function initSlider(){
+  let dragging=false;
+  let startX=0;
+  let startOffset=0;
+  let maxX=0;
+
+  function getClientX(e){
+    if(e.touches && e.touches[0]) return e.touches[0].clientX;
+    return e.clientX;
+  }
+
+  function onDown(e){
+    if(!slideWrap.classList.contains("active")) return;
+    dragging=true;
+    slideKnob.style.transition="none";
+
+    const trackRect = slideTrack.getBoundingClientRect();
+    const knobRect  = slideKnob.getBoundingClientRect();
+    maxX = trackRect.width - knobRect.width;
+
+    startX = getClientX(e);
+    const match = slideKnob.style.transform.match(/translateX\(([-0-9.]+)px\)/);
+    startOffset = match ? parseFloat(match[1]) : 0;
+
+    e.preventDefault();
+  }
+
+  function onMove(e){
+    if(!dragging) return;
+    const x = getClientX(e);
+    let dx = x - startX;
+    let pos = startOffset + dx;
+    if(pos<0) pos=0;
+    if(pos>maxX) pos=maxX;
+    slideKnob.style.transform=`translateX(${pos}px)`;
+  }
+
+  function onUp(){
+    if(!dragging) return;
+    dragging=false;
+
+    const trackRect = slideTrack.getBoundingClientRect();
+    const knobRect  = slideKnob.getBoundingClientRect();
+    const offset = knobRect.left - trackRect.left;
+    const threshold = maxX*0.7;
+
+    if(offset>=threshold){
+      slideKnob.style.transition="transform .18s ease-out";
+      slideKnob.style.transform=`translateX(${maxX}px)`;
+      setTimeout(()=>{ handleComplete(); },160);
+    }else{
+      slideKnob.style.transition="transform .25s ease-out";
+      slideKnob.style.transform="translateX(0px)";
+    }
+  }
+
+  slideKnob.addEventListener("pointerdown", onDown);
+  window.addEventListener("pointermove", onMove);
+  window.addEventListener("pointerup", onUp);
+
+  // Touch fallback (for older Safari if needed)
+  slideKnob.addEventListener("touchstart", onDown, {passive:false});
+  window.addEventListener("touchmove", onMove, {passive:false});
+  window.addEventListener("touchend", onUp);
+})();
 
 /* BOOT */
 initUI();
