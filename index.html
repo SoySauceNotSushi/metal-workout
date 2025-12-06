@@ -207,9 +207,14 @@
   #bigTimer.hidden{ display:none; }
   #bigTimer.show{ opacity:1; }
 
-  .t-col{
-    text-align:center;
-  }
+.t-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;      /* centers numbers + labels */
+  justify-content: center;
+  width: 100px;             /* ensures equal spacing */
+  text-align: center;
+}
 
   .t-num{
   font-size:52px;
