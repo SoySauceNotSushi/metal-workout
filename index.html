@@ -17,9 +17,6 @@
     --pill-green:#d9fbe3;
     --pill-orange:#ffe6bf;
     --pill-red:#ffe0e0;
-
-    --shadow-soft:0 18px 48px rgba(15,23,42,0.16);
-    --shadow-subtle:0 8px 18px rgba(15,23,42,0.12);
   }
 
   *{ box-sizing:border-box; }
@@ -30,7 +27,6 @@
     background:var(--bg);
     color:var(--ink);
     font-family:-apple-system,BlinkMacSystemFont,"SF Pro",Segoe UI,Roboto,sans-serif;
-    -webkit-font-smoothing:antialiased;
   }
 
   .container{
@@ -44,11 +40,6 @@
     font-size:15px;
     color:var(--sub);
     margin-bottom:16px;
-    opacity:.95;
-    display:flex;
-    align-items:center;
-    gap:6px;
-    transition:opacity .25s ease, transform .25s ease;
   }
 
   h1{
@@ -92,53 +83,40 @@
     transition:opacity .32s ease, transform .32s cubic-bezier(.18,.84,.32,1.12);
   }
 
-  /* RADIO ROW */
+  /* RADIO ROW (aligned LEFT) */
   #radioRow{
-  display:flex;
-  gap:22px;
-  margin:0 0 6px;
-  justify-content:flex-start;
-}
+    display:flex;
+    gap:22px;
+    margin:0 0 10px;
+    justify-content:flex-start;
+  }
+
   .opt{
     display:flex;
     align-items:center;
     gap:6px;
     font-size:14px;
     color:var(--ink);
-    padding:6px 10px;
-    border-radius:999px;
-    transition:background .2s ease, color .2s ease, transform .16s ease, box-shadow .16s ease;
+    cursor:pointer;
   }
- /* Hide native radio */
 
-  /* Completely invisible radio buttons */
-.opt input{
-  appearance:none;
-  -webkit-appearance:none;
-  width:0;
-  height:0;
-  position:absolute;
-  opacity:0;
-  pointer-events:none;
-}
+  .opt input{
+    width:18px;
+    height:18px;
+    accent-color:var(--brand);
+  }
+  .opt input:focus{
+    outline:none;
+  }
 
-@keyframes radioPop{
-  0%{ transform:scale(0); opacity:0; }
-  100%{ transform:scale(1); opacity:1; }
-} 
   .opt.disabled{
     opacity:.35;
     pointer-events:none;
   }
+
   .opt.active{
     color:var(--brand);
     font-weight:600;
-    background:#e4ecff80;
-    box-shadow:0 0 0 1px #e4ecff;
-  }
-  .opt:active:not(.disabled){
-    transform:scale(.97);
-    box-shadow:0 0 0 1px rgba(36,83,245,0.22);
   }
 
   /* PREVIEW CARD (wireframe left + tag right) */
@@ -149,14 +127,11 @@
     margin:32px auto 24px;
     border-radius:18px;
     background:#ffffff;
-    box-shadow:var(--shadow-soft);
+    box-shadow:0 18px 48px rgba(15,23,42,0.16);
     padding:18px 20px;
     opacity:0;
     transform:translateY(26px) scale(.96) rotateX(5deg);
-    transition:
-      opacity .32s ease,
-      transform .32s cubic-bezier(.18,.84,.32,1.12),
-      box-shadow .24s ease;
+    transition:opacity .32s ease, transform .32s cubic-bezier(.18,.84,.32,1.12);
     pointer-events:none;
   }
   .preview-card.show{
@@ -166,20 +141,6 @@
   .preview-card.hidden{
     display:none;
   }
-  .preview-card::before{
-    content:"";
-    position:absolute;
-    inset:0;
-    border-radius:inherit;
-    background:radial-gradient(circle at 0% 0%,rgba(36,83,245,0.06),transparent 55%);
-    opacity:0;
-    pointer-events:none;
-    transition:opacity .3s ease;
-  }
-  .preview-card.show::before{
-    opacity:1;
-  }
-
   .preview-title{
     font-size:18px;
     font-weight:700;
@@ -195,48 +156,20 @@
     align-items:center;
     justify-content:flex-start;
     gap:8px;
-    opacity:0;
-    transform:translateY(6px);
-    transition:opacity .28s ease, transform .28s ease;
   }
-  .preview-row.show-row{
-    opacity:1;
-    transform:translateY(0);
-  }
-
-  /* Wireframe shimmer */
   .preview-wire{
-    position:relative;
     height:12px;
     width:32%;
     min-width:90px;
-    border-radius:6px;
-    overflow:hidden;
     background:#f2f3f5;
+    border-radius:6px;
   }
-  .preview-wire::before{
-    content:"";
-    position:absolute;
-    inset:0;
-    background:linear-gradient(120deg,
-      rgba(255,255,255,0),
-      rgba(255,255,255,0.8),
-      rgba(255,255,255,0));
-    transform:translateX(-100%);
-    animation:wireShimmer 1.7s linear infinite;
-  }
-  @keyframes wireShimmer{
-    0%{ transform:translateX(-100%); }
-    100%{ transform:translateX(100%); }
-  }
-
   .preview-tag{
     padding:4px 10px;
     border-radius:999px;
     font-size:13px;
     font-weight:600;
     white-space:nowrap;
-    box-shadow:0 0 0 1px rgba(15,23,42,0.04);
   }
   .preview-tag-weighted{ background:var(--pill-blue); color:var(--brand); }
   .preview-tag-abs{ background:var(--pill-green); color:#22c55e; }
@@ -287,26 +220,37 @@
   #card{
     background:var(--card);
     border-radius:16px;
-    padding:20px;
+    padding:20px 20px 18px;
     margin-top:4px;
     display:none;
     opacity:0;
     transform:translateY(12px) scale(.98);
-    box-shadow:var(--shadow-subtle);
-    transition:
-      opacity .3s ease,
-      transform .3s cubic-bezier(.18,.84,.32,1.12),
-      box-shadow .25s ease;
+    transition:opacity .3s ease,
+               transform .3s cubic-bezier(.18,.84,.32,1.12);
   }
   #card.visible{
     opacity:1;
     transform:translateY(0) scale(1);
   }
 
+  .card-header{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:8px;
+    margin-bottom:22px;
+  }
+
   #dayTitle{
     font-size:20px;
     font-weight:700;
-    margin-bottom:22px;
+  }
+
+  #cardMeta{
+    font-size:14px;
+    font-weight:400;
+    color:var(--sub);
+    white-space:nowrap;
   }
 
   .line{
@@ -316,15 +260,7 @@
     align-items:center;
     gap:8px;
     flex-wrap:wrap;
-    opacity:0;
-    transform:translateY(6px);
-    transition:opacity .22s ease, transform .22s ease;
   }
-  .line.show-line{
-    opacity:1;
-    transform:translateY(0);
-  }
-
   .pill{
     padding:3px 8px;
     border-radius:999px;
@@ -353,23 +289,10 @@
     font-size:18px;
     font-weight:600;
     cursor:pointer;
-    transition:
-      opacity .25s ease,
-      box-shadow .22s ease,
-      transform .16s ease,
-      background .18s ease;
-    box-shadow:0 15px 30px rgba(36,83,245,0.35);
+    transition:opacity .25s ease;
   }
   #mainBtn.hidden{ display:none; }
-  #mainBtn.disabled{
-    opacity:.4;
-    pointer-events:none;
-    box-shadow:none;
-  }
-  #mainBtn:active:not(.disabled){
-    transform:translateX(-50%) scale(.97);
-    box-shadow:0 10px 20px rgba(36,83,245,0.4);
-  }
+  #mainBtn.disabled{ opacity:.4; pointer-events:none; }
 
   /* BIG TIMER */
   #bigTimer{
@@ -415,7 +338,6 @@
     max-width:480px;
   }
   .slide-wrap.hidden{ display:none; }
-
   .slide-track{
     position:relative;
     height:56px;
@@ -424,26 +346,18 @@
     overflow:hidden;
     user-select:none;
     touch-action:none;
-    box-shadow:0 10px 22px rgba(15,23,42,0.15);
-    transition:box-shadow .22s ease, background .22s ease;
   }
-  .slide-track.filled{
-    box-shadow:0 14px 30px rgba(36,83,245,0.38);
-    background:linear-gradient(135deg,#2453f5,#4f8cff);
-  }
-
   .slide-fill{
     position:absolute;
     inset:0;
     width:0;
-    background:linear-gradient(120deg, #2453f5, #4f8cff);
+    background:var(--brand);
     border-radius:999px;
     pointer-events:none;
     transition:width .18s ease-out;
     box-sizing:content-box;
     padding-right:8px;
   }
-
   .slide-label{
     position:absolute;
     inset:0;
@@ -466,7 +380,6 @@
     0%,100%{ opacity:.75; }
     50%{ opacity:1; }
   }
-
   .slide-knob{
     position:absolute;
     top:50%;
@@ -481,22 +394,13 @@
     box-shadow:0 8px 16px rgba(15,23,42,0.18);
     transform:translate(0,-50%);
     touch-action:none;
-    transition:box-shadow .18s ease, transform .18s ease;
-  }
-  .slide-track.filled .slide-knob{
-    box-shadow:0 10px 24px rgba(36,83,245,0.5);
   }
   .slide-knob .arrow{
     font-size:20px;
     color:var(--brand);
-    transition:transform .18s ease;
-  }
-  .slide-track.filled .slide-knob .arrow{
-    transform:translateX(2px);
   }
 </style>
 <!-- ===================== CSS END ===================== -->
-
 </head>
 <body>
 
@@ -535,9 +439,12 @@
   <!-- AI LOADING MESH -->
   <div id="aiStage" class="ai-stage"></div>
 
-  <!-- REAL WORKOUT CARD -->
+  <!-- REAL / HISTORY WORKOUT CARD -->
   <div id="card">
-    <div id="dayTitle"></div>
+    <div class="card-header">
+      <div id="dayTitle"></div>
+      <div id="cardMeta"></div>
+    </div>
     <div id="lines"></div>
   </div>
 
@@ -553,7 +460,6 @@
     </div>
     <div class="t-col">
       <div id="tSecs" class="t-num">SECS</div>
-      <div class="t-label">SECS</div>
     </div>
   </div>
 
@@ -608,14 +514,19 @@ function afterStart(){
   if(DEV) return true;
   return new Date() >= getStartTime(false);
 }
+function weekdayName(dateStr){
+  const [y,m,d]=dateStr.split("-").map(Number);
+  const dt=new Date(y,m-1,d);
+  return dt.toLocaleDateString(undefined,{ weekday:"long" });
+}
 
 /* -------------------------------------------------
-   SUBTITLE ANIMATION (slide up/down smooth)
+   SUBTITLE ANIMATION
 -------------------------------------------------- */
 function setSubtitle(text){
   const el = qs("#subtitle");
+  if(!el) return;
   const oldText = el.textContent;
-
   if(oldText === text) return;
 
   el.classList.remove("subtitle-enter","subtitle-enter-active");
@@ -646,6 +557,7 @@ function resetWeekIfNeeded(){
     localStorage.removeItem("jy_locks");
     localStorage.removeItem("jy_workoutToday");
     localStorage.removeItem("jy_completedToday");
+    localStorage.removeItem("jy_weekHistory");   // NEW: clear weekly history
   }
 }
 function loadLocks(){
@@ -686,14 +598,28 @@ function loadCompletedToday(){
   return null;
 }
 
+/* WEEKLY HISTORY */
+function loadWeekHistory(){
+  if(DEV) return {};
+  const raw=localStorage.getItem("jy_weekHistory");
+  if(!raw) return {};
+  try{ return JSON.parse(raw); }catch{ return {}; }
+}
+function saveHistoryEntry(workout){
+  if(DEV || !workout || !workout.mode) return;
+  const hist=loadWeekHistory();
+  hist[workout.mode]={ date:todayKey(), workout };
+  localStorage.setItem("jy_weekHistory",JSON.stringify(hist));
+}
+
 /* -------------------------------------------------
    DOM REFERENCES
 -------------------------------------------------- */
-const subtitleEl = qs("#subtitle");
 const radioRow   = qs("#radioRow");
 const aiStage    = qs("#aiStage");
 const cardEl     = qs("#card");
 const dayTitleEl = qs("#dayTitle");
+const cardMetaEl = qs("#cardMeta");
 const linesEl    = qs("#lines");
 const mainBtn    = qs("#mainBtn");
 
@@ -703,9 +629,9 @@ const tM         = qs("#tMins");
 const tS         = qs("#tSecs");
 
 const slideWrap  = qs("#slideWrap");
+const slideKnob  = qs(".slide-knob");
 const slideTrackEl = qs(".slide-track");
 const slideFillEl  = qs(".slide-fill");
-const slideKnob  = qs(".slide-knob");
 
 const weatherEl  = qs(".weather");
 
@@ -717,6 +643,7 @@ const previewLines = qs("#previewLines");
 let selectedMode   = null;
 let currentWorkout = null;
 let countdownInterval = null;
+let inHistoryMode  = false;  // NEW: are we in "Here’s what you trained this week" view?
 
 /* -------------------------------------------------
    WORKOUT GENERATION (REAL)
@@ -740,17 +667,14 @@ function buildWorkout(mode){
       m1.shoulders = true;
       shouldersUsed = true;
     }
-
     if(mode==="pull" && !bicepsUsed && Math.random()<0.5){
       m1.biceps = true;
       bicepsUsed = true;
     }
-
     if(!absUsed && Math.random()<0.5){
       m2.abs = true;
       absUsed = true;
     }
-
     if(Math.random()<0.5 && !m1.weighted) m1.weighted = true;
     else if(Math.random()<0.5 && !m2.weighted) m2.weighted = true;
 
@@ -768,7 +692,6 @@ function buildWorkout(mode){
         m.weighted = true;
         weightedUsed = true;
       }
-
       if(!absUsed && Math.random()<0.5){
         m.abs = true;
         absUsed = true;
@@ -778,7 +701,6 @@ function buildWorkout(mode){
   }
   else if(mode==="full"){
     const count = Math.random()<0.5 ? 3 : 4;
-
     for(let i=0;i<count;i++){
       const m={ label:rand(METALS) };
 
@@ -856,68 +778,53 @@ function allowedPreviewTags(mode){
 }
 
 function randomPreviewRows(mode){
-  const pool = allowedPreviewTags(mode).filter(x => x !== null);
-  const rows = [];
-  const used = new Set();
-  const count = 3;
+  const poolAll = allowedPreviewTags(mode);
+  const rows=[];
+  const used=new Set();
+  const count=3;
 
-  // Pull & Push → Weighted ALWAYS row 1
-  if(mode === "pull" || mode === "push"){
-    rows.push({
-      label:"Weighted",
-      class:"preview-tag preview-tag-weighted"
-    });
+  // Pull + Push: row 1 always Weighted
+  if(mode==="pull" || mode==="push"){
+    rows.push({label:"Weighted", class:"preview-tag preview-tag-weighted"});
     used.add("Weighted");
-
-    for(let i=1; i<count; i++){
-      const remaining = pool.filter(t => !used.has(t.label));
-
-      // 40% chance → blank row
-      if(Math.random() < 0.40){
+    for(let i=1;i<count;i++){
+      // 30% chance of empty row
+      if(Math.random()<0.3){
         rows.push(null);
         continue;
       }
-
-      if(remaining.length > 0){
-        const pick = remaining[Math.floor(Math.random() * remaining.length)];
-        used.add(pick.label);
-        rows.push(pick);
-      } else {
-        rows.push(null);
-      }
+      const pool = poolAll.filter(t=>t && !used.has(t.label));
+      if(!pool.length){ rows.push(null); continue; }
+      const pick = pool[Math.floor(Math.random()*pool.length)];
+      used.add(pick.label);
+      rows.push(pick);
     }
-
     return rows;
   }
 
-  // Legs + Full → random BUT unique + sometimes blank
-  for(let i=0; i<count; i++){
-    const remaining = pool.filter(t => !used.has(t.label));
-
-    if(Math.random() < 0.40){
+  // Legs + Full: unique, but some rows may be empty
+  for(let i=0;i<count;i++){
+    if(Math.random()<0.3){
       rows.push(null);
       continue;
     }
-
-    if(remaining.length > 0){
-      const pick = remaining[Math.floor(Math.random() * remaining.length)];
-      used.add(pick.label);
-      rows.push(pick);
-    } else {
-      rows.push(null);
-    }
+    const pool = poolAll.filter(t=>t && !used.has(t.label));
+    if(!pool.length){ rows.push(null); continue; }
+    const pick = pool[Math.floor(Math.random()*pool.length)];
+    used.add(pick.label);
+    rows.push(pick);
   }
-
   return rows;
 }
 
 function renderPreviewCard(mode){
+  if(!previewCard) return;
   previewTitle.textContent = modeTitle(mode);
   previewLines.innerHTML = "";
 
   const rows = randomPreviewRows(mode);
 
-  rows.forEach((r, idx)=>{
+  rows.forEach(r=>{
     const row=document.createElement("div");
     row.className="preview-row";
 
@@ -930,18 +837,12 @@ function renderPreviewCard(mode){
       tag.className=r.class;
       tag.textContent=r.label;
       row.appendChild(tag);
-    } else {
+    }else{
       const spacer=document.createElement("span");
       spacer.style.minWidth="50px";
       row.appendChild(spacer);
     }
-
     previewLines.appendChild(row);
-
-    // staggered appearance
-    setTimeout(()=>{
-      row.classList.add("show-row");
-    }, 40 * idx + 60);
   });
 }
 
@@ -951,17 +852,16 @@ function showPreviewCard(){
   void previewCard.offsetWidth;
   previewCard.classList.add("show");
 }
-
 function hidePreviewCard(immediate=false){
+  if(!previewCard) return;
   if(immediate){
     previewCard.classList.remove("show");
     previewCard.classList.add("hidden");
-  } else {
+  }else{
     previewCard.classList.remove("show");
     setTimeout(()=>previewCard.classList.add("hidden"),260);
   }
 }
-
 function updatePreviewForMode(mode){
   if(!mode){ hidePreviewCard(); return; }
   renderPreviewCard(mode);
@@ -969,15 +869,17 @@ function updatePreviewForMode(mode){
 }
 
 /* -------------------------------------------------
-   RENDER REAL WORKOUT CARD (with fade-in)
+   RENDER REAL / HISTORY WORKOUT CARD
 -------------------------------------------------- */
-function renderWorkoutCard(workout){
+function renderWorkoutCard(workout, metaText=null){
+  if(!workout) return;
   const {mode, items} = workout;
 
   dayTitleEl.textContent = modeTitle(mode);
-  linesEl.innerHTML = "";
+  cardMetaEl.textContent = metaText || "";
 
-  items.forEach((it, idx)=>{
+  linesEl.innerHTML = "";
+  items.forEach(it=>{
     const row=document.createElement("div");
     row.className="line";
 
@@ -1010,10 +912,6 @@ function renderWorkoutCard(workout){
     }
 
     linesEl.appendChild(row);
-
-    setTimeout(()=>{
-      row.classList.add("show-line");
-    }, 40 * idx + 60);
   });
 
   cardEl.style.display="block";
@@ -1021,11 +919,16 @@ function renderWorkoutCard(workout){
   void cardEl.offsetWidth;
   cardEl.classList.add("visible");
 }
+function hideCard(){
+  cardEl.classList.remove("visible");
+  setTimeout(()=>{ cardEl.style.display="none"; },220);
+}
 
 /* -------------------------------------------------
    VIEW STATES
 -------------------------------------------------- */
 function showSelectionState(){
+  inHistoryMode=false;
   stopCountdown();
   bigTimer.classList.add("hidden");
   bigTimer.classList.remove("show");
@@ -1035,9 +938,7 @@ function showSelectionState(){
   radioRow.style.display="flex";
   applyLocksToRadios();
 
-  cardEl.style.display="none";
-  cardEl.classList.remove("visible");
-
+  hideCard();
   aiStage.style.display="none";
 
   mainBtn.textContent="Generate";
@@ -1046,17 +947,15 @@ function showSelectionState(){
   mainBtn.classList.add("disabled");
 
   slideWrap.classList.add("hidden");
-
   hidePreviewCard(true);
 }
 
 function showPreLockedState(){
+  inHistoryMode=false;
   setSubtitle("Next workout in");
   radioRow.style.display="none";
 
-  cardEl.style.display="none";
-  cardEl.classList.remove("visible");
-
+  hideCard();
   aiStage.style.display="none";
 
   mainBtn.classList.add("hidden");
@@ -1067,15 +966,15 @@ function showPreLockedState(){
 }
 
 function showWorkoutState(workout){
+  inHistoryMode=false;
   stopCountdown();
   bigTimer.classList.add("hidden");
   bigTimer.classList.remove("show");
 
   currentWorkout = workout;
-
   setSubtitle("Today’s workout");
 
-  renderWorkoutCard(workout);
+  renderWorkoutCard(workout,null);
 
   radioRow.style.display="none";
   mainBtn.classList.add("hidden");
@@ -1086,36 +985,38 @@ function showWorkoutState(workout){
 }
 
 function showCompletedState(){
-  setSubtitle("Next workout in");
-  radioRow.style.display="none";
+  inHistoryMode=true;
 
-  cardEl.style.display="none";
-  cardEl.classList.remove("visible");
+  setSubtitle("Here’s what you trained this week");
+
+  // show only modes that were trained this week
+  applyHistoryRadios();
+
+  // card hidden initially, timer visible
+  hideCard();
+  bigTimer.classList.remove("hidden");
+  bigTimer.classList.add("show");
 
   aiStage.style.display="none";
-
   mainBtn.classList.add("hidden");
   slideWrap.classList.add("hidden");
 
   hidePreviewCard(true);
-
   startBigTimer(getStartTime(true));
 }
 
 function showAllUsedWeekState(){
+  inHistoryMode=false;
   setSubtitle("All workouts used this week");
 
   radioRow.style.display="none";
-  cardEl.style.display="none";
-  cardEl.classList.remove("visible");
-
+  hideCard();
   aiStage.style.display="none";
 
   mainBtn.classList.add("hidden");
   slideWrap.classList.add("hidden");
 
   bigTimer.classList.add("hidden");
-
   hidePreviewCard(true);
 }
 
@@ -1214,6 +1115,7 @@ function handleComplete(){
   if(navigator.vibrate) navigator.vibrate(15);
 
   saveCompletedToday(currentWorkout?.mode || "workout");
+  saveHistoryEntry(currentWorkout);   // NEW: store into weekly history
 
   cardEl.style.display="none";
   slideWrap.classList.add("hidden");
@@ -1259,8 +1161,6 @@ slideKnob.addEventListener("pointerdown", e=>{
 
   maxSlide = trackRect.width - knobRect.width - 8;
   slideStartX = e.clientX;
-
-  if(navigator.vibrate) navigator.vibrate(6);
 });
 
 slideKnob.addEventListener("pointermove", e=>{
@@ -1317,7 +1217,6 @@ function endSlide(e){
     },240);
   }
 }
-
 slideKnob.addEventListener("pointerup", endSlide);
 slideKnob.addEventListener("pointercancel", endSlide);
 
@@ -1336,7 +1235,6 @@ function weatherCodeToText(code){
   };
   return map[code] || "Unknown";
 }
-
 function getWeatherEmoji(cond){
   const c=cond.toLowerCase();
   if(c.includes("clear")) return "☀️";
@@ -1348,85 +1246,91 @@ function getWeatherEmoji(cond){
   if(c.includes("fog")||c.includes("mist")) return "🌫️";
   return "🌡️";
 }
-
 function updateWeatherUI(){
   if(!navigator.geolocation){
     weatherEl.textContent="Location unavailable";
     return;
   }
-
   weatherEl.textContent="Loading weather…";
-
   navigator.geolocation.getCurrentPosition(async pos=>{
     const lat=pos.coords.latitude;
     const lon=pos.coords.longitude;
-
     try{
-      const url=
-        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`;
-
+      const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`;
       const res=await fetch(url);
       const data=await res.json();
-
       const temp=Math.round(data.current_weather.temperature);
       const cond=weatherCodeToText(data.current_weather.weathercode);
       const emoji=getWeatherEmoji(cond);
-
       let city="Your area";
       try{
-        const rev = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`
-        );
+        const rev=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
         const r=await rev.json();
         city = r.address.city || r.address.town ||
                r.address.village || r.address.county || city;
       }catch{}
-
-      weatherEl.textContent = `${emoji} ${temp}°C ${city}`;
+      weatherEl.textContent=`${emoji} ${temp}°C ${city}`;
     }catch{
       weatherEl.textContent="Weather unavailable";
     }
-
   },()=>{
     weatherEl.textContent="Enable location for weather";
-  },{ timeout:10000, maximumAge:600000 });
+  },{
+    timeout:10000,
+    maximumAge:600000
+  });
 }
 
 /* -------------------------------------------------
-   INIT UI
+   INIT / LOCKS / HISTORY RADIOS
 -------------------------------------------------- */
 function anyUnlockedModes(){
   if(DEV) return true;
   const locks=loadLocks();
   return ["pull","push","legs","full"].some(k=>!locks[k]);
 }
-
 function applyLocksToRadios(){
   const locks=loadLocks();
   qsa(".opt").forEach(lbl=>{
     const mode=lbl.dataset.mode;
     const input=lbl.querySelector("input");
-
+    lbl.style.display="flex";
     lbl.classList.remove("disabled");
     input.disabled=false;
-
     if(!DEV && locks[mode]){
       lbl.classList.add("disabled");
-      input.disabled = true;
+      input.disabled=true;
     }
   });
 }
-
 function clearRadioSelection(){
   qsa("input[name='mode']").forEach(r=> r.checked=false);
   qsa(".opt").forEach(lbl=> lbl.classList.remove("active"));
+}
+
+/* Only show modes that have history when in history view */
+function applyHistoryRadios(){
+  const hist=loadWeekHistory();
+  qsa(".opt").forEach(lbl=>{
+    const mode=lbl.dataset.mode;
+    const input=lbl.querySelector("input");
+    if(hist[mode]){
+      lbl.style.display="flex";
+      input.disabled=false;
+      lbl.classList.remove("disabled");
+    }else{
+      lbl.style.display="none";
+    }
+    input.checked=false;
+    lbl.classList.remove("active");
+  });
+  radioRow.style.display="flex";
 }
 
 function initUI(){
   resetWeekIfNeeded();
   clearRadioSelection();
   selectedMode=null;
-
   hidePreviewCard(true);
 
   if(DEV){
@@ -1444,22 +1348,18 @@ function initUI(){
     showPreLockedState();
     return;
   }
-
   if(completed){
     showCompletedState();
     return;
   }
-
   if(workout){
     showWorkoutState(workout);
     return;
   }
-
   if(!anyUnlockedModes()){
     showAllUsedWeekState();
     return;
   }
-
   showSelectionState();
 }
 
@@ -1468,22 +1368,49 @@ function initUI(){
 -------------------------------------------------- */
 qsa("input[name='mode']").forEach(r=>{
   r.addEventListener("change",()=>{
-    selectedMode = r.value;
+    const mode = r.value;
 
     qsa(".opt").forEach(lbl=>{
-      lbl.classList.toggle("active",
-        lbl.dataset.mode === selectedMode
-      );
+      lbl.classList.toggle("active", lbl.dataset.mode===mode);
     });
 
+    if(inHistoryMode){
+      // HISTORY VIEW: show stored workout, hide timer
+      const hist=loadWeekHistory();
+      const entry=hist[mode];
+      if(entry){
+        const label = weekdayName(entry.date);
+        renderWorkoutCard(entry.workout, label);
+        bigTimer.classList.remove("show");   // fade out timer
+      }
+      return;
+    }
+
+    // NORMAL SELECTION VIEW
+    selectedMode = mode;
     mainBtn.textContent =
       `Generate ${modeTitle(selectedMode).replace(" Day","")}`;
     mainBtn.classList.remove("disabled");
-
     updatePreviewForMode(selectedMode);
-
     if(navigator.vibrate) navigator.vibrate(8);
   });
+});
+
+/* -------------------------------------------------
+   CLICK OUTSIDE CARD IN HISTORY MODE → HIDE CARD, SHOW TIMER
+-------------------------------------------------- */
+document.addEventListener("click",(e)=>{
+  if(!inHistoryMode) return;
+  if(cardEl.style.display==="none" || !cardEl.classList.contains("visible")) return;
+
+  const clickInsideCard = cardEl.contains(e.target);
+  const clickInRadios   = radioRow.contains(e.target);
+
+  if(clickInsideCard || clickInRadios) return;
+
+  // Clicked outside
+  hideCard();
+  bigTimer.classList.add("show"); // fade back in
 });
 
 /* -------------------------------------------------
