@@ -933,84 +933,103 @@ function handleComplete(){
   setTimeout(()=>{ showCompletedState(); },600);
 }
 
-/* SLIDER LOGIC */
-let sliding=false;
-let slideStartX=0;
-let maxSlide=0;
+/* SLIDER LOGIC — FINAL SUPER SMOOTH VERSION */
+let sliding = false;
+let slideStartX = 0;
+let maxSlide = 0;
 
-function resetSlider(){
+function resetSlider() {
   const knobW = slideKnob.offsetWidth || 48;
-  slideKnob.style.transition="none";
-  slideFill.style.transition="none";
-  slideKnob.style.transform="translate(0,-50%)";
-  slideFill.style.width=`${knobW}px`;
+
+  slideKnob.style.transition = "none";
+  slideFill.style.transition = "none";
+
+  slideKnob.style.transform = "translate(0,-50%)";
+  slideFill.style.width = `${knobW}px`;
   slideTrack.classList.remove("filled");
-  setTimeout(()=>{
-    slideKnob.style.transition="";
-    slideFill.style.transition="width .18s ease-out";
-  },0);
+
+  setTimeout(() => {
+    slideKnob.style.transition = "";
+    slideFill.style.transition = "width .18s ease-out";
+  }, 20);
 }
 
-slideKnob.addEventListener("pointerdown",e=>{
+slideKnob.addEventListener("pointerdown", (e) => {
   e.preventDefault();
-  sliding=true;
+  sliding = true;
+
   slideKnob.setPointerCapture(e.pointerId);
-  const trackRect=slideTrack.getBoundingClientRect();
-  const knobRect =slideKnob.getBoundingClientRect();
+
+  slideKnob.style.transition = "none";
+  slideFill.style.transition = "none";
+
+  const trackRect = slideTrack.getBoundingClientRect();
+  const knobRect = slideKnob.getBoundingClientRect();
+
   maxSlide = trackRect.width - knobRect.width - 8;
-  slideStartX=e.clientX;
+  slideStartX = e.clientX;
 });
 
-slideKnob.addEventListener("pointermove",e=>{
-  if(!sliding) return;
-  const knobRect=slideKnob.getBoundingClientRect();
-  const dx=e.clientX - slideStartX;
-  let x=Math.max(0,Math.min(maxSlide,dx));
-  slideKnob.style.transform=`translate(${x}px,-50%)`;
-  slideFill.style.width=`${x + knobRect.width}px`;
+slideKnob.addEventListener("pointermove", (e) => {
+  if (!sliding) return;
 
-  const trackWidth=slideTrack.offsetWidth;
-  const labelCenter=trackWidth/2;
-  const knobCenter=4 + knobRect.width/2 + x;
-  if(knobCenter>labelCenter){
+  const knobRect = slideKnob.getBoundingClientRect();
+  const dx = e.clientX - slideStartX;
+
+  let x = Math.max(0, Math.min(maxSlide, dx));
+
+  slideKnob.style.transform = `translate(${x}px,-50%)`;
+  slideFill.style.width = `${x + knobRect.width}px`;
+
+  // white text toggle
+  const trackWidth = slideTrack.offsetWidth;
+  const labelCenter = trackWidth / 2;
+  const knobCenter = 4 + knobRect.width / 2 + x;
+
+  if (knobCenter > labelCenter) {
     slideTrack.classList.add("filled");
-  }else{
+  } else {
     slideTrack.classList.remove("filled");
   }
 });
 
-function endSlide(e){
-  if(!sliding) return;
-  sliding=false;
-  if(e.pointerId) slideKnob.releasePointerCapture(e.pointerId);
+function endSlide(e) {
+  if (!sliding) return;
+  sliding = false;
 
-  const knobRect=slideKnob.getBoundingClientRect();
-  const trackRect=slideTrack.getBoundingClientRect();
-  const currentTransform=slideKnob.style.transform;
-  let match=/translate\(([-0-9.]+)px/.exec(currentTransform);
-  let x=match?parseFloat(match[1]):0;
+  if (e.pointerId) slideKnob.releasePointerCapture(e.pointerId);
 
-  if(x >= maxSlide*0.9){
-    slideKnob.style.transform=`translate(${maxSlide}px,-50%)`;
-    slideFill.style.width=`${maxSlide + knobRect.width}px`;
+  const knobRect = slideKnob.getBoundingClientRect();
+  const currentTransform = slideKnob.style.transform;
+  const match = /translate\(([-0-9.]+)px/.exec(currentTransform);
+  const x = match ? parseFloat(match[1]) : 0;
+
+  slideKnob.style.transition = "transform .22s ease-out";
+  slideFill.style.transition = "width .22s ease-out";
+
+  if (x >= maxSlide * 0.9) {
+    slideKnob.style.transform = `translate(${maxSlide}px,-50%)`;
+    slideFill.style.width = `${maxSlide + knobRect.width}px`;
     slideTrack.classList.add("filled");
+
+    // HAPTIC FEEDBACK
+    if (navigator.vibrate) navigator.vibrate(15);
+
     handleComplete();
-  }else{
+  } else {
     slideTrack.classList.remove("filled");
-    slideKnob.style.transition="transform .22s ease-out";
-    slideFill.style.transition="width .22s ease-out";
-    slideKnob.style.transform="translate(0,-50%)";
-    slideFill.style.width=`${knobRect.width}px`;
-    setTimeout(()=>{
-      slideKnob.style.transition="";
-      slideFill.style.transition="width .18s ease-out";
-    },230);
+    slideKnob.style.transform = "translate(0,-50%)";
+    slideFill.style.width = `${knobRect.width}px`;
+
+    setTimeout(() => {
+      slideKnob.style.transition = "";
+      slideFill.style.transition = "width .18s ease-out";
+    }, 240);
   }
 }
 
-slideKnob.addEventListener("pointerup",endSlide);
-slideKnob.addEventListener("pointercancel",endSlide);
-
+slideKnob.addEventListener("pointerup", endSlide);
+slideKnob.addEventListener("pointercancel", endSlide);
 /* BOOT */
 initUI();
 updateWeatherUI();
