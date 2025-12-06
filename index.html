@@ -190,15 +190,19 @@
   #mainBtn.hidden{
     display:none;
   }
+  #mainBtn.disabled{
+    opacity:.4;
+    pointer-events:none;
+  }
 
   /* BIG CENTER TIMER */
   #bigTimer{
     position:fixed;
-    top:50%;
+    top:calc(50% + 2rem); /* 2rem lower */
     left:50%;
     transform:translate(-50%,-50%);
     display:flex;
-    gap:1.5rem;      /* <- tighter spacing between columns */
+    gap:1.5rem;
     opacity:0;
     transition:opacity .45s ease;
   }
@@ -215,7 +219,7 @@
     flex-direction:column;
     align-items:center;
     justify-content:center;
-    width:72px;      /* narrower columns so everything looks tight */
+    width:72px;
     text-align:center;
   }
 
@@ -223,7 +227,7 @@
     font-size:48px;
     font-weight:400;
     color:var(--ink);
-    font-variant-numeric:tabular-nums; /* stops jitter */
+    font-variant-numeric:tabular-nums;
   }
 
   .t-label{
@@ -488,12 +492,10 @@ function buildWorkout(mode){
     let m1 = {label:m1Label};
     let m2 = {label:m2Label};
 
-    // shoulders / biceps
     if(Math.random()<0.5){
       if(mode==="push") m1.shoulders=true;
       if(mode==="pull") m1.biceps=true;
     }
-
     if(maybeAbs()) m2.abs=true;
     if(maybeWeighted()) m1.weighted=true;
     if(maybeWeighted()) m2.weighted=true;
@@ -593,7 +595,8 @@ function showSelectionState(){
 
   mainBtn.textContent="Generate";
   mainBtn.onclick=handleGenerate;
-  mainBtn.classList.add("hidden");
+  mainBtn.classList.remove("hidden");
+  mainBtn.classList.add("disabled"); // visible but disabled until a mode is selected
 }
 
 function showPreLockedState(){
@@ -618,6 +621,7 @@ function showWorkoutState(workout){
   mainBtn.textContent=`${title} completed`;
   mainBtn.onclick=handleComplete;
   mainBtn.classList.remove("hidden");
+  mainBtn.classList.remove("disabled");
 }
 
 function showCompletedState(){
@@ -645,7 +649,7 @@ function initUI(){
   selectedMode=null;
 
   if(DEV){
-    const workout=loadWorkoutToday(); // in dev this is usually null
+    const workout=loadWorkoutToday();
     const completed=null;
     if(workout){
       showWorkoutState(workout);
@@ -692,7 +696,7 @@ qsa("input[name='mode']").forEach(r=>{
       lbl.classList.toggle("active",lbl.dataset.mode===selectedMode);
     });
     mainBtn.textContent=`Generate ${modeTitle(selectedMode).replace(" Day","")}`;
-    mainBtn.classList.remove("hidden");
+    mainBtn.classList.remove("disabled");
   });
 });
 
@@ -730,7 +734,7 @@ function handleComplete(){
       particleCount:160,
       spread:90,
       startVelocity:35,
-      origin:{ x:0.5, y:1.05 }   // from bottom center, behind button
+      origin:{ x:0.5, y:1.05 }   // from bottom center
     });
   }
 
