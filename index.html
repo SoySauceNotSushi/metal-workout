@@ -719,40 +719,58 @@ function modeTitle(mode){
 }
 
 /* -----------------------------------------
-   PREVIEW CARD (WIREFRAME LEFT, TAG RIGHT)
+   PREVIEW CARD (RANDOMIZED, NO SPOILERS)
 ----------------------------------------- */
-function renderPreviewCard(workout){
+
+const PREVIEW_TAGS = [
+  {label:"Weighted", class:"preview-tag preview-tag-weighted"},
+  {label:"Abs", class:"preview-tag preview-tag-abs"},
+  {label:"Shoulders", class:"preview-tag preview-tag-shoulders"},
+  {label:"Biceps", class:"preview-tag preview-tag-biceps"},
+  {label:"Kettlebell", class:"preview-tag preview-tag-kettlebell"},
+  null, null // allow blank rows sometimes
+];
+
+function randomPreviewRows(){
+  const rows = [];
+  const count = 3; // always 3 rows
+
+  for(let i=0;i<count;i++){
+    const pick = PREVIEW_TAGS[Math.floor(Math.random()*PREVIEW_TAGS.length)];
+
+    rows.push({
+      tagLabel: pick ? pick.label : null,
+      tagClass: pick ? pick.class : null
+    });
+  }
+  return rows;
+}
+
+function renderPreviewCard(mode){
   if(!previewCard) return;
 
-  const {mode,items}=workout;
   previewTitle.textContent = modeTitle(mode);
-  previewLines.innerHTML   = "";
+  previewLines.innerHTML = "";
 
-  items.forEach(it=>{
-    const row=document.createElement("div");
-    row.className="preview-row";
+  const rows = randomPreviewRows();
 
-    // LEFT: wireframe
-    const wire=document.createElement("div");
-    wire.className="preview-wire";
+  rows.forEach(r=>{
+    const row = document.createElement("div");
+    row.className = "preview-row";
+
+    // wireframe (always)
+    const wire = document.createElement("div");
+    wire.className = "preview-wire";
     row.appendChild(wire);
 
-    // determine tag
-    let tagLabel=null, tagClass=null;
-    if(it.weighted){ tagLabel="Weighted"; tagClass="preview-tag preview-tag-weighted"; }
-    else if(it.abs){ tagLabel="Abs"; tagClass="preview-tag preview-tag-abs"; }
-    else if(it.shoulders){ tagLabel="Shoulders"; tagClass="preview-tag preview-tag-shoulders"; }
-    else if(it.biceps){ tagLabel="Biceps"; tagClass="preview-tag preview-tag-biceps"; }
-    else if(it.kettlebell){ tagLabel="Kettlebell"; tagClass="preview-tag preview-tag-kettlebell"; }
-
-    // RIGHT: tag or spacer
-    if(tagLabel){
-      const tag=document.createElement("span");
-      tag.className=tagClass;
-      tag.textContent=tagLabel;
+    // tag (sometimes)
+    if(r.tagLabel){
+      const tag = document.createElement("span");
+      tag.className = r.tagClass;
+      tag.textContent = r.tagLabel;
       row.appendChild(tag);
     } else {
-      const spacer=document.createElement("span");
+      const spacer = document.createElement("span");
       spacer.style.minWidth="50px";
       row.appendChild(spacer);
     }
@@ -772,7 +790,7 @@ function hidePreviewCard(immediate=false){
   if(immediate){
     previewCard.classList.remove("show");
     previewCard.classList.add("hidden");
-  }else{
+  } else {
     previewCard.classList.remove("show");
     setTimeout(()=>previewCard.classList.add("hidden"),260);
   }
@@ -780,13 +798,10 @@ function hidePreviewCard(immediate=false){
 
 function updatePreviewForMode(mode){
   if(!mode){
-    pendingWorkout=null;
     hidePreviewCard();
     return;
   }
-  const workout = buildWorkout(mode);
-  pendingWorkout = workout;
-  renderPreviewCard(workout);
+  renderPreviewCard(mode);
   showPreviewCard();
 }
 
