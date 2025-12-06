@@ -399,6 +399,7 @@ const bigTimer   = qs("#bigTimer");
 const tH         = qs("#tHours");
 const tM         = qs("#tMins");
 const tS         = qs("#tSecs");
+const weatherEl  = qs(".weather");
 
 let selectedMode   = null;
 let currentWorkout = null;
@@ -687,6 +688,80 @@ function initUI(){
 }
 
 /* -----------------------------------------
+   WEATHER
+----------------------------------------- */
+function weatherCodeToText(code){
+  const map={
+    0:"Clear sky",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",
+    45:"Fog",48:"Fog",
+    51:"Drizzle",53:"Drizzle",55:"Drizzle",
+    61:"Rain",63:"Rain",65:"Rain",
+    71:"Snow",73:"Snow",75:"Snow",
+    80:"Rain shower",81:"Rain shower",82:"Rain shower",
+    95:"Thunderstorm",96:"Thunderstorm",99:"Thunderstorm"
+  };
+  return map[code] || "Unknown";
+}
+
+function getWeatherEmoji(cond){
+  const c=cond.toLowerCase();
+  if(c.includes("clear")) return "☀️";
+  if(c.includes("cloud")) return "⛅";
+  if(c.includes("rain")) return "🌧️";
+  if(c.includes("drizzle")) return "🌦️";
+  if(c.includes("thunder")) return "🌩️";
+  if(c.includes("snow")) return "❄️";
+  if(c.includes("fog") || c.includes("mist")) return "🌫️";
+  return "🌡️";
+}
+
+function updateWeatherUI(){
+  if(!weatherEl) return;
+
+  if(!navigator.geolocation){
+    weatherEl.textContent="Location unavailable";
+    return;
+  }
+
+  weatherEl.textContent="Loading weather…";
+
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    const lat=pos.coords.latitude;
+    const lon=pos.coords.longitude;
+
+    try{
+      const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`;
+      const res=await fetch(url);
+      const data=await res.json();
+
+      const temp=Math.round(data.current_weather.temperature);
+      const cond=weatherCodeToText(data.current_weather.weathercode);
+      const emoji=getWeatherEmoji(cond);
+
+      // reverse geocode for city
+      let city="Your area";
+      try{
+        const rev=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+        const r=await rev.json();
+        city = r.address.city || r.address.town || r.address.village || r.address.county || city;
+      }catch(e){
+        // ignore, keep default city
+      }
+
+      weatherEl.textContent=`${emoji} ${temp}°C ${city}`;
+    }catch(e){
+      weatherEl.textContent="Weather unavailable";
+    }
+  },err=>{
+    weatherEl.textContent="Enable location for weather";
+  },{
+    enableHighAccuracy:false,
+    timeout:10000,
+    maximumAge:600000
+  });
+}
+
+/* -----------------------------------------
    EVENTS
 ----------------------------------------- */
 qsa("input[name='mode']").forEach(r=>{
@@ -749,6 +824,7 @@ function handleComplete(){
    BOOT
 ----------------------------------------- */
 initUI();
+updateWeatherUI();
 </script>
 
 </body>
