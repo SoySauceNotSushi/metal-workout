@@ -687,11 +687,28 @@ function allowedPreviewTags(mode){
 }
 function randomPreviewRows(mode){
   const pool = allowedPreviewTags(mode);
-  const rows=[];
-  const count=3;
+  const rows = [];
+  const count = 3;
+
+  // Pull & Push = always Weighted on row 1
+  if(mode === "pull" || mode === "push"){
+    rows.push({
+      label:"Weighted",
+      class:"preview-tag preview-tag-weighted"
+    });
+
+    // rows 2 & 3 = random (mode-legal)
+    for(let i=1;i<count;i++){
+      rows.push(pool[Math.floor(Math.random()*pool.length)]);
+    }
+    return rows;
+  }
+
+  // Legs + Full body = fully random
   for(let i=0;i<count;i++){
     rows.push(pool[Math.floor(Math.random()*pool.length)]);
   }
+
   return rows;
 }
 function renderPreviewCard(mode){
