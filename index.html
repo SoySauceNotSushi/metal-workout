@@ -166,7 +166,6 @@
     color:#d97706;
   }
 
-  /* NEW: kettlebell pill (red) */
   .pill-kettlebell{
     background:#fed7d7;
     color:#dc2626;
@@ -464,71 +463,77 @@ function clearRadioSelection(){
 /* WORKOUT GENERATION LOGIC */
 const METALS = ["Metacon","EMOM","Ladder","AMRAP","Tabata"];
 const rand          = arr => arr[Math.floor(Math.random()*arr.length)];
-const maybeAbs      = () => Math.random()<0.5;
-const maybeWeighted = () => Math.random()<0.25;
+
+/**
+ * Assign "special labels" to metal items:
+ * - weighted, abs, shoulders, biceps, kettlebell
+ * Each: 50% chance, max once per workout, metals only (no Sets & Reps)
+ */
+function assignSpecialLabels(mode, items){
+  const metalIndices = items
+    .map((it, idx) => (!it.isStrength ? idx : -1))
+    .filter(i => i !== -1);
+
+  if (!metalIndices.length) return;
+
+  function assignFlag(flagName, isEligibleForMode, probability = 0.5){
+    if(Math.random() >= probability) return;
+    const eligible = metalIndices.filter(idx => isEligibleForMode(mode, items[idx]));
+    if(!eligible.length) return;
+    const pick = eligible[Math.floor(Math.random()*eligible.length)];
+    items[pick][flagName] = true;
+  }
+
+  // Weighted: allowed on any metal
+  assignFlag("weighted", () => true, 0.5);
+
+  // Abs: allowed on any metal
+  assignFlag("abs", () => true, 0.5);
+
+  // Shoulders: Push + Full only
+  assignFlag("shoulders", (mode) => mode==="push" || mode==="full", 0.5);
+
+  // Biceps: Pull + Full only
+  assignFlag("biceps", (mode) => mode==="pull" || mode==="full", 0.5);
+
+  // Kettlebell: Legs + Full only
+  assignFlag("kettlebell", (mode) => mode==="legs" || mode==="full", 0.5);
+}
 
 function buildWorkout(mode){
   const items=[];
 
   if(mode==="push" || mode==="pull"){
-    items.push({label:"Strength",weighted:true});
+    // Always first: Sets & Reps (weighted)
+    items.push({label:"Sets & Reps", weighted:true, isStrength:true});
 
-    const m1Label = rand(METALS);
-    const m2Label = rand(METALS.filter(m=>m!==m1Label || METALS.length===1));
-
-    let m1 = {label:m1Label};
-    let m2 = {label:m2Label};
-
-    if(Math.random()<0.5){
-      if(mode==="push") m1.shoulders=true;
-      if(mode==="pull") m1.biceps=true;
+    const metalCount = 2;
+    for(let i=0;i<metalCount;i++){
+      items.push({
+        label: rand(METALS),
+        isStrength:false
+      });
     }
-    if(maybeAbs()) m2.abs=true;
-    if(maybeWeighted()) m1.weighted=true;
-    if(maybeWeighted()) m2.weighted=true;
-
-    items.push(m1,m2);
   } else if(mode==="legs"){
-    // Legs: 2–3 metals; Kettlebell can appear on exactly one metal, 50% overall chance
-    const count = Math.random() < 0.5 ? 2 : 3;
-    const kettlebellOverall = Math.random() < 0.5; // 50% chance there is any KB at all
-    const kettlebellIndex = kettlebellOverall ? Math.floor(Math.random() * count) : -1;
-
-    for(let i=0;i<count;i++){
-      const lbl=rand(METALS);
-      const item = {
-        label:lbl,
-        weighted:maybeWeighted(),
-        abs:maybeAbs()
-      };
-      if(i === kettlebellIndex){
-        item.kettlebell = true;
-      }
-      items.push(item);
+    const metalCount = Math.random() < 0.5 ? 2 : 3;
+    for(let i=0;i<metalCount;i++){
+      items.push({
+        label: rand(METALS),
+        isStrength:false
+      });
     }
   } else if(mode==="full"){
-    // Full-body: no strength, 3–4 metals; optional single focus (shoulders or biceps)
-    const count = Math.random() < 0.5 ? 3 : 4;
-
-    let focusTag = null;
-    if (Math.random() < 0.5) {
-      focusTag = Math.random() < 0.5 ? "shoulders" : "biceps";
-    }
-    const focusIndex = focusTag ? Math.floor(Math.random() * count) : -1;
-
-    for (let i = 0; i < count; i++) {
-      const lbl = rand(METALS);
-      const item = {
-        label: lbl,
-        weighted: maybeWeighted(),
-        abs: maybeAbs()
-      };
-      if (focusTag && i === focusIndex) {
-        item[focusTag] = true;
-      }
-      items.push(item);
+    const metalCount = Math.random() < 0.5 ? 3 : 4;
+    for(let i=0;i<metalCount;i++){
+      items.push({
+        label: rand(METALS),
+        isStrength:false
+      });
     }
   }
+
+  // Apply shared label logic across all modes
+  assignSpecialLabels(mode, items);
 
   return {mode,items};
 }
