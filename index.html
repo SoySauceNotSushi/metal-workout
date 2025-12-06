@@ -8,13 +8,17 @@
 <style>
   :root{
     --brand:#2453f5;
+    --brand-light:#a6bfff;
+    --brand-mid:#5c7df5;
     --ink:#0f172a;
     --sub:#64748b;
     --bg:#ffffff;
     --card:#f8fafc;
+
     --pill-blue:#e4ecff;
     --pill-green:#d9fbe3;
     --pill-orange:#ffe6bf;
+    --pill-red:#ffd7d7;
   }
 
   *{ box-sizing:border-box; }
@@ -53,6 +57,7 @@
     margin:0 0 22px;
   }
 
+  /* RADIO ROW */
   #radioRow{
     display:flex;
     gap:22px;
@@ -82,6 +87,7 @@
     font-weight:600;
   }
 
+  /* AI GRADIENT STAGE */
   .ai-stage{
     position:relative;
     height:160px;
@@ -112,14 +118,16 @@
 
   @keyframes meshBreath{
     0%,100%{ transform:scale(1); opacity:.7 }
-    50%{ transform:scale(1.04); opacity:.35 }
+    50%    { transform:scale(1.04); opacity:.35 }
   }
+
   @keyframes meshDrift{
     0%{ transform:translate3d(0,0,0); }
     50%{ transform:translate3d(2%,-1.5%,0); }
     100%{ transform:translate3d(0,0,0); }
   }
 
+  /* WORKOUT CARD */
   #card{
     background:var(--card);
     border-radius:16px;
@@ -167,11 +175,11 @@
   }
 
   .pill-kettlebell{
-    background:#fed7d7;
-    color:#dc2626;
+    background:var(--pill-red);
+    color:#c72f2f;
   }
 
-  /* MAIN GENERATE BUTTON */
+  /* MAIN BUTTON (Generate) */
   #mainBtn{
     position:fixed;
     left:50%;
@@ -189,73 +197,14 @@
     cursor:pointer;
     transition:opacity .25s ease;
   }
-  #mainBtn.hidden{
-    display:none;
-  }
+
+  #mainBtn.hidden{ display:none; }
   #mainBtn.disabled{
     opacity:.4;
     pointer-events:none;
   }
 
-  /* SLIDE TO COMPLETE (ghost, ultra minimal) */
-  #slideWrap{
-    position:fixed;
-    left:50%;
-    bottom:24px;
-    transform:translateX(-50%);
-    width:calc(100% - 48px);
-    max-width:480px;
-    height:56px;
-    display:none;
-    align-items:center;
-    justify-content:flex-start;
-  }
-
-  .slide-track{
-    width:100%;
-    height:56px;
-    display:flex;
-    align-items:center;
-  }
-
-  .slide-knob{
-    width:32px;
-    height:32px;
-    border-radius:999px;
-    background:#ffffff;
-    box-shadow:0 4px 12px rgba(15,23,42,0.18);
-    flex-shrink:0;
-    touch-action:none;
-    transform:translateX(0);
-  }
-
-  .slide-text{
-    margin-left:12px;
-    font-size:16px;
-    color:var(--sub);
-    position:relative;
-    overflow:hidden;
-  }
-
-  .slide-text span{
-    display:inline-block;
-    background:linear-gradient(
-      120deg,
-      rgba(148,163,184,0.4),
-      #ffffff,
-      rgba(148,163,184,0.4)
-    );
-    background-size:200% 100%;
-    -webkit-background-clip:text;
-    color:transparent;
-    animation:shimmer 2.4s infinite;
-  }
-
-  @keyframes shimmer{
-    0%{ background-position:-100% 0; }
-    100%{ background-position:100% 0; }
-  }
-
+  /* BIG CENTER TIMER */
   #bigTimer{
     position:fixed;
     top:calc(50% + 2rem);
@@ -267,12 +216,8 @@
     transition:opacity .45s ease;
   }
 
-  #bigTimer.hidden{
-    display:none;
-  }
-  #bigTimer.show{
-    opacity:1;
-  }
+  #bigTimer.hidden{ display:none; }
+  #bigTimer.show{ opacity:1; }
 
   .t-col{
     display:flex;
@@ -296,6 +241,82 @@
     margin-top:6px;
     letter-spacing:1px;
   }
+
+  /* SLIDE TO COMPLETE (New Component) */
+  #slideContainer{
+    position:fixed;
+    left:50%;
+    bottom:24px;
+    transform:translateX(-50%);
+    width:calc(100% - 48px);
+    max-width:480px;
+    height:56px;
+    display:none;
+
+    background:#f7f8f9;
+    border-radius:28px;
+    overflow:hidden;
+    position:fixed;
+  }
+
+  #slideFill{
+    position:absolute;
+    left:0;
+    top:0;
+    bottom:0;
+    width:0%;
+    background:var(--brand);
+    transition:width 0s;
+    box-shadow:0 0 22px 8px rgba(36,83,245,0.25);
+  }
+
+  #slideKnob{
+    position:absolute;
+    top:50%;
+    left:6px;
+    transform:translateY(-50%);
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    background:#fff;
+    box-shadow:0 2px 6px rgba(0,0,0,0.15),
+               0 0 12px rgba(36,83,245,0.35);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:20px;
+    color:var(--brand);
+    user-select:none;
+    touch-action:none;
+  }
+
+  #slideText{
+    position:absolute;
+    top:50%;
+    left:60px;
+    transform:translateY(-50%);
+    font-size:17px;
+    font-weight:600;
+    color:var(--sub);
+    pointer-events:none;
+
+    background: linear-gradient(
+      90deg,
+      #cccccc 0%,
+      #ffffff 50%,
+      #cccccc 100%
+    );
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    background-size:200% auto;
+    animation: shimmer 3s linear infinite;
+  }
+
+  @keyframes shimmer {
+    0%   { background-position:200% 0; }
+    100% { background-position:-200% 0; }
+  }
+
 </style>
 </head>
 <body>
@@ -327,6 +348,7 @@
     <div id="lines"></div>
   </div>
 
+  <!-- BIG TIMER -->
   <div id="bigTimer" class="hidden">
     <div class="t-col">
       <div id="tHours" class="t-num">00</div>
@@ -341,24 +363,26 @@
       <div class="t-label">SECS</div>
     </div>
   </div>
+
 </div>
 
+<!-- NORMAL BUTTON (Generate) -->
 <button id="mainBtn">Generate</button>
 
-<!-- Slide-to-complete control -->
-<div id="slideWrap">
-  <div id="slideTrack" class="slide-track">
-    <div id="slideKnob" class="slide-knob"></div>
-    <div class="slide-text">
-      <span>Slide to complete →</span>
-    </div>
-  </div>
+<!-- SLIDE TO COMPLETE -->
+<div id="slideContainer">
+  <div id="slideFill"></div>
+  <div id="slideKnob">→</div>
+  <div id="slideText">Slide To Complete</div>
 </div>
 
+<!-- CONFETTI LIB -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
-/* CONFIG / UTIL */
+/* -----------------------------------------
+   CONFIG / UTIL
+----------------------------------------- */
 const DEV = new URLSearchParams(location.search).get("dev")==="true";
 const START_HOUR = 17;
 const START_MIN = 30;
@@ -391,7 +415,9 @@ function afterStart(){
   return new Date() >= getStartTime(false);
 }
 
-/* STORAGE */
+/* -----------------------------------------
+   STORAGE
+----------------------------------------- */
 function resetWeekIfNeeded(){
   if(DEV) return;
   const cur=weekKey();
@@ -448,7 +474,9 @@ function loadCompletedToday(){
   return null;
 }
 
-/* DOM REFS */
+/* -----------------------------------------
+   DOM REFS
+----------------------------------------- */
 const subtitleEl = qs("#subtitle");
 const radioRow   = qs("#radioRow");
 const aiStage    = qs("#aiStage");
@@ -462,15 +490,13 @@ const tM         = qs("#tMins");
 const tS         = qs("#tSecs");
 const weatherEl  = qs(".weather");
 
-const slideWrap  = qs("#slideWrap");
-const slideTrack = qs("#slideTrack");
-const slideKnob  = qs("#slideKnob");
-
 let selectedMode   = null;
 let currentWorkout = null;
 let countdownInterval = null;
 
-/* TIMER */
+/* -----------------------------------------
+   COUNTDOWN
+----------------------------------------- */
 function stopCountdown(){
   if(countdownInterval){
     clearInterval(countdownInterval);
@@ -508,7 +534,9 @@ function startBigTimer(target){
   countdownInterval=setInterval(tick,1000);
 }
 
-/* LOCKS / RADIOS */
+/* -----------------------------------------
+   LOCKS / RADIOS
+----------------------------------------- */
 function anyUnlockedModes(){
   if(DEV) return true;
   const locks=loadLocks();
@@ -534,17 +562,16 @@ function clearRadioSelection(){
   qsa(".opt").forEach(lbl=>lbl.classList.remove("active"));
 }
 
-/* WORKOUT GENERATION */
+/* -----------------------------------------
+   METALS + LABEL LOGIC
+----------------------------------------- */
 const METALS = ["Metacon","EMOM","Ladder","AMRAP","Tabata"];
-const rand   = arr => arr[Math.floor(Math.random()*arr.length)];
 
-/**
- * Assign special labels with rules:
- * - Each label (weighted, abs, shoulders, biceps, kettlebell) has 50% chance
- * - Max once per workout for each label
- * - Weighted is NEVER applied on a kettlebell metal
- * - Strength block (Sets & Reps) is excluded from these labels
- */
+const rand          = arr => arr[Math.floor(Math.random()*arr.length)];
+const maybeAbs      = () => Math.random()<0.5;
+
+function maybe(prob=0.5){ return Math.random() < prob; }
+
 function assignSpecialLabels(mode, items){
   const metalIndices = items
     .map((it, idx) => (!it.isStrength ? idx : -1))
@@ -552,76 +579,57 @@ function assignSpecialLabels(mode, items){
 
   if (!metalIndices.length) return;
 
-  const used = {
-    weighted: false,
-    abs: false,
-    shoulders: false,
-    biceps: false,
-    kettlebell: false
-  };
-
-  function tryAssign(flag, isEligible){
-    if(used[flag]) return;
-    if(Math.random() >= 0.5) return;
-
-    const eligible = metalIndices.filter(idx => isEligible(items[idx], idx));
+  function assignFlag(flagName, isEligible, probability = 0.5){
+    if(Math.random() >= probability) return;
+    const eligible = metalIndices.filter(idx => isEligible(mode, items[idx]));
     if(!eligible.length) return;
-
     const pick = eligible[Math.floor(Math.random()*eligible.length)];
-    items[pick][flag] = true;
-    used[flag] = true;
+    items[pick][flagName] = true;
   }
 
-  // Abs anywhere
-  tryAssign("abs", () => true);
-
-  // Shoulders: Push + Full only
-  tryAssign("shoulders", () => mode === "push" || mode === "full");
-
-  // Biceps: Pull + Full only
-  tryAssign("biceps", () => mode === "pull" || mode === "full");
-
-  // Kettlebell: Legs + Full only
-  tryAssign("kettlebell", () => mode === "legs" || mode === "full");
-
-  // Weighted: any metal that is NOT kettlebell
-  tryAssign("weighted", (item) => !item.kettlebell);
+  assignFlag("abs", () => true, 0.5);
+  assignFlag("shoulders", (mode) => mode==="push" || mode==="full", 0.5);
+  assignFlag("biceps", (mode) => mode==="pull" || mode==="full", 0.5);
+  assignFlag("kettlebell", (mode) => mode==="legs" || mode==="full", 0.5);
+  assignFlag("weighted", (mode,item) => !item.kettlebell, 0.5);
 }
 
+/* -----------------------------------------
+   WORKOUT GENERATION
+----------------------------------------- */
 function buildWorkout(mode){
-  const items = [];
+  const items=[];
 
-  if(mode === "push" || mode === "pull"){
-    // First block always Sets & Reps (weighted)
-    items.push({ label: "Sets & Reps", weighted: true, isStrength: true });
+  if(mode==="push" || mode==="pull"){
+    items.push({label:"Set & Reps",weighted:true,isStrength:true});
 
-    const metalCount = 2;
-    for (let i = 0; i < metalCount; i++){
-      items.push({
-        label: rand(METALS),
-        isStrength: false
-      });
+    const m1Label = rand(METALS);
+    const m2Label = rand(METALS.filter(m=>m!==m1Label || METALS.length===1));
+
+    let m1={label:m1Label};
+    let m2={label:m2Label};
+
+    items.push(m1,m2);
+    assignSpecialLabels(mode,items);
+
+  }else if(mode==="legs"){
+    const count = maybe()?3:4;
+    for(let i=0;i<count;i++){
+      const lbl=rand(METALS);
+      items.push({label:lbl});
     }
-  } else if (mode === "legs"){
-    const metalCount = Math.random() < 0.5 ? 2 : 3;
-    for (let i = 0; i < metalCount; i++){
-      items.push({
-        label: rand(METALS),
-        isStrength: false
-      });
+    assignSpecialLabels(mode,items);
+
+  }else if(mode==="full"){
+    const count = maybe()?3:4;
+    for(let i=0;i<count;i++){
+      const lbl=rand(METALS);
+      items.push({label:lbl});
     }
-  } else if (mode === "full"){
-    const metalCount = Math.random() < 0.5 ? 3 : 4;
-    for (let i = 0; i < metalCount; i++){
-      items.push({
-        label: rand(METALS),
-        isStrength: false
-      });
-    }
+    assignSpecialLabels(mode,items);
   }
 
-  assignSpecialLabels(mode, items);
-  return { mode, items };
+  return {mode,items};
 }
 
 function modeTitle(mode){
@@ -632,11 +640,13 @@ function modeTitle(mode){
   return "Workout";
 }
 
-/* RENDER CARD */
+/* -----------------------------------------
+   RENDER
+----------------------------------------- */
 function renderWorkoutCard(workout){
-  const {mode,items} = workout;
-  dayTitleEl.textContent = modeTitle(mode);
-  linesEl.innerHTML = "";
+  const {mode,items}=workout;
+  dayTitleEl.textContent=modeTitle(mode);
+  linesEl.innerHTML="";
 
   items.forEach(it=>{
     const row=document.createElement("div");
@@ -673,21 +683,15 @@ function renderWorkoutCard(workout){
       p.textContent="Kettlebell";
       row.appendChild(p);
     }
-
     linesEl.appendChild(row);
   });
 
   cardEl.style.display="block";
 }
 
-/* VIEW STATES */
-function hideSlide(){
-  slideWrap.style.display="none";
-  slideWrap.classList.remove("active");
-  slideKnob.style.transition="none";
-  slideKnob.style.transform="translateX(0px)";
-}
-
+/* -----------------------------------------
+   VIEW STATES
+----------------------------------------- */
 function showSelectionState(){
   stopCountdown();
   bigTimer.classList.add("hidden");
@@ -703,15 +707,17 @@ function showSelectionState(){
   mainBtn.classList.remove("hidden");
   mainBtn.classList.add("disabled");
 
-  hideSlide();
+  qs("#slideContainer").style.display="none";
 }
 
 function showPreLockedState(){
   subtitleEl.textContent="Next workout in";
   radioRow.style.display="none";
   cardEl.style.display="none";
+
   mainBtn.classList.add("hidden");
-  hideSlide();
+  qs("#slideContainer").style.display="none";
+
   startBigTimer(getStartTime(false));
 }
 
@@ -725,20 +731,21 @@ function showWorkoutState(workout){
   renderWorkoutCard(workout);
   radioRow.style.display="none";
 
-  // Hide button, show slide control
   mainBtn.classList.add("hidden");
-  slideWrap.style.display="flex";
-  slideWrap.classList.add("active");
-  slideKnob.style.transition="none";
-  slideKnob.style.transform="translateX(0px)";
+
+  const slideContainer=qs("#slideContainer");
+  slideContainer.style.display="block";
+  resetSlider();
 }
 
 function showCompletedState(){
-  subtitleEl.textContent = "Next workout in";
-  radioRow.style.display = "none";
-  cardEl.style.display = "none";
+  subtitleEl.textContent="Next workout in";
+  radioRow.style.display="none";
+  cardEl.style.display="none";
+
   mainBtn.classList.add("hidden");
-  hideSlide();
+  qs("#slideContainer").style.display="none";
+
   startBigTimer(getStartTime(true));
 }
 
@@ -746,12 +753,15 @@ function showAllUsedWeekState(){
   subtitleEl.textContent="All workouts used this week";
   radioRow.style.display="none";
   cardEl.style.display="none";
+
   mainBtn.classList.add("hidden");
-  hideSlide();
+  qs("#slideContainer").style.display="none";
   bigTimer.classList.add("hidden");
 }
 
-/* INIT */
+/* -----------------------------------------
+   INIT UI
+----------------------------------------- */
 function initUI(){
   resetWeekIfNeeded();
   clearRadioSelection();
@@ -795,7 +805,9 @@ function initUI(){
   showSelectionState();
 }
 
-/* WEATHER */
+/* -----------------------------------------
+   WEATHER
+----------------------------------------- */
 function weatherCodeToText(code){
   const map={
     0:"Clear sky",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",
@@ -809,25 +821,21 @@ function weatherCodeToText(code){
   return map[code] || "Unknown";
 }
 
-function getWeatherEmoji(cond,temp){
+function getWeatherEmoji(cond){
   const c=cond.toLowerCase();
   if(c.includes("clear")) return "☀️";
   if(c.includes("cloud")) return "⛅";
-  if(c.includes("overcast")) return "☁️";
   if(c.includes("rain")) return "🌧️";
   if(c.includes("drizzle")) return "🌦️";
-  if(c.includes("shower")) return "🌦️";
   if(c.includes("thunder")) return "🌩️";
   if(c.includes("snow")) return "❄️";
-  if(c.includes("fog") || c.includes("mist") || c.includes("haze")) return "🌫️";
-
-  if(temp<=0) return "🥶";
-  if(temp>=30) return "🥵";
+  if(c.includes("fog") || c.includes("mist")) return "🌫️";
   return "🌡️";
 }
 
 function updateWeatherUI(){
   if(!weatherEl) return;
+
   if(!navigator.geolocation){
     weatherEl.textContent="Location unavailable";
     return;
@@ -840,21 +848,20 @@ function updateWeatherUI(){
     const lon=pos.coords.longitude;
 
     try{
-      const res=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`);
+      const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`;
+      const res=await fetch(url);
       const data=await res.json();
 
       const temp=Math.round(data.current_weather.temperature);
       const cond=weatherCodeToText(data.current_weather.weathercode);
-      const emoji=getWeatherEmoji(cond,temp);
+      const emoji=getWeatherEmoji(cond);
 
       let city="Your area";
       try{
         const rev=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
         const r=await rev.json();
         city = r.address.city || r.address.town || r.address.village || r.address.county || city;
-      }catch(e){
-        // ignore
-      }
+      }catch(e){}
 
       weatherEl.textContent=`${emoji} ${temp}°C ${city}`;
     }catch(e){
@@ -869,7 +876,9 @@ function updateWeatherUI(){
   });
 }
 
-/* EVENTS */
+/* -----------------------------------------
+   EVENT: MODE SELECTION
+----------------------------------------- */
 qsa("input[name='mode']").forEach(r=>{
   r.addEventListener("change",()=>{
     selectedMode=r.value;
@@ -881,6 +890,9 @@ qsa("input[name='mode']").forEach(r=>{
   });
 });
 
+/* -----------------------------------------
+   GENERATE WORKOUT
+----------------------------------------- */
 function handleGenerate(){
   if(!selectedMode) return;
 
@@ -909,8 +921,25 @@ function handleGenerate(){
   },900);
 }
 
-function handleComplete(){
-  hideSlide();
+/* -----------------------------------------
+   SLIDER ENGINE
+----------------------------------------- */
+const slideContainer = qs("#slideContainer");
+const slideKnob      = qs("#slideKnob");
+const slideFill      = qs("#slideFill");
+const slideText      = qs("#slideText");
+
+let sliding=false;
+let startX=0;
+let knobStartLeft=0;
+
+function resetSlider(){
+  slideFill.style.width="0%";
+  slideText.style.opacity="1";
+  slideKnob.style.left="6px";
+}
+
+function handleCompleteSlide(){
   if(window.confetti){
     confetti({
       particleCount:160,
@@ -923,77 +952,64 @@ function handleComplete(){
   saveCompletedToday(currentWorkout?.mode || "workout");
   cardEl.style.display="none";
 
+  slideContainer.style.display="none";
   setTimeout(()=>{ showCompletedState(); },600);
 }
 
-/* SLIDER (drag to complete) */
-(function initSlider(){
-  let dragging=false;
-  let startX=0;
-  let startOffset=0;
-  let maxX=0;
+slideKnob.addEventListener("touchstart",e=>{
+  sliding=true;
+  startX=e.touches[0].clientX;
+  knobStartLeft=parseFloat(slideKnob.style.left);
+});
 
-  function getClientX(e){
-    if(e.touches && e.touches[0]) return e.touches[0].clientX;
-    return e.clientX;
+slideKnob.addEventListener("touchmove",e=>{
+  if(!sliding) return;
+  const dx=e.touches[0].clientX-startX;
+
+  const trackWidth=slideContainer.clientWidth;
+  const knobWidth=slideKnob.clientWidth;
+  const minLeft=6;
+  const maxLeft=trackWidth-knobWidth-6;
+
+  let newLeft=knobStartLeft+dx;
+  newLeft=Math.max(minLeft,Math.min(maxLeft,newLeft));
+
+  slideKnob.style.left=newLeft+"px";
+
+  const progress=(newLeft-minLeft)/(maxLeft-minLeft);
+  slideFill.style.width=(progress*100)+"%";
+
+  slideText.style.opacity=1-progress*1.4; // fades faster
+});
+
+slideKnob.addEventListener("touchend",()=>{
+  if(!sliding) return;
+  sliding=false;
+
+  const trackWidth=slideContainer.clientWidth;
+  const knobWidth=slideKnob.clientWidth;
+  const minLeft=6;
+  const maxLeft=trackWidth-knobWidth-6;
+
+  const currentLeft=parseFloat(slideKnob.style.left);
+  const progress=(currentLeft-minLeft)/(maxLeft-minLeft);
+
+  if(progress>0.9){
+    slideKnob.style.left=maxLeft+"px";
+    slideFill.style.width="100%";
+    slideText.style.opacity="0";
+    setTimeout(handleCompleteSlide,200);
+
+  }else{
+    slideKnob.style.left=minLeft+"px";
+    slideFill.style.width="0%";
+    slideText.style.opacity="1";
   }
+});
 
-  function onDown(e){
-    if(!slideWrap.classList.contains("active")) return;
-    dragging=true;
-    slideKnob.style.transition="none";
-
-    const trackRect = slideTrack.getBoundingClientRect();
-    const knobRect  = slideKnob.getBoundingClientRect();
-    maxX = trackRect.width - knobRect.width;
-
-    startX = getClientX(e);
-    const match = slideKnob.style.transform.match(/translateX\(([-0-9.]+)px\)/);
-    startOffset = match ? parseFloat(match[1]) : 0;
-
-    e.preventDefault();
-  }
-
-  function onMove(e){
-    if(!dragging) return;
-    const x = getClientX(e);
-    let dx = x - startX;
-    let pos = startOffset + dx;
-    if(pos<0) pos=0;
-    if(pos>maxX) pos=maxX;
-    slideKnob.style.transform=`translateX(${pos}px)`;
-  }
-
-  function onUp(){
-    if(!dragging) return;
-    dragging=false;
-
-    const trackRect = slideTrack.getBoundingClientRect();
-    const knobRect  = slideKnob.getBoundingClientRect();
-    const offset = knobRect.left - trackRect.left;
-    const threshold = maxX*0.7;
-
-    if(offset>=threshold){
-      slideKnob.style.transition="transform .18s ease-out";
-      slideKnob.style.transform=`translateX(${maxX}px)`;
-      setTimeout(()=>{ handleComplete(); },160);
-    }else{
-      slideKnob.style.transition="transform .25s ease-out";
-      slideKnob.style.transform="translateX(0px)";
-    }
-  }
-
-  slideKnob.addEventListener("pointerdown", onDown);
-  window.addEventListener("pointermove", onMove);
-  window.addEventListener("pointerup", onUp);
-
-  // Touch fallback (for older Safari if needed)
-  slideKnob.addEventListener("touchstart", onDown, {passive:false});
-  window.addEventListener("touchmove", onMove, {passive:false});
-  window.addEventListener("touchend", onUp);
-})();
-
-/* BOOT */
+/* -----------------------------------------
+   BOOT
+----------------------------------------- */
 initUI();
 updateWeatherUI();
 </script>
