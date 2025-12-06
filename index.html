@@ -48,35 +48,40 @@
     margin:0 0 6px;
   }
 
-  /* Subtitle with slide/fade animation */
-  #subtitle{
-    font-size:17px;
-    font-weight:400;
-    color:var(--sub);
-    margin:0 0 18px;
-    position:relative;
-    display:inline-block;
-    overflow:hidden;
-  }
+/* --------------------------------------------
+   SUBTITLE — Smooth upward exit + upward entry
+   -------------------------------------------- */
+#subtitle{
+  font-size:17px;
+  font-weight:400;
+  color:var(--sub);
+  margin:0 0 18px;
+  position:relative;
+  display:inline-block;
+  overflow:hidden;
+}
 
-  .subtitle-enter{
-    opacity:0;
-    transform:translateY(6px);
-  }
-  .subtitle-enter-active{
-    opacity:1;
-    transform:translateY(0);
-    transition:opacity .25s ease, transform .25s ease;
-  }
-  .subtitle-exit{
-    opacity:1;
-    transform:translateY(0);
-  }
-  .subtitle-exit-active{
-    opacity:0;
-    transform:translateY(-6px);
-    transition:opacity .25s ease, transform .25s ease;
-  }
+/* New text enters from BELOW → upward */
+.subtitle-enter{
+  opacity:0;
+  transform:translateY(10px);
+}
+.subtitle-enter-active{
+  opacity:1;
+  transform:translateY(0);
+  transition:opacity .32s ease, transform .32s cubic-bezier(.18,.84,.32,1.12);
+}
+
+/* Old text exits upward */
+.subtitle-exit{
+  opacity:1;
+  transform:translateY(0);
+}
+.subtitle-exit-active{
+  opacity:0;
+  transform:translateY(-10px);
+  transition:opacity .32s ease, transform .32s cubic-bezier(.18,.84,.32,1.12);
+}
 
   /* RADIO ROW */
   #radioRow{
