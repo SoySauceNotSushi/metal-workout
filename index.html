@@ -166,6 +166,12 @@
     color:#d97706;
   }
 
+  /* NEW: kettlebell pill (red) */
+  .pill-kettlebell{
+    background:#fed7d7;
+    color:#dc2626;
+  }
+
   #mainBtn{
     position:fixed;
     left:50%;
@@ -483,24 +489,32 @@ function buildWorkout(mode){
 
     items.push(m1,m2);
   } else if(mode==="legs"){
-    const count=Math.random()<0.5?2:3;
+    // Legs: 2–3 metals; Kettlebell can appear on exactly one metal, 50% overall chance
+    const count = Math.random() < 0.5 ? 2 : 3;
+    const kettlebellOverall = Math.random() < 0.5; // 50% chance there is any KB at all
+    const kettlebellIndex = kettlebellOverall ? Math.floor(Math.random() * count) : -1;
+
     for(let i=0;i<count;i++){
       const lbl=rand(METALS);
-      items.push({
+      const item = {
         label:lbl,
         weighted:maybeWeighted(),
         abs:maybeAbs()
-      });
+      };
+      if(i === kettlebellIndex){
+        item.kettlebell = true;
+      }
+      items.push(item);
     }
   } else if(mode==="full"){
-    // NEW full-body logic: no strength, 3–4 pure metals, one optional focus (shoulders OR biceps)
+    // Full-body: no strength, 3–4 metals; optional single focus (shoulders or biceps)
     const count = Math.random() < 0.5 ? 3 : 4;
 
     let focusTag = null;
     if (Math.random() < 0.5) {
       focusTag = Math.random() < 0.5 ? "shoulders" : "biceps";
     }
-    const focusIndex = focusTag ? Math.floor(Math.random()*count) : -1;
+    const focusIndex = focusTag ? Math.floor(Math.random() * count) : -1;
 
     for (let i = 0; i < count; i++) {
       const lbl = rand(METALS);
@@ -562,6 +576,13 @@ function renderWorkoutCard(workout){
       p.textContent="Biceps";
       row.appendChild(p);
     }
+    if(it.kettlebell){
+      const p=document.createElement("span");
+      p.className="pill pill-kettlebell";
+      p.textContent="Kettlebell";
+      row.appendChild(p);
+    }
+
     linesEl.appendChild(row);
   });
 
