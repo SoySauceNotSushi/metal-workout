@@ -51,14 +51,78 @@
     font-size:17px;
     font-weight:400;
     color:var(--sub);
-    margin:0 0 22px;
+    margin:0 0 18px;
+  }
+
+  /* ============================
+     ROTATING FAKE STACK
+  ============================ */
+  .fake-stack{
+    position:relative;
+    width:100%;
+    max-width:420px;
+    height:140px;
+    margin:0 auto 20px;
+    pointer-events:none;
+    transition:opacity .25s ease, transform .25s ease;
+  }
+  .fake-stack.hidden{
+    display:none;
+  }
+  .fake-stack.fade-out{
+    opacity:0;
+    transform:translateY(8px);
+  }
+
+  .fake-card{
+    position:absolute;
+    inset:0;
+    border-radius:18px;
+    background:#f8fafc;
+    padding:16px 18px;
+    box-shadow:0 18px 48px rgba(15,23,42,0.16);
+    opacity:0;
+    transform:translateY(26px) scale(.94);
+    transition:
+      opacity .35s ease,
+      transform .35s ease;
+  }
+
+  .fake-card.front{
+    opacity:1;
+    transform:translateY(0) scale(1);
+    z-index:3;
+  }
+  .fake-card.mid{
+    opacity:.75;
+    transform:translateY(14px) scale(.97);
+    z-index:2;
+  }
+  .fake-card.back{
+    opacity:.5;
+    transform:translateY(26px) scale(.94);
+    z-index:1;
+  }
+
+  .fake-title{
+    font-size:18px;
+    font-weight:700;
+    margin-bottom:8px;
+  }
+  .fake-line{
+    font-size:15px;
+    margin-bottom:6px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
   }
 
   /* RADIO ROW */
   #radioRow{
     display:flex;
     gap:22px;
-    margin-bottom:18px;
+    margin:4px 0 18px;
   }
 
   .opt{
@@ -84,18 +148,15 @@
     font-weight:600;
   }
 
-  /* AI STAGE WITH STACKED CARDS */
+  /* AI GRADIENT STAGE */
   .ai-stage{
     position:relative;
-    height:210px;
-    margin:24px 0 16px;
-    border-radius:24px;
+    height:160px;
+    margin:10px 0 20px;
+    border-radius:100%;
     display:none;
     overflow:visible;
-    opacity:0;
-    transition:opacity .25s ease;
   }
-  .ai-stage.show{ opacity:1; }
 
   .ai-stage::before{
     content:"";
@@ -113,6 +174,7 @@
     animation:meshBreath 2s ease-in-out infinite,
              meshDrift 3s ease-in-out infinite;
   }
+
   .ai-stage.show::before{ opacity:.9; }
 
   @keyframes meshBreath{
@@ -125,85 +187,7 @@
     100%{ transform:translate3d(0,0,0); }
   }
 
-  .ai-stack{
-    position:relative;
-    height:100%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    pointer-events:none;
-  }
-
-  .ai-card{
-    position:absolute;
-    width:82%;
-    max-width:380px;
-    background:var(--card);
-    border-radius:20px;
-    padding:16px 18px 14px;
-    box-shadow:0 18px 40px rgba(15,23,42,0.16);
-    opacity:0;
-    transform:translateY(24px) scale(.94);
-    transition:transform .45s ease, opacity .45s ease;
-  }
-
-  .ai-card-title{
-    font-size:16px;
-    font-weight:600;
-    margin-bottom:8px;
-  }
-  .ai-card-lines{
-    font-size:14px;
-  }
-  .ai-card-line{
-    display:flex;
-    align-items:center;
-    gap:6px;
-    margin-bottom:4px;
-  }
-
-  .ai-card-pill{
-    padding:2px 7px;
-    border-radius:999px;
-    font-size:11px;
-    font-weight:600;
-  }
-
-  .ai-card-pill.weighted{
-    background:var(--pill-blue);
-    color:var(--brand);
-  }
-  .ai-card-pill.abs{
-    background:var(--pill-green);
-    color:#22c55e;
-  }
-  .ai-card-pill.orange{
-    background:var(--pill-orange);
-    color:#d97706;
-  }
-  .ai-card-pill.red{
-    background:var(--pill-red);
-    color:#e11d48;
-  }
-
-  /* depths */
-  .ai-card[data-depth="0"]{
-    opacity:1;
-    transform:translateY(0) scale(1);
-    z-index:3;
-  }
-  .ai-card[data-depth="1"]{
-    opacity:.86;
-    transform:translateY(10px) scale(.965);
-    z-index:2;
-  }
-  .ai-card[data-depth="2"]{
-    opacity:.55;
-    transform:translateY(20px) scale(.93);
-    z-index:1;
-  }
-
-  /* WORKOUT CARD */
+  /* WORKOUT CARD (REAL) */
   #card{
     background:var(--card);
     border-radius:16px;
@@ -353,7 +337,7 @@
     pointer-events:none;
     transition:width .18s ease-out;
     box-sizing:content-box;
-    padding-right:8px; /* tiny extra blue tail */
+    padding-right:8px; /* blue extra space near knob */
   }
 
   .slide-label{
@@ -378,7 +362,7 @@
   }
 
   @keyframes slidePulse{
-    0%,100%{ opacity:.75; }
+    0%,100{ opacity:.75; }
     50%{ opacity:1; }
   }
 
@@ -411,6 +395,13 @@
   <h1>Welcome back Jy</h1>
   <div id="subtitle">What would you like to train?</div>
 
+  <!-- ROTATING FAKE STACK -->
+  <div id="fakeStack" class="fake-stack">
+    <div class="fake-card front"></div>
+    <div class="fake-card mid"></div>
+    <div class="fake-card back"></div>
+  </div>
+
   <div id="radioRow">
     <label class="opt" data-mode="pull">
       <input type="radio" name="mode" value="pull"> Pull
@@ -426,10 +417,7 @@
     </label>
   </div>
 
-  <!-- AI stage with animated stack -->
-  <div id="aiStage" class="ai-stage">
-    <div id="aiStack" class="ai-stack"></div>
-  </div>
+  <div id="aiStage" class="ai-stage"></div>
 
   <div id="card">
     <div id="dayTitle"></div>
@@ -447,7 +435,7 @@
       <div class="t-label">MINS</div>
     </div>
     <div class="t-col">
-      <div id="tSecs" class="t-num">00</div>
+      <div id="tSecs" class="t-num">SECS</div>
       <div class="t-label">SECS</div>
     </div>
   </div>
@@ -455,7 +443,7 @@
 
 <button id="mainBtn">Generate</button>
 
-<!-- SLIDE TO COMPLETE -->
+<!-- SLIDE TO COMPLETE (only in workout state) -->
 <div id="slideWrap" class="slide-wrap hidden">
   <div class="slide-track">
     <div class="slide-fill"></div>
@@ -470,7 +458,9 @@
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
-/* CONFIG / UTIL */
+/* -----------------------------------------
+   CONFIG / UTIL
+----------------------------------------- */
 const DEV = new URLSearchParams(location.search).get("dev")==="true";
 const START_HOUR = 17;
 const START_MIN = 30;
@@ -503,7 +493,9 @@ function afterStart(){
   return new Date() >= getStartTime(false);
 }
 
-/* STORAGE */
+/* -----------------------------------------
+   STORAGE
+----------------------------------------- */
 function resetWeekIfNeeded(){
   if(DEV) return;
   const cur=weekKey();
@@ -560,11 +552,12 @@ function loadCompletedToday(){
   return null;
 }
 
-/* DOM */
+/* -----------------------------------------
+   DOM REFS
+----------------------------------------- */
 const subtitleEl = qs("#subtitle");
 const radioRow   = qs("#radioRow");
 const aiStage    = qs("#aiStage");
-const aiStack    = qs("#aiStack");
 const cardEl     = qs("#card");
 const dayTitleEl = qs("#dayTitle");
 const linesEl    = qs("#lines");
@@ -578,13 +571,19 @@ const weatherEl  = qs(".weather");
 const slideWrap  = qs("#slideWrap");
 const slideTrack = qs("#slideWrap .slide-track");
 const slideFill  = qs("#slideWrap .slide-fill");
+const slideLabel = qs("#slideWrap .slide-label span");
 const slideKnob  = qs("#slideWrap .slide-knob");
+
+const fakeStack  = qs("#fakeStack");
+const fakeCards  = qsa("#fakeStack .fake-card");
 
 let selectedMode   = null;
 let currentWorkout = null;
 let countdownInterval = null;
 
-/* COUNTDOWN */
+/* -----------------------------------------
+   COUNTDOWN / BIG TIMER
+----------------------------------------- */
 function stopCountdown(){
   if(countdownInterval){
     clearInterval(countdownInterval);
@@ -622,7 +621,9 @@ function startBigTimer(target){
   countdownInterval=setInterval(tick,1000);
 }
 
-/* LOCKS / RADIOS */
+/* -----------------------------------------
+   LOCKS / RADIOS
+----------------------------------------- */
 function anyUnlockedModes(){
   if(DEV) return true;
   const locks=loadLocks();
@@ -648,7 +649,9 @@ function clearRadioSelection(){
   qsa(".opt").forEach(lbl=>lbl.classList.remove("active"));
 }
 
-/* WORKOUT GENERATION */
+/* -----------------------------------------
+   WORKOUT GENERATION LOGIC
+----------------------------------------- */
 const METALS = ["Metacon","EMOM","Ladder","AMRAP","Tabata"];
 const rand = arr => arr[Math.floor(Math.random()*arr.length)];
 
@@ -658,6 +661,7 @@ function buildWorkout(mode){
       bicepsUsed=false, kettlebellUsed=false;
 
   if(mode==="push" || mode==="pull"){
+    // always weighted base
     items.push({label:"Sets & Reps", weighted:true});
 
     const m1Label=rand(METALS);
@@ -665,6 +669,7 @@ function buildWorkout(mode){
     let m1={label:m1Label};
     let m2={label:m2Label};
 
+    // shoulders / biceps (only on 1 metal)
     if(mode==="push" && !shouldersUsed && Math.random()<0.5){
       m1.shoulders=true;
       shouldersUsed=true;
@@ -673,10 +678,14 @@ function buildWorkout(mode){
       m1.biceps=true;
       bicepsUsed=true;
     }
+
+    // abs (only 1)
     if(!absUsed && Math.random()<0.5){
       m2.abs=true;
       absUsed=true;
     }
+
+    // weighted behaves like others – only one metal can have it
     if(!weightedUsed && Math.random()<0.5){
       m1.weighted=true;
       weightedUsed=true;
@@ -685,6 +694,7 @@ function buildWorkout(mode){
       m2.weighted=true;
       weightedUsed=true;
     }
+
     items.push(m1,m2);
 
   }else if(mode==="legs"){
@@ -693,6 +703,7 @@ function buildWorkout(mode){
       const lbl=rand(METALS);
       const m={label:lbl};
 
+      // kettlebell OR weighted, but kettlebell can't also be weighted
       if(!kettlebellUsed && Math.random()<0.5){
         m.kettlebell=true;
         kettlebellUsed=true;
@@ -709,6 +720,7 @@ function buildWorkout(mode){
     }
 
   }else if(mode==="full"){
+    // 3 or 4 metals, only one weighted & one abs max
     const count=Math.random()<0.5?3:4;
     for(let i=0;i<count;i++){
       const lbl=rand(METALS);
@@ -736,7 +748,107 @@ function modeTitle(mode){
   return "Workout";
 }
 
-/* RENDER MAIN CARD */
+/* -----------------------------------------
+   ROTATING FAKE STACK LOGIC
+----------------------------------------- */
+let fakeTimer=null;
+let fakeInitialized=false;
+const SAMPLE_MODES=["push","pull","legs","full"];
+
+function renderFakeCard(el, workout){
+  const {mode,items}=workout;
+  let html=`<div class="fake-title">${modeTitle(mode)}</div>`;
+  items.slice(0,3).forEach(it=>{
+    html+=`<div class="fake-line">${it.label}`;
+    if(it.weighted){
+      html+=` <span class="pill pill-weighted">Weighted</span>`;
+    }
+    if(it.abs){
+      html+=` <span class="pill pill-abs">Abs</span>`;
+    }
+    if(it.shoulders){
+      html+=` <span class="pill pill-shoulders">Shoulders</span>`;
+    }
+    if(it.biceps){
+      html+=` <span class="pill pill-biceps">Biceps</span>`;
+    }
+    if(it.kettlebell){
+      html+=` <span class="pill pill-kettlebell">Kettlebell</span>`;
+    }
+    html+=`</div>`;
+  });
+  el.innerHTML=html;
+}
+
+function initFakeStack(){
+  if(!fakeStack || !fakeCards.length) return;
+  const sampleModes=[...SAMPLE_MODES];
+  fakeCards.forEach((card,i)=>{
+    const mode=sampleModes[i % sampleModes.length];
+    renderFakeCard(card,buildWorkout(mode));
+  });
+  fakeCards[0].classList.add("front");
+  fakeCards[1].classList.add("mid");
+  fakeCards[2].classList.add("back");
+  fakeInitialized=true;
+  startFakeRotation();
+}
+
+function startFakeRotation(){
+  if(fakeTimer) clearInterval(fakeTimer);
+  if(!fakeStack || fakeStack.classList.contains("hidden")) return;
+  fakeTimer=setInterval(rotateFakeCards,2600);
+}
+
+function stopFakeRotation(){
+  if(fakeTimer){
+    clearInterval(fakeTimer);
+    fakeTimer=null;
+  }
+}
+
+function rotateFakeCards(){
+  if(!fakeStack) return;
+  const front=fakeStack.querySelector(".fake-card.front");
+  const mid  =fakeStack.querySelector(".fake-card.mid");
+  const back =fakeStack.querySelector(".fake-card.back");
+  if(!front || !mid || !back) return;
+
+  const newlyBack=front;
+
+  front.classList.remove("front"); front.classList.add("back");
+  mid.classList.remove("mid");     mid.classList.add("front");
+  back.classList.remove("back");   back.classList.add("mid");
+
+  const mode = SAMPLE_MODES[Math.floor(Math.random()*SAMPLE_MODES.length)];
+  renderFakeCard(newlyBack,buildWorkout(mode));
+}
+
+function showFakeStack(){
+  if(!fakeStack) return;
+  fakeStack.classList.remove("hidden","fade-out");
+  if(!fakeInitialized){
+    initFakeStack();
+  }else{
+    startFakeRotation();
+  }
+}
+
+function hideFakeStack(immediate=false){
+  if(!fakeStack) return;
+  stopFakeRotation();
+  if(immediate){
+    fakeStack.classList.add("hidden");
+    fakeStack.classList.remove("fade-out");
+  }else{
+    fakeStack.classList.add("fade-out");
+    setTimeout(()=>fakeStack.classList.add("hidden"),260);
+  }
+}
+
+/* -----------------------------------------
+   RENDER WORKOUT CARD
+----------------------------------------- */
 function renderWorkoutCard(workout){
   const {mode,items}=workout;
   dayTitleEl.textContent=modeTitle(mode);
@@ -783,118 +895,9 @@ function renderWorkoutCard(workout){
   cardEl.style.display="block";
 }
 
-/* ---------- AI PREVIEW STACK ---------- */
-let aiCards = [];
-let aiInterval = null;
-
-function buildPreviewWorkout(){
-  const mode = selectedMode || rand(["push","pull","legs","full"]);
-  return buildWorkout(mode);
-}
-
-function renderAiCard(cardEl, workout){
-  const titleEl = cardEl.querySelector(".ai-card-title");
-  const linesEl = cardEl.querySelector(".ai-card-lines");
-  titleEl.textContent = modeTitle(workout.mode);
-  linesEl.innerHTML = "";
-
-  workout.items.slice(0,3).forEach(it=>{
-    const row=document.createElement("div");
-    row.className="ai-card-line";
-    row.appendChild(document.createTextNode(it.label));
-
-    if(it.weighted){
-      const p=document.createElement("span");
-      p.className="ai-card-pill weighted";
-      p.textContent="Weighted";
-      row.appendChild(p);
-    }
-    if(it.abs){
-      const p=document.createElement("span");
-      p.className="ai-card-pill abs";
-      p.textContent="Abs";
-      row.appendChild(p);
-    }
-    if(it.shoulders){
-      const p=document.createElement("span");
-      p.className="ai-card-pill orange";
-      p.textContent="Shoulders";
-      row.appendChild(p);
-    }
-    if(it.biceps){
-      const p=document.createElement("span");
-      p.className="ai-card-pill orange";
-      p.textContent="Biceps";
-      row.appendChild(p);
-    }
-    if(it.kettlebell){
-      const p=document.createElement("span");
-      p.className="ai-card-pill red";
-      p.textContent="Kettlebell";
-      row.appendChild(p);
-    }
-
-    linesEl.appendChild(row);
-  });
-}
-
-function layoutAiCards(){
-  aiCards.forEach(card=>{
-    const depth = parseInt(card.dataset.depth,10);
-    card.setAttribute("data-depth", depth); // triggers CSS
-  });
-}
-
-function cycleAiCards(){
-  aiCards.forEach(card=>{
-    let d = parseInt(card.dataset.depth,10);
-    d = (d + 1) % 3;
-    card.dataset.depth = d;
-    // new front card gets fresh workout
-    if(d === 0){
-      renderAiCard(card, buildPreviewWorkout());
-    }
-  });
-  layoutAiCards();
-}
-
-function setupAiStack(){
-  if(aiCards.length) return;
-  // create 3 cards
-  for(let i=0;i<3;i++){
-    const c=document.createElement("div");
-    c.className="ai-card";
-    c.dataset.depth = String(i); // 0 front,1 mid,2 back
-    c.innerHTML = `
-      <div class="ai-card-title"></div>
-      <div class="ai-card-lines"></div>
-    `;
-    renderAiCard(c, buildPreviewWorkout());
-    aiStack.appendChild(c);
-    aiCards.push(c);
-  }
-  layoutAiCards();
-}
-
-function startAiStack(){
-  setupAiStack();
-  aiStage.style.display="block";
-  requestAnimationFrame(()=>aiStage.classList.add("show"));
-
-  if(aiInterval) clearInterval(aiInterval);
-  aiInterval = setInterval(cycleAiCards, 900);
-}
-
-function stopAiStack(){
-  aiStage.classList.remove("show");
-  if(aiInterval){
-    clearInterval(aiInterval);
-    aiInterval=null;
-  }
-  setTimeout(()=>{ aiStage.style.display="none"; },260);
-}
-
-/* VIEW STATES */
+/* -----------------------------------------
+   VIEW STATES
+----------------------------------------- */
 function showSelectionState(){
   stopCountdown();
   bigTimer.classList.add("hidden");
@@ -904,6 +907,7 @@ function showSelectionState(){
   radioRow.style.display="flex";
   applyLocksToRadios();
   cardEl.style.display="none";
+  aiStage.style.display="none";
 
   mainBtn.textContent="Generate";
   mainBtn.onclick=handleGenerate;
@@ -911,16 +915,17 @@ function showSelectionState(){
   mainBtn.classList.add("disabled");
 
   slideWrap.classList.add("hidden");
-  stopAiStack();
+  showFakeStack();
 }
 
 function showPreLockedState(){
   subtitleEl.textContent="Next workout in";
   radioRow.style.display="none";
   cardEl.style.display="none";
+  aiStage.style.display="none";
   mainBtn.classList.add("hidden");
   slideWrap.classList.add("hidden");
-  stopAiStack();
+  hideFakeStack(true);
   startBigTimer(getStartTime(false));
 }
 
@@ -937,16 +942,17 @@ function showWorkoutState(workout){
   mainBtn.classList.add("hidden");
   slideWrap.classList.remove("hidden");
   resetSlider();
-  stopAiStack();
+  hideFakeStack(true);
 }
 
 function showCompletedState(){
   subtitleEl.textContent="Next workout in";
   radioRow.style.display="none";
   cardEl.style.display="none";
+  aiStage.style.display="none";
   mainBtn.classList.add("hidden");
   slideWrap.classList.add("hidden");
-  stopAiStack();
+  hideFakeStack(true);
   startBigTimer(getStartTime(true));
 }
 
@@ -954,13 +960,16 @@ function showAllUsedWeekState(){
   subtitleEl.textContent="All workouts used this week";
   radioRow.style.display="none";
   cardEl.style.display="none";
+  aiStage.style.display="none";
   mainBtn.classList.add("hidden");
   slideWrap.classList.add("hidden");
   bigTimer.classList.add("hidden");
-  stopAiStack();
+  hideFakeStack(true);
 }
 
-/* INIT */
+/* -----------------------------------------
+   INIT
+----------------------------------------- */
 function initUI(){
   resetWeekIfNeeded();
   clearRadioSelection();
@@ -1004,7 +1013,9 @@ function initUI(){
   showSelectionState();
 }
 
-/* WEATHER */
+/* -----------------------------------------
+   WEATHER
+----------------------------------------- */
 function weatherCodeToText(code){
   const map={
     0:"Clear sky",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",
@@ -1073,7 +1084,9 @@ function updateWeatherUI(){
   });
 }
 
-/* RADIO EVENTS */
+/* -----------------------------------------
+   RADIO EVENTS
+----------------------------------------- */
 qsa("input[name='mode']").forEach(r=>{
   r.addEventListener("change",()=>{
     selectedMode=r.value;
@@ -1085,12 +1098,17 @@ qsa("input[name='mode']").forEach(r=>{
   });
 });
 
-/* GENERATE */
+/* -----------------------------------------
+   GENERATE
+----------------------------------------- */
 function handleGenerate(){
   if(!selectedMode) return;
 
-  startAiStack();
+  // hide rotating stack smoothly
+  hideFakeStack();
 
+  aiStage.style.display="block";
+  aiStage.classList.add("show");
   mainBtn.disabled=true;
   mainBtn.textContent="Generating...";
   cardEl.style.display="none";
@@ -1106,12 +1124,17 @@ function handleGenerate(){
       saveLocks(locks);
     }
 
+    aiStage.classList.remove("show");
+    aiStage.style.display="none";
     mainBtn.disabled=false;
+
     showWorkoutState(workout);
   },900);
 }
 
-/* COMPLETE VIA SLIDE */
+/* -----------------------------------------
+   COMPLETE VIA SLIDE
+----------------------------------------- */
 function handleComplete(){
   if(window.confetti){
     confetti({
@@ -1121,8 +1144,9 @@ function handleComplete(){
       origin:{ x:0.5, y:1.05 }
     });
   }
+  // haptic (vibrate) – mobile browsers that support it
   if(navigator.vibrate){
-    navigator.vibrate(30);
+    navigator.vibrate(15);
   }
 
   saveCompletedToday(currentWorkout?.mode || "workout");
@@ -1132,7 +1156,9 @@ function handleComplete(){
   setTimeout(()=>{ showCompletedState(); },600);
 }
 
-/* SLIDER LOGIC */
+/* -----------------------------------------
+   SLIDER LOGIC
+----------------------------------------- */
 let sliding = false;
 let slideStartX = 0;
 let maxSlide = 0;
@@ -1228,7 +1254,9 @@ function endSlide(e) {
 slideKnob.addEventListener("pointerup", endSlide);
 slideKnob.addEventListener("pointercancel", endSlide);
 
-/* BOOT */
+/* -----------------------------------------
+   BOOT
+----------------------------------------- */
 initUI();
 updateWeatherUI();
 </script>
