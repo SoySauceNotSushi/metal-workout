@@ -110,32 +110,16 @@
     transition:background .2s ease, color .2s ease, transform .16s ease, box-shadow .16s ease;
   }
  /* Hide native radio */
+
+  /* Completely invisible radio buttons */
 .opt input{
   appearance:none;
   -webkit-appearance:none;
-  width:18px;
-  height:18px;
-  border-radius:50%;
-  border:2px solid #cfd6e3;
-  background:#fff;
-  transition:border .22s ease, background .22s ease;
-  position:relative;
-}
-
-/* Filled center when checked */
-.opt input:checked{
-  border-color:var(--brand);
-  background:var(--brand);
-}
-
-/* Inner dot animation */
-.opt input:checked::after{
-  content:"";
+  width:0;
+  height:0;
   position:absolute;
-  inset:4px;
-  background:#fff;
-  border-radius:50%;
-  animation:radioPop .25s cubic-bezier(.2,1.3,.3,1);
+  opacity:0;
+  pointer-events:none;
 }
 
 @keyframes radioPop{
