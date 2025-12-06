@@ -750,23 +750,52 @@ function allowedPreviewTags(mode){
 }
 
 function randomPreviewRows(mode){
-  const pool = allowedPreviewTags(mode);
+  const pool = allowedPreviewTags(mode).filter(x => x !== null);
   const rows = [];
+  const used = new Set();
+
+  // Row count
   const count = 3;
 
-  // Pull + Push → ALWAYS Weighted on row 1 (wireframe consistency)
-  if(mode==="pull" || mode==="push"){
+  // Pull & Push → Weighted ALWAYS row 1
+  if(mode === "pull" || mode === "push"){
     rows.push({
       label:"Weighted",
       class:"preview-tag preview-tag-weighted"
     });
+    used.add("Weighted");
 
-    for(let i=1;i<count;i++){
-      rows.push(pool[Math.floor(Math.random()*pool.length)]);
+    // Fill row 2 & 3 with unique items
+    for(let i=1; i<count; i++){
+      const remaining = pool.filter(t => !used.has(t.label));
+      if(remaining.length === 0){
+        rows.push(null);
+        continue;
+      }
+      const pick = remaining[Math.floor(Math.random() * remaining.length)];
+      used.add(pick.label);
+      rows.push(pick);
     }
+
     return rows;
   }
 
+  // Legs + Full → fully random BUT unique
+  for(let i=0; i<count; i++){
+    const remaining = pool.filter(t => !used.has(t.label));
+    
+    if(remaining.length === 0){
+      rows.push(null);
+      continue;
+    }
+
+    const pick = remaining[Math.floor(Math.random() * remaining.length)];
+    used.add(pick.label);
+    rows.push(pick);
+  }
+
+  return rows;
+}
   // Legs + Full → fully random (but legal)
   for(let i=0;i<count;i++){
     rows.push(pool[Math.floor(Math.random()*pool.length)]);
