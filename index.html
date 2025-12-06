@@ -17,6 +17,9 @@
     --pill-green:#d9fbe3;
     --pill-orange:#ffe6bf;
     --pill-red:#ffe0e0;
+
+    --shadow-soft:0 18px 48px rgba(15,23,42,0.16);
+    --shadow-subtle:0 8px 18px rgba(15,23,42,0.12);
   }
 
   *{ box-sizing:border-box; }
@@ -27,6 +30,7 @@
     background:var(--bg);
     color:var(--ink);
     font-family:-apple-system,BlinkMacSystemFont,"SF Pro",Segoe UI,Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;
   }
 
   .container{
@@ -40,6 +44,11 @@
     font-size:15px;
     color:var(--sub);
     margin-bottom:16px;
+    opacity:.95;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    transition:opacity .25s ease, transform .25s ease;
   }
 
   h1{
@@ -48,40 +57,40 @@
     margin:0 0 6px;
   }
 
-/* --------------------------------------------
-   SUBTITLE — Smooth upward exit + upward entry
-   -------------------------------------------- */
-#subtitle{
-  font-size:17px;
-  font-weight:400;
-  color:var(--sub);
-  margin:0 0 18px;
-  position:relative;
-  display:inline-block;
-  overflow:hidden;
-}
+  /* --------------------------------------------
+     SUBTITLE — Smooth upward exit + upward entry
+     -------------------------------------------- */
+  #subtitle{
+    font-size:17px;
+    font-weight:400;
+    color:var(--sub);
+    margin:0 0 18px;
+    position:relative;
+    display:inline-block;
+    overflow:hidden;
+  }
 
-/* New text enters from BELOW → upward */
-.subtitle-enter{
-  opacity:0;
-  transform:translateY(10px);
-}
-.subtitle-enter-active{
-  opacity:1;
-  transform:translateY(0);
-  transition:opacity .32s ease, transform .32s cubic-bezier(.18,.84,.32,1.12);
-}
+  /* New text enters from BELOW → upward */
+  .subtitle-enter{
+    opacity:0;
+    transform:translateY(10px);
+  }
+  .subtitle-enter-active{
+    opacity:1;
+    transform:translateY(0);
+    transition:opacity .32s ease, transform .32s cubic-bezier(.18,.84,.32,1.12);
+  }
 
-/* Old text exits upward */
-.subtitle-exit{
-  opacity:1;
-  transform:translateY(0);
-}
-.subtitle-exit-active{
-  opacity:0;
-  transform:translateY(-10px);
-  transition:opacity .32s ease, transform .32s cubic-bezier(.18,.84,.32,1.12);
-}
+  /* Old text exits upward */
+  .subtitle-exit{
+    opacity:1;
+    transform:translateY(0);
+  }
+  .subtitle-exit-active{
+    opacity:0;
+    transform:translateY(-10px);
+    transition:opacity .32s ease, transform .32s cubic-bezier(.18,.84,.32,1.12);
+  }
 
   /* RADIO ROW */
   #radioRow{
@@ -96,6 +105,9 @@
     gap:6px;
     font-size:14px;
     color:var(--ink);
+    padding:6px 10px;
+    border-radius:999px;
+    transition:background .2s ease, color .2s ease, transform .16s ease, box-shadow .16s ease;
   }
   .opt input{
     width:18px;
@@ -108,6 +120,12 @@
   .opt.active{
     color:var(--brand);
     font-weight:600;
+    background:#e4ecff80;
+    box-shadow:0 0 0 1px #e4ecff;
+  }
+  .opt:active:not(.disabled){
+    transform:scale(.97);
+    box-shadow:0 0 0 1px rgba(36,83,245,0.22);
   }
 
   /* PREVIEW CARD (wireframe left + tag right) */
@@ -118,11 +136,14 @@
     margin:32px auto 24px;
     border-radius:18px;
     background:#ffffff;
-    box-shadow:0 18px 48px rgba(15,23,42,0.16);
+    box-shadow:var(--shadow-soft);
     padding:18px 20px;
     opacity:0;
     transform:translateY(26px) scale(.96) rotateX(5deg);
-    transition:opacity .32s ease, transform .32s cubic-bezier(.18,.84,.32,1.12);
+    transition:
+      opacity .32s ease,
+      transform .32s cubic-bezier(.18,.84,.32,1.12),
+      box-shadow .24s ease;
     pointer-events:none;
   }
   .preview-card.show{
@@ -132,6 +153,20 @@
   .preview-card.hidden{
     display:none;
   }
+  .preview-card::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:inherit;
+    background:radial-gradient(circle at 0% 0%,rgba(36,83,245,0.06),transparent 55%);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .3s ease;
+  }
+  .preview-card.show::before{
+    opacity:1;
+  }
+
   .preview-title{
     font-size:18px;
     font-weight:700;
@@ -147,20 +182,48 @@
     align-items:center;
     justify-content:flex-start;
     gap:8px;
+    opacity:0;
+    transform:translateY(6px);
+    transition:opacity .28s ease, transform .28s ease;
   }
+  .preview-row.show-row{
+    opacity:1;
+    transform:translateY(0);
+  }
+
+  /* Wireframe shimmer */
   .preview-wire{
+    position:relative;
     height:12px;
     width:32%;
     min-width:90px;
-    background:#f2f3f5;
     border-radius:6px;
+    overflow:hidden;
+    background:#f2f3f5;
   }
+  .preview-wire::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(120deg,
+      rgba(255,255,255,0),
+      rgba(255,255,255,0.8),
+      rgba(255,255,255,0));
+    transform:translateX(-100%);
+    animation:wireShimmer 1.7s linear infinite;
+  }
+  @keyframes wireShimmer{
+    0%{ transform:translateX(-100%); }
+    100%{ transform:translateX(100%); }
+  }
+
   .preview-tag{
     padding:4px 10px;
     border-radius:999px;
     font-size:13px;
     font-weight:600;
     white-space:nowrap;
+    box-shadow:0 0 0 1px rgba(15,23,42,0.04);
   }
   .preview-tag-weighted{ background:var(--pill-blue); color:var(--brand); }
   .preview-tag-abs{ background:var(--pill-green); color:#22c55e; }
@@ -216,8 +279,11 @@
     display:none;
     opacity:0;
     transform:translateY(12px) scale(.98);
-    transition:opacity .3s ease,
-               transform .3s cubic-bezier(.18,.84,.32,1.12);
+    box-shadow:var(--shadow-subtle);
+    transition:
+      opacity .3s ease,
+      transform .3s cubic-bezier(.18,.84,.32,1.12),
+      box-shadow .25s ease;
   }
   #card.visible{
     opacity:1;
@@ -229,6 +295,7 @@
     font-weight:700;
     margin-bottom:22px;
   }
+
   .line{
     font-size:16px;
     margin-bottom:10px;
@@ -236,7 +303,15 @@
     align-items:center;
     gap:8px;
     flex-wrap:wrap;
+    opacity:0;
+    transform:translateY(6px);
+    transition:opacity .22s ease, transform .22s ease;
   }
+  .line.show-line{
+    opacity:1;
+    transform:translateY(0);
+  }
+
   .pill{
     padding:3px 8px;
     border-radius:999px;
@@ -265,10 +340,23 @@
     font-size:18px;
     font-weight:600;
     cursor:pointer;
-    transition:opacity .25s ease;
+    transition:
+      opacity .25s ease,
+      box-shadow .22s ease,
+      transform .16s ease,
+      background .18s ease;
+    box-shadow:0 15px 30px rgba(36,83,245,0.35);
   }
   #mainBtn.hidden{ display:none; }
-  #mainBtn.disabled{ opacity:.4; pointer-events:none; }
+  #mainBtn.disabled{
+    opacity:.4;
+    pointer-events:none;
+    box-shadow:none;
+  }
+  #mainBtn:active:not(.disabled){
+    transform:translateX(-50%) scale(.97);
+    box-shadow:0 10px 20px rgba(36,83,245,0.4);
+  }
 
   /* BIG TIMER */
   #bigTimer{
@@ -314,6 +402,7 @@
     max-width:480px;
   }
   .slide-wrap.hidden{ display:none; }
+
   .slide-track{
     position:relative;
     height:56px;
@@ -322,18 +411,26 @@
     overflow:hidden;
     user-select:none;
     touch-action:none;
+    box-shadow:0 10px 22px rgba(15,23,42,0.15);
+    transition:box-shadow .22s ease, background .22s ease;
   }
+  .slide-track.filled{
+    box-shadow:0 14px 30px rgba(36,83,245,0.38);
+    background:linear-gradient(135deg,#2453f5,#4f8cff);
+  }
+
   .slide-fill{
     position:absolute;
     inset:0;
     width:0;
-    background:var(--brand);
+    background:linear-gradient(120deg, #2453f5, #4f8cff);
     border-radius:999px;
     pointer-events:none;
     transition:width .18s ease-out;
     box-sizing:content-box;
     padding-right:8px;
   }
+
   .slide-label{
     position:absolute;
     inset:0;
@@ -356,6 +453,7 @@
     0%,100%{ opacity:.75; }
     50%{ opacity:1; }
   }
+
   .slide-knob{
     position:absolute;
     top:50%;
@@ -370,10 +468,18 @@
     box-shadow:0 8px 16px rgba(15,23,42,0.18);
     transform:translate(0,-50%);
     touch-action:none;
+    transition:box-shadow .18s ease, transform .18s ease;
+  }
+  .slide-track.filled .slide-knob{
+    box-shadow:0 10px 24px rgba(36,83,245,0.5);
   }
   .slide-knob .arrow{
     font-size:20px;
     color:var(--brand);
+    transition:transform .18s ease;
+  }
+  .slide-track.filled .slide-knob .arrow{
+    transform:translateX(2px);
   }
 </style>
 <!-- ===================== CSS END ===================== -->
@@ -433,7 +539,7 @@
       <div class="t-label">MINS</div>
     </div>
     <div class="t-col">
-      <div id="tSecs" class="t-num">00</div>
+      <div id="tSecs" class="t-num">SECS</div>
       <div class="t-label">SECS</div>
     </div>
   </div>
@@ -456,7 +562,7 @@
 <!-- External libs -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-<!-- ===================== JS START (PART 3) ===================== -->
+<!-- ===================== JS START ===================== -->
 <script>
 /* -------------------------------------------------
    CONFIG / UTIL
@@ -499,14 +605,12 @@ function setSubtitle(text){
 
   if(oldText === text) return;
 
-  // Exit animation
   el.classList.remove("subtitle-enter","subtitle-enter-active");
   el.classList.add("subtitle-exit");
   requestAnimationFrame(()=>{
     el.classList.add("subtitle-exit-active");
   });
 
-  // After exit finishes
   setTimeout(()=>{
     el.textContent = text;
     el.classList.remove("subtitle-exit","subtitle-exit-active");
@@ -586,8 +690,8 @@ const tM         = qs("#tMins");
 const tS         = qs("#tSecs");
 
 const slideWrap  = qs("#slideWrap");
-const slideTrack = qs("#slideTrack");
-const slideFill  = qs("#slideFill");
+const slideTrackEl = qs(".slide-track");
+const slideFillEl  = qs(".slide-fill");
 const slideKnob  = qs(".slide-knob");
 
 const weatherEl  = qs(".weather");
@@ -603,7 +707,6 @@ let countdownInterval = null;
 
 /* -------------------------------------------------
    WORKOUT GENERATION (REAL)
-   — LEGAL RULES EXACTLY AS YOU WANT —
 -------------------------------------------------- */
 const METALS = ["Metacon","EMOM","Ladder","AMRAP","Tabata"];
 const rand = arr => arr[Math.floor(Math.random()*arr.length)];
@@ -613,7 +716,6 @@ function buildWorkout(mode){
   let weightedUsed=false, absUsed=false, shouldersUsed=false,
       bicepsUsed=false, kettlebellUsed=false;
 
-  /* PUSH + PULL (first item always Weighted Sets/Reps) */
   if(mode==="push" || mode==="pull"){
     items.push({label:"Sets & Reps", weighted:true});
     weightedUsed = true;
@@ -621,32 +723,26 @@ function buildWorkout(mode){
     const m1={ label:rand(METALS) };
     const m2={ label:rand(METALS) };
 
-    // Shoulders only allowed in PUSH + FULL
     if(mode==="push" && !shouldersUsed && Math.random()<0.5){
       m1.shoulders = true;
       shouldersUsed = true;
     }
 
-    // Biceps only allowed in PULL + FULL
     if(mode==="pull" && !bicepsUsed && Math.random()<0.5){
       m1.biceps = true;
       bicepsUsed = true;
     }
 
-    // Abs allowed in all
     if(!absUsed && Math.random()<0.5){
       m2.abs = true;
       absUsed = true;
     }
 
-    // Weighted (secondary)
     if(Math.random()<0.5 && !m1.weighted) m1.weighted = true;
     else if(Math.random()<0.5 && !m2.weighted) m2.weighted = true;
 
     items.push(m1,m2);
   }
-
-  /* LEGS — ONLY Weighted, Abs, Kettlebell */
   else if(mode==="legs"){
     const count = Math.random()<0.5 ? 2 : 3;
     for(let i=0;i<count;i++){
@@ -667,8 +763,6 @@ function buildWorkout(mode){
       items.push(m);
     }
   }
-
-  /* FULL BODY — all tags possible */
   else if(mode==="full"){
     const count = Math.random()<0.5 ? 3 : 4;
 
@@ -713,7 +807,6 @@ function modeTitle(mode){
 /* -------------------------------------------------
    PREVIEW CARD — NON-SPOILER, MODE-LEGAL
 -------------------------------------------------- */
-
 function allowedPreviewTags(mode){
   switch(mode){
     case "pull":
@@ -763,7 +856,6 @@ function randomPreviewRows(mode){
     });
     used.add("Weighted");
 
-    // Rows 2 & 3
     for(let i=1; i<count; i++){
       const remaining = pool.filter(t => !used.has(t.label));
 
@@ -773,7 +865,6 @@ function randomPreviewRows(mode){
         continue;
       }
 
-      // Otherwise pick a unique legal tag
       if(remaining.length > 0){
         const pick = remaining[Math.floor(Math.random() * remaining.length)];
         used.add(pick.label);
@@ -790,13 +881,11 @@ function randomPreviewRows(mode){
   for(let i=0; i<count; i++){
     const remaining = pool.filter(t => !used.has(t.label));
 
-    // 40% chance → blank row
     if(Math.random() < 0.40){
       rows.push(null);
       continue;
     }
 
-    // pick unique tag
     if(remaining.length > 0){
       const pick = remaining[Math.floor(Math.random() * remaining.length)];
       used.add(pick.label);
@@ -815,7 +904,7 @@ function renderPreviewCard(mode){
 
   const rows = randomPreviewRows(mode);
 
-  rows.forEach(r=>{
+  rows.forEach((r, idx)=>{
     const row=document.createElement("div");
     row.className="preview-row";
 
@@ -835,6 +924,11 @@ function renderPreviewCard(mode){
     }
 
     previewLines.appendChild(row);
+
+    // staggered appearance
+    setTimeout(()=>{
+      row.classList.add("show-row");
+    }, 40 * idx + 60);
   });
 }
 
@@ -860,11 +954,7 @@ function updatePreviewForMode(mode){
   renderPreviewCard(mode);
   showPreviewCard();
 }
-</script>
-<!-- ===================== JS END (PART 3) ===================== -->
 
-<!-- ===================== JS START (PART 4) ===================== -->
-<script>
 /* -------------------------------------------------
    RENDER REAL WORKOUT CARD (with fade-in)
 -------------------------------------------------- */
@@ -874,7 +964,7 @@ function renderWorkoutCard(workout){
   dayTitleEl.textContent = modeTitle(mode);
   linesEl.innerHTML = "";
 
-  items.forEach(it=>{
+  items.forEach((it, idx)=>{
     const row=document.createElement("div");
     row.className="line";
 
@@ -907,9 +997,12 @@ function renderWorkoutCard(workout){
     }
 
     linesEl.appendChild(row);
+
+    setTimeout(()=>{
+      row.classList.add("show-line");
+    }, 40 * idx + 60);
   });
 
-  // Fade-in animation
   cardEl.style.display="block";
   cardEl.classList.remove("visible");
   void cardEl.offsetWidth;
@@ -1083,7 +1176,6 @@ function handleGenerate(){
       saveLocks(locks);
     }
 
-    // Hide AI mesh
     aiStage.classList.remove("show");
     aiStage.style.display="none";
 
@@ -1122,8 +1214,6 @@ function handleComplete(){
 let sliding=false;
 let slideStartX=0;
 let maxSlide=0;
-const slideTrackEl = qs(".slide-track");
-const slideFillEl  = qs(".slide-fill");
 
 function resetSlider(){
   const knobW = slideKnob.offsetWidth || 48;
@@ -1156,6 +1246,8 @@ slideKnob.addEventListener("pointerdown", e=>{
 
   maxSlide = trackRect.width - knobRect.width - 8;
   slideStartX = e.clientX;
+
+  if(navigator.vibrate) navigator.vibrate(6);
 });
 
 slideKnob.addEventListener("pointermove", e=>{
@@ -1387,6 +1479,6 @@ qsa("input[name='mode']").forEach(r=>{
 initUI();
 updateWeatherUI();
 </script>
-<!-- ===================== JS END (PART 4) ===================== -->
+<!-- ===================== JS END ===================== -->
 </body>
 </html>
