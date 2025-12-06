@@ -1,3 +1,14 @@
+Got you. Here’s the entire file, all in one piece, with the preview card UI changed so that:
+	•	Each row = oval tag on the left + short wireframe bar (15–20% width) on the right
+	•	Tags are beside the wireframe, not inside it
+	•	No mode selected → no preview card
+	•	Everything else (timers, storage, slide, mesh, weather, etc.) stays the same
+
+You can paste this straight over your existing file.
+
+⸻
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -85,10 +96,9 @@
     font-weight:600;
   }
 
-  /* ============================
-     MODE PREVIEW CARD (WIREFRAME)
-     (replaces rotating fake stack)
-  ============================ */
+  /* ============================================
+     MODE PREVIEW CARD (TAG LEFT + WIREFRAME RIGHT)
+  ============================================ */
   .preview-card{
     position:relative;
     width:100%;
@@ -97,7 +107,7 @@
     border-radius:18px;
     background:#ffffff;
     box-shadow:0 18px 48px rgba(15,23,42,0.16);
-    padding:16px 18px;
+    padding:18px 20px;
     opacity:0;
     transform:translateY(26px) scale(.96) rotateX(5deg);
     transition:
@@ -118,53 +128,54 @@
   .preview-title{
     font-size:18px;
     font-weight:700;
-    margin-bottom:8px;
+    margin-bottom:14px;
   }
 
   .preview-lines{
     display:flex;
     flex-direction:column;
-    gap:8px;
+    gap:14px;
   }
 
   .preview-row{
-    height:24px;
-    border-radius:8px;
-    background:#f7f8f9; /* wireframe bar */
     display:flex;
     align-items:center;
-    gap:6px;
-    padding:0 10px;
-    flex-wrap:wrap;
+    justify-content:space-between;
   }
 
   .preview-tag{
-    padding:2px 7px;
+    padding:4px 10px;
     border-radius:999px;
-    font-size:11px;
+    font-size:13px;
     font-weight:600;
-    line-height:1;
+    white-space:nowrap;
   }
 
   .preview-tag-weighted{
     background:var(--pill-blue);
     color:var(--brand);
   }
-
   .preview-tag-abs{
     background:var(--pill-green);
     color:#22c55e;
   }
-
   .preview-tag-shoulders,
   .preview-tag-biceps{
     background:var(--pill-orange);
     color:#d97706;
   }
-
   .preview-tag-kettlebell{
     background:var(--pill-red);
     color:#e11d48;
+  }
+
+  .preview-wire{
+    height:12px;
+    width:18%;
+    min-width:60px;
+    max-width:70px;
+    background:#f2f3f5;
+    border-radius:6px;
   }
 
   /* AI GRADIENT STAGE */
@@ -433,7 +444,7 @@
     </label>
   </div>
 
-  <!-- MODE PREVIEW CARD (wireframe metals + tags) -->
+  <!-- MODE PREVIEW CARD -->
   <div id="previewCard" class="preview-card hidden">
     <div id="previewTitle" class="preview-title"></div>
     <div id="previewLines" class="preview-lines"></div>
@@ -686,7 +697,7 @@ function buildWorkout(mode){
       bicepsUsed=false, kettlebellUsed=false;
 
   if(mode==="push" || mode==="pull"){
-    // always weighted base
+    // base strength block
     items.push({label:"Sets & Reps", weighted:true});
     weightedUsed=true;
 
@@ -772,7 +783,7 @@ function modeTitle(mode){
 }
 
 /* -----------------------------------------
-   MODE PREVIEW CARD (WIREFRAME)
+   MODE PREVIEW CARD (WIREFRAME ROWS)
 ----------------------------------------- */
 function renderPreviewCard(workout){
   if(!previewCard || !previewTitle || !previewLines) return;
@@ -784,36 +795,42 @@ function renderPreviewCard(workout){
     const row=document.createElement("div");
     row.className="preview-row";
 
+    // choose a single tag per row, priority order
+    let tagLabel = null;
+    let tagClass = null;
+
     if(it.weighted){
-      const t=document.createElement("span");
-      t.className="preview-tag preview-tag-weighted";
-      t.textContent="Weighted";
-      row.appendChild(t);
+      tagLabel = "Weighted";
+      tagClass = "preview-tag preview-tag-weighted";
+    }else if(it.abs){
+      tagLabel = "Abs";
+      tagClass = "preview-tag preview-tag-abs";
+    }else if(it.shoulders){
+      tagLabel = "Shoulders";
+      tagClass = "preview-tag preview-tag-shoulders";
+    }else if(it.biceps){
+      tagLabel = "Biceps";
+      tagClass = "preview-tag preview-tag-biceps";
+    }else if(it.kettlebell){
+      tagLabel = "Kettlebell";
+      tagClass = "preview-tag preview-tag-kettlebell";
     }
-    if(it.abs){
-      const t=document.createElement("span");
-      t.className="preview-tag preview-tag-abs";
-      t.textContent="Abs";
-      row.appendChild(t);
+
+    if(tagLabel){
+      const tag=document.createElement("span");
+      tag.className=tagClass;
+      tag.textContent=tagLabel;
+      row.appendChild(tag);
+    }else{
+      const spacer=document.createElement("span");
+      spacer.style.minWidth="1px";
+      spacer.textContent="";
+      row.appendChild(spacer);
     }
-    if(it.shoulders){
-      const t=document.createElement("span");
-      t.className="preview-tag preview-tag-shoulders";
-      t.textContent="Shoulders";
-      row.appendChild(t);
-    }
-    if(it.biceps){
-      const t=document.createElement("span");
-      t.className="preview-tag preview-tag-biceps";
-      t.textContent="Biceps";
-      row.appendChild(t);
-    }
-    if(it.kettlebell){
-      const t=document.createElement("span");
-      t.className="preview-tag preview-tag-kettlebell";
-      t.textContent="Kettlebell";
-      row.appendChild(t);
-    }
+
+    const wire=document.createElement("div");
+    wire.className="preview-wire";
+    row.appendChild(wire);
 
     previewLines.appendChild(row);
   });
@@ -822,9 +839,8 @@ function renderPreviewCard(workout){
 function showPreviewCard(){
   if(!previewCard) return;
   previewCard.classList.remove("hidden");
-  // restart transition
   previewCard.classList.remove("show");
-  void previewCard.offsetWidth;
+  void previewCard.offsetWidth; // restart transition
   previewCard.classList.add("show");
 }
 
@@ -835,9 +851,7 @@ function hidePreviewCard(immediate=false){
     previewCard.classList.add("hidden");
   }else{
     previewCard.classList.remove("show");
-    setTimeout(()=>{
-      previewCard.classList.add("hidden");
-    },260);
+    setTimeout(()=>previewCard.classList.add("hidden"),260);
   }
 }
 
@@ -922,7 +936,7 @@ function showSelectionState(){
   mainBtn.classList.add("disabled");
 
   slideWrap.classList.add("hidden");
-  hidePreviewCard(true); // no card until a mode is chosen
+  hidePreviewCard(true); // until a mode is chosen
 }
 
 function showPreLockedState(){
@@ -1105,7 +1119,6 @@ qsa("input[name='mode']").forEach(r=>{
     mainBtn.textContent=`Generate ${modeTitle(selectedMode).replace(" Day","")}`;
     mainBtn.classList.remove("disabled");
 
-    // update preview card for this mode
     updatePreviewForMode(selectedMode);
 
     if(window.navigator.vibrate){
@@ -1120,7 +1133,6 @@ qsa("input[name='mode']").forEach(r=>{
 function handleGenerate(){
   if(!selectedMode) return;
 
-  // hide preview card smoothly
   hidePreviewCard();
 
   aiStage.style.display="block";
@@ -1161,7 +1173,6 @@ function handleComplete(){
       origin:{ x:0.5, y:1.05 }
     });
   }
-  // haptic (vibrate) – mobile browsers that support it
   if(navigator.vibrate){
     navigator.vibrate(15);
   }
