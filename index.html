@@ -796,12 +796,6 @@ function randomPreviewRows(mode){
 
   return rows;
 }
-  // Legs + Full → fully random (but legal)
-  for(let i=0;i<count;i++){
-    rows.push(pool[Math.floor(Math.random()*pool.length)]);
-  }
-  return rows;
-}
 
 function renderPreviewCard(mode){
   previewTitle.textContent = modeTitle(mode);
