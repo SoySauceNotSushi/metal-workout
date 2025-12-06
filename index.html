@@ -58,7 +58,7 @@
   #radioRow{
     display:flex;
     gap:22px;
-    margin:0 auto 6px; /* radios close to subtitle */
+    margin:0 auto 6px;
     justify-content:center;
   }
 
@@ -86,7 +86,7 @@
   }
 
   /* ============================================
-     MODE PREVIEW CARD (TAG LEFT + WIREFRAME RIGHT)
+     MODE PREVIEW CARD (WIREFRAME LEFT + TAG RIGHT)
   ============================================ */
   .preview-card{
     position:relative;
@@ -132,6 +132,14 @@
     justify-content:space-between;
   }
 
+  .preview-wire{
+    height:12px;
+    width:32%;               /* ✔ your requested width */
+    min-width:90px;
+    background:#f2f3f5;
+    border-radius:6px;
+  }
+
   .preview-tag{
     padding:4px 10px;
     border-radius:999px;
@@ -140,37 +148,17 @@
     white-space:nowrap;
   }
 
-  .preview-tag-weighted{
-    background:var(--pill-blue);
-    color:var(--brand);
-  }
-  .preview-tag-abs{
-    background:var(--pill-green);
-    color:#22c55e;
-  }
+  .preview-tag-weighted{ background:var(--pill-blue); color:var(--brand); }
+  .preview-tag-abs{ background:var(--pill-green); color:#22c55e; }
   .preview-tag-shoulders,
-  .preview-tag-biceps{
-    background:var(--pill-orange);
-    color:#d97706;
-  }
-  .preview-tag-kettlebell{
-    background:var(--pill-red);
-    color:#e11d48;
-  }
+  .preview-tag-biceps{ background:var(--pill-orange); color:#d97706; }
+  .preview-tag-kettlebell{ background:var(--pill-red); color:#e11d48; }
 
-  .preview-wire{
-    height:12px;
-    width:32%;      /* 30–35% sweet spot */
-    min-width:90px; /* slightly bigger minimum */
-    background:#f2f3f5;
-    border-radius:6px;
-}
-
-  /* AI GRADIENT STAGE */
+  /* AI MESH STAGE */
   .ai-stage{
     position:absolute;
     left:50%;
-    top:260px; /* keep it fixed in the same middle area */
+    top:260px;
     transform:translateX(-50%);
     width:260px;
     height:260px;
@@ -197,8 +185,6 @@
              meshDrift 3s ease-in-out infinite;
   }
 
-  .ai-stage.show::before{ opacity:.9; }
-
   @keyframes meshBreath{
     0%,100%{ transform:scale(1); opacity:.7 }
     50%{ transform:scale(1.04); opacity:.35 }
@@ -209,7 +195,7 @@
     100%{ transform:translate3d(0,0,0); }
   }
 
-  /* WORKOUT CARD (REAL) */
+  /* REAL WORKOUT CARD */
   #card{
     background:var(--card);
     border-radius:16px;
@@ -240,28 +226,13 @@
     font-weight:600;
   }
 
-  .pill-weighted{
-    background:var(--pill-blue);
-    color:var(--brand);
-  }
-
-  .pill-abs{
-    background:var(--pill-green);
-    color:#22c55e;
-  }
-
+  .pill-weighted{ background:var(--pill-blue); color:var(--brand); }
+  .pill-abs{ background:var(--pill-green); color:#22c55e; }
   .pill-shoulders,
-  .pill-biceps{
-    background:var(--pill-orange);
-    color:#d97706;
-  }
+  .pill-biceps{ background:var(--pill-orange); color:#d97706; }
+  .pill-kettlebell{ background:var(--pill-red); color:#e11d48; }
 
-  .pill-kettlebell{
-    background:var(--pill-red);
-    color:#e11d48;
-  }
-
-  /* GENERATE BUTTON (selection state) */
+  /* GENERATE BUTTON */
   #mainBtn{
     position:fixed;
     left:50%;
@@ -279,15 +250,10 @@
     cursor:pointer;
     transition:opacity .25s ease;
   }
-  #mainBtn.hidden{
-    display:none;
-  }
-  #mainBtn.disabled{
-    opacity:.4;
-    pointer-events:none;
-  }
+  #mainBtn.hidden{ display:none; }
+  #mainBtn.disabled{ opacity:.4; pointer-events:none; }
 
-  /* BIG CENTER TIMER */
+  /* BIG TIMER */
   #bigTimer{
     position:fixed;
     top:calc(50% + 2rem);
@@ -298,13 +264,8 @@
     opacity:0;
     transition:opacity .45s ease;
   }
-
-  #bigTimer.hidden{
-    display:none;
-  }
-  #bigTimer.show{
-    opacity:1;
-  }
+  #bigTimer.hidden{ display:none; }
+  #bigTimer.show{ opacity:1; }
 
   .t-col{
     display:flex;
@@ -359,7 +320,7 @@
     pointer-events:none;
     transition:width .18s ease-out;
     box-sizing:content-box;
-    padding-right:8px; /* blue extra space near knob */
+    padding-right:8px;
   }
 
   .slide-label{
@@ -410,6 +371,7 @@
   }
 </style>
 </head>
+
 <body>
 <div class="container">
   <div class="weather">Enable location for weather</div>
@@ -432,7 +394,7 @@
     </label>
   </div>
 
-  <!-- MODE PREVIEW CARD -->
+  <!-- PREVIEW CARD -->
   <div id="previewCard" class="preview-card hidden">
     <div id="previewTitle" class="preview-title"></div>
     <div id="previewLines" class="preview-lines"></div>
@@ -445,7 +407,6 @@
     <div id="lines"></div>
   </div>
 
-  <!-- BIG TIMER (CENTERED) -->
   <div id="bigTimer" class="hidden">
     <div class="t-col">
       <div id="tHours" class="t-num">00</div>
@@ -464,7 +425,6 @@
 
 <button id="mainBtn">Generate</button>
 
-<!-- SLIDE TO COMPLETE (only in workout state) -->
 <div id="slideWrap" class="slide-wrap hidden">
   <div class="slide-track">
     <div class="slide-fill"></div>
@@ -595,14 +555,14 @@ const slideFill  = qs("#slideWrap .slide-fill");
 const slideLabel = qs("#slideWrap .slide-label span");
 const slideKnob  = qs("#slideWrap .slide-knob");
 
-/* Preview card DOM */
+/* Preview Card DOM */
 const previewCard   = qs("#previewCard");
 const previewTitle  = qs("#previewTitle");
 const previewLines  = qs("#previewLines");
 
 let selectedMode    = null;
 let currentWorkout  = null;
-let pendingWorkout  = null; // for preview → real workout reuse
+let pendingWorkout  = null; 
 let countdownInterval = null;
 
 /* -----------------------------------------
@@ -685,51 +645,38 @@ function buildWorkout(mode){
       bicepsUsed=false, kettlebellUsed=false;
 
   if(mode==="push" || mode==="pull"){
-    // base strength block
     items.push({label:"Sets & Reps", weighted:true});
     weightedUsed=true;
 
-    const m1Label=rand(METALS);
-    const m2Label=rand(METALS);
-    let m1={label:m1Label};
-    let m2={label:m2Label};
+    const m1={ label: rand(METALS) };
+    const m2={ label: rand(METALS) };
 
-    // shoulders / biceps (only on 1 metal)
-    if(mode==="push" && !shouldersUsed && Math.random()<0.5){
+    if(mode==="push" && Math.random()<0.5){
       m1.shoulders=true;
-      shouldersUsed=true;
     }
-    if(mode==="pull" && !bicepsUsed && Math.random()<0.5){
+    if(mode==="pull" && Math.random()<0.5){
       m1.biceps=true;
-      bicepsUsed=true;
     }
 
-    // abs (only 1)
     if(!absUsed && Math.random()<0.5){
       m2.abs=true;
       absUsed=true;
     }
 
-    // extra weighted on one metal (at most once more)
-    if(Math.random()<0.5 && !m1.weighted){
-      m1.weighted=true;
-    }else if(Math.random()<0.5 && !m2.weighted){
-      m2.weighted=true;
-    }
+    if(Math.random()<0.5) m1.weighted=true;
+    else if(Math.random()<0.5) m2.weighted=true;
 
     items.push(m1,m2);
 
-  }else if(mode==="legs"){
-    const count=Math.random()<0.5?2:3;
+  } else if(mode==="legs"){
+    const count=Math.random()<0.5 ? 2 : 3;
     for(let i=0;i<count;i++){
-      const lbl=rand(METALS);
-      const m={label:lbl};
+      const m={ label: rand(METALS) };
 
-      // kettlebell OR weighted, but kettlebell can't also be weighted
       if(!kettlebellUsed && Math.random()<0.5){
         m.kettlebell=true;
         kettlebellUsed=true;
-      }else if(!weightedUsed && Math.random()<0.5){
+      } else if(!weightedUsed && Math.random()<0.5){
         m.weighted=true;
         weightedUsed=true;
       }
@@ -738,15 +685,15 @@ function buildWorkout(mode){
         m.abs=true;
         absUsed=true;
       }
+
       items.push(m);
     }
 
-  }else if(mode==="full"){
-    // 3 or 4 metals, only one weighted & one abs max
-    const count=Math.random()<0.5?3:4;
+  } else if(mode==="full"){
+    const count=Math.random()<0.5 ? 3 : 4;
     for(let i=0;i<count;i++){
-      const lbl=rand(METALS);
-      const m={label:lbl};
+      const m={ label: rand(METALS) };
+
       if(!weightedUsed && Math.random()<0.5){
         m.weighted=true;
         weightedUsed=true;
@@ -771,67 +718,56 @@ function modeTitle(mode){
 }
 
 /* -----------------------------------------
-   MODE PREVIEW CARD (WIREFRAME ROWS)
+   PREVIEW CARD (WIREFRAME LEFT, TAG RIGHT)
 ----------------------------------------- */
 function renderPreviewCard(workout){
-  if(!previewCard || !previewTitle || !previewLines) return;
+  if(!previewCard) return;
+
   const {mode,items}=workout;
-  previewTitle.textContent=modeTitle(mode);
-  previewLines.innerHTML="";
+  previewTitle.textContent = modeTitle(mode);
+  previewLines.innerHTML   = "";
 
   items.forEach(it=>{
     const row=document.createElement("div");
     row.className="preview-row";
 
-    // choose a single tag per row, priority order
-    let tagLabel = null;
-    let tagClass = null;
+    // LEFT: wireframe
+    const wire=document.createElement("div");
+    wire.className="preview-wire";
+    row.appendChild(wire);
 
-    if(it.weighted){
-      tagLabel = "Weighted";
-      tagClass = "preview-tag preview-tag-weighted";
-    }else if(it.abs){
-      tagLabel = "Abs";
-      tagClass = "preview-tag preview-tag-abs";
-    }else if(it.shoulders){
-      tagLabel = "Shoulders";
-      tagClass = "preview-tag preview-tag-shoulders";
-    }else if(it.biceps){
-      tagLabel = "Biceps";
-      tagClass = "preview-tag preview-tag-biceps";
-    }else if(it.kettlebell){
-      tagLabel = "Kettlebell";
-      tagClass = "preview-tag preview-tag-kettlebell";
+    // determine tag
+    let tagLabel=null, tagClass=null;
+    if(it.weighted){ tagLabel="Weighted"; tagClass="preview-tag preview-tag-weighted"; }
+    else if(it.abs){ tagLabel="Abs"; tagClass="preview-tag preview-tag-abs"; }
+    else if(it.shoulders){ tagLabel="Shoulders"; tagClass="preview-tag preview-tag-shoulders"; }
+    else if(it.biceps){ tagLabel="Biceps"; tagClass="preview-tag preview-tag-biceps"; }
+    else if(it.kettlebell){ tagLabel="Kettlebell"; tagClass="preview-tag preview-tag-kettlebell"; }
+
+    // RIGHT: tag or spacer
+    if(tagLabel){
+      const tag=document.createElement("span");
+      tag.className=tagClass;
+      tag.textContent=tagLabel;
+      row.appendChild(tag);
+    } else {
+      const spacer=document.createElement("span");
+      spacer.style.minWidth="50px";
+      row.appendChild(spacer);
     }
 
-// --- Wireframe first (left) ---
-const wire=document.createElement("div");
-wire.className="preview-wire";
-row.appendChild(wire);
-
-// --- Tag second (right) ---
-if(tagLabel){
-  const tag=document.createElement("span");
-  tag.className=tagClass;
-  tag.textContent=tagLabel;
-  row.appendChild(tag);
-} else {
-  const spacer=document.createElement("span");
-  spacer.style.minWidth="50px";
-  spacer.textContent="";
-  row.appendChild(spacer);
+    previewLines.appendChild(row);
+  });
 }
 
 function showPreviewCard(){
-  if(!previewCard) return;
   previewCard.classList.remove("hidden");
   previewCard.classList.remove("show");
-  void previewCard.offsetWidth; // restart transition
+  void previewCard.offsetWidth;
   previewCard.classList.add("show");
 }
 
 function hidePreviewCard(immediate=false){
-  if(!previewCard) return;
   if(immediate){
     previewCard.classList.remove("show");
     previewCard.classList.add("hidden");
@@ -847,19 +783,19 @@ function updatePreviewForMode(mode){
     hidePreviewCard();
     return;
   }
-  const workout=buildWorkout(mode);
-  pendingWorkout=workout;
+  const workout = buildWorkout(mode);
+  pendingWorkout = workout;
   renderPreviewCard(workout);
   showPreviewCard();
 }
 
 /* -----------------------------------------
-   RENDER WORKOUT CARD
+   RENDER REAL WORKOUT CARD
 ----------------------------------------- */
 function renderWorkoutCard(workout){
   const {mode,items}=workout;
-  dayTitleEl.textContent=modeTitle(mode);
-  linesEl.innerHTML="";
+  dayTitleEl.textContent = modeTitle(mode);
+  linesEl.innerHTML = "";
 
   items.forEach(it=>{
     const row=document.createElement("div");
@@ -896,10 +832,11 @@ function renderWorkoutCard(workout){
       p.textContent="Kettlebell";
       row.appendChild(p);
     }
+
     linesEl.appendChild(row);
   });
 
-  cardEl.style.display="block";
+  cardEl.style.display = "block";
 }
 
 /* -----------------------------------------
@@ -922,7 +859,7 @@ function showSelectionState(){
   mainBtn.classList.add("disabled");
 
   slideWrap.classList.add("hidden");
-  hidePreviewCard(true); // until a mode is chosen
+  hidePreviewCard(true);
 }
 
 function showPreLockedState(){
@@ -941,14 +878,16 @@ function showWorkoutState(workout){
   bigTimer.classList.add("hidden");
   bigTimer.classList.remove("show");
 
-  currentWorkout=workout;
-  subtitleEl.textContent="Today’s workout";
+  currentWorkout = workout;
+
+  subtitleEl.textContent="Today's workout";
   renderWorkoutCard(workout);
   radioRow.style.display="none";
 
   mainBtn.classList.add("hidden");
   slideWrap.classList.remove("hidden");
   resetSlider();
+
   hidePreviewCard(true);
 }
 
@@ -957,8 +896,10 @@ function showCompletedState(){
   radioRow.style.display="none";
   cardEl.style.display="none";
   aiStage.style.display="none";
+
   mainBtn.classList.add("hidden");
   slideWrap.classList.add("hidden");
+
   hidePreviewCard(true);
   startBigTimer(getStartTime(true));
 }
@@ -968,25 +909,26 @@ function showAllUsedWeekState(){
   radioRow.style.display="none";
   cardEl.style.display="none";
   aiStage.style.display="none";
+
   mainBtn.classList.add("hidden");
   slideWrap.classList.add("hidden");
   bigTimer.classList.add("hidden");
+
   hidePreviewCard(true);
 }
 
 /* -----------------------------------------
-   INIT
+   INIT UI LOGIC
 ----------------------------------------- */
 function initUI(){
   resetWeekIfNeeded();
   clearRadioSelection();
-  selectedMode=null;
-  pendingWorkout=null;
+  pendingWorkout = null;
+  selectedMode = null;
   hidePreviewCard(true);
 
   if(DEV){
-    const workout=loadWorkoutToday();
-    const completed=null;
+    const workout = loadWorkoutToday();
     if(workout){
       showWorkoutState(workout);
     }else{
@@ -995,7 +937,7 @@ function initUI(){
     return;
   }
 
-  const workout   = loadWorkoutToday();
+  const workout = loadWorkoutToday();
   const completed = loadCompletedToday();
   const lockedByTime = !afterStart();
 
@@ -1046,7 +988,7 @@ function getWeatherEmoji(cond){
   if(c.includes("drizzle")) return "🌦️";
   if(c.includes("thunder")) return "🌩️";
   if(c.includes("snow")) return "❄️";
-  if(c.includes("fog") || c.includes("mist")) return "🌫️";
+  if(c.includes("fog")||c.includes("mist")) return "🌫️";
   return "🌡️";
 }
 
@@ -1087,34 +1029,33 @@ function updateWeatherUI(){
   },err=>{
     weatherEl.textContent="Enable location for weather";
   },{
-    enableHighAccuracy:false,
     timeout:10000,
     maximumAge:600000
   });
 }
 
 /* -----------------------------------------
-   RADIO EVENTS
+   RADIO SELECTION
 ----------------------------------------- */
 qsa("input[name='mode']").forEach(r=>{
   r.addEventListener("change",()=>{
-    selectedMode=r.value;
+    selectedMode = r.value;
+
     qsa(".opt").forEach(lbl=>{
-      lbl.classList.toggle("active",lbl.dataset.mode===selectedMode);
+      lbl.classList.toggle("active", lbl.dataset.mode === selectedMode);
     });
-    mainBtn.textContent=`Generate ${modeTitle(selectedMode).replace(" Day","")}`;
+
+    mainBtn.textContent = `Generate ${modeTitle(selectedMode).replace(" Day","")}`;
     mainBtn.classList.remove("disabled");
 
     updatePreviewForMode(selectedMode);
 
-    if(window.navigator.vibrate){
-      navigator.vibrate(8);
-    }
+    if(navigator.vibrate) navigator.vibrate(8);
   });
 });
 
-/* -----------------------------------------
-   GENERATE
+ /* -----------------------------------------
+   GENERATE WORKOUT
 ----------------------------------------- */
 function handleGenerate(){
   if(!selectedMode) return;
@@ -1129,8 +1070,8 @@ function handleGenerate(){
 
   setTimeout(()=>{
     const workout = pendingWorkout || buildWorkout(selectedMode);
-    currentWorkout=workout;
-    pendingWorkout=null;
+    currentWorkout = workout;
+    pendingWorkout = null;
 
     if(!DEV){
       saveWorkoutToday(workout);
@@ -1148,7 +1089,7 @@ function handleGenerate(){
 }
 
 /* -----------------------------------------
-   COMPLETE VIA SLIDE
+   COMPLETE WORKOUT (SLIDE SUCCESS)
 ----------------------------------------- */
 function handleComplete(){
   if(window.confetti){
@@ -1159,6 +1100,7 @@ function handleComplete(){
       origin:{ x:0.5, y:1.05 }
     });
   }
+
   if(navigator.vibrate){
     navigator.vibrate(15);
   }
@@ -1173,95 +1115,94 @@ function handleComplete(){
 /* -----------------------------------------
    SLIDER LOGIC
 ----------------------------------------- */
-let sliding = false;
-let slideStartX = 0;
-let maxSlide = 0;
+let sliding=false;
+let slideStartX=0;
+let maxSlide=0;
 
-function resetSlider() {
+function resetSlider(){
   const knobW = slideKnob.offsetWidth || 48;
 
-  slideKnob.style.transition = "none";
-  slideFill.style.transition = "none";
+  slideKnob.style.transition="none";
+  slideFill.style.transition="none";
 
-  slideKnob.style.transform = "translate(0,-50%)";
-  slideFill.style.width = `${knobW}px`;
+  slideKnob.style.transform="translate(0,-50%)";
+  slideFill.style.width=`${knobW}px`;
   slideTrack.classList.remove("filled");
 
-  setTimeout(() => {
-    slideKnob.style.transition = "";
-    slideFill.style.transition = "width .18s ease-out";
-  }, 20);
+  setTimeout(()=>{
+    slideKnob.style.transition="";
+    slideFill.style.transition="width .18s ease-out";
+  },20);
 }
 
-slideKnob.addEventListener("pointerdown", (e) => {
+slideKnob.addEventListener("pointerdown",(e)=>{
   e.preventDefault();
-  sliding = true;
+  sliding=true;
 
   slideKnob.setPointerCapture(e.pointerId);
+  slideKnob.style.transition="none";
+  slideFill.style.transition="none";
 
-  slideKnob.style.transition = "none";
-  slideFill.style.transition = "none";
-
-  const trackRect = slideTrack.getBoundingClientRect();
-  const knobRect = slideKnob.getBoundingClientRect();
+  const trackRect=slideTrack.getBoundingClientRect();
+  const knobRect=slideKnob.getBoundingClientRect();
 
   maxSlide = trackRect.width - knobRect.width - 8;
   slideStartX = e.clientX;
 });
 
-slideKnob.addEventListener("pointermove", (e) => {
-  if (!sliding) return;
+slideKnob.addEventListener("pointermove",(e)=>{
+  if(!sliding) return;
 
-  const knobRect = slideKnob.getBoundingClientRect();
-  const dx = e.clientX - slideStartX;
-
+  const knobRect=slideKnob.getBoundingClientRect();
+  const dx=e.clientX - slideStartX;
   let x = Math.max(0, Math.min(maxSlide, dx));
 
   slideKnob.style.transform = `translate(${x}px,-50%)`;
   slideFill.style.width = `${x + knobRect.width}px`;
 
   const trackWidth = slideTrack.offsetWidth;
-  const labelCenter = trackWidth / 2;
-  const knobCenter = 4 + knobRect.width / 2 + x;
+  const labelCenter = trackWidth/2;
+  const knobCenter = 4 + knobRect.width/2 + x;
 
-  if (knobCenter > labelCenter) {
+  if(knobCenter > labelCenter){
     slideTrack.classList.add("filled");
-  } else {
+  }else{
     slideTrack.classList.remove("filled");
   }
 });
 
-function endSlide(e) {
-  if (!sliding) return;
-  sliding = false;
+function endSlide(e){
+  if(!sliding) return;
+  sliding=false;
 
-  if (e.pointerId) slideKnob.releasePointerCapture(e.pointerId);
+  if(e.pointerId){
+    slideKnob.releasePointerCapture(e.pointerId);
+  }
 
-  const knobRect = slideKnob.getBoundingClientRect();
-  const currentTransform = slideKnob.style.transform;
-  const match = /translate\(([-0-9.]+)px/.exec(currentTransform);
+  const knobRect=slideKnob.getBoundingClientRect();
+  const match=/translate\(([-0-9.]+)px/.exec(slideKnob.style.transform);
   const x = match ? parseFloat(match[1]) : 0;
 
-  slideKnob.style.transition = "transform .22s ease-out";
-  slideFill.style.transition = "width .22s ease-out";
+  slideKnob.style.transition="transform .22s ease-out";
+  slideFill.style.transition="width .22s ease-out";
 
-  if (x >= maxSlide * 0.9) {
-    slideKnob.style.transform = `translate(${maxSlide}px,-50%)`;
-    slideFill.style.width = `${maxSlide + knobRect.width}px`;
+  if(x >= maxSlide*0.9){
+    slideKnob.style.transform=`translate(${maxSlide}px,-50%)`;
+    slideFill.style.width=`${maxSlide + knobRect.width}px`;
     slideTrack.classList.add("filled");
 
-    if (navigator.vibrate) navigator.vibrate(15);
+    if(navigator.vibrate) navigator.vibrate(15);
 
     handleComplete();
-  } else {
+  }else{
     slideTrack.classList.remove("filled");
-    slideKnob.style.transform = "translate(0,-50%)";
-    slideFill.style.width = `${knobRect.width}px`;
+    slideKnob.style.transform="translate(0,-50%)";
+    slideFill.style.width=`${knobRect.width}px`;
 
-    setTimeout(() => {
-      slideKnob.style.transition = "";
-      slideFill.style.transition = "width .18s ease-out";
-    }, 240);
+    setTimeout(()=>{
+      slideKnob.style.transition="";
+      slideFill.style.transition="width .18s ease-out";
+    },240);
   }
 }
 
@@ -1275,4 +1216,4 @@ initUI();
 updateWeatherUI();
 </script>
 </body>
-</html>
+</html> 
