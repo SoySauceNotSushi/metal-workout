@@ -804,24 +804,22 @@ function renderPreviewCard(workout){
       tagClass = "preview-tag preview-tag-kettlebell";
     }
 
-    if(tagLabel){
-      const tag=document.createElement("span");
-      tag.className=tagClass;
-      tag.textContent=tagLabel;
-      row.appendChild(tag);
-    }else{
-      const spacer=document.createElement("span");
-      spacer.style.minWidth="1px";
-      spacer.textContent="";
-      row.appendChild(spacer);
-    }
+// --- Wireframe first (left) ---
+const wire=document.createElement("div");
+wire.className="preview-wire";
+row.appendChild(wire);
 
-    const wire=document.createElement("div");
-    wire.className="preview-wire";
-    row.appendChild(wire);
-
-    previewLines.appendChild(row);
-  });
+// --- Tag second (right) ---
+if(tagLabel){
+  const tag=document.createElement("span");
+  tag.className=tagClass;
+  tag.textContent=tagLabel;
+  row.appendChild(tag);
+} else {
+  const spacer=document.createElement("span");
+  spacer.style.minWidth="50px";
+  spacer.textContent="";
+  row.appendChild(spacer);
 }
 
 function showPreviewCard(){
