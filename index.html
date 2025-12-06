@@ -57,15 +57,15 @@
   /* ============================
      ROTATING FAKE STACK
   ============================ */
-  .fake-stack{
+.fake-stack{
     position:relative;
     width:100%;
     max-width:420px;
     height:140px;
-    margin:0 auto 20px;
+    margin:40px auto 28px; /* push stack DOWN below radios */
     pointer-events:none;
     transition:opacity .25s ease, transform .25s ease;
-  }
+}
   .fake-stack.hidden{
     display:none;
   }
@@ -122,8 +122,9 @@
   #radioRow{
     display:flex;
     gap:22px;
-    margin:4px 0 18px;
-  }
+    margin:0 auto 6px; /* radios close to subtitle */
+    justify-content:center;
+}
 
   .opt{
     display:flex;
