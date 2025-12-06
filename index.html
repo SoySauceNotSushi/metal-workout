@@ -7,231 +7,169 @@
 
 <style>
   :root{
-    --brand:#2453f5;
-    --ink:#0f172a;
-    --sub:#64748b;
-    --bg:#ffffff;
-    --card:#f8fafc;
-    --pill-blue:#e4ecff;
-    --pill-green:#d9fbe3;
-    --pill-orange:#ffe6bf;
-    --pill-red:#ffe0e0;
-  }
-
-  *{ box-sizing:border-box; }
-
-  body{
-    margin:0;
-    padding:0;
-    background:var(--bg);
-    color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"SF Pro",Segoe UI,Roboto,sans-serif;
-  }
-
-  .container{
-    max-width:480px;
-    margin:0 auto;
-    padding:24px;
-    padding-bottom:120px; /* room for bottom controls */
-  }
-
-  .weather{
-    font-size:15px;
-    color:var(--sub);
-    margin-bottom:16px;
-  }
-
-  h1{
-    font-size:30px;
-    font-weight:700;
-    margin:0 0 6px;
-  }
-
-  #subtitle{
-    font-size:17px;
-    font-weight:400;
-    color:var(--sub);
-    margin:0 0 18px;
-  }
-
-  /* RADIO ROW */
-  #radioRow{
-    display:flex;
-    gap:22px;
-    margin:0 auto 6px;
-    justify-content:center;
-  }
-
-  .opt{
-    display:flex;
-    align-items:center;
-    gap:6px;
-    font-size:14px;
-    color:var(--ink);
-  }
-
-  .opt input{
-    width:18px;
-    height:18px;
-  }
-
-  .opt.disabled{
-    opacity:.35;
-    pointer-events:none;
-  }
-
-  .opt.active{
-    color:var(--brand);
-    font-weight:600;
-  }
-
-  /* ============================================
-     MODE PREVIEW CARD (WIREFRAME LEFT + TAG RIGHT)
-  ============================================ */
-  .preview-card{
-    position:relative;
-    width:100%;
-    max-width:420px;
-    margin:32px auto 24px;
-    border-radius:18px;
-    background:#ffffff;
-    box-shadow:0 18px 48px rgba(15,23,42,0.16);
-    padding:18px 20px;
-    opacity:0;
-    transform:translateY(26px) scale(.96) rotateX(5deg);
-    transition:
-      opacity .32s ease,
-      transform .32s cubic-bezier(.18,.84,.32,1.12);
-    pointer-events:none;
-  }
-
-  .preview-card.show{
-    opacity:1;
-    transform:translateY(0) scale(1) rotateX(0deg);
-  }
-
-  .preview-card.hidden{
-    display:none;
-  }
-
-  .preview-title{
-    font-size:18px;
-    font-weight:700;
-    margin-bottom:14px;
-  }
-
-  .preview-lines{
-    display:flex;
-    flex-direction:column;
-    gap:14px;
-  }
-
-  .preview-row{
-    display:flex;
-    align-items:center;
-    justify-content:flex-start;
-    gap:8px; /* distance between wireframe + tag */
+  --brand:#2453f5;
+  --ink:#0f172a;
+  --sub:#64748b;
+  --bg:#ffffff;
+  --card:#f8fafc;
+  --pill-blue:#e4ecff;
+  --pill-green:#d9fbe3;
+  --pill-orange:#ffe6bf;
+  --pill-red:#ffe0e0;
 }
 
-  .preview-wire{
-    height:12px;
-    width:32%;               /* ✔ your requested width */
-    min-width:90px;
-    background:#f2f3f5;
-    border-radius:6px;
-  }
+/* Base */
+*{ box-sizing:border-box; }
 
-  .preview-tag{
-    padding:4px 10px;
-    border-radius:999px;
-    font-size:13px;
-    font-weight:600;
-    white-space:nowrap;
-  }
+body{
+  margin:0;
+  padding:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro",Segoe UI,Roboto,sans-serif;
+}
 
-  .preview-tag-weighted{ background:var(--pill-blue); color:var(--brand); }
-  .preview-tag-abs{ background:var(--pill-green); color:#22c55e; }
-  .preview-tag-shoulders,
-  .preview-tag-biceps{ background:var(--pill-orange); color:#d97706; }
-  .preview-tag-kettlebell{ background:var(--pill-red); color:#e11d48; }
+.container{
+  max-width:480px;
+  margin:0 auto;
+  padding:24px;
+  padding-bottom:120px;
+}
 
-  /* AI MESH STAGE */
-  .ai-stage{
-    position:absolute;
-    left:50%;
-    top:260px;
-    transform:translateX(-50%);
-    width:260px;
-    height:260px;
-    border-radius:50%;
-    display:none;
-    pointer-events:none;
-    overflow:visible;
-  }
+.weather{
+  font-size:15px;
+  color:var(--sub);
+  margin-bottom:16px;
+}
 
-  .ai-stage::before{
-    content:"";
-    position:absolute;
-    inset:-20% -15% -25% -15%;
-    filter:blur(84px) saturate(160%) contrast(115%);
-    opacity:0;
-    transition:opacity .25s ease;
-    background:
-      radial-gradient(22rem 22rem at 30% 36%, #3A7BFF77 0, #0000 50%),
-      radial-gradient(22rem 22rem at 72% 34%, #7DFF5C77 0, #0000 54%),
-      radial-gradient(24rem 20rem at 40% 72%, #FFA43A77 0, #0000 54%),
-      radial-gradient(20rem 20rem at 70% 74%, #9B8FFF99 0, #0000 80%);
-    background-blend-mode:screen;
-    animation:meshBreath 2s ease-in-out infinite,
-             meshDrift 3s ease-in-out infinite;
-  }
+h1{
+  font-size:30px;
+  font-weight:700;
+  margin:0 0 6px;
+}
 
-  @keyframes meshBreath{
-    0%,100%{ transform:scale(1); opacity:.7 }
-    50%{ transform:scale(1.04); opacity:.35 }
-  }
-  @keyframes meshDrift{
-    0%{ transform:translate3d(0,0,0); }
-    50%{ transform:translate3d(2%,-1.5%,0); }
-    100%{ transform:translate3d(0,0,0); }
-  }
+#subtitle{
+  font-size:17px;
+  font-weight:400;
+  color:var(--sub);
+  margin:0 0 18px;
+}
 
-  /* REAL WORKOUT CARD */
-  #card{
-    background:var(--card);
-    border-radius:16px;
-    padding:20px;
-    margin-top:4px;
-    display:none;
-  }
+/* RADIO ROW */
+#radioRow{
+  display:flex;
+  gap:22px;
+  margin:0 auto 6px;
+  justify-content:center;
+}
 
-  #dayTitle{
-    font-size:20px;
-    font-weight:700;
-    margin-bottom:10px;
-  }
+.opt{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:14px;
+  color:var(--ink);
+}
 
-  .line{
-    font-size:16px;
-    margin-bottom:8px;
-    display:flex;
-    align-items:center;
-    gap:8px;
-    flex-wrap:wrap;
-  }
+.opt input{
+  width:18px;
+  height:18px;
+}
 
-  .pill{
-    padding:3px 8px;
-    border-radius:999px;
-    font-size:12px;
-    font-weight:600;
-  }
+.opt.disabled{
+  opacity:.35;
+  pointer-events:none;
+}
 
-  .pill-weighted{ background:var(--pill-blue); color:var(--brand); }
-  .pill-abs{ background:var(--pill-green); color:#22c55e; }
-  .pill-shoulders,
-  .pill-biceps{ background:var(--pill-orange); color:#d97706; }
-  .pill-kettlebell{ background:var(--pill-red); color:#e11d48; }
+.opt.active{
+  color:var(--brand);
+  font-weight:600;
+}
+
+/* ==========================================================
+   MODE PREVIEW CARD (WIREFRAME LEFT + TAG ON RIGHT)
+========================================================== */
+.preview-card{
+  position:relative;
+  width:100%;
+  max-width:420px;
+  margin:32px auto 24px;
+  border-radius:18px;
+  background:#ffffff;
+  box-shadow:0 18px 48px rgba(15,23,42,0.16);
+  padding:18px 20px;
+  opacity:0;
+  transform:translateY(26px) scale(.96) rotateX(5deg);
+  transition:
+    opacity .32s ease,
+    transform .32s cubic-bezier(.18,.84,.32,1.12);
+  pointer-events:none;
+}
+
+.preview-card.show{
+  opacity:1;
+  transform:translateY(0) scale(1) rotateX(0deg);
+}
+
+.preview-card.hidden{
+  display:none;
+}
+
+.preview-title{
+  font-size:18px;
+  font-weight:700;
+  margin-bottom:14px;
+}
+
+.preview-lines{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.preview-row{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:8px; /* wireframe + tag spacing */
+}
+
+.preview-wire{
+  height:12px;
+  width:32%;     /* 30–35% width */
+  min-width:90px;
+  background:#f2f3f5;
+  border-radius:6px;
+}
+
+.preview-tag{
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:600;
+  white-space:nowrap;
+}
+
+/* TAG COLORS (Preview) */
+.preview-tag-weighted{ background:var(--pill-blue); color:var(--brand); }
+.preview-tag-abs{ background:var(--pill-green); color:#22c55e; }
+
+/* Shoulders — now PURPLE */
+.preview-tag-shoulders{
+  background:#ede9fe; /* soft purple */
+  color:#7c3aed;      /* deep purple */
+}
+
+/* Biceps remains orange */
+.preview-tag-biceps{
+  background:var(--pill-orange);
+  color:#d97706;
+}
+
+.preview-tag-kettlebell{
+  background:var(--pill-red);
+  color:#e11d48;
+}
 
   /* GENERATE BUTTON */
   #mainBtn{
