@@ -753,8 +753,6 @@ function randomPreviewRows(mode){
   const pool = allowedPreviewTags(mode).filter(x => x !== null);
   const rows = [];
   const used = new Set();
-
-  // Row count
   const count = 3;
 
   // Pull & Push → Weighted ALWAYS row 1
@@ -765,33 +763,47 @@ function randomPreviewRows(mode){
     });
     used.add("Weighted");
 
-    // Fill row 2 & 3 with unique items
+    // Rows 2 & 3
     for(let i=1; i<count; i++){
       const remaining = pool.filter(t => !used.has(t.label));
-      if(remaining.length === 0){
+
+      // 40% chance → blank row
+      if(Math.random() < 0.40){
         rows.push(null);
         continue;
       }
-      const pick = remaining[Math.floor(Math.random() * remaining.length)];
-      used.add(pick.label);
-      rows.push(pick);
+
+      // Otherwise pick a unique legal tag
+      if(remaining.length > 0){
+        const pick = remaining[Math.floor(Math.random() * remaining.length)];
+        used.add(pick.label);
+        rows.push(pick);
+      } else {
+        rows.push(null);
+      }
     }
 
     return rows;
   }
 
-  // Legs + Full → fully random BUT unique
+  // Legs + Full → random BUT unique + sometimes blank
   for(let i=0; i<count; i++){
     const remaining = pool.filter(t => !used.has(t.label));
-    
-    if(remaining.length === 0){
+
+    // 40% chance → blank row
+    if(Math.random() < 0.40){
       rows.push(null);
       continue;
     }
 
-    const pick = remaining[Math.floor(Math.random() * remaining.length)];
-    used.add(pick.label);
-    rows.push(pick);
+    // pick unique tag
+    if(remaining.length > 0){
+      const pick = remaining[Math.floor(Math.random() * remaining.length)];
+      used.add(pick.label);
+      rows.push(pick);
+    } else {
+      rows.push(null);
+    }
   }
 
   return rows;
