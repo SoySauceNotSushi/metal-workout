@@ -31,7 +31,7 @@
     max-width:480px;
     margin:0 auto;
     padding:24px;
-    padding-bottom:96px;
+    padding-bottom:96px; /* room for button when it's visible */
   }
 
   .weather{
@@ -83,7 +83,7 @@
     font-weight:600;
   }
 
-  /* AI GRADIENT BEHIND */
+  /* AI GRADIENT STAGE */
   .ai-stage{
     position:relative;
     height:160px;
@@ -122,7 +122,7 @@
     100%{ transform:translate3d(0,0,0); }
   }
 
-  /* CARD */
+  /* WORKOUT CARD */
   #card{
     background:var(--card);
     border-radius:16px;
@@ -169,7 +169,7 @@
     color:#d97706;
   }
 
-  /* BUTTON */
+  /* MAIN BUTTON */
   #mainBtn{
     position:fixed;
     left:50%;
@@ -191,45 +191,47 @@
     display:none;
   }
 
-  /* CENTER TIMER */
+  /* BIG CENTER TIMER */
   #bigTimer{
     position:fixed;
     top:50%;
     left:50%;
     transform:translate(-50%,-50%);
     display:flex;
-    justify-content:center;
-    gap:48px;
+    gap:1.5rem;      /* <- tighter spacing between columns */
     opacity:0;
     transition:opacity .45s ease;
   }
 
-  #bigTimer.hidden{ display:none; }
-  #bigTimer.show{ opacity:1; }
+  #bigTimer.hidden{
+    display:none;
+  }
+  #bigTimer.show{
+    opacity:1;
+  }
 
-.t-col {
-  display: flex;
-  flex-direction: column;
-  align-items: center;      /* centers numbers + labels */
-  justify-content: center;
-  width: 100px;             /* ensures equal spacing */
-  text-align: center;
-}
+  .t-col{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    width:72px;      /* narrower columns so everything looks tight */
+    text-align:center;
+  }
 
   .t-num{
-  font-size:52px;
-  font-weight:400;
-  color:var(--ink);
-  font-variant-numeric: tabular-nums; /* stops digits from shifting */
-}
+    font-size:48px;
+    font-weight:400;
+    color:var(--ink);
+    font-variant-numeric:tabular-nums; /* stops jitter */
+  }
 
   .t-label{
     font-size:14px;
     color:var(--sub);
-    margin-top:4px;
+    margin-top:6px;
     letter-spacing:1px;
   }
-
 </style>
 </head>
 <body>
@@ -281,27 +283,25 @@
 
 <button id="mainBtn">Generate</button>
 
-<!-- CONFETTI -->
+<!-- CONFETTI LIB -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
-/* ------------------------------------------------
-   SAME COMPLETE LOGIC AS BEFORE  
-   (Locks, storage, timers, workout generation, UI)
-   NOTHING REMOVED OR SHORTENED
------------------------------------------------- */
-
+/* -----------------------------------------
+   CONFIG / UTIL
+----------------------------------------- */
 const DEV = new URLSearchParams(location.search).get("dev")==="true";
 const START_HOUR = 17;
 const START_MIN = 30;
 
-const qs = s => document.querySelector(s);
+const qs  = s => document.querySelector(s);
 const qsa = s => Array.from(document.querySelectorAll(s));
 
 function todayKey(){
   const d=new Date();
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 }
+
 function weekKey(){
   const d=new Date();
   const jan1=new Date(d.getFullYear(),0,1);
@@ -309,18 +309,22 @@ function weekKey(){
   const week=Math.ceil((days+d.getDay()+1)/7);
   return `${d.getFullYear()}-W${week}`;
 }
+
 function getStartTime(tomorrow=false){
   const d=new Date();
   if(tomorrow) d.setDate(d.getDate()+1);
   d.setHours(START_HOUR,START_MIN,0,0);
   return d;
 }
+
 function afterStart(){
   if(DEV) return true;
   return new Date() >= getStartTime(false);
 }
 
-/* STORAGE */
+/* -----------------------------------------
+   STORAGE
+----------------------------------------- */
 function resetWeekIfNeeded(){
   if(DEV) return;
   const cur=weekKey();
@@ -335,17 +339,21 @@ function resetWeekIfNeeded(){
 
 function loadLocks(){
   if(DEV) return {};
-  try{return JSON.parse(localStorage.getItem("jy_locks")||"{}");}
-  catch{return {};}
+  try{
+    return JSON.parse(localStorage.getItem("jy_locks")||"{}");
+  }catch{return {};}
 }
+
 function saveLocks(obj){
   if(DEV) return;
   localStorage.setItem("jy_locks",JSON.stringify(obj));
 }
+
 function saveWorkoutToday(data){
   if(DEV) return;
   localStorage.setItem("jy_workoutToday",JSON.stringify({date:todayKey(),data}));
 }
+
 function loadWorkoutToday(){
   if(DEV) return null;
   const raw=localStorage.getItem("jy_workoutToday");
@@ -356,10 +364,12 @@ function loadWorkoutToday(){
   }catch{}
   return null;
 }
+
 function saveCompletedToday(mode){
   if(DEV) return;
   localStorage.setItem("jy_completedToday",JSON.stringify({date:todayKey(),mode}));
 }
+
 function loadCompletedToday(){
   if(DEV) return null;
   const raw=localStorage.getItem("jy_completedToday");
@@ -371,24 +381,28 @@ function loadCompletedToday(){
   return null;
 }
 
-/* DOM */
-const subtitleEl=qs("#subtitle");
-const radioRow=qs("#radioRow");
-const aiStage=qs("#aiStage");
-const cardEl=qs("#card");
-const dayTitleEl=qs("#dayTitle");
-const linesEl=qs("#lines");
-const mainBtn=qs("#mainBtn");
-const bigTimer=qs("#bigTimer");
-const tH=qs("#tHours");
-const tM=qs("#tMins");
-const tS=qs("#tSecs");
+/* -----------------------------------------
+   DOM REFS
+----------------------------------------- */
+const subtitleEl = qs("#subtitle");
+const radioRow   = qs("#radioRow");
+const aiStage    = qs("#aiStage");
+const cardEl     = qs("#card");
+const dayTitleEl = qs("#dayTitle");
+const linesEl    = qs("#lines");
+const mainBtn    = qs("#mainBtn");
+const bigTimer   = qs("#bigTimer");
+const tH         = qs("#tHours");
+const tM         = qs("#tMins");
+const tS         = qs("#tSecs");
 
-let selectedMode=null;
-let currentWorkout=null;
-let countdownInterval=null;
+let selectedMode   = null;
+let currentWorkout = null;
+let countdownInterval = null;
 
-/* TIMER */
+/* -----------------------------------------
+   COUNTDOWN / BIG TIMER
+----------------------------------------- */
 function stopCountdown(){
   if(countdownInterval){
     clearInterval(countdownInterval);
@@ -409,7 +423,7 @@ function startBigTimer(target){
       bigTimer.classList.remove("show");
       setTimeout(()=>{
         bigTimer.classList.add("hidden");
-        initUI();
+        initUI();   // when countdown finishes, reset UI for next day
       },300);
       return;
     }
@@ -426,7 +440,9 @@ function startBigTimer(target){
   countdownInterval=setInterval(tick,1000);
 }
 
-/* LOCKS */
+/* -----------------------------------------
+   LOCKS / RADIOS
+----------------------------------------- */
 function anyUnlockedModes(){
   if(DEV) return true;
   const locks=loadLocks();
@@ -448,30 +464,36 @@ function applyLocksToRadios(){
 }
 
 function clearRadioSelection(){
-  qsa("input[name='mode']").forEach(r=>r.checked=false);
+  qsa("input[name='mode']").forEach(r=>{r.checked=false;});
   qsa(".opt").forEach(lbl=>lbl.classList.remove("active"));
 }
 
-/* METALS */
-const METALS=["Metacon","EMOM","Ladder","AMRAP","Tabata"];
-const rand=arr=>arr[Math.floor(Math.random()*arr.length)];
-const maybeAbs=()=>Math.random()<0.5;
-const maybeWeighted=()=>Math.random()<0.25;
+/* -----------------------------------------
+   WORKOUT GENERATION LOGIC
+----------------------------------------- */
+const METALS = ["Metacon","EMOM","Ladder","AMRAP","Tabata"];
+const rand          = arr => arr[Math.floor(Math.random()*arr.length)];
+const maybeAbs      = () => Math.random()<0.5;
+const maybeWeighted = () => Math.random()<0.25;
 
-/* Workout generation */
 function buildWorkout(mode){
   const items=[];
+
   if(mode==="push" || mode==="pull"){
     items.push({label:"Strength",weighted:true});
-    const m1Label=rand(METALS);
-    const m2Label=rand(METALS.filter(m=>m!==m1Label || METALS.length===1));
-    let m1={label:m1Label};
-    let m2={label:m2Label};
 
+    const m1Label = rand(METALS);
+    const m2Label = rand(METALS.filter(m=>m!==m1Label || METALS.length===1));
+
+    let m1 = {label:m1Label};
+    let m2 = {label:m2Label};
+
+    // shoulders / biceps
     if(Math.random()<0.5){
       if(mode==="push") m1.shoulders=true;
       if(mode==="pull") m1.biceps=true;
     }
+
     if(maybeAbs()) m2.abs=true;
     if(maybeWeighted()) m1.weighted=true;
     if(maybeWeighted()) m2.weighted=true;
@@ -501,6 +523,7 @@ function buildWorkout(mode){
       }
     }
   }
+
   return {mode,items};
 }
 
@@ -512,11 +535,14 @@ function modeTitle(mode){
   return "Workout";
 }
 
-/* RENDER CARD */
+/* -----------------------------------------
+   RENDER WORKOUT CARD
+----------------------------------------- */
 function renderWorkoutCard(workout){
   const {mode,items}=workout;
   dayTitleEl.textContent=modeTitle(mode);
   linesEl.innerHTML="";
+
   items.forEach(it=>{
     const row=document.createElement("div");
     row.className="line";
@@ -548,18 +574,23 @@ function renderWorkoutCard(workout){
     }
     linesEl.appendChild(row);
   });
+
   cardEl.style.display="block";
 }
 
-/* STATES */
+/* -----------------------------------------
+   VIEW STATES
+----------------------------------------- */
 function showSelectionState(){
   stopCountdown();
   bigTimer.classList.add("hidden");
   bigTimer.classList.remove("show");
+
   subtitleEl.textContent="What would you like to train?";
   radioRow.style.display="flex";
   applyLocksToRadios();
   cardEl.style.display="none";
+
   mainBtn.textContent="Generate";
   mainBtn.onclick=handleGenerate;
   mainBtn.classList.add("hidden");
@@ -577,10 +608,12 @@ function showWorkoutState(workout){
   stopCountdown();
   bigTimer.classList.add("hidden");
   bigTimer.classList.remove("show");
+
   currentWorkout=workout;
   subtitleEl.textContent="Today’s workout";
   renderWorkoutCard(workout);
   radioRow.style.display="none";
+
   const title=modeTitle(workout.mode);
   mainBtn.textContent=`${title} completed`;
   mainBtn.onclick=handleComplete;
@@ -603,14 +636,16 @@ function showAllUsedWeekState(){
   bigTimer.classList.add("hidden");
 }
 
-/* INIT */
+/* -----------------------------------------
+   INIT
+----------------------------------------- */
 function initUI(){
   resetWeekIfNeeded();
   clearRadioSelection();
   selectedMode=null;
 
   if(DEV){
-    const workout=loadWorkoutToday();
+    const workout=loadWorkoutToday(); // in dev this is usually null
     const completed=null;
     if(workout){
       showWorkoutState(workout);
@@ -620,9 +655,9 @@ function initUI(){
     return;
   }
 
-  const workout=loadWorkoutToday();
-  const completed=loadCompletedToday();
-  const lockedByTime=!afterStart();
+  const workout   = loadWorkoutToday();
+  const completed = loadCompletedToday();
+  const lockedByTime = !afterStart();
 
   if(!workout && !completed && lockedByTime){
     showPreLockedState();
@@ -647,7 +682,9 @@ function initUI(){
   showSelectionState();
 }
 
-/* RADIO CHANGE */
+/* -----------------------------------------
+   EVENTS
+----------------------------------------- */
 qsa("input[name='mode']").forEach(r=>{
   r.addEventListener("change",()=>{
     selectedMode=r.value;
@@ -659,9 +696,9 @@ qsa("input[name='mode']").forEach(r=>{
   });
 });
 
-/* GENERATE */
 function handleGenerate(){
   if(!selectedMode) return;
+
   aiStage.style.display="block";
   aiStage.classList.add("show");
   mainBtn.disabled=true;
@@ -671,27 +708,29 @@ function handleGenerate(){
   setTimeout(()=>{
     const workout=buildWorkout(selectedMode);
     currentWorkout=workout;
+
     if(!DEV){
       saveWorkoutToday(workout);
       const locks=loadLocks();
       locks[selectedMode]=true;
       saveLocks(locks);
     }
+
     aiStage.classList.remove("show");
     aiStage.style.display="none";
     mainBtn.disabled=false;
+
     showWorkoutState(workout);
   },900);
 }
 
-/* COMPLETE */
 function handleComplete(){
   if(window.confetti){
     confetti({
       particleCount:160,
       spread:90,
       startVelocity:35,
-      origin:{ x:0.5, y:1.05 }   /* 🎉 CONFETTI FROM BOTTOM CENTER */
+      origin:{ x:0.5, y:1.05 }   // from bottom center, behind button
     });
   }
 
@@ -702,7 +741,9 @@ function handleComplete(){
   setTimeout(()=>{ showCompletedState(); },600);
 }
 
-/* BOOT */
+/* -----------------------------------------
+   BOOT
+----------------------------------------- */
 initUI();
 </script>
 
