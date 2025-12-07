@@ -1438,27 +1438,15 @@ qsa("input[name='mode']").forEach(r=>{
     mainBtn.textContent = `Generate ${modeTitle(selectedMode).replace(" Day","")}`;
     mainBtn.classList.remove("disabled");
     updatePreviewForMode(selectedMode);
-    if(navigator.vibrate) navigator.vibrate(8);
-  });
-});
-
-/* CLICK OUTSIDE PAST CARD → hide + show timer */
-  document.addEventListener("click",(e)=>{
-  if(!historyMode) return;
-  if(pastCardEl.style.display==="none") return;
-
-  const insideCard  = pastCardEl.contains(e.target);
-  const insideRadio = radioRow.contains(e.target);
-
-  /* CLICK OUTSIDE PAST CARD → hide + show timer */
-document.addEventListener("click",(e)=>{
+    if(navigator.vibrate) navigator.vibrate(/* CLICK OUTSIDE PAST CARD → hide + show timer */
+document.addEventListener("click", (e) => {
   if (!historyMode) return;
   if (pastCardEl.style.display === "none") return;
 
   const insideCard  = pastCardEl.contains(e.target);
   const insideRadio = radioRow.contains(e.target);
 
-  if (!insideCard && !insideRadio){
+  if (!insideCard && !insideRadio) {
     hidePastCard();
 
     // Reset radios so clicking again works
