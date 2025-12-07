@@ -1450,25 +1450,22 @@ qsa("input[name='mode']").forEach(r=>{
   const insideCard  = pastCardEl.contains(e.target);
   const insideRadio = radioRow.contains(e.target);
 
-  if(!insideCard && !insideRadio){
-    hidePastCard();
-
-    /* CLICK OUTSIDE PAST CARD → hide + show timer */
-document.addEventListener("click", (e) => {
+  /* CLICK OUTSIDE PAST CARD → hide + show timer */
+document.addEventListener("click",(e)=>{
   if (!historyMode) return;
   if (pastCardEl.style.display === "none") return;
 
   const insideCard  = pastCardEl.contains(e.target);
   const insideRadio = radioRow.contains(e.target);
 
-  if (!insideCard && !insideRadio) {
+  if (!insideCard && !insideRadio){
     hidePastCard();
 
-    // Fully reset radios so clicking again works
+    // Reset radios so clicking again works
     qsa(".opt").forEach(lbl => {
       lbl.classList.remove("active");
       const inp = lbl.querySelector("input");
-      if (inp) inp.checked = false; // ⭐ Critical fix
+      if (inp) inp.checked = false;
     });
 
     selectedMode = null;
