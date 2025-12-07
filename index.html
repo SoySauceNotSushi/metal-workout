@@ -43,7 +43,7 @@
     padding-bottom:120px;
   }
 
-  /* TOP HEADER ROW: weather + streak */
+  /* TOP HEADER ROW: weather + streak + dev reset */
   .top-header{
     display:flex;
     align-items:center;
@@ -110,6 +110,25 @@
       transform:translateY(0) rotateX(0deg);
       opacity:1;
     }
+  }
+
+  /* DEV RESET BUTTON */
+  .dev-reset-btn{
+    font-size:13px;
+    padding:6px 12px;
+    border-radius:8px;
+    border:none;
+    background:#f3f4f6;
+    color:#0f172a;
+    box-shadow:0 2px 6px rgba(0,0,0,0.12);
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .dev-reset-btn.hidden{
+    display:none;
+  }
+  .dev-reset-btn:active{
+    transform:scale(.96);
   }
 
   h1{
@@ -184,7 +203,7 @@
     background:#e4ecff80;
     box-shadow:0 0 0 1px #e4ecff;
   }
-  .opt:active:not(.disabled)){
+  .opt:active:not(.disabled){
     transform:scale(.97);
     box-shadow:0 0 0 1px rgba(36,83,245,0.22);
   }
@@ -593,6 +612,8 @@
         <span id="streakCount" class="streak-count">0</span>
       </div>
     </div>
+
+    <button id="devResetBtn" class="dev-reset-btn hidden">Reset Dev</button>
   </div>
 
   <h1>Welcome back Jy</h1>
@@ -709,9 +730,15 @@ function getStartTime(tomorrow=false){
   d.setHours(START_HOUR,START_MIN,0,0);
   return d;
 }
-// in DEV, always "after start"
+
+/* TIME LOCK: prod uses 17:30, dev uses dev_time_lock (30s after completion) */
 function afterStart(){
-  if(DEV) return true;
+  if(DEV){
+    const lock = lsGet("dev_time_lock");
+    if(!lock) return true; // no lock set → allowed
+    const unlockAt = new Date(parseInt(lock,10));
+    return new Date() >= unlockAt;
+  }
   return new Date() >= getStartTime(false);
 }
 
@@ -770,6 +797,19 @@ function resetWeekIfNeeded(){
       saveWeekSummary(summary);
     }
   }
+}
+
+/* DEV RESET: wipe all dev data */
+function devResetAll(){
+  if(!DEV) return;
+  const keys = [
+    "streak", "weekKey", "week_summary",
+    "locks", "workoutToday", "completedToday",
+    "history_week", "dev_time_lock"
+  ];
+  keys.forEach(k => lsRemove(k));
+  alert("Dev data wiped.");
+  initUI();
 }
 
 /* SUBTITLE ANIM */
@@ -878,6 +918,9 @@ const weatherEl  = qs(".weather");
 const streakBarFill = qs(".streak-bar-fill");
 const streakCountEl = qs("#streakCount");
 
+/* Dev reset button DOM */
+const devResetBtn = qs("#devResetBtn");
+
 /* Preview DOM */
 const previewCard  = qs("#previewCard");
 const previewTitle = qs("#previewTitle");
@@ -894,6 +937,12 @@ let currentWorkout = null;
 let countdownInterval = null;
 let historyMode = false;
 let lastStreakValue = getStreak();
+
+/* SHOW DEV RESET BUTTON ONLY IN DEV */
+if(DEV && devResetBtn){
+  devResetBtn.classList.remove("hidden");
+  devResetBtn.addEventListener("click", devResetAll);
+}
 
 /* WORKOUT GENERATION */
 const METALS = ["Metacon","EMOM","Ladder","AMRAP","Tabata"];
@@ -1298,7 +1347,9 @@ function showCompletedState(){
   mainBtn.classList.add("hidden");
   slideWrap.classList.add("hidden");
 
-  startBigTimer(getStartTime(true));
+  // in both prod + dev, after completion we're waiting for next "window"
+  const target = DEV ? new Date(Date.now() + 30000) : getStartTime(true);
+  startBigTimer(target);
 }
 function showAllUsedWeekState(){
   historyMode=false;
@@ -1440,6 +1491,12 @@ function handleComplete(){
   saveCompletedToday(currentWorkout.mode);
   saveHistoryForMode(currentWorkout);
 
+  // DEV: set 30s time lock AFTER completion
+  if(DEV){
+    const unlockAt = Date.now() + 30000; // 30 seconds
+    lsSet("dev_time_lock", String(unlockAt));
+  }
+
   const stats = updateWeeklyStatsAfterCompletion();
   renderStreakUI({animateFlip: stats.streakIncreased});
 
@@ -1448,7 +1505,7 @@ function handleComplete(){
   setTimeout(()=> showCompletedState(),600);
 }
 
-/* SLIDER LOGIC – smoother, transform-based */
+/* SLIDER LOGIC – transform-based */
 let sliding=false;
 let startX=0;
 let currentX=0;
