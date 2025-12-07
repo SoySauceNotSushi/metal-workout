@@ -57,9 +57,7 @@
     margin:0 0 6px;
   }
 
-  /* --------------------------------------------
-     SUBTITLE — Smooth upward exit + upward entry
-     -------------------------------------------- */
+  /* SUBTITLE ANIMATION */
   #subtitle{
     font-size:17px;
     font-weight:400;
@@ -69,7 +67,6 @@
     display:inline-block;
     overflow:hidden;
   }
-
   .subtitle-enter{
     opacity:0;
     transform:translateY(10px);
@@ -79,7 +76,6 @@
     transform:translateY(0);
     transition:opacity .32s ease, transform .32s cubic-bezier(.18,.84,.32,1.12);
   }
-
   .subtitle-exit{
     opacity:1;
     transform:translateY(0);
@@ -90,7 +86,7 @@
     transition:opacity .32s ease, transform .32s cubic-bezier(.18,.84,.32,1.12);
   }
 
-  /* RADIO ROW */
+  /* RADIO ROW (used both in selection + history mode) */
   #radioRow{
     display:flex;
     gap:22px;
@@ -98,17 +94,16 @@
     justify-content:flex-start;
   }
   .opt{
+    position:relative;
     display:flex;
     align-items:center;
     gap:6px;
     font-size:14px;
     color:var(--ink);
-    padding:6px 10px;
+    padding:6px 12px;
     border-radius:999px;
-    transition:background .2s ease, color .2s ease, transform .16s ease, box-shadow .16s ease, opacity .18s ease;
-    position:relative;
+    transition:background .2s ease, color .2s ease, transform .16s ease, box-shadow .16s ease;
   }
-  /* hide native radio */
   .opt input{
     appearance:none;
     -webkit-appearance:none;
@@ -118,7 +113,6 @@
     opacity:0;
     pointer-events:none;
   }
-
   .opt.disabled{
     opacity:.35;
     pointer-events:none;
@@ -169,9 +163,7 @@
     pointer-events:none;
     transition:opacity .3s ease;
   }
-  .preview-card.show::before{
-    opacity:1;
-  }
+  .preview-card.show::before{ opacity:1; }
 
   .preview-title{
     font-size:18px;
@@ -276,7 +268,7 @@
     100%{ transform:translate3d(0,0,0); }
   }
 
-  /* REAL WORKOUT CARD */
+  /* REAL WORKOUT CARD (TODAY) */
   #card{
     background:var(--card);
     border-radius:16px;
@@ -295,7 +287,6 @@
     opacity:1;
     transform:translateY(0) scale(1);
   }
-
   #dayTitle{
     font-size:20px;
     font-weight:700;
@@ -330,19 +321,19 @@
   .pill-biceps{ background:var(--pill-orange); color:#d97706; }
   .pill-kettlebell{ background:var(--pill-red); color:#e11d48; }
 
-  /* PAST WORKOUT CARD (history mode) */
+  /* PAST WORKOUT CARD (HISTORY) */
   #pastCard{
     background:var(--card);
     border-radius:16px;
-    padding:20px;
-    margin-top:12px;
+    padding:18px 20px;
+    margin-top:18px;
     display:none;
     opacity:0;
     transform:translateY(18px) scale(.98);
     box-shadow:var(--shadow-subtle);
     transition:
-      opacity .28s ease,
-      transform .28s cubic-bezier(.18,.84,.32,1.12);
+      opacity .25s ease,
+      transform .25s cubic-bezier(.18,.84,.32,1.12);
   }
   #pastCard.visible{
     opacity:1;
@@ -350,21 +341,26 @@
   }
   .past-header{
     display:flex;
-    align-items:baseline;
+    align-items:flex-end;
     justify-content:space-between;
-    margin-bottom:14px;
+    margin-bottom:18px;
   }
-  .past-title{
+  #pastTitle{
     font-size:18px;
     font-weight:700;
   }
-  .past-day{
+  #pastMeta{
     font-size:14px;
     color:var(--sub);
   }
-  .past-lines{
+
+  .past-line{
+    font-size:16px;
+    margin-bottom:10px;
     display:flex;
-    flex-direction:column;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
   }
 
   /* GENERATE BUTTON */
@@ -445,7 +441,6 @@
     max-width:480px;
   }
   .slide-wrap.hidden{ display:none; }
-
   .slide-track{
     position:relative;
     height:56px;
@@ -461,19 +456,17 @@
     box-shadow:0 14px 30px rgba(36,83,245,0.38);
     background:linear-gradient(135deg,#2453f5,#4f8cff);
   }
-
   .slide-fill{
     position:absolute;
     inset:0;
     width:0;
-    background:linear-gradient(120deg, #2453f5, #4f8cff);
+    background:linear-gradient(120deg,#2453f5,#4f8cff);
     border-radius:999px;
     pointer-events:none;
     transition:width .18s ease-out;
     box-sizing:content-box;
     padding-right:8px;
   }
-
   .slide-label{
     position:absolute;
     inset:0;
@@ -489,14 +482,11 @@
     color:var(--brand);
     animation:slidePulse 1.8s ease-in-out infinite;
   }
-  .slide-track.filled .slide-label span{
-    color:#fff;
-  }
+  .slide-track.filled .slide-label span{ color:#fff; }
   @keyframes slidePulse{
     0%,100%{ opacity:.75; }
     50%{ opacity:1; }
   }
-
   .slide-knob{
     position:absolute;
     top:50%;
@@ -531,12 +521,14 @@
 <body>
 
 <div class="container">
+
   <div class="weather">Enable location for weather</div>
 
   <h1>Welcome back Jy</h1>
+
   <div id="subtitle">What would you like to train?</div>
 
-  <!-- RADIO ROW -->
+  <!-- RADIO ROW (selection + history) -->
   <div id="radioRow">
     <label class="opt" data-mode="pull">
       <input type="radio" name="mode" value="pull"> Pull
@@ -561,19 +553,19 @@
   <!-- AI LOADING MESH -->
   <div id="aiStage" class="ai-stage"></div>
 
-  <!-- TODAY'S WORKOUT CARD -->
+  <!-- TODAY WORKOUT CARD -->
   <div id="card">
     <div id="dayTitle"></div>
     <div id="lines"></div>
   </div>
 
-  <!-- PAST WORKOUT CARD (HISTORY MODE) -->
+  <!-- PAST WORKOUT CARD (history) -->
   <div id="pastCard">
     <div class="past-header">
-      <div id="pastTitle" class="past-title"></div>
-      <div id="pastDay" class="past-day"></div>
+      <div id="pastTitle"></div>
+      <div id="pastMeta"></div>
     </div>
-    <div id="pastLines" class="past-lines"></div>
+    <div id="pastLines"></div>
   </div>
 
   <!-- BIG COUNTDOWN TIMER -->
@@ -591,6 +583,7 @@
       <div class="t-label">SECS</div>
     </div>
   </div>
+
 </div>
 
 <!-- MAIN GENERATE BUTTON -->
@@ -609,9 +602,10 @@
 
 <!-- ===================== JS START ===================== -->
 <script>
+/* CONFIG / UTIL */
 const DEV = new URLSearchParams(location.search).get("dev")==="true";
 const START_HOUR = 17;
-const START_MIN = 30;
+const START_MIN  = 30;
 
 const qs  = s => document.querySelector(s);
 const qsa = s => Array.from(document.querySelectorAll(s));
@@ -637,12 +631,9 @@ function afterStart(){
   if(DEV) return true;
   return new Date() >= getStartTime(false);
 }
-function todayWeekdayShort(){
-  const d=new Date();
-  return ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()];
-}
+const WEEKDAYS=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 
-/* SUBTITLE ANIMATION */
+/* SUBTITLE ANIM */
 function setSubtitle(text){
   const el = qs("#subtitle");
   const oldText = el.textContent;
@@ -650,23 +641,18 @@ function setSubtitle(text){
 
   el.classList.remove("subtitle-enter","subtitle-enter-active");
   el.classList.add("subtitle-exit");
-  requestAnimationFrame(()=>{
-    el.classList.add("subtitle-exit-active");
-  });
+  requestAnimationFrame(()=> el.classList.add("subtitle-exit-active"));
 
   setTimeout(()=>{
     el.textContent = text;
     el.classList.remove("subtitle-exit","subtitle-exit-active");
     el.classList.add("subtitle-enter");
-    requestAnimationFrame(()=>{
-      el.classList.add("subtitle-enter-active");
-    });
+    requestAnimationFrame(()=> el.classList.add("subtitle-enter-active"));
   },250);
 }
 
 /* STORAGE */
 function resetWeekIfNeeded(){
-  if(DEV) return;
   const cur=weekKey();
   const prev=localStorage.getItem("jy_weekKey");
   if(cur!==prev){
@@ -674,24 +660,20 @@ function resetWeekIfNeeded(){
     localStorage.removeItem("jy_locks");
     localStorage.removeItem("jy_workoutToday");
     localStorage.removeItem("jy_completedToday");
-    localStorage.removeItem("jy_history");
+    localStorage.removeItem("jy_history_week");
   }
 }
 function loadLocks(){
-  if(DEV) return {};
   try{ return JSON.parse(localStorage.getItem("jy_locks")||"{}"); }
   catch{ return {}; }
 }
 function saveLocks(obj){
-  if(DEV) return;
   localStorage.setItem("jy_locks",JSON.stringify(obj));
 }
 function saveWorkoutToday(data){
-  if(DEV) return;
   localStorage.setItem("jy_workoutToday",JSON.stringify({date:todayKey(),data}));
 }
 function loadWorkoutToday(){
-  if(DEV) return null;
   const raw=localStorage.getItem("jy_workoutToday");
   if(!raw) return null;
   try{
@@ -701,11 +683,9 @@ function loadWorkoutToday(){
   return null;
 }
 function saveCompletedToday(mode){
-  if(DEV) return;
   localStorage.setItem("jy_completedToday",JSON.stringify({date:todayKey(),mode}));
 }
 function loadCompletedToday(){
-  if(DEV) return null;
   const raw=localStorage.getItem("jy_completedToday");
   if(!raw) return null;
   try{
@@ -715,24 +695,38 @@ function loadCompletedToday(){
   return null;
 }
 
-/* WEEK HISTORY (for past workouts) */
-function loadHistory(){
-  if(DEV) return {};
-  try{ return JSON.parse(localStorage.getItem("jy_history")||"{}"); }
-  catch{ return {}; }
-}
-function saveHistoryForMode(mode, workout){
-  if(DEV) return;
-  const hist = loadHistory();
-  hist[mode] = {
-    day: todayWeekdayShort(),
-    workout
+/* WEEK HISTORY (per mode) */
+function saveHistoryForMode(workout){
+  const wk = weekKey();
+  let data;
+  try{
+    data = JSON.parse(localStorage.getItem("jy_history_week")||"{}");
+  }catch{ data = {}; }
+  if(!data || data.week !== wk){
+    data = {week:wk, entries:{}};
+  }
+  const d=new Date();
+  const dayName=WEEKDAYS[d.getDay()];
+  data.entries[workout.mode] = {
+    mode: workout.mode,
+    items: workout.items,
+    dayName
   };
-  localStorage.setItem("jy_history", JSON.stringify(hist));
+  localStorage.setItem("jy_history_week",JSON.stringify(data));
+}
+function loadHistory(){
+  try{
+    const raw=localStorage.getItem("jy_history_week");
+    if(!raw) return {};
+    const obj=JSON.parse(raw);
+    if(obj.week !== weekKey()) return {};
+    return obj.entries || {};
+  }catch{
+    return {};
+  }
 }
 
-/* DOM */
-const subtitleEl = qs("#subtitle");
+/* DOM REFS */
 const radioRow   = qs("#radioRow");
 const aiStage    = qs("#aiStage");
 const cardEl     = qs("#card");
@@ -752,20 +746,21 @@ const slideKnob  = qs(".slide-knob");
 
 const weatherEl  = qs(".weather");
 
+/* Preview DOM */
 const previewCard  = qs("#previewCard");
 const previewTitle = qs("#previewTitle");
 const previewLines = qs("#previewLines");
 
-/* past history card */
+/* Past card DOM */
 const pastCardEl   = qs("#pastCard");
 const pastTitleEl  = qs("#pastTitle");
-const pastDayEl    = qs("#pastDay");
+const pastMetaEl   = qs("#pastMeta");
 const pastLinesEl  = qs("#pastLines");
 
 let selectedMode   = null;
 let currentWorkout = null;
 let countdownInterval = null;
-let historyMode = false;   // true only when viewing weekly history (after completion)
+let historyMode = false;
 
 /* WORKOUT GENERATION */
 const METALS = ["Metacon","EMOM","Ladder","AMRAP","Tabata"];
@@ -845,10 +840,8 @@ function buildWorkout(mode){
       items.push(m);
     }
   }
-
   return {mode, items};
 }
-
 function modeTitle(mode){
   if(mode==="pull") return "Pull Day";
   if(mode==="push") return "Push Day";
@@ -892,92 +885,74 @@ function allowedPreviewTags(mode){
       ];
   }
 }
-
 function randomPreviewRows(mode){
   const pool = allowedPreviewTags(mode).filter(x => x !== null);
   const rows = [];
   const used = new Set();
   const count = 3;
 
-  if(mode === "pull" || mode === "push"){
-    rows.push({
-      label:"Weighted",
-      class:"preview-tag preview-tag-weighted"
-    });
+  if(mode==="pull" || mode==="push"){
+    rows.push({label:"Weighted", class:"preview-tag preview-tag-weighted"});
     used.add("Weighted");
-
-    for(let i=1; i<count; i++){
+    for(let i=1;i<count;i++){
       const remaining = pool.filter(t => !used.has(t.label));
-
-      if(Math.random() < 0.40){
+      if(Math.random()<0.4){
         rows.push(null);
         continue;
       }
-
-      if(remaining.length > 0){
-        const pick = remaining[Math.floor(Math.random() * remaining.length)];
+      if(remaining.length){
+        const pick=remaining[Math.floor(Math.random()*remaining.length)];
         used.add(pick.label);
         rows.push(pick);
-      } else {
+      }else{
         rows.push(null);
       }
     }
     return rows;
   }
 
-  for(let i=0; i<count; i++){
+  for(let i=0;i<count;i++){
     const remaining = pool.filter(t => !used.has(t.label));
-
-    if(Math.random() < 0.40){
+    if(Math.random()<0.4){
       rows.push(null);
       continue;
     }
-
-    if(remaining.length > 0){
-      const pick = remaining[Math.floor(Math.random() * remaining.length)];
+    if(remaining.length){
+      const pick=remaining[Math.floor(Math.random()*remaining.length)];
       used.add(pick.label);
       rows.push(pick);
-    } else {
+    }else{
       rows.push(null);
     }
   }
   return rows;
 }
-
 function renderPreviewCard(mode){
   previewTitle.textContent = modeTitle(mode);
   previewLines.innerHTML = "";
-
   const rows = randomPreviewRows(mode);
-
-  rows.forEach((r, idx)=>{
+  rows.forEach((r,idx)=>{
     const row=document.createElement("div");
     row.className="preview-row";
-
     const wire=document.createElement("div");
     wire.className="preview-wire";
     row.appendChild(wire);
-
     if(r){
       const tag=document.createElement("span");
       tag.className=r.class;
       tag.textContent=r.label;
       row.appendChild(tag);
-    } else {
+    }else{
       const spacer=document.createElement("span");
       spacer.style.minWidth="50px";
       row.appendChild(spacer);
     }
-
     previewLines.appendChild(row);
-
-    setTimeout(()=> row.classList.add("show-row"), 40 * idx + 60);
+    setTimeout(()=>row.classList.add("show-row"), 40*idx+60);
   });
 }
-
 function showPreviewCard(){
-  previewCard.classList.remove("hidden");
-  previewCard.classList.remove("show");
+  previewCard.classList.remove("hidden","show");
   void previewCard.offsetWidth;
   previewCard.classList.add("show");
 }
@@ -985,7 +960,7 @@ function hidePreviewCard(immediate=false){
   if(immediate){
     previewCard.classList.remove("show");
     previewCard.classList.add("hidden");
-  } else {
+  }else{
     previewCard.classList.remove("show");
     setTimeout(()=>previewCard.classList.add("hidden"),260);
   }
@@ -996,47 +971,39 @@ function updatePreviewForMode(mode){
   showPreviewCard();
 }
 
-/* TODAY'S WORKOUT CARD */
+/* RENDER TODAY CARD */
 function renderWorkoutCard(workout){
   const {mode, items} = workout;
-
   dayTitleEl.textContent = modeTitle(mode);
-  linesEl.innerHTML = "";
-
-  items.forEach((it, idx)=>{
+  linesEl.innerHTML="";
+  items.forEach((it,idx)=>{
     const row=document.createElement("div");
     row.className="line";
-
     row.appendChild(document.createTextNode(it.label));
 
     if(it.weighted){
       const p=document.createElement("span");
-      p.className="pill pill-weighted"; p.textContent="Weighted";
-      row.appendChild(p);
+      p.className="pill pill-weighted"; p.textContent="Weighted"; row.appendChild(p);
     }
     if(it.abs){
       const p=document.createElement("span");
-      p.className="pill pill-abs"; p.textContent="Abs";
-      row.appendChild(p);
+      p.className="pill pill-abs"; p.textContent="Abs"; row.appendChild(p);
     }
     if(it.shoulders){
       const p=document.createElement("span");
-      p.className="pill pill-shoulders"; p.textContent="Shoulders";
-      row.appendChild(p);
+      p.className="pill pill-shoulders"; p.textContent="Shoulders"; row.appendChild(p);
     }
     if(it.biceps){
       const p=document.createElement("span");
-      p.className="pill pill-biceps"; p.textContent="Biceps";
-      row.appendChild(p);
+      p.className="pill pill-biceps"; p.textContent="Biceps"; row.appendChild(p);
     }
     if(it.kettlebell){
       const p=document.createElement("span");
-      p.className="pill pill-kettlebell"; p.textContent="Kettlebell";
-      row.appendChild(p);
+      p.className="pill pill-kettlebell"; p.textContent="Kettlebell"; row.appendChild(p);
     }
 
     linesEl.appendChild(row);
-    setTimeout(()=> row.classList.add("show-line"), 40 * idx + 60);
+    setTimeout(()=>row.classList.add("show-line"),40*idx+60);
   });
 
   cardEl.style.display="block";
@@ -1045,65 +1012,43 @@ function renderWorkoutCard(workout){
   cardEl.classList.add("visible");
 }
 
-/* PAST WORKOUT CARD (HISTORY) */
-function hidePastCard(){
-  pastCardEl.classList.remove("visible");
-  if(pastCardEl.style.display !== "none"){
-    setTimeout(()=>{ pastCardEl.style.display="none"; },220);
-  }
-  if(historyMode){
-    bigTimer.classList.add("show"); // fade timer back in
-  }
-}
-
+/* RENDER PAST CARD */
 function renderPastCardForMode(mode){
   const hist = loadHistory();
-  const entry = hist[mode];
-  if(!entry){
-    hidePastCard();
-    return false;
-  }
-
-  const workout = entry.workout;
+  const data = hist[mode];
+  if(!data){ hidePastCard(); return false; }
 
   pastTitleEl.textContent = modeTitle(mode);
-  pastDayEl.textContent = entry.day || "";
-  pastLinesEl.innerHTML = "";
+  pastMetaEl.textContent  = data.dayName || "";
+  pastLinesEl.innerHTML   = "";
 
-  workout.items.forEach((it, idx)=>{
+  (data.items || []).forEach(it=>{
     const row=document.createElement("div");
-    row.className="line";
-
+    row.className="past-line";
     row.appendChild(document.createTextNode(it.label));
 
     if(it.weighted){
       const p=document.createElement("span");
-      p.className="pill pill-weighted"; p.textContent="Weighted";
-      row.appendChild(p);
+      p.className="pill pill-weighted"; p.textContent="Weighted"; row.appendChild(p);
     }
     if(it.abs){
       const p=document.createElement("span");
-      p.className="pill pill-abs"; p.textContent="Abs";
-      row.appendChild(p);
+      p.className="pill pill-abs"; p.textContent="Abs"; row.appendChild(p);
     }
     if(it.shoulders){
       const p=document.createElement("span");
-      p.className="pill pill-shoulders"; p.textContent="Shoulders";
-      row.appendChild(p);
+      p.className="pill pill-shoulders"; p.textContent="Shoulders"; row.appendChild(p);
     }
     if(it.biceps){
       const p=document.createElement("span");
-      p.className="pill pill-biceps"; p.textContent="Biceps";
-      row.appendChild(p);
+      p.className="pill pill-biceps"; p.textContent="Biceps"; row.appendChild(p);
     }
     if(it.kettlebell){
       const p=document.createElement("span");
-      p.className="pill pill-kettlebell"; p.textContent="Kettlebell";
-      row.appendChild(p);
+      p.className="pill pill-kettlebell"; p.textContent="Kettlebell"; row.appendChild(p);
     }
 
     pastLinesEl.appendChild(row);
-    setTimeout(()=> row.classList.add("show-line"), 40 * idx + 60);
   });
 
   pastCardEl.style.display="block";
@@ -1111,11 +1056,56 @@ function renderPastCardForMode(mode){
   void pastCardEl.offsetWidth;
   pastCardEl.classList.add("visible");
 
-  bigTimer.classList.remove("show"); // fade timer out, still running
+  bigTimer.classList.remove("show");
+  setTimeout(()=> bigTimer.classList.add("hidden"), 240);
+
   return true;
+}
+function hidePastCard(){
+  if(pastCardEl.style.display==="none") return;
+  pastCardEl.classList.remove("visible");
+  setTimeout(()=>{
+    pastCardEl.style.display="none";
+    if(historyMode){
+      bigTimer.classList.remove("hidden");
+      requestAnimationFrame(()=> bigTimer.classList.add("show"));
+    }
+  },220);
 }
 
 /* VIEW STATES */
+function anyUnlockedModes(){
+  const locks=loadLocks();
+  return ["pull","push","legs","full"].some(k=>!locks[k]);
+}
+function applyLocksToRadios(){
+  const locks=loadLocks();
+  qsa(".opt").forEach(lbl=>{
+    const mode=lbl.dataset.mode;
+    const input=lbl.querySelector("input");
+    lbl.classList.remove("disabled");
+    input.disabled=false;
+    if(locks[mode]){
+      lbl.classList.add("disabled");
+      input.disabled=true;
+    }
+  });
+}
+function applyHistoryLocksToRadios(){
+  const hist=loadHistory();
+  qsa(".opt").forEach(lbl=>{
+    const mode=lbl.dataset.mode;
+    const input=lbl.querySelector("input");
+    const has = !!hist[mode];
+    input.disabled = !has;
+    lbl.classList.toggle("disabled", !has);
+  });
+}
+function clearRadioSelection(){
+  qsa("input[name='mode']").forEach(r=> r.checked=false);
+  qsa(".opt").forEach(lbl=> lbl.classList.remove("active"));
+}
+
 function showSelectionState(){
   historyMode=false;
   stopCountdown();
@@ -1127,36 +1117,25 @@ function showSelectionState(){
   applyLocksToRadios();
 
   cardEl.style.display="none";
-  cardEl.classList.remove("visible");
-  hidePastCard();
-  aiStage.style.display="none";
-
-  mainBtn.textContent="Generate";
-  mainBtn.onclick = handleGenerate;
+  pastCardEl.style.display="none";
+  slideWrap.classList.add("hidden");
   mainBtn.classList.remove("hidden");
   mainBtn.classList.add("disabled");
+  mainBtn.textContent="Generate";
 
-  slideWrap.classList.add("hidden");
   hidePreviewCard(true);
 }
-
 function showPreLockedState(){
   historyMode=false;
   setSubtitle("Next workout in");
   radioRow.style.display="none";
-
   cardEl.style.display="none";
-  cardEl.classList.remove("visible");
-  hidePastCard();
-  aiStage.style.display="none";
-
+  pastCardEl.style.display="none";
   mainBtn.classList.add("hidden");
   slideWrap.classList.add("hidden");
-
   hidePreviewCard(true);
   startBigTimer(getStartTime(false));
 }
-
 function showWorkoutState(workout){
   historyMode=false;
   stopCountdown();
@@ -1164,74 +1143,57 @@ function showWorkoutState(workout){
   bigTimer.classList.remove("show");
 
   currentWorkout = workout;
-
   setSubtitle("Today’s workout");
-  renderWorkoutCard(workout);
 
+  renderWorkoutCard(workout);
   radioRow.style.display="none";
   mainBtn.classList.add("hidden");
   slideWrap.classList.remove("hidden");
-
   resetSlider();
   hidePreviewCard(true);
-  hidePastCard();
 }
-
 function showCompletedState(){
   historyMode=true;
-  setSubtitle("Here’s what you trained this week");
-
-  radioRow.style.display="flex";
   clearRadioSelection();
   applyHistoryLocksToRadios();
 
-  cardEl.style.display="none";
-  cardEl.classList.remove("visible");
-  hidePreviewCard(true);
+  setSubtitle("Here’s what you trained this week");
+  radioRow.style.display="flex";
 
+  cardEl.style.display="none";
+  pastCardEl.style.display="none";
   mainBtn.classList.add("hidden");
   slideWrap.classList.add("hidden");
-  aiStage.style.display="none";
 
-  bigTimer.classList.remove("hidden");
   startBigTimer(getStartTime(true));
 }
-
 function showAllUsedWeekState(){
   historyMode=false;
   setSubtitle("All workouts used this week");
-
   radioRow.style.display="none";
   cardEl.style.display="none";
-  cardEl.classList.remove("visible");
-
-  aiStage.style.display="none";
+  pastCardEl.style.display="none";
   mainBtn.classList.add("hidden");
   slideWrap.classList.add("hidden");
-
   bigTimer.classList.add("hidden");
-  hidePreviewCard(true);
-  hidePastCard();
 }
 
 /* TIMER */
 function stopCountdown(){
   if(countdownInterval){
     clearInterval(countdownInterval);
-    countdownInterval = null;
+    countdownInterval=null;
   }
 }
 function startBigTimer(target){
   stopCountdown();
-
   bigTimer.classList.remove("hidden");
   requestAnimationFrame(()=> bigTimer.classList.add("show"));
 
   function tick(){
     const now=new Date();
-    let diff = target - now;
-
-    if(diff <= 0){
+    let diff=target-now;
+    if(diff<=0){
       stopCountdown();
       bigTimer.classList.remove("show");
       setTimeout(()=>{
@@ -1240,28 +1202,23 @@ function startBigTimer(target){
       },300);
       return;
     }
-
-    const totalSec = Math.floor(diff/1000);
-    const h = String(Math.floor(totalSec/3600)).padStart(2,"0");
-    const m = String(Math.floor((totalSec%3600)/60)).padStart(2,"0");
-    const s = String(totalSec%60).padStart(2,"0");
-
+    const totalSec=Math.floor(diff/1000);
+    const h=String(Math.floor(totalSec/3600)).padStart(2,"0");
+    const m=String(Math.floor((totalSec%3600)/60)).padStart(2,"0");
+    const s=String(totalSec%60).padStart(2,"0");
     tH.textContent=h;
     tM.textContent=m;
     tS.textContent=s;
   }
-
   tick();
   countdownInterval=setInterval(tick,1000);
 }
 
-/* GENERATE */
+/* GENERATE FLOW */
 function handleGenerate(){
   if(!selectedMode) return;
 
   hidePreviewCard();
-  hidePastCard();
-
   aiStage.style.display="block";
   aiStage.classList.add("show");
 
@@ -1273,41 +1230,37 @@ function handleGenerate(){
     const workout = buildWorkout(selectedMode);
     currentWorkout = workout;
 
-    if(!DEV){
-      saveWorkoutToday(workout);
-      saveHistoryForMode(selectedMode, workout);
-
-      const locks = loadLocks();
-      locks[selectedMode] = true;
-      saveLocks(locks);
-    }
+    saveWorkoutToday(workout);
+    const locks=loadLocks();
+    locks[selectedMode]=true;
+    saveLocks(locks);
 
     aiStage.classList.remove("show");
     aiStage.style.display="none";
-
     mainBtn.disabled=false;
+
     showWorkoutState(workout);
   },900);
 }
 
-/* SLIDE → COMPLETE */
+/* SLIDE COMPLETE */
 function handleComplete(){
   if(window.confetti){
     confetti({
       particleCount:160,
       spread:90,
       startVelocity:35,
-      origin:{ x:0.5, y:1.05 }
+      origin:{x:0.5,y:1.05}
     });
   }
   if(navigator.vibrate) navigator.vibrate(15);
 
-  saveCompletedToday(currentWorkout?.mode || "workout");
+  saveCompletedToday(currentWorkout.mode);
+  saveHistoryForMode(currentWorkout);
 
   cardEl.style.display="none";
   slideWrap.classList.add("hidden");
-
-  setTimeout(()=> showCompletedState(), 600);
+  setTimeout(()=> showCompletedState(),600);
 }
 
 /* SLIDER LOGIC */
@@ -1316,96 +1269,72 @@ let slideStartX=0;
 let maxSlide=0;
 
 function resetSlider(){
-  const knobW = slideKnob.offsetWidth || 48;
-
+  const knobW=slideKnob.offsetWidth || 48;
   slideKnob.style.transition="none";
   slideFillEl.style.transition="none";
-
   slideKnob.style.transform="translate(0,-50%)";
-  slideFillEl.style.width = `${knobW}px`;
-
+  slideFillEl.style.width=`${knobW}px`;
   slideTrackEl.classList.remove("filled");
-
   setTimeout(()=>{
     slideKnob.style.transition="";
     slideFillEl.style.transition="width .18s ease-out";
   },20);
 }
-
-slideKnob.addEventListener("pointerdown", e=>{
+slideKnob.addEventListener("pointerdown",e=>{
   e.preventDefault();
   sliding=true;
   slideKnob.setPointerCapture(e.pointerId);
-
   slideKnob.style.transition="none";
   slideFillEl.style.transition="none";
-
-  const trackRect = slideTrackEl.getBoundingClientRect();
-  const knobRect = slideKnob.getBoundingClientRect();
-
-  maxSlide = trackRect.width - knobRect.width - 8;
-  slideStartX = e.clientX;
-
+  const trackRect=slideTrackEl.getBoundingClientRect();
+  const knobRect =slideKnob.getBoundingClientRect();
+  maxSlide=trackRect.width-knobRect.width-8;
+  slideStartX=e.clientX;
   if(navigator.vibrate) navigator.vibrate(6);
 });
-
-slideKnob.addEventListener("pointermove", e=>{
+slideKnob.addEventListener("pointermove",e=>{
   if(!sliding) return;
+  const knobRect=slideKnob.getBoundingClientRect();
+  const dx=e.clientX-slideStartX;
+  let x=Math.max(0,Math.min(maxSlide,dx));
+  slideKnob.style.transform=`translate(${x}px,-50%)`;
+  slideFillEl.style.width=`${x+knobRect.width}px`;
 
-  const knobRect = slideKnob.getBoundingClientRect();
-  const dx = e.clientX - slideStartX;
-
-  let x = Math.max(0, Math.min(maxSlide, dx));
-
-  slideKnob.style.transform = `translate(${x}px,-50%)`;
-  slideFillEl.style.width = `${x + knobRect.width}px`;
-
-  const trackWidth = slideTrackEl.offsetWidth;
-  const labelCenter = trackWidth/2;
-  const knobCenter = 4 + knobRect.width/2 + x;
-
-  if(knobCenter > labelCenter){
-    slideTrackEl.classList.add("filled");
-  } else {
-    slideTrackEl.classList.remove("filled");
-  }
+  const trackWidth=slideTrackEl.offsetWidth;
+  const labelCenter=trackWidth/2;
+  const knobCenter=4+knobRect.width/2+x;
+  if(knobCenter>labelCenter) slideTrackEl.classList.add("filled");
+  else slideTrackEl.classList.remove("filled");
 });
-
 function endSlide(e){
   if(!sliding) return;
   sliding=false;
-
   if(e.pointerId) slideKnob.releasePointerCapture(e.pointerId);
-
-  const knobRect = slideKnob.getBoundingClientRect();
-  const match = /translate\(([-0-9.]+)px/.exec(slideKnob.style.transform);
-  const x = match ? parseFloat(match[1]) : 0;
-
+  const knobRect=slideKnob.getBoundingClientRect();
+  const match=/translate\(([-0-9.]+)px/.exec(slideKnob.style.transform);
+  const x=match?parseFloat(match[1]):0;
   slideKnob.style.transition="transform .22s ease-out";
   slideFillEl.style.transition="width .22s ease-out";
-
-  if(x >= maxSlide * 0.9){
+  if(x>=maxSlide*0.9){
     slideKnob.style.transform=`translate(${maxSlide}px,-50%)`;
-    slideFillEl.style.width=`${maxSlide + knobRect.width}px`;
+    slideFillEl.style.width=`${maxSlide+knobRect.width}px`;
     slideTrackEl.classList.add("filled");
-
     if(navigator.vibrate) navigator.vibrate(15);
     handleComplete();
-  } else {
+  }else{
     slideTrackEl.classList.remove("filled");
     slideKnob.style.transform="translate(0,-50%)";
     slideFillEl.style.width=`${knobRect.width}px`;
-
     setTimeout(()=>{
       slideKnob.style.transition="";
       slideFillEl.style.transition="width .18s ease-out";
     },240);
   }
 }
-slideKnob.addEventListener("pointerup", endSlide);
-slideKnob.addEventListener("pointercancel", endSlide);
+slideKnob.addEventListener("pointerup",endSlide);
+slideKnob.addEventListener("pointercancel",endSlide);
 
-/* WEATHER */
+/* WEATHER (unchanged logic) */
 function weatherCodeToText(code){
   const map={
     0:"Clear sky",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",
@@ -1435,7 +1364,6 @@ function updateWeatherUI(){
     return;
   }
   weatherEl.textContent="Loading weather…";
-
   navigator.geolocation.getCurrentPosition(async pos=>{
     const lat=pos.coords.latitude;
     const lon=pos.coords.longitude;
@@ -1443,162 +1371,96 @@ function updateWeatherUI(){
       const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`;
       const res=await fetch(url);
       const data=await res.json();
-
       const temp=Math.round(data.current_weather.temperature);
       const cond=weatherCodeToText(data.current_weather.weathercode);
       const emoji=getWeatherEmoji(cond);
-
       let city="Your area";
       try{
-        const rev = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`
-        );
+        const rev=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
         const r=await rev.json();
-        city = r.address.city || r.address.town ||
-               r.address.village || r.address.county || city;
+        city=r.address.city||r.address.town||r.address.village||r.address.county||city;
       }catch{}
-
-      weatherEl.textContent = `${emoji} ${temp}°C ${city}`;
+      weatherEl.textContent=`${emoji} ${temp}°C ${city}`;
     }catch{
       weatherEl.textContent="Weather unavailable";
     }
   },()=>{
     weatherEl.textContent="Enable location for weather";
-  },{ timeout:10000, maximumAge:600000 });
-}
-
-/* RADIOS LOCKS (SELECTION MODE) */
-function anyUnlockedModes(){
-  if(DEV) return true;
-  const locks=loadLocks();
-  return ["pull","push","legs","full"].some(k=>!locks[k]);
-}
-function applyLocksToRadios(){
-  const locks=loadLocks();
-  qsa(".opt").forEach(lbl=>{
-    const mode=lbl.dataset.mode;
-    const input=lbl.querySelector("input");
-
-    lbl.classList.remove("disabled");
-    input.disabled=false;
-
-    if(!DEV && locks[mode]){
-      lbl.classList.add("disabled");
-      input.disabled = true;
-    }
-  });
-}
-
-/* RADIOS LOCKS (HISTORY MODE: enable only modes with history) */
-function applyHistoryLocksToRadios(){
-  const hist   = loadHistory();
-  const hasAny = Object.keys(hist).length > 0;
-
-  qsa(".opt").forEach(lbl=>{
-    const mode = lbl.dataset.mode;
-    const input = lbl.querySelector("input");
-    const has = !!hist[mode];
-
-    if (!hasAny){
-      // If no history yet -> don't deadlock the UI
-      input.disabled = false;
-      lbl.classList.remove("disabled");
-    } else {
-      input.disabled = !has;
-      lbl.classList.toggle("disabled", !has);
-    }
-  });
-}
-
-function clearRadioSelection(){
-  qsa("input[name='mode']").forEach(r=> r.checked=false);
-  qsa(".opt").forEach(lbl=> lbl.classList.remove("active"));
+  },{timeout:10000,maximumAge:600000});
 }
 
 /* INIT UI */
 function initUI(){
   resetWeekIfNeeded();
   clearRadioSelection();
-  selectedMode = null;
+  selectedMode=null;
   hidePreviewCard(true);
   hidePastCard();
 
-  // NOTE: DEV behaves the SAME as prod now – no early return.
-  const workout     = loadWorkoutToday();
-  const completed   = loadCompletedToday();
+  const workout   = loadWorkoutToday();
+  const completed = loadCompletedToday();
   const lockedByTime = !afterStart();
 
-  // Before 17:30, nothing done yet
-  if (!workout && !completed && lockedByTime){
+  if(!workout && !completed && lockedByTime){
     showPreLockedState();
     return;
   }
-
-  // Finished a workout today → history mode (timer + history radios)
-  if (completed){
-    showCompletedState();   // this sets historyMode = true and calls applyHistoryLocksToRadios()
+  if(completed){
+    showCompletedState();
     return;
   }
-
-  // Generated today’s workout but not completed → “Today’s workout” state
-  if (workout){
-    showWorkoutState(workout);  // historyMode = false
+  if(workout){
+    showWorkoutState(workout);
     return;
   }
-
-  // All 4 modes locked for the week
-  if (!anyUnlockedModes()){
+  if(!anyUnlockedModes()){
     showAllUsedWeekState();
     return;
   }
-
-  // Normal selection state (first time this week or some modes still unused)
   showSelectionState();
 }
 
 /* RADIO INTERACTION */
 qsa("input[name='mode']").forEach(r=>{
-  r.addEventListener("change", () => {
+  r.addEventListener("change",()=>{
     selectedMode = r.value;
-
     qsa(".opt").forEach(lbl=>{
-      lbl.classList.toggle("active", lbl.dataset.mode === selectedMode);
+      lbl.classList.toggle("active", lbl.dataset.mode===selectedMode);
     });
 
-    // HISTORY MODE: clicking radios shows past workout for that mode
-    if (historyMode){
+    if(historyMode){
       const shown = renderPastCardForMode(selectedMode);
-      if (shown && navigator.vibrate) navigator.vibrate(6);
-      return;   // don't touch preview / main button in history mode
+      if(shown && navigator.vibrate) navigator.vibrate(6);
+      return;
     }
 
-    // NORMAL MODE: hide past card, show preview + enable generate
     hidePastCard();
-    mainBtn.textContent =
-      `Generate ${modeTitle(selectedMode).replace(" Day","")}`;
+    mainBtn.textContent = `Generate ${modeTitle(selectedMode).replace(" Day","")}`;
     mainBtn.classList.remove("disabled");
     updatePreviewForMode(selectedMode);
-
-    if (navigator.vibrate) navigator.vibrate(8);
+    if(navigator.vibrate) navigator.vibrate(8);
   });
 });
 
-/* CLICK OUTSIDE PAST CARD → hide card + show timer again */
+/* CLICK OUTSIDE PAST CARD → hide + show timer again */
 document.addEventListener("click",(e)=>{
-  if (!historyMode) return;
-  if (pastCardEl.style.display === "none") return;
-
+  if(!historyMode) return;
+  if(pastCardEl.style.display==="none") return;
   const insideCard  = pastCardEl.contains(e.target);
   const insideRadio = radioRow.contains(e.target);
-
-  if (!insideCard && !insideRadio){
+  if(!insideCard && !insideRadio){
     hidePastCard();
   }
 });
+
+/* MAIN BUTTON */
+mainBtn.addEventListener("click", handleGenerate);
 
 /* BOOT */
 initUI();
 updateWeatherUI();
 </script>
 <!-- ===================== JS END ===================== -->
-</body>  
+
+</body>
+</html>
