@@ -575,7 +575,7 @@ function getStartTime(tomorrow=false){
 }
 
 function afterStart(){
-  if(DEV) return true;
+  if (DEV) return false;   // DEV is ALWAYS locked = you can test history properly
   return new Date() >= getStartTime(false);
 }
 
