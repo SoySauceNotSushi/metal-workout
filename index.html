@@ -608,6 +608,21 @@
 const urlParams = new URLSearchParams(window.location.search);
 const DEV = urlParams.get("dev")==="true" || urlParams.get("dev")==="1";
 
+/* DEV OVERRIDES – full unlock */
+if (DEV) {
+  localStorage.removeItem("jy_locks");
+  localStorage.removeItem("jy_completedToday");
+  localStorage.removeItem("jy_workoutToday");
+
+  // always keep radios enabled
+  window.afterStart = () => true;
+  window.anyUnlockedModes = () => true;
+
+  // disable timer
+  window.startBigTimer = () => {};
+  window.stopCountdown = () => {};
+}
+  
 // In Option A: dev only overrides *time lock*
 const START_HOUR = 17;
 const START_MIN  = 30;
