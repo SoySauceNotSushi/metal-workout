@@ -731,12 +731,21 @@ function getStartTime(tomorrow=false){
   return d;
 }
 
+/* DEV unlock timestamp helper */
+function getDevUnlockTime(){
+  if(!DEV) return null;
+  const raw = lsGet("dev_time_lock");
+  if(!raw) return null;
+  const ts = parseInt(raw,10);
+  if(Number.isNaN(ts)) return null;
+  return new Date(ts);
+}
+
 /* TIME LOCK: prod uses 17:30, dev uses dev_time_lock (30s after completion) */
 function afterStart(){
   if(DEV){
-    const lock = lsGet("dev_time_lock");
-    if(!lock) return true; // no lock set → allowed
-    const unlockAt = new Date(parseInt(lock,10));
+    const unlockAt = getDevUnlockTime();
+    if(!unlockAt) return true; // no lock → allowed
     return new Date() >= unlockAt;
   }
   return new Date() >= getStartTime(false);
@@ -1316,7 +1325,18 @@ function showPreLockedState(){
   mainBtn.classList.add("hidden");
   slideWrap.classList.add("hidden");
   hidePreviewCard(true);
-  startBigTimer(getStartTime(false));
+
+  if(DEV){
+    const unlockAt = getDevUnlockTime();
+    if(unlockAt){
+      startBigTimer(unlockAt);
+    }else{
+      // no lock? just show selection
+      showSelectionState();
+    }
+  }else{
+    startBigTimer(getStartTime(false));
+  }
 }
 function showWorkoutState(workout){
   historyMode=false;
@@ -1347,8 +1367,18 @@ function showCompletedState(){
   mainBtn.classList.add("hidden");
   slideWrap.classList.add("hidden");
 
-  // in both prod + dev, after completion we're waiting for next "window"
-  const target = DEV ? new Date(Date.now() + 30000) : getStartTime(true);
+  let target;
+  if(DEV){
+    target = getDevUnlockTime();
+    if(!target){
+      const unlockAt = Date.now() + 30000;
+      lsSet("dev_time_lock", String(unlockAt));
+      target = new Date(unlockAt);
+    }
+  }else{
+    target = getStartTime(true);
+  }
+
   startBigTimer(target);
 }
 function showAllUsedWeekState(){
@@ -1505,7 +1535,7 @@ function handleComplete(){
   setTimeout(()=> showCompletedState(),600);
 }
 
-/* SLIDER LOGIC – transform-based */
+/* SLIDER LOGIC – smoother, transform-based */
 let sliding=false;
 let startX=0;
 let currentX=0;
@@ -1525,8 +1555,7 @@ function resetSlider(){
   slideFillEl.style.transition = "none";
 
   slideKnob.style.transform = "translate(0,-50%)";
-  const baseProgress = knobWidth / trackWidth;
-  slideFillEl.style.transform = `scaleX(${baseProgress})`;
+  slideFillEl.style.transform = "scaleX(0)";
 
   setTimeout(()=>{
     slideKnob.style.transition = "transform .2s ease-out";
@@ -1559,13 +1588,10 @@ slideKnob.addEventListener("pointermove",e=>{
   let x = Math.max(0, Math.min(maxSlide, dx));
   currentX = x;
 
-  const progress = (x + knobWidth) / trackWidth;
+  const progress = maxSlide === 0 ? 0 : (x / maxSlide);
 
   slideKnob.style.transform = `translate(${x}px,-50%)`;
   slideFillEl.style.transform = `scaleX(${progress})`;
-
-  if(progress > 0.5) slideTrackEl.classList.add("filled");
-  else slideTrackEl.classList.remove("filled");
 });
 function endSlide(e){
   if(!sliding) return;
@@ -1575,21 +1601,19 @@ function endSlide(e){
   slideKnob.style.transition = "transform .22s ease-out";
   slideFillEl.style.transition = "transform .22s ease-out";
 
-  const progress = (currentX + knobWidth) / trackWidth;
+  const progress = maxSlide === 0 ? 0 : (currentX / maxSlide);
 
   if(progress > 0.92){
     const x = maxSlide;
-    const finalProgress = (x + knobWidth)/trackWidth;
     slideKnob.style.transform = `translate(${x}px,-50%)`;
-    slideFillEl.style.transform = `scaleX(${finalProgress})`;
+    slideFillEl.style.transform = `scaleX(1)`;
     slideTrackEl.classList.add("filled");
     if(navigator.vibrate) navigator.vibrate(15);
     handleComplete();
   }else{
     slideTrackEl.classList.remove("filled");
     slideKnob.style.transform = "translate(0,-50%)";
-    const baseProgress = knobWidth/trackWidth;
-    slideFillEl.style.transform = `scaleX(${baseProgress})`;
+    slideFillEl.style.transform = "scaleX(0)";
   }
 }
 slideKnob.addEventListener("pointerup",endSlide);
@@ -1664,9 +1688,9 @@ function initUI(){
 
   if(!workout && !completed && lockedByTime){
     showPreLockedState();
-  }else if(completed){
+  }else if(completed && lockedByTime){
     showCompletedState();
-  }else if(workout){
+  }else if(workout && !completed){
     showWorkoutState(workout);
   }else if(!anyUnlockedModes()){
     showAllUsedWeekState();
