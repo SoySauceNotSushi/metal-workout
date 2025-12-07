@@ -40,15 +40,38 @@
     padding-bottom:120px;
   }
 
+  /* TOP ROW: weather left, streak right */
+  .top-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:8px;
+  }
+
   .weather{
     font-size:15px;
     color:var(--sub);
-    margin-bottom:16px;
     opacity:.95;
     display:flex;
     align-items:center;
     gap:6px;
     transition:opacity .25s ease, transform .25s ease;
+  }
+
+  .streak-badge{
+    font-size:15px;
+    font-weight:600;
+    color:#f97316; /* nice orange, but still minimal */
+    white-space:nowrap;
+    opacity:1;
+    visibility:visible;
+    transition:opacity .2s ease, visibility .2s ease, transform .2s ease;
+    transform:translateY(0);
+  }
+  .streak-badge.hidden{
+    opacity:0;
+    visibility:hidden;
+    transform:translateY(-2px);
   }
 
   h1{
@@ -123,7 +146,7 @@
     background:#e4ecff80;
     box-shadow:0 0 0 1px #e4ecff;
   }
-  .opt:active:not(.disabled){
+  .opt:active:not(.disabled)){
     transform:scale(.97);
     box-shadow:0 0 0 1px rgba(36,83,245,0.22);
   }
@@ -522,7 +545,10 @@
 
 <div class="container">
 
-  <div class="weather">Enable location for weather</div>
+  <div class="top-row">
+    <div class="weather">Enable location for weather</div>
+    <div id="streakBadge" class="streak-badge hidden"></div>
+  </div>
 
   <h1>Welcome back Jy</h1>
 
@@ -603,27 +629,7 @@
 <!-- ===================== JS START ===================== -->
 <script>
 /* CONFIG / UTIL */
-
-// DEV mode = ?dev=true OR ?dev=1
-const urlParams = new URLSearchParams(window.location.search);
-const DEV = urlParams.get("dev")==="true" || urlParams.get("dev")==="1";
-
-/* DEV OVERRIDES – full unlock */
-if (DEV) {
-  localStorage.removeItem("jy_locks");
-  localStorage.removeItem("jy_completedToday");
-  localStorage.removeItem("jy_workoutToday");
-
-  // always keep radios enabled
-  window.afterStart = () => true;
-  window.anyUnlockedModes = () => true;
-
-  // disable timer
-  window.startBigTimer = () => {};
-  window.stopCountdown = () => {};
-}
-  
-// In Option A: dev only overrides *time lock*
+const DEV = new URLSearchParams(location.search).get("dev")==="true";
 const START_HOUR = 17;
 const START_MIN  = 30;
 
@@ -648,10 +654,46 @@ function getStartTime(tomorrow=false){
   return d;
 }
 function afterStart(){
-  // real time check (DEV override handled in initUI)
+  // Pure time check; DEV bypass happens via lockedByTime in initUI
   return new Date() >= getStartTime(false);
 }
 const WEEKDAYS=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+
+/* STREAK HELPERS */
+function loadStreak(){
+  const raw = localStorage.getItem("jy_streak");
+  const n = parseInt(raw || "0",10);
+  return isNaN(n) ? 0 : n;
+}
+function saveStreak(n){
+  localStorage.setItem("jy_streak", String(n));
+}
+function updateStreakUI(){
+  const streakEl = qs("#streakBadge");
+  if(!streakEl) return;
+  const n = loadStreak();
+  if(n > 0){
+    streakEl.textContent = `🔥 ${n}`;
+    streakEl.classList.remove("hidden");
+  }else{
+    streakEl.classList.add("hidden");
+  }
+}
+function markTodayTrained(){
+  const wk = weekKey();
+  let data;
+  try{
+    data = JSON.parse(localStorage.getItem("jy_weekStats") || "{}");
+  }catch{
+    data = {};
+  }
+  if(!data || data.week !== wk){
+    data = { week: wk, days: {} };
+  }
+  data.days = data.days || {};
+  data.days[todayKey()] = true;
+  localStorage.setItem("jy_weekStats", JSON.stringify(data));
+}
 
 /* SUBTITLE ANIM */
 function setSubtitle(text){
@@ -671,18 +713,43 @@ function setSubtitle(text){
   },250);
 }
 
-/* STORAGE */
+/* STORAGE + WEEK RESET (with streak) */
 function resetWeekIfNeeded(){
-  const cur=weekKey();
-  const prev=localStorage.getItem("jy_weekKey");
-  if(cur!==prev){
+  const cur = weekKey();
+  const prev = localStorage.getItem("jy_weekKey");
+
+  // If week changed AND we had a previous week, evaluate streak based on last week
+  if(cur !== prev && prev){
+    try{
+      const raw = localStorage.getItem("jy_weekStats");
+      if(raw){
+        const stats = JSON.parse(raw);
+        if(stats.week === prev){
+          const daysObj = stats.days || {};
+          const daysCount = Object.keys(daysObj).length;
+          let streak = loadStreak();
+          if(daysCount >= 3){
+            streak += 1;
+          }else{
+            streak = 0;
+          }
+          saveStreak(streak);
+        }
+      }
+    }catch{}
+  }
+
+  // On any week change (including first run), reset per-week data
+  if(cur !== prev){
     localStorage.setItem("jy_weekKey",cur);
     localStorage.removeItem("jy_locks");
     localStorage.removeItem("jy_workoutToday");
     localStorage.removeItem("jy_completedToday");
     localStorage.removeItem("jy_history_week");
+    localStorage.setItem("jy_weekStats", JSON.stringify({ week: cur, days: {} }));
   }
 }
+
 function loadLocks(){
   try{ return JSON.parse(localStorage.getItem("jy_locks")||"{}"); }
   catch{ return {}; }
@@ -765,6 +832,7 @@ const slideFillEl  = qs(".slide-fill");
 const slideKnob  = qs(".slide-knob");
 
 const weatherEl  = qs(".weather");
+const streakEl   = qs("#streakBadge");
 
 /* Preview DOM */
 const previewCard  = qs("#previewCard");
@@ -1277,6 +1345,7 @@ function handleComplete(){
 
   saveCompletedToday(currentWorkout.mode);
   saveHistoryForMode(currentWorkout);
+  markTodayTrained();      // 🔥 mark this day as trained for this week
 
   cardEl.style.display="none";
   slideWrap.classList.add("hidden");
@@ -1354,7 +1423,7 @@ function endSlide(e){
 slideKnob.addEventListener("pointerup",endSlide);
 slideKnob.addEventListener("pointercancel",endSlide);
 
-/* WEATHER (unchanged logic) */
+/* WEATHER */
 function weatherCodeToText(code){
   const map={
     0:"Clear sky",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",
@@ -1411,7 +1480,9 @@ function updateWeatherUI(){
 
 /* INIT UI */
 function initUI(){
-  resetWeekIfNeeded();
+  resetWeekIfNeeded();      // handles streak and week stats rollover
+  updateStreakUI();         // 🔥 show / hide badge
+
   clearRadioSelection();
   selectedMode=null;
   hidePreviewCard(true);
@@ -1419,8 +1490,7 @@ function initUI(){
 
   const workout   = loadWorkoutToday();
   const completed = loadCompletedToday();
-
-  // 🔓 DEV OVERRIDE: no pre-lock screen in dev
+  // DEV: always unlocked; PROD: respect time
   const lockedByTime = DEV ? false : !afterStart();
 
   if(!workout && !completed && lockedByTime){
@@ -1464,23 +1534,23 @@ qsa("input[name='mode']").forEach(r=>{
   });
 });
 
-/* CLICK OUTSIDE PAST CARD → hide + re-arm radios */
-document.addEventListener("click",(e)=>{
-  if(!historyMode) return;
-  if(pastCardEl.style.display==="none") return;
+/* CLICK OUTSIDE PAST CARD → hide + show timer, reset radios */
+document.addEventListener("click", (e) => {
+  if (!historyMode) return;
+  if (pastCardEl.style.display === "none") return;
 
   const insideCard  = pastCardEl.contains(e.target);
   const insideRadio = radioRow.contains(e.target);
 
-  if(!insideCard && !insideRadio){
+  if (!insideCard && !insideRadio) {
     hidePastCard();
 
-    // Reset radios so clicking again on the same pill works
     qsa(".opt").forEach(lbl => {
       lbl.classList.remove("active");
       const inp = lbl.querySelector("input");
       if (inp) inp.checked = false;
     });
+
     selectedMode = null;
   }
 });
