@@ -1331,7 +1331,7 @@ function showPreLockedState(){
     if(unlockAt){
       startBigTimer(unlockAt);
     }else{
-      // no lock? just show selection
+      // no lock? just show selection in dev
       showSelectionState();
     }
   }else{
@@ -1674,7 +1674,13 @@ function updateWeatherUI(){
   },{timeout:10000,maximumAge:600000});
 }
 
-/* INIT UI */
+/* INIT UI
+   RULES:
+   - If completedToday => always showCompletedState (locked for the day)
+   - Else if workoutToday => always showWorkoutState (stuck on workout)
+   - Else if before start time => pre-locked countdown
+   - Else normal selection
+*/
 function initUI(){
   resetWeekIfNeeded();
   clearRadioSelection();
@@ -1682,16 +1688,20 @@ function initUI(){
   hidePreviewCard(true);
   hidePastCard();
 
-  const workout   = loadWorkoutToday();
-  const completed = loadCompletedToday();
-  const lockedByTime = !afterStart();
+  const workout       = loadWorkoutToday();
+  const completedObj  = loadCompletedToday();
+  const hasCompleted  = !!completedObj;
+  const lockedByTime  = !afterStart(); // true = before today's 17:30 in prod, or before dev unlock
 
-  if(!workout && !completed && lockedByTime){
-    showPreLockedState();
-  }else if(completed && lockedByTime){
+  if(hasCompleted){
+    // Once you've completed today's workout, you're locked to completed view for the rest of the day
     showCompletedState();
-  }else if(workout && !completed){
+  }else if(workout){
+    // Workout generated but not completed -> stuck on workout screen (even after refresh)
     showWorkoutState(workout);
+  }else if(lockedByTime){
+    // Before daily unlock and nothing done yet -> pre-locked countdown
+    showPreLockedState();
   }else if(!anyUnlockedModes()){
     showAllUsedWeekState();
   }else{
