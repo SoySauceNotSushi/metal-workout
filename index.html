@@ -1491,14 +1491,22 @@ function applyLocksToRadios(){
 
 /* RADIOS LOCKS (HISTORY MODE: enable only modes with history) */
 function applyHistoryLocksToRadios(){
-  const hist = loadHistory();
+  const hist   = loadHistory();
+  const hasAny = Object.keys(hist).length > 0;
+
   qsa(".opt").forEach(lbl=>{
     const mode = lbl.dataset.mode;
     const input = lbl.querySelector("input");
     const has = !!hist[mode];
 
-    input.disabled = !has;
-    lbl.classList.toggle("disabled", !has);
+    if (!hasAny){
+      // If no history yet -> don't deadlock the UI
+      input.disabled = false;
+      lbl.classList.remove("disabled");
+    } else {
+      input.disabled = !has;
+      lbl.classList.toggle("disabled", !has);
+    }
   });
 }
 
@@ -1511,78 +1519,79 @@ function clearRadioSelection(){
 function initUI(){
   resetWeekIfNeeded();
   clearRadioSelection();
-  selectedMode=null;
+  selectedMode = null;
   hidePreviewCard(true);
   hidePastCard();
 
-  if(DEV){
-    const workout = loadWorkoutToday();
-    workout ? showWorkoutState(workout)
-            : showSelectionState();
-    return;
-  }
-
-  const workout = loadWorkoutToday();
-  const completed = loadCompletedToday();
+  // NOTE: DEV behaves the SAME as prod now – no early return.
+  const workout     = loadWorkoutToday();
+  const completed   = loadCompletedToday();
   const lockedByTime = !afterStart();
 
-  if(!workout && !completed && lockedByTime){
+  // Before 17:30, nothing done yet
+  if (!workout && !completed && lockedByTime){
     showPreLockedState();
     return;
   }
 
-  if(completed){
-    showCompletedState();
+  // Finished a workout today → history mode (timer + history radios)
+  if (completed){
+    showCompletedState();   // this sets historyMode = true and calls applyHistoryLocksToRadios()
     return;
   }
 
-  if(workout){
-    showWorkoutState(workout);
+  // Generated today’s workout but not completed → “Today’s workout” state
+  if (workout){
+    showWorkoutState(workout);  // historyMode = false
     return;
   }
 
-  if(!anyUnlockedModes()){
+  // All 4 modes locked for the week
+  if (!anyUnlockedModes()){
     showAllUsedWeekState();
     return;
   }
 
+  // Normal selection state (first time this week or some modes still unused)
   showSelectionState();
 }
 
 /* RADIO INTERACTION */
 qsa("input[name='mode']").forEach(r=>{
-  r.addEventListener("change",()=>{
+  r.addEventListener("change", () => {
     selectedMode = r.value;
 
     qsa(".opt").forEach(lbl=>{
       lbl.classList.toggle("active", lbl.dataset.mode === selectedMode);
     });
 
-    if(historyMode){
+    // HISTORY MODE: clicking radios shows past workout for that mode
+    if (historyMode){
       const shown = renderPastCardForMode(selectedMode);
-      if(shown && navigator.vibrate) navigator.vibrate(6);
-      return;
+      if (shown && navigator.vibrate) navigator.vibrate(6);
+      return;   // don't touch preview / main button in history mode
     }
 
+    // NORMAL MODE: hide past card, show preview + enable generate
     hidePastCard();
     mainBtn.textContent =
       `Generate ${modeTitle(selectedMode).replace(" Day","")}`;
     mainBtn.classList.remove("disabled");
     updatePreviewForMode(selectedMode);
 
-    if(navigator.vibrate) navigator.vibrate(8);
+    if (navigator.vibrate) navigator.vibrate(8);
   });
 });
 
-/* CLICK OUTSIDE PAST CARD → hide + show timer */
+/* CLICK OUTSIDE PAST CARD → hide card + show timer again */
 document.addEventListener("click",(e)=>{
-  if(!historyMode) return;
-  if(pastCardEl.style.display==="none") return;
+  if (!historyMode) return;
+  if (pastCardEl.style.display === "none") return;
 
   const insideCard  = pastCardEl.contains(e.target);
   const insideRadio = radioRow.contains(e.target);
 
-  if(!insideCard && !insideRadio){
+  if (!insideCard && !insideRadio){
     hidePastCard();
   }
 });
@@ -1592,5 +1601,4 @@ initUI();
 updateWeatherUI();
 </script>
 <!-- ===================== JS END ===================== -->
-</body>
-</html>
+</body>  
