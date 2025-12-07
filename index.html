@@ -600,12 +600,16 @@
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-  <script>
+<!-- ===================== JS START ===================== -->
+<script>
 /* CONFIG / UTIL */
-const DEV = new URLSearchParams(location.search).get("dev")==="true";  
-// Example: jyworkout.com/?dev=true  → you bypass time-lock
 
-const START_HOUR = 17;   // 17:30 = 5:30 PM daily unlock
+// DEV mode = ?dev=true OR ?dev=1
+const urlParams = new URLSearchParams(window.location.search);
+const DEV = urlParams.get("dev")==="true" || urlParams.get("dev")==="1";
+
+// In Option A: dev only overrides *time lock*
+const START_HOUR = 17;
 const START_MIN  = 30;
 
 const qs  = s => document.querySelector(s);
@@ -615,7 +619,6 @@ function todayKey(){
   const d=new Date();
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 }
-
 function weekKey(){
   const d=new Date();
   const jan1=new Date(d.getFullYear(),0,1);
@@ -623,21 +626,19 @@ function weekKey(){
   const week=Math.ceil((days+d.getDay()+1)/7);
   return `${d.getFullYear()}-W${week}`;
 }
-
 function getStartTime(tomorrow=false){
   const d=new Date();
   if(tomorrow) d.setDate(d.getDate()+1);
   d.setHours(START_HOUR,START_MIN,0,0);
   return d;
 }
-
 function afterStart(){
-  return true;  // ALWAYS unlocked for testing
+  // real time check (DEV override handled in initUI)
+  return new Date() >= getStartTime(false);
 }
-
 const WEEKDAYS=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 
-/* SUBTITLE ANIMATION */
+/* SUBTITLE ANIM */
 function setSubtitle(text){
   const el = qs("#subtitle");
   const oldText = el.textContent;
@@ -667,7 +668,6 @@ function resetWeekIfNeeded(){
     localStorage.removeItem("jy_history_week");
   }
 }
-
 function loadLocks(){
   try{ return JSON.parse(localStorage.getItem("jy_locks")||"{}"); }
   catch{ return {}; }
@@ -675,7 +675,6 @@ function loadLocks(){
 function saveLocks(obj){
   localStorage.setItem("jy_locks",JSON.stringify(obj));
 }
-
 function saveWorkoutToday(data){
   localStorage.setItem("jy_workoutToday",JSON.stringify({date:todayKey(),data}));
 }
@@ -688,7 +687,6 @@ function loadWorkoutToday(){
   }catch{}
   return null;
 }
-
 function saveCompletedToday(mode){
   localStorage.setItem("jy_completedToday",JSON.stringify({date:todayKey(),mode}));
 }
@@ -702,30 +700,25 @@ function loadCompletedToday(){
   return null;
 }
 
-/* WEEK HISTORY */
+/* WEEK HISTORY (per mode) */
 function saveHistoryForMode(workout){
   const wk = weekKey();
   let data;
   try{
     data = JSON.parse(localStorage.getItem("jy_history_week")||"{}");
   }catch{ data = {}; }
-
   if(!data || data.week !== wk){
     data = {week:wk, entries:{}};
   }
-
   const d=new Date();
   const dayName=WEEKDAYS[d.getDay()];
-
   data.entries[workout.mode] = {
     mode: workout.mode,
     items: workout.items,
     dayName
   };
-
   localStorage.setItem("jy_history_week",JSON.stringify(data));
 }
-
 function loadHistory(){
   try{
     const raw=localStorage.getItem("jy_history_week");
@@ -745,18 +738,25 @@ const cardEl     = qs("#card");
 const dayTitleEl = qs("#dayTitle");
 const linesEl    = qs("#lines");
 const mainBtn    = qs("#mainBtn");
+
 const bigTimer   = qs("#bigTimer");
 const tH         = qs("#tHours");
 const tM         = qs("#tMins");
 const tS         = qs("#tSecs");
+
 const slideWrap  = qs("#slideWrap");
 const slideTrackEl = qs(".slide-track");
 const slideFillEl  = qs(".slide-fill");
 const slideKnob  = qs(".slide-knob");
+
 const weatherEl  = qs(".weather");
+
+/* Preview DOM */
 const previewCard  = qs("#previewCard");
 const previewTitle = qs("#previewTitle");
 const previewLines = qs("#previewLines");
+
+/* Past card DOM */
 const pastCardEl   = qs("#pastCard");
 const pastTitleEl  = qs("#pastTitle");
 const pastMetaEl   = qs("#pastMeta");
@@ -776,70 +776,77 @@ function buildWorkout(mode){
   let weightedUsed=false, absUsed=false, shouldersUsed=false,
       bicepsUsed=false, kettlebellUsed=false;
 
-  if(mode==="pull" || mode==="push"){
+  if(mode==="push" || mode==="pull"){
     items.push({label:"Sets & Reps", weighted:true});
     weightedUsed = true;
 
     const m1={ label:rand(METALS) };
     const m2={ label:rand(METALS) };
 
-    if(mode==="push" && Math.random()<0.5){
-      m1.shoulders = true; shouldersUsed = true;
+    if(mode==="push" && !shouldersUsed && Math.random()<0.5){
+      m1.shoulders = true;
+      shouldersUsed = true;
     }
-    if(mode==="pull" && Math.random()<0.5){
-      m1.biceps = true; bicepsUsed = true;
+    if(mode==="pull" && !bicepsUsed && Math.random()<0.5){
+      m1.biceps = true;
+      bicepsUsed = true;
     }
-    if(Math.random()<0.5){
-      m2.abs = true; absUsed = true;
+    if(!absUsed && Math.random()<0.5){
+      m2.abs = true;
+      absUsed = true;
     }
-    if(Math.random()<0.5) m1.weighted = true;
-    if(Math.random()<0.5) m2.weighted = true;
+    if(Math.random()<0.5 && !m1.weighted) m1.weighted = true;
+    else if(Math.random()<0.5 && !m2.weighted) m2.weighted = true;
 
     items.push(m1,m2);
   }
-
   else if(mode==="legs"){
     const count = Math.random()<0.5 ? 2 : 3;
     for(let i=0;i<count;i++){
       const m={ label:rand(METALS) };
       if(!kettlebellUsed && Math.random()<0.5){
-        m.kettlebell = true; kettlebellUsed = true;
+        m.kettlebell = true;
+        kettlebellUsed = true;
       } else if(!weightedUsed && Math.random()<0.5){
-        m.weighted = true; weightedUsed = true;
+        m.weighted = true;
+        weightedUsed = true;
       }
       if(!absUsed && Math.random()<0.5){
-        m.abs = true; absUsed = true;
+        m.abs = true;
+        absUsed = true;
       }
       items.push(m);
     }
   }
-
   else if(mode==="full"){
     const count = Math.random()<0.5 ? 3 : 4;
     for(let i=0;i<count;i++){
       const m={ label:rand(METALS) };
       if(!weightedUsed && Math.random()<0.5){
-        m.weighted = true; weightedUsed = true;
+        m.weighted = true;
+        weightedUsed = true;
       }
       if(!absUsed && Math.random()<0.5){
-        m.abs = true; absUsed = true;
+        m.abs = true;
+        absUsed = true;
       }
       if(!shouldersUsed && Math.random()<0.3){
-        m.shoulders = true; shouldersUsed = true;
+        m.shoulders = true;
+        shouldersUsed = true;
       }
       if(!bicepsUsed && Math.random()<0.3){
-        m.biceps = true; bicepsUsed = true;
+        m.biceps = true;
+        bicepsUsed = true;
       }
       if(!kettlebellUsed && Math.random()<0.3){
-        m.kettlebell = true; kettlebellUsed = true;
+        m.kettlebell = true;
+        kettlebellUsed = true;
       }
       items.push(m);
     }
   }
-
   return {mode, items};
 }
-
 function modeTitle(mode){
   if(mode==="pull") return "Pull Day";
   if(mode==="push") return "Push Day";
@@ -853,111 +860,127 @@ function allowedPreviewTags(mode){
   switch(mode){
     case "pull":
       return [
-        {label:"Weighted", class:"preview-tag-weighted"},
-        {label:"Abs", class:"preview-tag-abs"},
-        {label:"Biceps", class:"preview-tag-biceps"}
+        {label:"Weighted", class:"preview-tag preview-tag-weighted"},
+        {label:"Abs", class:"preview-tag preview-tag-abs"},
+        {label:"Biceps", class:"preview-tag preview-tag-biceps"},
+        null
       ];
     case "push":
       return [
-        {label:"Weighted", class:"preview-tag-weighted"},
-        {label:"Abs", class:"preview-tag-abs"},
-        {label:"Shoulders", class:"preview-tag-shoulders"}
+        {label:"Weighted", class:"preview-tag preview-tag-weighted"},
+        {label:"Abs", class:"preview-tag preview-tag-abs"},
+        {label:"Shoulders", class:"preview-tag preview-tag-shoulders"},
+        null
       ];
     case "legs":
       return [
-        {label:"Weighted", class:"preview-tag-weighted"},
-        {label:"Abs", class:"preview-tag-abs"},
-        {label:"Kettlebell", class:"preview-tag-kettlebell"}
+        {label:"Weighted", class:"preview-tag preview-tag-weighted"},
+        {label:"Abs", class:"preview-tag preview-tag-abs"},
+        {label:"Kettlebell", class:"preview-tag preview-tag-kettlebell"},
+        null
       ];
     case "full":
       return [
-        {label:"Weighted", class:"preview-tag-weighted"},
-        {label:"Abs", class:"preview-tag-abs"},
-        {label:"Kettlebell", class:"preview-tag-kettlebell"},
-        {label:"Shoulders", class:"preview-tag-shoulders"},
-        {label:"Biceps", class:"preview-tag-biceps"}
+        {label:"Weighted", class:"preview-tag preview-tag-weighted"},
+        {label:"Abs", class:"preview-tag preview-tag-abs"},
+        {label:"Kettlebell", class:"preview-tag preview-tag-kettlebell"},
+        {label:"Shoulders", class:"preview-tag preview-tag-shoulders"},
+        {label:"Biceps", class:"preview-tag preview-tag-biceps"},
+        null
       ];
   }
 }
-
 function randomPreviewRows(mode){
-  const pool = allowedPreviewTags(mode);
+  const pool = allowedPreviewTags(mode).filter(x => x !== null);
   const rows = [];
   const used = new Set();
   const count = 3;
 
+  if(mode==="pull" || mode==="push"){
+    rows.push({label:"Weighted", class:"preview-tag preview-tag-weighted"});
+    used.add("Weighted");
+    for(let i=1;i<count;i++){
+      const remaining = pool.filter(t => !used.has(t.label));
+      if(Math.random()<0.4){
+        rows.push(null);
+        continue;
+      }
+      if(remaining.length){
+        const pick=remaining[Math.floor(Math.random()*remaining.length)];
+        used.add(pick.label);
+        rows.push(pick);
+      }else{
+        rows.push(null);
+      }
+    }
+    return rows;
+  }
+
   for(let i=0;i<count;i++){
+    const remaining = pool.filter(t => !used.has(t.label));
     if(Math.random()<0.4){
       rows.push(null);
       continue;
     }
-    const remaining = pool.filter(t => !used.has(t.label));
     if(remaining.length){
-      const r=rand(remaining);
-      used.add(r.label);
-      rows.push(r);
+      const pick=remaining[Math.floor(Math.random()*remaining.length)];
+      used.add(pick.label);
+      rows.push(pick);
     }else{
       rows.push(null);
     }
   }
   return rows;
 }
-
 function renderPreviewCard(mode){
   previewTitle.textContent = modeTitle(mode);
   previewLines.innerHTML = "";
-
   const rows = randomPreviewRows(mode);
   rows.forEach((r,idx)=>{
     const row=document.createElement("div");
     row.className="preview-row";
-
     const wire=document.createElement("div");
     wire.className="preview-wire";
     row.appendChild(wire);
-
     if(r){
       const tag=document.createElement("span");
-      tag.className="preview-tag "+r.class;
+      tag.className=r.class;
       tag.textContent=r.label;
       row.appendChild(tag);
     }else{
-      row.appendChild(document.createElement("span"));
+      const spacer=document.createElement("span");
+      spacer.style.minWidth="50px";
+      row.appendChild(spacer);
     }
-
     previewLines.appendChild(row);
-    setTimeout(()=>row.classList.add("show-row"),40*idx+60);
+    setTimeout(()=>row.classList.add("show-row"), 40*idx+60);
   });
 }
-
 function showPreviewCard(){
-  previewCard.classList.remove("hidden");
+  previewCard.classList.remove("hidden","show");
   void previewCard.offsetWidth;
   previewCard.classList.add("show");
 }
-
 function hidePreviewCard(immediate=false){
   if(immediate){
     previewCard.classList.remove("show");
     previewCard.classList.add("hidden");
-    return;
+  }else{
+    previewCard.classList.remove("show");
+    setTimeout(()=>previewCard.classList.add("hidden"),260);
   }
-  previewCard.classList.remove("show");
-  setTimeout(()=>previewCard.classList.add("hidden"),260);
 }
-
 function updatePreviewForMode(mode){
   if(!mode){ hidePreviewCard(); return; }
   renderPreviewCard(mode);
   showPreviewCard();
 }
 
-/* RENDER TODAY WORKOUT */
+/* RENDER TODAY CARD */
 function renderWorkoutCard(workout){
   const {mode, items} = workout;
   dayTitleEl.textContent = modeTitle(mode);
   linesEl.innerHTML="";
-
   items.forEach((it,idx)=>{
     const row=document.createElement("div");
     row.className="line";
@@ -1034,6 +1057,7 @@ function renderPastCardForMode(mode){
   });
 
   pastCardEl.style.display="block";
+  pastCardEl.classList.remove("visible");
   void pastCardEl.offsetWidth;
   pastCardEl.classList.add("visible");
 
@@ -1042,8 +1066,8 @@ function renderPastCardForMode(mode){
 
   return true;
 }
-
 function hidePastCard(){
+  if(pastCardEl.style.display==="none") return;
   pastCardEl.classList.remove("visible");
   setTimeout(()=>{
     pastCardEl.style.display="none";
@@ -1059,7 +1083,6 @@ function anyUnlockedModes(){
   const locks=loadLocks();
   return ["pull","push","legs","full"].some(k=>!locks[k]);
 }
-
 function applyLocksToRadios(){
   const locks=loadLocks();
   qsa(".opt").forEach(lbl=>{
@@ -1073,7 +1096,6 @@ function applyLocksToRadios(){
     }
   });
 }
-
 function applyHistoryLocksToRadios(){
   const hist=loadHistory();
   qsa(".opt").forEach(lbl=>{
@@ -1084,7 +1106,6 @@ function applyHistoryLocksToRadios(){
     lbl.classList.toggle("disabled", !has);
   });
 }
-
 function clearRadioSelection(){
   qsa("input[name='mode']").forEach(r=> r.checked=false);
   qsa(".opt").forEach(lbl=> lbl.classList.remove("active"));
@@ -1109,7 +1130,6 @@ function showSelectionState(){
 
   hidePreviewCard(true);
 }
-
 function showPreLockedState(){
   historyMode=false;
   setSubtitle("Next workout in");
@@ -1121,7 +1141,6 @@ function showPreLockedState(){
   hidePreviewCard(true);
   startBigTimer(getStartTime(false));
 }
-
 function showWorkoutState(workout){
   historyMode=false;
   stopCountdown();
@@ -1138,7 +1157,6 @@ function showWorkoutState(workout){
   resetSlider();
   hidePreviewCard(true);
 }
-
 function showCompletedState(){
   historyMode=true;
   clearRadioSelection();
@@ -1152,9 +1170,8 @@ function showCompletedState(){
   mainBtn.classList.add("hidden");
   slideWrap.classList.add("hidden");
 
-  startBigTimer(getStartTime(true)); // tomorrow 5:30 PM
+  startBigTimer(getStartTime(true));
 }
-
 function showAllUsedWeekState(){
   historyMode=false;
   setSubtitle("All workouts used this week");
@@ -1173,7 +1190,6 @@ function stopCountdown(){
     countdownInterval=null;
   }
 }
-
 function startBigTimer(target){
   stopCountdown();
   bigTimer.classList.remove("hidden");
@@ -1187,7 +1203,7 @@ function startBigTimer(target){
       bigTimer.classList.remove("show");
       setTimeout(()=>{
         bigTimer.classList.add("hidden");
-        initUI();          // re-evaluate state at unlock time
+        initUI();
       },300);
       return;
     }
@@ -1221,7 +1237,7 @@ function handleGenerate(){
 
     saveWorkoutToday(workout);
     const locks=loadLocks();
-    locks[selectedMode]=true;  // lock this mode for the week
+    locks[selectedMode]=true;
     saveLocks(locks);
 
     aiStage.classList.remove("show");
@@ -1269,21 +1285,18 @@ function resetSlider(){
     slideFillEl.style.transition="width .18s ease-out";
   },20);
 }
-
 slideKnob.addEventListener("pointerdown",e=>{
   e.preventDefault();
   sliding=true;
   slideKnob.setPointerCapture(e.pointerId);
   slideKnob.style.transition="none";
   slideFillEl.style.transition="none";
-
   const trackRect=slideTrackEl.getBoundingClientRect();
   const knobRect =slideKnob.getBoundingClientRect();
   maxSlide=trackRect.width-knobRect.width-8;
   slideStartX=e.clientX;
   if(navigator.vibrate) navigator.vibrate(6);
 });
-
 slideKnob.addEventListener("pointermove",e=>{
   if(!sliding) return;
   const knobRect=slideKnob.getBoundingClientRect();
@@ -1298,19 +1311,15 @@ slideKnob.addEventListener("pointermove",e=>{
   if(knobCenter>labelCenter) slideTrackEl.classList.add("filled");
   else slideTrackEl.classList.remove("filled");
 });
-
 function endSlide(e){
   if(!sliding) return;
   sliding=false;
   if(e.pointerId) slideKnob.releasePointerCapture(e.pointerId);
-
   const knobRect=slideKnob.getBoundingClientRect();
   const match=/translate\(([-0-9.]+)px/.exec(slideKnob.style.transform);
   const x=match?parseFloat(match[1]):0;
-
   slideKnob.style.transition="transform .22s ease-out";
   slideFillEl.style.transition="width .22s ease-out";
-
   if(x>=maxSlide*0.9){
     slideKnob.style.transform=`translate(${maxSlide}px,-50%)`;
     slideFillEl.style.width=`${maxSlide+knobRect.width}px`;
@@ -1330,7 +1339,7 @@ function endSlide(e){
 slideKnob.addEventListener("pointerup",endSlide);
 slideKnob.addEventListener("pointercancel",endSlide);
 
-/* WEATHER */
+/* WEATHER (unchanged logic) */
 function weatherCodeToText(code){
   const map={
     0:"Clear sky",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",
@@ -1343,7 +1352,6 @@ function weatherCodeToText(code){
   };
   return map[code] || "Unknown";
 }
-
 function getWeatherEmoji(cond){
   const c=cond.toLowerCase();
   if(c.includes("clear")) return "☀️";
@@ -1355,7 +1363,6 @@ function getWeatherEmoji(cond){
   if(c.includes("fog")||c.includes("mist")) return "🌫️";
   return "🌡️";
 }
-
 function updateWeatherUI(){
   if(!navigator.geolocation){
     weatherEl.textContent="Location unavailable";
@@ -1397,22 +1404,24 @@ function initUI(){
 
   const workout   = loadWorkoutToday();
   const completed = loadCompletedToday();
-  const lockedByTime = !afterStart();
+
+  // 🔓 DEV OVERRIDE: no pre-lock screen in dev
+  const lockedByTime = DEV ? false : !afterStart();
 
   if(!workout && !completed && lockedByTime){
-    showPreLockedState();      // countdown to 5:30 PM
+    showPreLockedState();
     return;
   }
   if(completed){
-    showCompletedState();      // history mode + timer to tomorrow
+    showCompletedState();
     return;
   }
   if(workout){
-    showWorkoutState(workout); // already generated, still not completed
+    showWorkoutState(workout);
     return;
   }
   if(!anyUnlockedModes()){
-    showAllUsedWeekState();    // all four modes used this week
+    showAllUsedWeekState();
     return;
   }
   showSelectionState();
@@ -1435,13 +1444,12 @@ qsa("input[name='mode']").forEach(r=>{
     hidePastCard();
     mainBtn.textContent = `Generate ${modeTitle(selectedMode).replace(" Day","")}`;
     mainBtn.classList.remove("disabled");
-    mainBtn.classList.remove("hidden");
     updatePreviewForMode(selectedMode);
     if(navigator.vibrate) navigator.vibrate(8);
   });
 });
 
-/* CLICK OUTSIDE PAST CARD → hide + show timer again */
+/* CLICK OUTSIDE PAST CARD → hide + re-arm radios */
 document.addEventListener("click",(e)=>{
   if(!historyMode) return;
   if(pastCardEl.style.display==="none") return;
@@ -1452,13 +1460,13 @@ document.addEventListener("click",(e)=>{
   if(!insideCard && !insideRadio){
     hidePastCard();
 
-    // reset radio selection so you can re-tap a mode
-    qsa(".opt").forEach(lbl=>{
+    // Reset radios so clicking again on the same pill works
+    qsa(".opt").forEach(lbl => {
       lbl.classList.remove("active");
-      const inp=lbl.querySelector("input");
-      if(inp) inp.checked=false;
+      const inp = lbl.querySelector("input");
+      if (inp) inp.checked = false;
     });
-    selectedMode=null;
+    selectedMode = null;
   }
 });
 
@@ -1469,5 +1477,7 @@ mainBtn.addEventListener("click", handleGenerate);
 initUI();
 updateWeatherUI();
 </script>
+<!-- ===================== JS END ===================== -->
+
 </body>
-</html>       
+</html>
