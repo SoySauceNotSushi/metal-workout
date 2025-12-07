@@ -645,6 +645,9 @@
   <!-- AI LOADING MESH -->
   <div id="aiStage" class="ai-stage"></div>
 
+<!-- CARDIO CARD -->
+<div id="cardioCard" class="cardio-card"></div>
+  
   <!-- TODAY WORKOUT CARD -->
   <div id="card">
     <div id="dayTitle"></div>
@@ -1674,6 +1677,30 @@ function updateWeatherUI(){
   },{timeout:10000,maximumAge:600000});
 }
 
+/* CARDIO TYPES + GENERATOR */
+const CARDIO_TYPES = ["Zone 2", "HIIT", "Sprints"];
+
+function maybeAddCardio(){
+  return Math.random() < 0.25 ? CARDIO_TYPES[Math.floor(Math.random()*CARDIO_TYPES.length)] : null;
+}
+
+function renderCardioCard(type){
+  const el = document.getElementById("cardioCard");
+  if(!type){
+    el.style.display = "none";
+    el.classList.remove("visible");
+    return;
+  }
+  el.innerHTML = `
+    <div style="font-size:20px;font-weight:700;margin-bottom:10px;">Cardio</div>
+    <div style="font-size:16px;">${type}</div>
+  `;
+  el.style.display = "block";
+  el.classList.remove("visible");
+  void el.offsetWidth;
+  el.classList.add("visible");
+}
+  
 /* INIT UI */
 function initUI(){
   resetWeekIfNeeded();
