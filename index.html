@@ -52,6 +52,131 @@
     margin-bottom:10px;
   }
 
+  /* ===================== NEW STREAK WIDGET ===================== */
+
+.streak-widget{
+  width:100%;
+  margin:16px 0 24px;
+  padding:18px 20px;
+  background:#0f0f0f;
+  border-radius:22px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  color:#fff;
+  box-shadow:0 6px 16px rgba(0,0,0,0.25);
+}
+
+/* LEFT FIRE BOX */
+.streak-fire-box{
+  width:86px;
+  height:86px;
+  background:#181818;
+  border-radius:20px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:8px 0;
+  text-align:center;
+  box-shadow:inset 0 0 20px rgba(255,255,255,0.05);
+}
+
+.fire-icon{
+  width:36px;
+  height:36px;
+  background:linear-gradient(180deg,#FFE066,#FF8A00,#FF3C00);
+  -webkit-mask:url('data:image/svg+xml;utf8,<svg fill="white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C12 2 7 7 7 11C7 14.3137 9.68629 17 13 17C16.3137 17 19 14.3137 19 11C19 8 17 5 12 2Z"/></svg>') center/contain no-repeat;
+          mask:url('data:image/svg+xml;utf8,<svg fill="white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C12 2 7 7 7 11C7 14.3137 9.68629 17 13 17C16.3137 17 19 14.3137 19 11C19 8 17 5 12 2Z"/></svg>') center/contain no-repeat;
+}
+
+.streak-days{
+  font-size:16px;
+  font-weight:700;
+  margin-top:6px;
+}
+
+.streak-label{
+  font-size:12px;
+  color:#ccc;
+  margin-top:2px;
+}
+
+/* MIDDLE PROGRESS + NUMBER */
+.streak-progress-wrap{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.streak-progress-number{
+  font-size:22px;
+  font-weight:700;
+  color:white;
+  text-align:left;
+}
+
+.streak-progress-bar{
+  width:100%;
+  height:10px;
+  background:#2a2a2a;
+  border-radius:999px;
+  overflow:hidden;
+  position:relative;
+}
+
+.streak-progress-fill{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#FF8A00,#FF4500);
+  box-shadow:0 0 12px rgba(255,100,0,0.8);
+  border-radius:999px;
+  transition:width .35s ease;
+}
+
+/* RIGHT DAY DOTS */
+.streak-dots{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  align-items:center;
+}
+
+.streak-dots .dot{
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  background:#3a3a3a;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:background .25s ease, transform .2s ease;
+}
+
+/* Completed days */
+.streak-dots .dot.filled{
+  background:#FF8A00;
+  transform:scale(1.05);
+}
+
+.streak-dots .dot.filled::after{
+  content:"✓";
+  font-size:12px;
+  font-weight:700;
+  color:white;
+}
+
+/* Small animation when filled */
+.streak-dots .dot.filled{
+  animation:dotPop .28s ease;
+}
+
+@keyframes dotPop{
+  0%{ transform:scale(0.4); opacity:0; }
+  100%{ transform:scale(1.05); opacity:1; }
+
   .weather{
     font-size:15px;
     color:var(--sub);
@@ -600,20 +725,42 @@
 
 <div class="container">
 
-  <div class="top-header">
-    <div class="weather">Enable location for weather</div>
+ <!-- TOP HEADER remains the same -->
+<div class="top-header">
+  <div class="weather">Enable location for weather</div>
+  <button id="devResetBtn" class="dev-reset-btn hidden">Reset Dev</button>
+</div>
 
-    <div class="streak-wrap">
-      <div class="streak-bar">
-        <div class="streak-bar-fill"></div>
-      </div>
-      <div class="streak-fire">
-        <span>🔥</span>
-        <span id="streakCount" class="streak-count">0</span>
-      </div>
+<!-- NEW STREAK WIDGET -->
+<div id="streakWidget" class="streak-widget">
+  
+  <!-- LEFT FIRE BOX -->
+  <div class="streak-fire-box">
+    <div class="fire-icon"></div>
+    <div class="streak-days"><span id="streakDayCount">0</span> days</div>
+    <div class="streak-label">Workout streak</div>
+  </div>
+
+  <!-- MIDDLE PROGRESS NUMBER + BAR -->
+  <div class="streak-progress-wrap">
+    <div class="streak-progress-number">
+      <span id="weekProgressCount">0</span> / 3
     </div>
+    <div class="streak-progress-bar">
+      <div class="streak-progress-fill" id="weekProgressFill"></div>
+    </div>
+  </div>
 
-    <button id="devResetBtn" class="dev-reset-btn hidden">Reset Dev</button>
+  <!-- RIGHT DAY DOTS -->
+  <div class="streak-dots">
+    <!-- Monday -->
+    <div class="dot" data-day="Mon" id="dot-mon"></div>
+    <div class="dot" data-day="Tue" id="dot-tue"></div>
+    <div class="dot" data-day="Wed" id="dot-wed"></div>
+    <div class="dot" data-day="Thu" id="dot-thu"></div>
+    <div class="dot" data-day="Fri" id="dot-fri"></div>
+    <div class="dot" data-day="Sat" id="dot-sat"></div>
+    <div class="dot" data-day="Sun" id="dot-sun"></div>
   </div>
 
   <h1>Welcome back Jy</h1>
@@ -923,10 +1070,6 @@ const slideKnob  = qs(".slide-knob");
 
 const weatherEl  = qs(".weather");
 
-/* Streak DOM */
-const streakBarFill = qs(".streak-bar-fill");
-const streakCountEl = qs("#streakCount");
-
 /* Dev reset button DOM */
 const devResetBtn = qs("#devResetBtn");
 
@@ -945,7 +1088,6 @@ let selectedMode   = null;
 let currentWorkout = null;
 let countdownInterval = null;
 let historyMode = false;
-let lastStreakValue = getStreak();
 
 /* SHOW DEV RESET BUTTON ONLY IN DEV */
 if(DEV && devResetBtn){
@@ -1367,6 +1509,9 @@ function showCompletedState(){
   mainBtn.classList.add("hidden");
   slideWrap.classList.add("hidden");
 
+  // Update streak widget when the completed view is shown
+  updateStreakWidget();
+
   let target;
   if(DEV){
     target = getDevUnlockTime();
@@ -1428,26 +1573,48 @@ function startBigTimer(target){
   countdownInterval=setInterval(tick,1000);
 }
 
-/* WEEKLY PROGRESS + STREAK UI */
-function renderStreakUI(opts={}){
-  const hist = loadHistory();
-  const doneCount = Object.keys(hist).length;
-  const pct = Math.min(doneCount/3,1);
-  streakBarFill.style.transform = `scaleX(${pct})`;
+/* ===================== NEW STREAK WIDGET JS ===================== */
 
+function updateStreakWidget() {
+  // Streak days
   const streak = getStreak();
-  const animateFlip = !!opts.animateFlip && streak > lastStreakValue;
+  const streakEl = document.querySelector("#streakDayCount");
+  if (streakEl) streakEl.textContent = streak;
 
-  if(animateFlip){
-    streakCountEl.classList.remove("flip");
-    void streakCountEl.offsetWidth;
-    streakCountEl.textContent = streak;
-    streakCountEl.classList.add("flip");
-    setTimeout(()=> streakCountEl.classList.remove("flip"),320);
-  }else{
-    streakCountEl.textContent = streak;
+  // Weekly history
+  const hist = loadHistory();
+  const completedDaysSet = new Set();
+
+  Object.keys(hist).forEach(mode => {
+    const entry = hist[mode];
+    if (entry && entry.dayName) {
+      completedDaysSet.add(entry.dayName);
+    }
+  });
+
+  // Weekly progress (1/3)
+  const weekCount = Math.min(completedDaysSet.size, 3);
+  const weekNumberEl = document.querySelector("#weekProgressCount");
+  const weekFillEl = document.querySelector("#weekProgressFill");
+
+  if (weekNumberEl) weekNumberEl.textContent = weekCount;
+  if (weekFillEl) {
+    const pct = (weekCount / 3) * 100;
+    weekFillEl.style.width = pct + "%";
   }
-  lastStreakValue = streak;
+
+  // Reset all day dots
+  ["mon","tue","wed","thu","fri","sat","sun"].forEach(d=>{
+    const el = document.querySelector(`#dot-${d}`);
+    if (el) el.classList.remove("filled");
+  });
+
+  // Fill dots for each completed day (based on history entries)
+  completedDaysSet.forEach(dayName=>{
+    const short = dayName.slice(0,3).toLowerCase(); // "Monday" -> "mon"
+    const el = document.querySelector(`#dot-${short}`);
+    if (el) el.classList.add("filled");
+  });
 }
 
 // called after a workout is fully completed (slide finished)
@@ -1463,18 +1630,16 @@ function updateWeeklyStatsAfterCompletion(){
   summary.workouts = doneCount;
 
   let streak = getStreak();
-  let streakIncreased = false;
   if(doneCount >= 3 && !summary.counted){
     streak += 1;
     summary.counted = true;
     setStreak(streak);
-    streakIncreased = true;
   }else{
     setStreak(streak);
   }
   saveWeekSummary(summary);
 
-  return {doneCount, streak, streakIncreased};
+  return {doneCount, streak};
 }
 
 /* GENERATE FLOW */
@@ -1527,8 +1692,8 @@ function handleComplete(){
     lsSet("dev_time_lock", String(unlockAt));
   }
 
-  const stats = updateWeeklyStatsAfterCompletion();
-  renderStreakUI({animateFlip: stats.streakIncreased});
+  // Update weekly stats (streak, counted flag, etc.)
+  updateWeeklyStatsAfterCompletion();
 
   cardEl.style.display="none";
   slideWrap.classList.add("hidden");
@@ -1708,7 +1873,8 @@ function initUI(){
     showSelectionState();
   }
 
-  renderStreakUI();
+  // Ensure widget is in sync on initial load
+  updateStreakWidget();
 }
 
 /* RADIO INTERACTION */
@@ -1762,6 +1928,5 @@ initUI();
 updateWeatherUI();
 </script>
 <!-- ===================== JS END ===================== -->
-
 </body>
 </html>
