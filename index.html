@@ -7,878 +7,592 @@
 
 <!-- ===================== CSS START ===================== -->
 <style>
-:root{
-  --brand:#2453f5;
-  --ink:#0f172a;
-  --sub:#64748b;
-  --bg:#ffffff;
-  --card:#f8fafc;
-  --pill-blue:#e4ecff;
-  --pill-green:#d9fbe3;
-  --pill-orange:#ffe6bf;
-  --pill-red:#ffe0e0;
+  :root{
+    --brand:#2453f5;
+    --ink:#0f172a;
+    --sub:#64748b;
+    --bg:#ffffff;
+    --card:#f8fafc;
+    --pill-blue:#e4ecff;
+    --pill-green:#d9fbe3;
+    --pill-orange:#ffe6bf;
+    --pill-red:#ffe0e0;
 
-  --streak-bg:#f7f8f9;
-  --streak-fill:#f97316;
+    --streak-bg:#f7f8f9;
+    --streak-fill:#f97316;
 
-  --shadow-soft:0 18px 48px rgba(15,23,42,0.16);
-  --shadow-subtle:0 8px 18px rgba(15,23,42,0.12);
+    --shadow-soft:0 18px 48px rgba(15,23,42,0.16);
+    --shadow-subtle:0 8px 18px rgba(15,23,42,0.12);
+  }
 
-  --border-soft:#e2e8f0;
-}
+  *{ box-sizing:border-box; }
 
-/* Global hidden helper */
-.hidden{
-  display:none !important;
-}
+  body{
+    margin:0;
+    padding:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro",Segoe UI,Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
 
-*{ box-sizing:border-box; }
+  .container{
+    max-width:480px;
+    margin:0 auto;
+    padding:24px;
+    padding-bottom:120px;
+  }
 
-body{
-  margin:0;
-  padding:0;
-  background:var(--bg);
-  color:var(--ink);
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro",Segoe UI,Roboto,sans-serif;
-  -webkit-font-smoothing:antialiased;
-}
+  /* TOP HEADER ROW: weather + streak + dev reset */
+  .top-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:10px;
+  }
 
-/* Container */
-.container{
-  max-width:480px;
-  margin:0 auto;
-  padding:24px;
-  padding-bottom:120px;
-}
+  .weather{
+    font-size:15px;
+    color:var(--sub);
+    opacity:.95;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    transition:opacity .25s ease, transform .25s ease;
+  }
 
-/* TOP HEADER ROW: weather + streak + dev reset */
-.top-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  margin-bottom:10px;
-}
+  .streak-wrap{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:6px;
+    min-width:110px;
+  }
+  .streak-bar{
+    position:relative;
+    width:76px;
+    height:8px;
+    border-radius:999px;
+    background:var(--streak-bg);
+    overflow:hidden;
+  }
+  .streak-bar-fill{
+    position:absolute;
+    inset:0;
+    background:var(--streak-fill);
+    transform-origin:left center;
+    transform:scaleX(0);
+    transition:transform .35s cubic-bezier(.22,.8,.4,1);
+  }
+  .streak-fire{
+    display:flex;
+    align-items:center;
+    gap:3px;
+    font-size:14px;
+    font-weight:600;
+    color:var(--streak-fill);
+  }
+  .streak-count{
+    display:inline-block;
+    font-variant-numeric:tabular-nums;
+    min-width:14px;
+  }
+  .streak-count.flip{
+    animation:streakFlip .32s ease-out;
+  }
+  @keyframes streakFlip{
+    0%{
+      transform:translateY(-60%) rotateX(90deg);
+      opacity:0;
+    }
+    100%{
+      transform:translateY(0) rotateX(0deg);
+      opacity:1;
+    }
+  }
 
-.weather{
-  font-size:15px;
-  color:var(--sub);
-  opacity:.95;
-  display:flex;
-  align-items:center;
-  gap:6px;
-  transition:opacity .25s ease, transform .25s ease;
-}
+  /* DEV RESET BUTTON */
+  .dev-reset-btn{
+    font-size:13px;
+    padding:6px 12px;
+    border-radius:8px;
+    border:none;
+    background:#f3f4f6;
+    color:#0f172a;
+    box-shadow:0 2px 6px rgba(0,0,0,0.12);
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .dev-reset-btn.hidden{
+    display:none;
+  }
+  .dev-reset-btn:active{
+    transform:scale(.96);
+  }
 
-.streak-wrap{
-  display:flex;
-  align-items:center;
-  justify-content:flex-end;
-  gap:6px;
-  min-width:110px;
-}
-.streak-bar{
-  position:relative;
-  width:76px;
-  height:8px;
-  border-radius:999px;
-  background:var(--streak-bg);
-  overflow:hidden;
-}
-.streak-bar-fill{
-  position:absolute;
-  inset:0;
-  background:var(--streak-fill);
-  transform-origin:left center;
-  transform:scaleX(0);
-  transition:transform .35s cubic-bezier(.22,.8,.4,1);
-}
-.streak-fire{
-  display:flex;
-  align-items:center;
-  gap:3px;
-  font-size:14px;
-  font-weight:600;
-  color:var(--streak-fill);
-}
-.streak-count{
-  display:inline-block;
-  font-variant-numeric:tabular-nums;
-  min-width:14px;
-}
-.streak-count.flip{
-  animation:streakFlip .32s ease-out;
-}
-@keyframes streakFlip{
-  0%{
-    transform:translateY(-60%) rotateX(90deg);
+  h1{
+    font-size:30px;
+    font-weight:700;
+    margin:4px 0 6px;
+  }
+
+  /* SUBTITLE ANIMATION */
+  #subtitle{
+    font-size:17px;
+    font-weight:400;
+    color:var(--sub);
+    margin:0 0 18px;
+    position:relative;
+    display:inline-block;
+    overflow:hidden;
+  }
+  .subtitle-enter{
     opacity:0;
+    transform:translateY(10px);
   }
-  100%{
-    transform:translateY(0) rotateX(0deg);
+  .subtitle-enter-active{
     opacity:1;
+    transform:translateY(0);
+    transition:opacity .32s ease, transform .32s cubic-bezier(.18,.84,.32,1.12);
   }
-}
+  .subtitle-exit{
+    opacity:1;
+    transform:translateY(0);
+  }
+  .subtitle-exit-active{
+    opacity:0;
+    transform:translateY(-10px);
+    transition:opacity .32s ease, transform .32s cubic-bezier(.18,.84,.32,1.12);
+  }
 
-/* DEV RESET BUTTON */
-.dev-reset-btn{
-  font-size:13px;
-  padding:6px 12px;
-  border-radius:8px;
-  border:none;
-  background:#f3f4f6;
-  color:#0f172a;
-  box-shadow:0 2px 6px rgba(0,0,0,0.12);
-  cursor:pointer;
-  white-space:nowrap;
-}
-.dev-reset-btn:active{
-  transform:scale(.96);
-}
+  /* RADIO ROW (used both in selection + history mode) */
+  #radioRow{
+    display:flex;
+    gap:22px;
+    margin:0 0 6px;
+    justify-content:flex-start;
+  }
+  .opt{
+    position:relative;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:14px;
+    color:var(--ink);
+    padding:6px 12px;
+    border-radius:999px;
+    transition:background .2s ease, color .2s ease, transform .16s ease, box-shadow .16s ease;
+  }
+  .opt input{
+    appearance:none;
+    -webkit-appearance:none;
+    width:0;
+    height:0;
+    position:absolute;
+    opacity:0;
+    pointer-events:none;
+  }
+  .opt.disabled{
+    opacity:.35;
+    pointer-events:none;
+  }
+  .opt.active{
+    color:var(--brand);
+    font-weight:600;
+    background:#e4ecff80;
+    box-shadow:0 0 0 1px #e4ecff;
+  }
+  .opt:active:not(.disabled){
+    transform:scale(.97);
+    box-shadow:0 0 0 1px rgba(36,83,245,0.22);
+  }
 
-/* Main heading + subtitle */
-h1{
-  font-size:30px;
-  font-weight:700;
-  margin:4px 0 6px;
-}
+  /* PREVIEW CARD (wireframe left + tag right) */
+  .preview-card{
+    position:relative;
+    width:100%;
+    max-width:420px;
+    margin:32px auto 24px;
+    border-radius:18px;
+    background:#ffffff;
+    box-shadow:var(--shadow-soft);
+    padding:18px 20px;
+    opacity:0;
+    transform:translateY(26px) scale(.96) rotateX(5deg);
+    transition:
+      opacity .32s ease,
+      transform .32s cubic-bezier(.18,.84,.32,1.12),
+      box-shadow .24s ease;
+    pointer-events:none;
+  }
+  .preview-card.show{
+    opacity:1;
+    transform:translateY(0) scale(1) rotateX(0deg);
+  }
+  .preview-card.hidden{
+    display:none;
+  }
+  .preview-card::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:inherit;
+    background:radial-gradient(circle at 0% 0%,rgba(36,83,245,0.06),transparent 55%);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .3s ease;
+  }
+  .preview-card.show::before{ opacity:1; }
 
-/* SUBTITLE ANIMATION */
-#subtitle{
-  font-size:17px;
-  font-weight:400;
-  color:var(--sub);
-  margin:0 0 18px;
-  position:relative;
-  display:inline-block;
-  overflow:hidden;
-}
-.subtitle-enter{
-  opacity:0;
-  transform:translateY(10px);
-}
-.subtitle-enter-active{
-  opacity:1;
-  transform:translateY(0);
-  transition:opacity .32s ease, transform .32s cubic-bezier(.18,.84,.32,1.12);
-}
-.subtitle-exit{
-  opacity:1;
-  transform:translateY(0);
-}
-.subtitle-exit-active{
-  opacity:0;
-  transform:translateY(-10px);
-  transition:opacity .32s ease, transform .32s cubic-bezier(.18,.84,.32,1.12);
-}
+  .preview-title{
+    font-size:18px;
+    font-weight:700;
+    margin-bottom:14px;
+  }
+  .preview-lines{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .preview-row{
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    gap:8px;
+    opacity:0;
+    transform:translateY(6px);
+    transition:opacity .28s ease, transform .28s ease;
+  }
+  .preview-row.show-row{
+    opacity:1;
+    transform:translateY(0);
+  }
 
-/* RADIO ROW (used both in selection + history mode) */
-#radioRow{
-  display:flex;
-  gap:22px;
-  margin:0 0 6px;
-  justify-content:flex-start;
-}
-.opt{
-  position:relative;
-  display:flex;
-  align-items:center;
-  gap:6px;
-  font-size:14px;
-  color:var(--ink);
-  padding:6px 12px;
-  border-radius:999px;
-  transition:background .2s ease, color .2s ease, transform .16s ease, box-shadow .16s ease;
-}
-.opt input{
-  appearance:none;
-  -webkit-appearance:none;
-  width:0;
-  height:0;
-  position:absolute;
-  opacity:0;
-  pointer-events:none;
-}
-.opt.disabled{
-  opacity:.35;
-  pointer-events:none;
-}
-.opt.active{
-  color:var(--brand);
-  font-weight:600;
-  background:#e4ecff80;
-  box-shadow:0 0 0 1px #e4ecff;
-}
-.opt:active:not(.disabled){
-  transform:scale(.97);
-  box-shadow:0 0 0 1px rgba(36,83,245,0.22);
-}
+  /* Wireframe shimmer */
+  .preview-wire{
+    position:relative;
+    height:12px;
+    width:32%;
+    min-width:90px;
+    border-radius:6px;
+    overflow:hidden;
+    background:#f2f3f5;
+  }
+  .preview-wire::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(120deg,
+      rgba(255,255,255,0),
+      rgba(255,255,255,0.8),
+      rgba(255,255,255,0));
+    transform:translateX(-100%);
+    animation:wireShimmer 1.7s linear infinite;
+  }
+  @keyframes wireShimmer{
+    0%{ transform:translateX(-100%); }
+    100%{ transform:translateX(100%); }
+  }
 
-/* PREVIEW CARD (wireframe left + tag right) */
-.preview-card{
-  position:relative;
-  width:100%;
-  max-width:420px;
-  margin:32px auto 24px;
-  border-radius:18px;
-  background:#ffffff;
-  box-shadow:var(--shadow-soft);
-  padding:18px 20px;
-  opacity:0;
-  transform:translateY(26px) scale(.96) rotateX(5deg);
-  transition:
-    opacity .32s ease,
-    transform .32s cubic-bezier(.18,.84,.32,1.12),
-    box-shadow .24s ease;
-  pointer-events:none;
-}
-.preview-card.show{
-  opacity:1;
-  transform:translateY(0) scale(1) rotateX(0deg);
-}
-.preview-card.hidden{
-  display:none;
-}
-.preview-card::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  border-radius:inherit;
-  background:radial-gradient(circle at 0% 0%,rgba(36,83,245,0.06),transparent 55%);
-  opacity:0;
-  pointer-events:none;
-  transition:opacity .3s ease;
-}
-.preview-card.show::before{ opacity:1; }
+  .preview-tag{
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:600;
+    white-space:nowrap;
+    box-shadow:0 0 0 1px rgba(15,23,42,0.04);
+  }
+  .preview-tag-weighted{ background:var(--pill-blue); color:var(--brand); }
+  .preview-tag-abs{ background:var(--pill-green); color:#22c55e; }
+  .preview-tag-shoulders{ background:#ede9fe; color:#7c3aed; }
+  .preview-tag-biceps{ background:var(--pill-orange); color:#d97706; }
+  .preview-tag-kettlebell{ background:var(--pill-red); color:#e11d48; }
 
-.preview-title{
-  font-size:18px;
-  font-weight:700;
-  margin-bottom:14px;
-}
-.preview-lines{
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-}
-.preview-row{
-  display:flex;
-  align-items:center;
-  justify-content:flex-start;
-  gap:8px;
-  opacity:0;
-  transform:translateY(6px);
-  transition:opacity .28s ease, transform .28s ease;
-}
-.preview-row.show-row{
-  opacity:1;
-  transform:translateY(0);
-}
+  /* AI GRADIENT STAGE */
+  .ai-stage{
+    position:absolute;
+    left:50%;
+    top:260px;
+    transform:translateX(-50%);
+    width:260px;
+    height:260px;
+    border-radius:50%;
+    display:none;
+    pointer-events:none;
+    overflow:visible;
+  }
+  .ai-stage::before{
+    content:"";
+    position:absolute;
+    inset:-20% -15% -25% -15%;
+    filter:blur(84px) saturate(160%) contrast(115%);
+    opacity:0;
+    transition:opacity .25s ease;
+    background:
+      radial-gradient(22rem 22rem at 30% 36%, #3A7BFF77 0, #0000 50%),
+      radial-gradient(22rem 22rem at 72% 34%, #7DFF5C77 0, #0000 54%),
+      radial-gradient(24rem 20rem at 40% 72%, #FFA43A77 0, #0000 54%),
+      radial-gradient(20rem 20rem at 70% 74%, #9B8FFF99 0, #0000 80%);
+    background-blend-mode:screen;
+    animation:meshBreath 2s ease-in-out infinite, meshDrift 3s ease-in-out infinite;
+  }
+  .ai-stage.show::before{ opacity:.9; }
+  @keyframes meshBreath{
+    0%,100%{ transform:scale(1); opacity:.7 }
+    50%{ transform:scale(1.04); opacity:.35 }
+  }
+  @keyframes meshDrift{
+    0%{ transform:translate3d(0,0,0); }
+    50%{ transform:translate3d(2%,-1.5%,0); }
+    100%{ transform:translate3d(0,0,0); }
+  }
 
-/* Wireframe shimmer */
-.preview-wire{
-  position:relative;
-  height:12px;
-  width:32%;
-  min-width:90px;
-  border-radius:6px;
-  overflow:hidden;
-  background:#f2f3f5;
-}
-.preview-wire::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:linear-gradient(120deg,
-    rgba(255,255,255,0),
-    rgba(255,255,255,0.8),
-    rgba(255,255,255,0));
-  transform:translateX(-100%);
-  animation:wireShimmer 1.7s linear infinite;
-}
-@keyframes wireShimmer{
-  0%{ transform:translateX(-100%); }
-  100%{ transform:translateX(100%); }
-}
+  /* REAL WORKOUT CARD (TODAY) */
+  #card{
+    background:var(--card);
+    border-radius:16px;
+    padding:20px;
+    margin-top:4px;
+    display:none;
+    opacity:0;
+    transform:translateY(12px) scale(.98);
+    box-shadow:var(--shadow-subtle);
+    transition:
+      opacity .3s ease,
+      transform .3s cubic-bezier(.18,.84,.32,1.12),
+      box-shadow .25s ease;
+  }
+  #card.visible{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+  #dayTitle{
+    font-size:20px;
+    font-weight:700;
+    margin-bottom:22px;
+  }
 
-.preview-tag{
-  padding:4px 10px;
-  border-radius:999px;
-  font-size:13px;
-  font-weight:600;
-  white-space:nowrap;
-  box-shadow:0 0 0 1px rgba(15,23,42,0.04);
-}
-.preview-tag-weighted{ background:var(--pill-blue); color:var(--brand); }
-.preview-tag-abs{ background:var(--pill-green); color:#22c55e; }
-.preview-tag-shoulders{ background:#ede9fe; color:#7c3aed; }
-.preview-tag-biceps{ background:var(--pill-orange); color:#d97706; }
-.preview-tag-kettlebell{ background:var(--pill-red); color:#e11d48; }
+  .line{
+    font-size:16px;
+    margin-bottom:10px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+    opacity:0;
+    transform:translateY(6px);
+    transition:opacity .22s ease, transform .22s ease;
+  }
+  .line.show-line{
+    opacity:1;
+    transform:translateY(0);
+  }
 
-/* AI GRADIENT STAGE */
-.ai-stage{
-  position:absolute;
-  left:50%;
-  top:260px;
-  transform:translateX(-50%);
-  width:260px;
-  height:260px;
-  border-radius:50%;
-  display:none;
-  pointer-events:none;
-  overflow:visible;
-}
-.ai-stage::before{
-  content:"";
-  position:absolute;
-  inset:-20% -15% -25% -15%;
-  filter:blur(84px) saturate(160%) contrast(115%);
-  opacity:0;
-  transition:opacity .25s ease;
-  background:
-    radial-gradient(22rem 22rem at 30% 36%, #3A7BFF77 0, #0000 50%),
-    radial-gradient(22rem 22rem at 72% 34%, #7DFF5C77 0, #0000 54%),
-    radial-gradient(24rem 20rem at 40% 72%, #FFA43A77 0, #0000 54%),
-    radial-gradient(20rem 20rem at 70% 74%, #9B8FFF99 0, #0000 80%);
-  background-blend-mode:screen;
-  animation:meshBreath 2s ease-in-out infinite, meshDrift 3s ease-in-out infinite;
-}
-.ai-stage.show::before{ opacity:.9; }
-@keyframes meshBreath{
-  0%,100%{ transform:scale(1); opacity:.7 }
-  50%{ transform:scale(1.04); opacity:.35 }
-}
-@keyframes meshDrift{
-  0%{ transform:translate3d(0,0,0); }
-  50%{ transform:translate3d(2%,-1.5%,0); }
-  100%{ transform:translate3d(0,0,0); }
-}
+  .pill{
+    padding:3px 8px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:600;
+  }
+  .pill-weighted{ background:var(--pill-blue); color:var(--brand); }
+  .pill-abs{ background:var(--pill-green); color:#22c55e; }
+  .pill-shoulders{ background:#ede9fe; color:#7c3aed; }
+  .pill-biceps{ background:var(--pill-orange); color:#d97706; }
+  .pill-kettlebell{ background:var(--pill-red); color:#e11d48; }
 
-/* TODAY WORKOUT CARD */
-#card{
-  background:var(--card);
-  border-radius:16px;
-  padding:20px;
-  margin-top:4px;
-  display:none;
-  opacity:0;
-  transform:translateY(12px) scale(.98);
-  box-shadow:var(--shadow-subtle);
-  transition:
-    opacity .3s ease,
-    transform .3s cubic-bezier(.18,.84,.32,1.12),
-    box-shadow .25s ease;
-}
-#card.visible{
-  opacity:1;
-  transform:translateY(0) scale(1);
-}
-#dayTitle{
-  font-size:20px;
-  font-weight:700;
-  margin-bottom:12px;
-}
+  /* PAST WORKOUT CARD (HISTORY) */
+  #pastCard{
+    background:var(--card);
+    border-radius:16px;
+    padding:18px 20px;
+    margin-top:18px;
+    display:none;
+    opacity:0;
+    transform:translateY(18px) scale(.98);
+    box-shadow:var(--shadow-subtle);
+    transition:
+      opacity .25s ease,
+      transform .25s cubic-bezier(.18,.84,.32,1.12);
+  }
+  #pastCard.visible{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+  .past-header{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    margin-bottom:18px;
+  }
+  #pastTitle{
+    font-size:18px;
+    font-weight:700;
+  }
+  #pastMeta{
+    font-size:14px;
+    color:var(--sub);
+  }
 
-/* Workout “line” = metal row */
-.line{
-  font-size:16px;
-  margin-bottom:10px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-  flex-wrap:wrap;
-  opacity:0;
-  transform:translateY(6px);
-  transition:opacity .22s ease, transform .22s ease;
-}
-.line.show-line{
-  opacity:1;
-  transform:translateY(0);
-}
+  .past-line{
+    font-size:16px;
+    margin-bottom:10px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+  }
 
-/* Pills */
-.pill{
-  padding:3px 8px;
-  border-radius:999px;
-  font-size:12px;
-  font-weight:600;
-}
-.pill-weighted{ background:var(--pill-blue); color:var(--brand); }
-.pill-abs{ background:var(--pill-green); color:#22c55e; }
-.pill-shoulders{ background:#ede9fe; color:#7c3aed; }
-.pill-biceps{ background:var(--pill-orange); color:#d97706; }
-.pill-kettlebell{ background:var(--pill-red); color:#e11d48; }
+  /* GENERATE BUTTON */
+  #mainBtn{
+    position:fixed;
+    left:50%;
+    bottom:24px;
+    transform:translateX(-50%);
+    width:calc(100% - 48px);
+    max-width:480px;
+    height:56px;
+    border-radius:28px;
+    border:none;
+    background:var(--brand);
+    color:#fff;
+    font-size:18px;
+    font-weight:600;
+    cursor:pointer;
+    transition:
+      opacity .25s ease,
+      box-shadow .22s ease,
+      transform .16s ease,
+      background .18s ease;
+    box-shadow:0 15px 30px rgba(36,83,245,0.35);
+  }
+  #mainBtn.hidden{ display:none; }
+  #mainBtn.disabled{
+    opacity:.4;
+    pointer-events:none;
+    box-shadow:none;
+  }
+  #mainBtn:active:not(.disabled){
+    transform:translateX(-50%) scale(.97);
+    box-shadow:0 10px 20px rgba(36,83,245,0.4);
+  }
 
-/* Selected exercises summary under card */
-.selected-exercises-label{
-  margin-top:12px;
-  font-size:13px;
-  font-weight:600;
-  color:var(--sub);
-}
-.selected-exercise-chips{
-  margin-top:6px;
-  display:flex;
-  flex-wrap:wrap;
-  gap:6px;
-}
-.selected-chip{
-  font-size:12px;
-  padding:4px 8px;
-  border-radius:999px;
-  background:#e5e7eb;
-  color:#111827;
-}
+  /* BIG TIMER */
+  #bigTimer{
+    position:fixed;
+    top:calc(50% + 2rem);
+    left:50%;
+    transform:translate(-50%,-50%);
+    display:flex;
+    gap:1.5rem;
+    opacity:0;
+    transition:opacity .45s ease;
+  }
+  #bigTimer.hidden{ display:none; }
+  #bigTimer.show{ opacity:1; }
+  .t-col{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    width:72px;
+    text-align:center;
+  }
+  .t-num{
+    font-size:48px;
+    font-weight:400;
+    color:var(--ink);
+    font-variant-numeric:tabular-nums;
+  }
+  .t-label{
+    font-size:14px;
+    color:var(--sub);
+    margin-top:6px;
+    letter-spacing:1px;
+  }
 
-/* Build Workout button inside card */
-.build-btn{
-  margin-top:16px;
-  width:100%;
-  border-radius:12px;
-  background:#111827;
-  color:#fff;
-  border:none;
-  padding:12px 16px;
-  font-size:15px;
-  font-weight:600;
-  cursor:pointer;
-  box-shadow:0 8px 18px rgba(15,23,42,.26);
-  display:block;
-}
-.build-btn:active{
-  transform:scale(.97);
-}
-
-/* PAST WORKOUT CARD (HISTORY) */
-#pastCard{
-  background:var(--card);
-  border-radius:16px;
-  padding:18px 20px;
-  margin-top:18px;
-  display:none;
-  opacity:0;
-  transform:translateY(18px) scale(.98);
-  box-shadow:var(--shadow-subtle);
-  transition:
-    opacity .25s ease,
-    transform .25s cubic-bezier(.18,.84,.32,1.12);
-}
-#pastCard.visible{
-  opacity:1;
-  transform:translateY(0) scale(1);
-}
-.past-header{
-  display:flex;
-  align-items:flex-end;
-  justify-content:space-between;
-  margin-bottom:18px;
-}
-#pastTitle{
-  font-size:18px;
-  font-weight:700;
-}
-#pastMeta{
-  font-size:14px;
-  color:var(--sub);
-}
-.past-line{
-  font-size:16px;
-  margin-bottom:10px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-  flex-wrap:wrap;
-}
-
-/* MAIN GENERATE BUTTON */
-#mainBtn{
-  position:fixed;
-  left:50%;
-  bottom:24px;
-  transform:translateX(-50%);
-  width:calc(100% - 48px);
-  max-width:480px;
-  height:56px;
-  border-radius:28px;
-  border:none;
-  background:var(--brand);
-  color:#fff;
-  font-size:18px;
-  font-weight:600;
-  cursor:pointer;
-  transition:
-    opacity .25s ease,
-    box-shadow .22s ease,
-    transform .16s ease,
-    background .18s ease;
-  box-shadow:0 15px 30px rgba(36,83,245,0.35);
-}
-#mainBtn.disabled{
-  opacity:.4;
-  pointer-events:none;
-  box-shadow:none;
-}
-#mainBtn:active:not(.disabled){
-  transform:translateX(-50%) scale(.97);
-  box-shadow:0 10px 20px rgba(36,83,245,0.4);
-}
-
-/* BIG TIMER */
-#bigTimer{
-  position:fixed;
-  top:calc(50% + 2rem);
-  left:50%;
-  transform:translate(-50%,-50%);
-  display:flex;
-  gap:1.5rem;
-  opacity:0;
-  transition:opacity .45s ease;
-}
-#bigTimer.show{ opacity:1; }
-.t-col{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  width:72px;
-  text-align:center;
-}
-.t-num{
-  font-size:48px;
-  font-weight:400;
-  color:var(--ink);
-  font-variant-numeric:tabular-nums;
-}
-.t-label{
-  font-size:14px;
-  color:var(--sub);
-  margin-top:6px;
-  letter-spacing:1px;
-}
-
-/* SLIDE TO COMPLETE */
-.slide-wrap{
-  position:fixed;
-  left:50%;
-  bottom:24px;
-  transform:translateX(-50%);
-  width:calc(100% - 48px);
-  max-width:480px;
-}
-.slide-track{
-  position:relative;
-  height:56px;
-  border-radius:999px;
-  background:#f7f8f9;
-  overflow:hidden;
-  user-select:none;
-  touch-action:none;
-  box-shadow:0 10px 22px rgba(15,23,42,0.15);
-  transition:box-shadow .22s ease, background .22s ease;
-}
-.slide-track.filled{
-  box-shadow:0 14px 30px rgba(36,83,245,0.38);
-  background:linear-gradient(135deg,#2453f5,#4f8cff);
-}
-.slide-fill{
-  position:absolute;
-  inset:0;
-  border-radius:999px;
-  pointer-events:none;
-  background:linear-gradient(120deg,#2453f5,#4f8cff);
-  transform-origin:left center;
-  transform:scaleX(0);
-  transition:transform .18s ease-out;
-}
-.slide-label{
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  pointer-events:none;
-  font-size:17px;
-  font-weight:600;
-  letter-spacing:.2px;
-}
-.slide-label span{
-  color:var(--brand);
-  animation:slidePulse 1.8s ease-in-out infinite;
-}
-.slide-track.filled .slide-label span{ color:#fff; }
-@keyframes slidePulse{
-  0%,100%{ opacity:.75; }
-  50%{ opacity:1; }
-}
-.slide-knob{
-  position:absolute;
-  top:50%;
-  left:4px;
-  width:48px;
-  height:48px;
-  border-radius:50%;
-  background:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  box-shadow:0 8px 16px rgba(15,23,42,0.18);
-  transform:translate(0,-50%);
-  touch-action:none;
-  transition:box-shadow .18s ease, transform .18s ease;
-}
-.slide-track.filled .slide-knob{
-  box-shadow:0 10px 24px rgba(36,83,245,0.5);
-}
-.slide-knob .arrow{
-  font-size:20px;
-  color:var(--brand);
-  transition:transform .18s ease;
-}
-.slide-track.filled .slide-knob .arrow{
-  transform:translateX(2px);
-}
-
-/* REPOSITORY BUTTON (under slider) */
-.repo-btn{
-  position:fixed;
-  left:50%;
-  transform:translateX(-50%);
-  bottom:96px;
-  width:calc(100% - 48px);
-  max-width:480px;
-  padding:14px 16px;
-  border-radius:16px;
-  border:none;
-  background:#f7f8f9;
-  color:#0f172a;
-  font-size:16px;
-  font-weight:600;
-  text-align:center;
-  box-shadow:0 6px 18px rgba(15,23,42,0.12);
-  cursor:pointer;
-  transition:transform .16s ease, box-shadow .2s ease, opacity .2s ease;
-}
-.repo-btn:active{
-  transform:translateX(-50%) scale(.97);
-  box-shadow:0 4px 12px rgba(15,23,42,0.18);
-}
-
-/* OVERLAYS (Repository + Builder) */
-.overlay{
-  position:fixed;
-  inset:0;
-  background:#ffffff;
-  z-index:40;
-  display:none;
-}
-.overlay.show{
-  display:block;
-}
-.overlay-inner{
-  max-width:480px;
-  margin:0 auto;
-  padding:20px 24px 32px;
-}
-
-/* Overlay header */
-.overlay-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:16px;
-}
-.overlay-left{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-.overlay-back{
-  border:none;
-  background:#f1f5f9;
-  width:32px;
-  height:32px;
-  border-radius:999px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:16px;
-  cursor:pointer;
-}
-.overlay-title{
-  font-size:18px;
-  font-weight:700;
-}
-.overlay-subtitle{
-  font-size:13px;
-  color:var(--sub);
-  margin-top:2px;
-}
-.overlay-edit-btn{
-  border:none;
-  background:transparent;
-  font-size:14px;
-  font-weight:600;
-  color:var(--brand);
-  cursor:pointer;
-}
-
-/* Repository layout */
-.repo-add-row{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  margin-bottom:14px;
-}
-.repo-add-input{
-  flex:1;
-  border-radius:10px;
-  border:1px solid var(--border-soft);
-  padding:8px 10px;
-  font-size:14px;
-}
-.repo-add-btn{
-  border:none;
-  border-radius:999px;
-  padding:8px 12px;
-  font-size:14px;
-  font-weight:600;
-  background:#111827;
-  color:#fff;
-  cursor:pointer;
-}
-.repo-list{
-  margin-top:4px;
-}
-.repo-item{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:10px 0;
-  border-bottom:1px solid #f1f5f9;
-}
-.repo-main{
-  display:flex;
-  flex-direction:column;
-  gap:4px;
-}
-.repo-name{
-  font-size:14px;
-  font-weight:500;
-}
-.repo-usage{
-  font-size:12px;
-  color:var(--sub);
-}
-.repo-delete-btn{
-  border:none;
-  background:transparent;
-  color:#ef4444;
-  font-size:16px;
-  cursor:pointer;
-  opacity:0;
-  pointer-events:none;
-}
-.overlay.edit-mode .repo-delete-btn{
-  opacity:1;
-  pointer-events:auto;
-}
-.repo-empty{
-  margin-top:8px;
-  font-size:13px;
-  color:var(--sub);
-}
-
-/* Builder list */
-.builder-list{
-  margin-top:10px;
-}
-.builder-section-title{
-  font-size:16px;
-  font-weight:600;
-  margin-top:16px;
-  margin-bottom:8px;
-}
-.builder-exercise-row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:8px 0;
-  border-bottom:1px solid #f1f5f9;
-}
-.builder-exercise-name{
-  font-size:14px;
-}
-.builder-toggle{
-  width:28px;
-  height:28px;
-  border-radius:999px;
-  border:1px solid var(--border-soft);
-  background:#ffffff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:17px;
-  cursor:pointer;
-}
-.builder-toggle.selected{
-  background:var(--brand);
-  color:#ffffff;
-  border-color:var(--brand);
-}
-
-/* Confirm modal (action sheet) */
-.modal{
-  position:fixed;
-  inset:0;
-  z-index:50;
-  display:none;
-}
-.modal.show{
-  display:block;
-}
-.modal-backdrop{
-  position:absolute;
-  inset:0;
-  background:rgba(15,23,42,0.35);
-}
-.modal-sheet{
-  position:absolute;
-  left:50%;
-  bottom:0;
-  transform:translateX(-50%);
-  width:100%;
-  max-width:480px;
-  background:#ffffff;
-  border-radius:18px 18px 0 0;
-  padding:16px 18px 20px;
-  box-shadow:0 -10px 24px rgba(15,23,42,0.25);
-}
-.modal-text{
-  font-size:15px;
-  font-weight:600;
-  margin-bottom:14px;
-}
-.modal-actions{
-  display:flex;
-  gap:10px;
-}
-.modal-btn{
-  flex:1;
-  height:40px;
-  border-radius:999px;
-  border:none;
-  font-size:14px;
-  font-weight:600;
-  cursor:pointer;
-}
-.modal-btn.secondary{
-  background:#f3f4f6;
-  color:#111827;
-}
-.modal-btn.danger{
-  background:#ef4444;
-  color:#ffffff;
-}
+  /* SLIDE TO COMPLETE */
+  .slide-wrap{
+    position:fixed;
+    left:50%;
+    bottom:24px;
+    transform:translateX(-50%);
+    width:calc(100% - 48px);
+    max-width:480px;
+  }
+  .slide-wrap.hidden{ display:none; }
+  .slide-track{
+    position:relative;
+    height:56px;
+    border-radius:999px;
+    background:#f7f8f9;
+    overflow:hidden;
+    user-select:none;
+    touch-action:none;
+    box-shadow:0 10px 22px rgba(15,23,42,0.15);
+    transition:box-shadow .22s ease, background .22s ease;
+  }
+  .slide-track.filled{
+    box-shadow:0 14px 30px rgba(36,83,245,0.38);
+    background:linear-gradient(135deg,#2453f5,#4f8cff);
+  }
+  .slide-fill{
+    position:absolute;
+    inset:0;
+    border-radius:999px;
+    pointer-events:none;
+    background:linear-gradient(120deg,#2453f5,#4f8cff);
+    transform-origin:left center;
+    transform:scaleX(0);
+    transition:transform .18s ease-out;
+  }
+  .slide-label{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    pointer-events:none;
+    font-size:17px;
+    font-weight:600;
+    letter-spacing:.2px;
+  }
+  .slide-label span{
+    color:var(--brand);
+    animation:slidePulse 1.8s ease-in-out infinite;
+  }
+  .slide-track.filled .slide-label span{ color:#fff; }
+  @keyframes slidePulse{
+    0%,100%{ opacity:.75; }
+    50%{ opacity:1; }
+  }
+  .slide-knob{
+    position:absolute;
+    top:50%;
+    left:4px;
+    width:48px;
+    height:48px;
+    border-radius:50%;
+    background:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 8px 16px rgba(15,23,42,0.18);
+    transform:translate(0,-50%);
+    touch-action:none;
+    transition:box-shadow .18s ease, transform .18s ease;
+  }
+  .slide-track.filled .slide-knob{
+    box-shadow:0 10px 24px rgba(36,83,245,0.5);
+  }
+  .slide-knob .arrow{
+    font-size:20px;
+    color:var(--brand);
+    transition:transform .18s ease;
+  }
+  .slide-track.filled .slide-knob .arrow{
+    transform:translateX(2px);
+  }
 </style>
 <!-- ===================== CSS END ===================== -->
 </head>
@@ -935,15 +649,6 @@ h1{
   <div id="card">
     <div id="dayTitle"></div>
     <div id="lines"></div>
-
-    <!-- Selected exercises summary -->
-    <div id="selectedSummary" class="hidden">
-      <div class="selected-exercises-label">Exercises you added</div>
-      <div id="selectedChips" class="selected-exercise-chips"></div>
-    </div>
-
-    <!-- Build Workout button -->
-    <button id="buildBtn" class="build-btn">Build Workout</button>
   </div>
 
   <!-- PAST WORKOUT CARD (history) -->
@@ -985,61 +690,6 @@ h1{
   </div>
 </div>
 
-<!-- REPOSITORY BUTTON -->
-<button id="repoBtn" class="repo-btn hidden">Repository</button>
-
-<!-- REPOSITORY OVERLAY (full white) -->
-<div id="repoOverlay" class="overlay">
-  <div class="overlay-inner">
-    <div class="overlay-header">
-      <div class="overlay-left">
-        <button id="repoCloseBtn" class="overlay-back">←</button>
-        <div>
-          <div id="repoTitle" class="overlay-title">Pull Repository</div>
-          <div class="overlay-subtitle">Manage your exercises</div>
-        </div>
-      </div>
-      <button id="repoEditBtn" class="overlay-edit-btn">Edit</button>
-    </div>
-
-    <div class="repo-add-row">
-      <input id="repoAddInput" class="repo-add-input" placeholder="Add exercise name" />
-      <button id="repoAddBtn" class="repo-add-btn">Add</button>
-    </div>
-
-    <div id="repoList" class="repo-list"></div>
-  </div>
-</div>
-
-<!-- BUILDER OVERLAY (Build Workout) -->
-<div id="builderOverlay" class="overlay">
-  <div class="overlay-inner">
-    <div class="overlay-header">
-      <div class="overlay-left">
-        <button id="builderCloseBtn" class="overlay-back">←</button>
-        <div>
-          <div id="builderTitle" class="overlay-title">Build Workout</div>
-          <div id="builderSubtitle" class="overlay-subtitle">Select exercises for today</div>
-        </div>
-      </div>
-    </div>
-
-    <div id="builderList" class="builder-list"></div>
-  </div>
-</div>
-
-<!-- CONFIRM MODAL (Are you sure?) -->
-<div id="confirmModal" class="modal">
-  <div class="modal-backdrop"></div>
-  <div class="modal-sheet">
-    <div id="confirmText" class="modal-text">Remove exercise?</div>
-    <div class="modal-actions">
-      <button id="confirmCancel" class="modal-btn secondary">Cancel</button>
-      <button id="confirmDelete" class="modal-btn danger">Remove</button>
-    </div>
-  </div>
-</div>
-
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <!-- ===================== JS START ===================== -->
@@ -1065,14 +715,14 @@ const qsa = s => Array.from(document.querySelectorAll(s));
 
 function todayKey(){
   const d=new Date();
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+  return ${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")};
 }
 function weekKey(){
   const d=new Date();
   const jan1=new Date(d.getFullYear(),0,1);
   const days=Math.floor((d-jan1)/86400000);
   const week=Math.ceil((days+d.getDay()+1)/7);
-  return `${d.getFullYear()}-W${week}`;
+  return ${d.getFullYear()}-W${week};
 }
 function getStartTime(tomorrow=false){
   const d=new Date();
@@ -1131,12 +781,15 @@ function resetWeekIfNeeded(){
   let streak = getStreak();
 
   if(prev && prev !== cur){
+    // we just rolled into a NEW week, evaluate last week's performance
     if(summary && summary.week === prev){
       if(summary.workouts < 3 && !summary.counted){
+        // didn't hit 3 workouts last week -> lose streak
         streak = 0;
         setStreak(streak);
       }
     }
+    // wipe weekly state for new week
     lsSet("weekKey", cur);
     lsRemove("locks");
     lsRemove("workoutToday");
@@ -1146,6 +799,7 @@ function resetWeekIfNeeded(){
     summary = {week:cur, workouts:0, counted:false};
     saveWeekSummary(summary);
   }else{
+    // first ever boot or same week; ensure basics exist
     if(!prev) lsSet("weekKey", cur);
     if(!summary || summary.week !== cur){
       summary = {week:cur, workouts:0, counted:false};
@@ -1160,8 +814,7 @@ function devResetAll(){
   const keys = [
     "streak", "weekKey", "week_summary",
     "locks", "workoutToday", "completedToday",
-    "history_week", "dev_time_lock",
-    "exercise_repo"
+    "history_week", "dev_time_lock"
   ];
   keys.forEach(k => lsRemove(k));
   alert("Dev data wiped.");
@@ -1186,7 +839,7 @@ function setSubtitle(text){
   },250);
 }
 
-/* GENERAL STORAGE (locks / workoutToday / completed / history) */
+/* STORAGE (locks / workoutToday / completed / history) */
 function loadLocks(){
   try{ return JSON.parse(lsGet("locks")||"{}"); }
   catch{ return {}; }
@@ -1250,35 +903,6 @@ function loadHistory(){
   }
 }
 
-/* EXERCISE REPOSITORY STORAGE */
-function loadExerciseRepo(){
-  const raw = lsGet("exercise_repo");
-  if(!raw){
-    return {pull:[], push:[], legs:[]};
-  }
-  try{
-    const obj = JSON.parse(raw);
-    return {
-      pull: obj.pull || [],
-      push: obj.push || [],
-      legs: obj.legs || []
-    };
-  }catch{
-    return {pull:[], push:[], legs:[]};
-  }
-}
-function saveExerciseRepo(){
-  lsSet("exercise_repo", JSON.stringify(exerciseRepo));
-}
-function createExercise(name, group){
-  return {
-    id: `${group}_${Date.now()}_${Math.random().toString(16).slice(2,8)}`,
-    name,
-    usage:0,
-    group
-  };
-}
-
 /* DOM REFS */
 const radioRow   = qs("#radioRow");
 const aiStage    = qs("#aiStage");
@@ -1317,48 +941,13 @@ const pastTitleEl  = qs("#pastTitle");
 const pastMetaEl   = qs("#pastMeta");
 const pastLinesEl  = qs("#pastLines");
 
-/* Selected exercises summary in card */
-const selectedSummaryEl = qs("#selectedSummary");
-const selectedChipsEl   = qs("#selectedChips");
-const buildBtn          = qs("#buildBtn");
-
-/* Repository DOM */
-const repoBtn       = qs("#repoBtn");
-const repoOverlay   = qs("#repoOverlay");
-const repoTitleEl   = qs("#repoTitle");
-const repoCloseBtn  = qs("#repoCloseBtn");
-const repoEditBtn   = qs("#repoEditBtn");
-const repoAddInput  = qs("#repoAddInput");
-const repoAddBtn    = qs("#repoAddBtn");
-const repoListEl    = qs("#repoList");
-
-/* Builder DOM */
-const builderOverlay  = qs("#builderOverlay");
-const builderTitleEl  = qs("#builderTitle");
-const builderSubtitleEl = qs("#builderSubtitle");
-const builderCloseBtn = qs("#builderCloseBtn");
-const builderListEl   = qs("#builderList");
-
-/* Confirm modal DOM */
-const confirmModalEl  = qs("#confirmModal");
-const confirmTextEl   = qs("#confirmText");
-const confirmCancelEl = qs("#confirmCancel");
-const confirmDeleteEl = qs("#confirmDelete");
-
-/* GLOBAL STATE */
 let selectedMode   = null;
 let currentWorkout = null;
 let countdownInterval = null;
 let historyMode = false;
 let lastStreakValue = getStreak();
 
-let exerciseRepo = loadExerciseRepo();
-let builderSelections = []; // array of exercise ids for today
-let repoMode = "pull";
-let repoEditMode = false;
-let pendingDelete = null;
-
-/* DEV RESET BUTTON VISIBILITY */
+/* SHOW DEV RESET BUTTON ONLY IN DEV */
 if(DEV && devResetBtn){
   devResetBtn.classList.remove("hidden");
   devResetBtn.addEventListener("click", devResetAll);
@@ -1442,9 +1031,8 @@ function buildWorkout(mode){
       items.push(m);
     }
   }
-  return {mode, items, selectedExerciseIds: []};
+  return {mode, items};
 }
-
 function modeTitle(mode){
   if(mode==="pull") return "Pull Day";
   if(mode==="push") return "Push Day";
@@ -1453,7 +1041,7 @@ function modeTitle(mode){
   return "Workout";
 }
 
-/* PREVIEW CARD LOGIC */
+/* PREVIEW CARD */
 function allowedPreviewTags(mode){
   switch(mode){
     case "pull":
@@ -1487,7 +1075,6 @@ function allowedPreviewTags(mode){
         null
       ];
   }
-  return [];
 }
 function randomPreviewRows(mode){
   const pool = allowedPreviewTags(mode).filter(x => x !== null);
@@ -1570,7 +1157,7 @@ function hidePreviewCard(immediate=false){
   }
 }
 function updatePreviewForMode(mode){
-  if(!mode){ hidePreviewCard(true); return; }
+  if(!mode){ hidePreviewCard(); return; }
   renderPreviewCard(mode);
   showPreviewCard();
 }
@@ -1677,27 +1264,6 @@ function hidePastCard(){
   },220);
 }
 
-/* REPOSITORY BUTTON HELPERS */
-function updateRepositoryButton(mode){
-  if(!repoBtn || !mode) return;
-  const map = {
-    pull: "Pull Repository",
-    push: "Push Repository",
-    legs: "Legs Repository",
-    full: "Full Body Repository"
-  };
-  repoBtn.textContent = map[mode] || "Repository";
-}
-function showRepoButtonUnderSlider(mode){
-  if(!repoBtn) return;
-  updateRepositoryButton(mode);
-  repoBtn.classList.remove("hidden");
-}
-function hideRepoButton(){
-  if(!repoBtn) return;
-  repoBtn.classList.add("hidden");
-}
-
 /* VIEW STATES */
 function anyUnlockedModes(){
   const locks=loadLocks();
@@ -1749,8 +1315,6 @@ function showSelectionState(){
   mainBtn.textContent="Generate";
 
   hidePreviewCard(true);
-  hideRepoButton();
-  selectedSummaryEl.classList.add("hidden");
 }
 function showPreLockedState(){
   historyMode=false;
@@ -1761,14 +1325,13 @@ function showPreLockedState(){
   mainBtn.classList.add("hidden");
   slideWrap.classList.add("hidden");
   hidePreviewCard(true);
-  hideRepoButton();
-  selectedSummaryEl.classList.add("hidden");
 
   if(DEV){
     const unlockAt = getDevUnlockTime();
     if(unlockAt){
       startBigTimer(unlockAt);
     }else{
+      // no lock? just show selection in dev
       showSelectionState();
     }
   }else{
@@ -1782,7 +1345,6 @@ function showWorkoutState(workout){
   bigTimer.classList.remove("show");
 
   currentWorkout = workout;
-  builderSelections = Array.isArray(workout.selectedExerciseIds) ? workout.selectedExerciseIds.slice() : [];
   setSubtitle("Today’s workout");
 
   renderWorkoutCard(workout);
@@ -1791,8 +1353,6 @@ function showWorkoutState(workout){
   slideWrap.classList.remove("hidden");
   resetSlider();
   hidePreviewCard(true);
-  renderSelectedChips();
-  showRepoButtonUnderSlider(workout.mode);
 }
 function showCompletedState(){
   historyMode=true;
@@ -1806,8 +1366,6 @@ function showCompletedState(){
   pastCardEl.style.display="none";
   mainBtn.classList.add("hidden");
   slideWrap.classList.add("hidden");
-  hideRepoButton();
-  selectedSummaryEl.classList.add("hidden");
 
   let target;
   if(DEV){
@@ -1820,6 +1378,7 @@ function showCompletedState(){
   }else{
     target = getStartTime(true);
   }
+
   startBigTimer(target);
 }
 function showAllUsedWeekState(){
@@ -1831,8 +1390,6 @@ function showAllUsedWeekState(){
   mainBtn.classList.add("hidden");
   slideWrap.classList.add("hidden");
   bigTimer.classList.add("hidden");
-  hideRepoButton();
-  selectedSummaryEl.classList.add("hidden");
 }
 
 /* TIMER */
@@ -1876,7 +1433,7 @@ function renderStreakUI(opts={}){
   const hist = loadHistory();
   const doneCount = Object.keys(hist).length;
   const pct = Math.min(doneCount/3,1);
-  streakBarFill.style.transform = `scaleX(${pct})`;
+  streakBarFill.style.transform = scaleX(${pct});
 
   const streak = getStreak();
   const animateFlip = !!opts.animateFlip && streak > lastStreakValue;
@@ -1892,12 +1449,15 @@ function renderStreakUI(opts={}){
   }
   lastStreakValue = streak;
 }
+
+// called after a workout is fully completed (slide finished)
 function updateWeeklyStatsAfterCompletion(){
   const wk = weekKey();
   let summary = loadWeekSummary() || {week:wk, workouts:0, counted:false};
   if(summary.week !== wk){
     summary = {week:wk, workouts:0, counted:false};
   }
+
   const hist = loadHistory();
   const doneCount = Object.keys(hist).length;
   summary.workouts = doneCount;
@@ -1913,6 +1473,7 @@ function updateWeeklyStatsAfterCompletion(){
     setStreak(streak);
   }
   saveWeekSummary(summary);
+
   return {doneCount, streak, streakIncreased};
 }
 
@@ -1927,14 +1488,12 @@ function handleGenerate(){
   mainBtn.disabled=true;
   mainBtn.textContent="Generating...";
   cardEl.style.display="none";
-  selectedSummaryEl.classList.add("hidden");
-  builderSelections = [];
 
   setTimeout(()=>{
     const workout = buildWorkout(selectedMode);
     currentWorkout = workout;
-    saveWorkoutToday(workout);
 
+    saveWorkoutToday(workout);
     const locks=loadLocks();
     locks[selectedMode]=true;
     saveLocks(locks);
@@ -1942,54 +1501,9 @@ function handleGenerate(){
     aiStage.classList.remove("show");
     aiStage.style.display="none";
     mainBtn.disabled=false;
+
     showWorkoutState(workout);
   },900);
-}
-
-/* SELECTED EXERCISES SUMMARY */
-function findExerciseById(id){
-  for(const g of ["pull","push","legs"]){
-    const arr = exerciseRepo[g] || [];
-    const ex = arr.find(e => e.id === id);
-    if(ex) return ex;
-  }
-  return null;
-}
-function renderSelectedChips(){
-  if(!currentWorkout || !Array.isArray(currentWorkout.selectedExerciseIds) || !currentWorkout.selectedExerciseIds.length){
-    selectedSummaryEl.classList.add("hidden");
-    selectedChipsEl.innerHTML = "";
-    return;
-  }
-  selectedSummaryEl.classList.remove("hidden");
-  selectedChipsEl.innerHTML = "";
-  currentWorkout.selectedExerciseIds.forEach(id=>{
-    const ex = findExerciseById(id);
-    const name = ex ? ex.name : id;
-    const chip = document.createElement("div");
-    chip.className = "selected-chip";
-    chip.textContent = name;
-    selectedChipsEl.appendChild(chip);
-  });
-}
-
-/* USAGE UPDATE (only on slide complete) */
-function incrementUsageFromCurrentSelection(){
-  if(!currentWorkout || !Array.isArray(currentWorkout.selectedExerciseIds)) return;
-  const ids = currentWorkout.selectedExerciseIds;
-  if(!ids.length) return;
-  const groups = ["pull","push","legs"];
-  ids.forEach(id=>{
-    for(const g of groups){
-      const arr = exerciseRepo[g] || [];
-      const ex = arr.find(e => e.id === id);
-      if(ex){
-        ex.usage = (ex.usage || 0) + 1;
-        break;
-      }
-    }
-  });
-  saveExerciseRepo();
 }
 
 /* SLIDE COMPLETE */
@@ -2004,29 +1518,24 @@ function handleComplete(){
   }
   if(navigator.vibrate) navigator.vibrate(15);
 
-  // Update usage counters for selected exercises
-  incrementUsageFromCurrentSelection();
-
   saveCompletedToday(currentWorkout.mode);
   saveHistoryForMode(currentWorkout);
 
+  // DEV: set 30s time lock AFTER completion
   if(DEV){
-    const unlockAt = Date.now() + 30000;
+    const unlockAt = Date.now() + 30000; // 30 seconds
     lsSet("dev_time_lock", String(unlockAt));
   }
 
   const stats = updateWeeklyStatsAfterCompletion();
   renderStreakUI({animateFlip: stats.streakIncreased});
 
-  hideRepoButton();
-
   cardEl.style.display="none";
   slideWrap.classList.add("hidden");
-  selectedSummaryEl.classList.add("hidden");
   setTimeout(()=> showCompletedState(),600);
 }
 
-/* SLIDER LOGIC */
+/* SLIDER LOGIC – smoother, transform-based */
 let sliding=false;
 let startX=0;
 let currentX=0;
@@ -2081,8 +1590,8 @@ slideKnob.addEventListener("pointermove",e=>{
 
   const progress = maxSlide === 0 ? 0 : (x / maxSlide);
 
-  slideKnob.style.transform = `translate(${x}px,-50%)`;
-  slideFillEl.style.transform = `scaleX(${progress})`;
+  slideKnob.style.transform = translate(${x}px,-50%);
+  slideFillEl.style.transform = scaleX(${progress});
 });
 function endSlide(e){
   if(!sliding) return;
@@ -2096,8 +1605,8 @@ function endSlide(e){
 
   if(progress > 0.92){
     const x = maxSlide;
-    slideKnob.style.transform = `translate(${x}px,-50%)`;
-    slideFillEl.style.transform = `scaleX(1)`;
+    slideKnob.style.transform = translate(${x}px,-50%);
+    slideFillEl.style.transform = scaleX(1);
     slideTrackEl.classList.add("filled");
     if(navigator.vibrate) navigator.vibrate(15);
     handleComplete();
@@ -2144,7 +1653,7 @@ function updateWeatherUI(){
     const lat=pos.coords.latitude;
     const lon=pos.coords.longitude;
     try{
-      const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`;
+      const url=https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto;
       const res=await fetch(url);
       const data=await res.json();
       const temp=Math.round(data.current_weather.temperature);
@@ -2152,11 +1661,11 @@ function updateWeatherUI(){
       const emoji=getWeatherEmoji(cond);
       let city="Your area";
       try{
-        const rev=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+        const rev=await fetch(https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json);
         const r=await rev.json();
         city=r.address.city||r.address.town||r.address.village||r.address.county||city;
       }catch{}
-      weatherEl.textContent=`${emoji} ${temp}°C ${city}`;
+      weatherEl.textContent=${emoji} ${temp}°C ${city};
     }catch{
       weatherEl.textContent="Weather unavailable";
     }
@@ -2165,33 +1674,40 @@ function updateWeatherUI(){
   },{timeout:10000,maximumAge:600000});
 }
 
-/* INIT UI */
+/* INIT UI
+   RULES:
+   - If completedToday => always showCompletedState (locked for the day)
+   - Else if workoutToday => always showWorkoutState (stuck on workout)
+   - Else if before start time => pre-locked countdown
+   - Else normal selection
+*/
 function initUI(){
   resetWeekIfNeeded();
   clearRadioSelection();
   selectedMode=null;
   hidePreviewCard(true);
   hidePastCard();
-  hideRepoButton();
-  selectedSummaryEl.classList.add("hidden");
 
   const workout       = loadWorkoutToday();
   const completedObj  = loadCompletedToday();
   const hasCompleted  = !!completedObj;
-  const lockedByTime  = !afterStart();
+  const lockedByTime  = !afterStart(); // true = before today's 17:30 in prod, or before dev unlock
 
   if(hasCompleted){
+    // Once you've completed today's workout, you're locked to completed view for the rest of the day
     showCompletedState();
   }else if(workout){
-    currentWorkout = workout;
+    // Workout generated but not completed -> stuck on workout screen (even after refresh)
     showWorkoutState(workout);
   }else if(lockedByTime){
+    // Before daily unlock and nothing done yet -> pre-locked countdown
     showPreLockedState();
   }else if(!anyUnlockedModes()){
     showAllUsedWeekState();
   }else{
     showSelectionState();
   }
+
   renderStreakUI();
 }
 
@@ -2210,14 +1726,14 @@ qsa("input[name='mode']").forEach(r=>{
     }
 
     hidePastCard();
-    mainBtn.textContent = `Generate ${modeTitle(selectedMode).replace(" Day","")}`;
+    mainBtn.textContent = Generate ${modeTitle(selectedMode).replace(" Day","")};
     mainBtn.classList.remove("disabled");
     updatePreviewForMode(selectedMode);
     if(navigator.vibrate) navigator.vibrate(8);
   });
 });
 
-/* CLICK OUTSIDE PAST CARD */
+/* CLICK OUTSIDE PAST CARD → hide + show timer */
 document.addEventListener("click",(e)=>{
   if(!historyMode) return;
   if(pastCardEl.style.display==="none") return;
@@ -2227,254 +1743,19 @@ document.addEventListener("click",(e)=>{
 
   if(!insideCard && !insideRadio){
     hidePastCard();
+
     qsa(".opt").forEach(lbl => {
       lbl.classList.remove("active");
       const inp = lbl.querySelector("input");
       if (inp) inp.checked = false;
     });
+
     selectedMode = null;
   }
 });
 
 /* MAIN BUTTON */
 mainBtn.addEventListener("click", handleGenerate);
-
-/* REPOSITORY OVERLAY LOGIC */
-function setRepoModeForCurrentWorkout(){
-  if(!currentWorkout) repoMode = "pull";
-  else if(currentWorkout.mode === "pull") repoMode = "pull";
-  else if(currentWorkout.mode === "push") repoMode = "push";
-  else if(currentWorkout.mode === "legs") repoMode = "legs";
-  else repoMode = "pull"; // for full body default to pull repo
-}
-
-function repoTitleForMode(m){
-  if(m==="pull") return "Pull Repository";
-  if(m==="push") return "Push Repository";
-  if(m==="legs") return "Legs Repository";
-  return "Repository";
-}
-
-function renderRepoList(){
-  repoListEl.innerHTML = "";
-  const list = (exerciseRepo[repoMode] || []).slice().sort((a,b)=>{
-    const ua = a.usage || 0;
-    const ub = b.usage || 0;
-    if(ub !== ua) return ub - ua;
-    return a.name.localeCompare(b.name);
-  });
-
-  if(!list.length){
-    const empty = document.createElement("div");
-    empty.className = "repo-empty";
-    empty.textContent = "No exercises yet. Add your first one above.";
-    repoListEl.appendChild(empty);
-    return;
-  }
-
-  list.forEach(ex=>{
-    const item = document.createElement("div");
-    item.className = "repo-item";
-
-    const main = document.createElement("div");
-    main.className = "repo-main";
-    const name = document.createElement("div");
-    name.className = "repo-name";
-    name.textContent = ex.name;
-    const usage = document.createElement("div");
-    usage.className = "repo-usage";
-    usage.textContent = `Usage: ${ex.usage || 0}`;
-    main.appendChild(name);
-    main.appendChild(usage);
-
-    const delBtn = document.createElement("button");
-    delBtn.className = "repo-delete-btn";
-    delBtn.textContent = "🗑";
-    delBtn.addEventListener("click",()=>{
-      pendingDelete = {group: repoMode, id: ex.id, name: ex.name};
-      confirmTextEl.textContent = `Remove "${ex.name}" from this repository?`;
-      confirmModalEl.classList.add("show");
-    });
-
-    item.appendChild(main);
-    item.appendChild(delBtn);
-    repoListEl.appendChild(item);
-  });
-}
-
-function openRepoOverlay(){
-  setRepoModeForCurrentWorkout();
-  repoTitleEl.textContent = repoTitleForMode(repoMode);
-  repoAddInput.value = "";
-  repoEditMode = false;
-  repoOverlay.classList.remove("edit-mode");
-  repoOverlay.classList.add("show");
-  renderRepoList();
-}
-function closeRepoOverlay(){
-  repoOverlay.classList.remove("show");
-}
-
-repoBtn.addEventListener("click", openRepoOverlay);
-repoCloseBtn.addEventListener("click", closeRepoOverlay);
-
-repoEditBtn.addEventListener("click",()=>{
-  repoEditMode = !repoEditMode;
-  if(repoEditMode){
-    repoOverlay.classList.add("edit-mode");
-    repoEditBtn.textContent = "Done";
-  }else{
-    repoOverlay.classList.remove("edit-mode");
-    repoEditBtn.textContent = "Edit";
-  }
-});
-
-function handleAddExercise(){
-  const name = repoAddInput.value.trim();
-  if(!name) return;
-  const ex = createExercise(name, repoMode);
-  exerciseRepo[repoMode] = exerciseRepo[repoMode] || [];
-  exerciseRepo[repoMode].push(ex);
-  saveExerciseRepo();
-  repoAddInput.value = "";
-  renderRepoList();
-}
-repoAddBtn.addEventListener("click", handleAddExercise);
-repoAddInput.addEventListener("keydown", e=>{
-  if(e.key === "Enter") handleAddExercise();
-});
-
-/* CONFIRM MODAL HANDLERS */
-confirmCancelEl.addEventListener("click",()=>{
-  pendingDelete = null;
-  confirmModalEl.classList.remove("show");
-});
-confirmModalEl.querySelector(".modal-backdrop").addEventListener("click", ()=>{
-  pendingDelete = null;
-  confirmModalEl.classList.remove("show");
-});
-confirmDeleteEl.addEventListener("click",()=>{
-  if(!pendingDelete){
-    confirmModalEl.classList.remove("show");
-    return;
-  }
-  const {group,id} = pendingDelete;
-  pendingDelete = null;
-
-  exerciseRepo[group] = (exerciseRepo[group] || []).filter(e=>e.id !== id);
-  saveExerciseRepo();
-
-  builderSelections = builderSelections.filter(x=>x!==id);
-  if(currentWorkout && Array.isArray(currentWorkout.selectedExerciseIds)){
-    currentWorkout.selectedExerciseIds = currentWorkout.selectedExerciseIds.filter(x=>x!==id);
-    saveWorkoutToday(currentWorkout);
-    renderSelectedChips();
-  }
-  renderRepoList();
-  if(builderOverlay.classList.contains("show")){
-    renderBuilderList();
-  }
-
-  confirmModalEl.classList.remove("show");
-});
-
-/* BUILDER OVERLAY LOGIC */
-function openBuilderOverlay(){
-  if(!currentWorkout) return;
-  builderTitleEl.textContent = "Build Workout";
-  builderSubtitleEl.textContent = "Select exercises for today";
-  builderSelections = Array.isArray(currentWorkout.selectedExerciseIds)
-    ? currentWorkout.selectedExerciseIds.slice()
-    : [];
-  builderOverlay.classList.add("show");
-  renderBuilderList();
-}
-function closeBuilderOverlay(){
-  builderOverlay.classList.remove("show");
-  if(currentWorkout){
-    currentWorkout.selectedExerciseIds = builderSelections.slice();
-    saveWorkoutToday(currentWorkout);
-    renderSelectedChips();
-  }
-}
-
-builderCloseBtn.addEventListener("click", closeBuilderOverlay);
-buildBtn.addEventListener("click", openBuilderOverlay);
-
-function renderBuilderGroupSection(title, groupKey){
-  const list = exerciseRepo[groupKey] || [];
-  if(!list.length) return;
-
-  const sectionTitle = document.createElement("div");
-  sectionTitle.className = "builder-section-title";
-  sectionTitle.textContent = title;
-  builderListEl.appendChild(sectionTitle);
-
-  list.forEach(ex=>{
-    const row = document.createElement("div");
-    row.className = "builder-exercise-row";
-
-    const name = document.createElement("div");
-    name.className = "builder-exercise-name";
-    name.textContent = ex.name;
-
-    const toggle = document.createElement("button");
-    toggle.className = "builder-toggle";
-    const isSelected = builderSelections.includes(ex.id);
-    if(isSelected){
-      toggle.classList.add("selected");
-      toggle.textContent = "✓";
-    }else{
-      toggle.textContent = "+";
-    }
-
-    toggle.addEventListener("click",()=>{
-      const idx = builderSelections.indexOf(ex.id);
-      if(idx === -1){
-        builderSelections.push(ex.id);
-      }else{
-        builderSelections.splice(idx,1);
-      }
-      const nowSelected = builderSelections.includes(ex.id);
-      if(nowSelected){
-        toggle.classList.add("selected");
-        toggle.textContent = "✓";
-      }else{
-        toggle.classList.remove("selected");
-        toggle.textContent = "+";
-      }
-    });
-
-    row.appendChild(name);
-    row.appendChild(toggle);
-    builderListEl.appendChild(row);
-  });
-}
-
-function renderBuilderList(){
-  builderListEl.innerHTML = "";
-  if(!currentWorkout) return;
-  const mode = currentWorkout.mode;
-
-  if(mode === "pull"){
-    renderBuilderGroupSection("Pull", "pull");
-  }else if(mode === "push"){
-    renderBuilderGroupSection("Push", "push");
-  }else if(mode === "legs"){
-    renderBuilderGroupSection("Legs", "legs");
-  }else if(mode === "full"){
-    renderBuilderGroupSection("Pull", "pull");
-    renderBuilderGroupSection("Push", "push");
-    renderBuilderGroupSection("Legs", "legs");
-  }
-
-  if(!builderListEl.children.length){
-    const empty = document.createElement("div");
-    empty.className = "repo-empty";
-    empty.textContent = "No exercises yet. Add them in the repository first.";
-    builderListEl.appendChild(empty);
-  }
-}
 
 /* BOOT */
 initUI();
