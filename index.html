@@ -715,14 +715,14 @@ const qsa = s => Array.from(document.querySelectorAll(s));
 
 function todayKey(){
   const d=new Date();
-  return ${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")};
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 }
 function weekKey(){
   const d=new Date();
   const jan1=new Date(d.getFullYear(),0,1);
   const days=Math.floor((d-jan1)/86400000);
   const week=Math.ceil((days+d.getDay()+1)/7);
-  return ${d.getFullYear()}-W${week};
+  return `${d.getFullYear()}-W${week}`;
 }
 function getStartTime(tomorrow=false){
   const d=new Date();
@@ -1433,7 +1433,7 @@ function renderStreakUI(opts={}){
   const hist = loadHistory();
   const doneCount = Object.keys(hist).length;
   const pct = Math.min(doneCount/3,1);
-  streakBarFill.style.transform = scaleX(${pct});
+  streakBarFill.style.transform = `scaleX(${pct})`;
 
   const streak = getStreak();
   const animateFlip = !!opts.animateFlip && streak > lastStreakValue;
@@ -1590,8 +1590,8 @@ slideKnob.addEventListener("pointermove",e=>{
 
   const progress = maxSlide === 0 ? 0 : (x / maxSlide);
 
-  slideKnob.style.transform = translate(${x}px,-50%);
-  slideFillEl.style.transform = scaleX(${progress});
+  slideKnob.style.transform = `translate(${x}px,-50%)`;
+  slideFillEl.style.transform = `scaleX(${progress})`;
 });
 function endSlide(e){
   if(!sliding) return;
@@ -1605,8 +1605,8 @@ function endSlide(e){
 
   if(progress > 0.92){
     const x = maxSlide;
-    slideKnob.style.transform = translate(${x}px,-50%);
-    slideFillEl.style.transform = scaleX(1);
+    slideKnob.style.transform = `translate(${x}px,-50%)`;
+    slideFillEl.style.transform = `scaleX(1)`;
     slideTrackEl.classList.add("filled");
     if(navigator.vibrate) navigator.vibrate(15);
     handleComplete();
@@ -1653,7 +1653,7 @@ function updateWeatherUI(){
     const lat=pos.coords.latitude;
     const lon=pos.coords.longitude;
     try{
-      const url=https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto;
+      const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`;
       const res=await fetch(url);
       const data=await res.json();
       const temp=Math.round(data.current_weather.temperature);
@@ -1661,11 +1661,11 @@ function updateWeatherUI(){
       const emoji=getWeatherEmoji(cond);
       let city="Your area";
       try{
-        const rev=await fetch(https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json);
+        const rev=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
         const r=await rev.json();
         city=r.address.city||r.address.town||r.address.village||r.address.county||city;
       }catch{}
-      weatherEl.textContent=${emoji} ${temp}°C ${city};
+      weatherEl.textContent=`${emoji} ${temp}°C ${city}`;
     }catch{
       weatherEl.textContent="Weather unavailable";
     }
@@ -1726,7 +1726,7 @@ qsa("input[name='mode']").forEach(r=>{
     }
 
     hidePastCard();
-    mainBtn.textContent = Generate ${modeTitle(selectedMode).replace(" Day","")};
+    mainBtn.textContent = `Generate ${modeTitle(selectedMode).replace(" Day","")}`;
     mainBtn.classList.remove("disabled");
     updatePreviewForMode(selectedMode);
     if(navigator.vibrate) navigator.vibrate(8);
