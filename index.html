@@ -23,6 +23,13 @@
 
   --shadow-soft:0 18px 48px rgba(15,23,42,0.16);
   --shadow-subtle:0 8px 18px rgba(15,23,42,0.12);
+
+  --border-soft:#e2e8f0;
+}
+
+/* Global hidden helper */
+.hidden{
+  display:none !important;
 }
 
 *{ box-sizing:border-box; }
@@ -36,6 +43,7 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 
+/* Container */
 .container{
   max-width:480px;
   margin:0 auto;
@@ -124,13 +132,11 @@ body{
   cursor:pointer;
   white-space:nowrap;
 }
-.dev-reset-btn.hidden{
-  display:none;
-}
 .dev-reset-btn:active{
   transform:scale(.96);
 }
 
+/* Main heading + subtitle */
 h1{
   font-size:30px;
   font-weight:700;
@@ -348,7 +354,7 @@ h1{
   100%{ transform:translate3d(0,0,0); }
 }
 
-/* REAL WORKOUT CARD (TODAY) */
+/* TODAY WORKOUT CARD */
 #card{
   background:var(--card);
   border-radius:16px;
@@ -370,9 +376,10 @@ h1{
 #dayTitle{
   font-size:20px;
   font-weight:700;
-  margin-bottom:22px;
+  margin-bottom:12px;
 }
 
+/* Workout “line” = metal row */
 .line{
   font-size:16px;
   margin-bottom:10px;
@@ -389,6 +396,7 @@ h1{
   transform:translateY(0);
 }
 
+/* Pills */
 .pill{
   padding:3px 8px;
   border-radius:999px;
@@ -400,6 +408,46 @@ h1{
 .pill-shoulders{ background:#ede9fe; color:#7c3aed; }
 .pill-biceps{ background:var(--pill-orange); color:#d97706; }
 .pill-kettlebell{ background:var(--pill-red); color:#e11d48; }
+
+/* Selected exercises summary under card */
+.selected-exercises-label{
+  margin-top:12px;
+  font-size:13px;
+  font-weight:600;
+  color:var(--sub);
+}
+.selected-exercise-chips{
+  margin-top:6px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+.selected-chip{
+  font-size:12px;
+  padding:4px 8px;
+  border-radius:999px;
+  background:#e5e7eb;
+  color:#111827;
+}
+
+/* Build Workout button inside card */
+.build-btn{
+  margin-top:16px;
+  width:100%;
+  border-radius:12px;
+  background:#111827;
+  color:#fff;
+  border:none;
+  padding:12px 16px;
+  font-size:15px;
+  font-weight:600;
+  cursor:pointer;
+  box-shadow:0 8px 18px rgba(15,23,42,.26);
+  display:block;
+}
+.build-btn:active{
+  transform:scale(.97);
+}
 
 /* PAST WORKOUT CARD (HISTORY) */
 #pastCard{
@@ -433,7 +481,6 @@ h1{
   font-size:14px;
   color:var(--sub);
 }
-
 .past-line{
   font-size:16px;
   margin-bottom:10px;
@@ -443,7 +490,7 @@ h1{
   flex-wrap:wrap;
 }
 
-/* GENERATE BUTTON */
+/* MAIN GENERATE BUTTON */
 #mainBtn{
   position:fixed;
   left:50%;
@@ -466,7 +513,6 @@ h1{
     background .18s ease;
   box-shadow:0 15px 30px rgba(36,83,245,0.35);
 }
-#mainBtn.hidden{ display:none; }
 #mainBtn.disabled{
   opacity:.4;
   pointer-events:none;
@@ -488,7 +534,6 @@ h1{
   opacity:0;
   transition:opacity .45s ease;
 }
-#bigTimer.hidden{ display:none; }
 #bigTimer.show{ opacity:1; }
 .t-col{
   display:flex;
@@ -520,7 +565,6 @@ h1{
   width:calc(100% - 48px);
   max-width:480px;
 }
-.slide-wrap.hidden{ display:none; }
 .slide-track{
   position:relative;
   height:56px;
@@ -594,14 +638,12 @@ h1{
   transform:translateX(2px);
 }
 
-/* =========================
-   REPOSITORY BUTTON (FLOATING)
-   ========================= */
+/* REPOSITORY BUTTON (under slider) */
 .repo-btn{
   position:fixed;
   left:50%;
   transform:translateX(-50%);
-  bottom:96px; /* sits above main button / slider */
+  bottom:96px;
   width:calc(100% - 48px);
   max-width:480px;
   padding:14px 16px;
@@ -616,240 +658,224 @@ h1{
   cursor:pointer;
   transition:transform .16s ease, box-shadow .2s ease, opacity .2s ease;
 }
-.repo-btn.hidden{
-  display:none;
-}
 .repo-btn:active{
   transform:translateX(-50%) scale(.97);
   box-shadow:0 4px 12px rgba(15,23,42,0.18);
 }
 
-/* =========================
-   REPOSITORY OVERLAY (FULL WHITE)
-   ========================= */
-.repo-overlay{
+/* OVERLAYS (Repository + Builder) */
+.overlay{
   position:fixed;
   inset:0;
   background:#ffffff;
   z-index:40;
-  overflow-y:auto;
-}
-.repo-overlay.hidden{
   display:none;
 }
-.repo-panel{
+.overlay.show{
+  display:block;
+}
+.overlay-inner{
   max-width:480px;
   margin:0 auto;
-  padding:18px 20px 32px;
+  padding:20px 24px 32px;
 }
 
-/* Header: back + title + edit */
-.repo-header{
+/* Overlay header */
+.overlay-header{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:8px;
   margin-bottom:16px;
 }
-.repo-header-left{
+.overlay-left{
   display:flex;
   align-items:center;
   gap:10px;
 }
-.repo-close-btn{
+.overlay-back{
   border:none;
-  background:#f3f4f6;
-  border-radius:999px;
-  width:34px;
-  height:34px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:18px;
-  cursor:pointer;
-}
-.repo-title-block{
-  display:flex;
-  flex-direction:column;
-  gap:2px;
-}
-#repoTitle{
-  font-size:20px;
-  font-weight:700;
-}
-.repo-subtitle{
-  font-size:13px;
-  color:var(--sub);
-}
-#repoEditToggle{
-  border:none;
-  background:transparent;
-  font-size:15px;
-  font-weight:500;
-  color:var(--brand);
-  cursor:pointer;
-}
-
-/* Toolbar */
-.repo-toolbar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  margin-bottom:14px;
-}
-.repo-add-btn{
-  border:none;
-  background:#0f172a;
-  color:#fff;
-  border-radius:999px;
-  padding:8px 14px;
-  font-size:14px;
-  font-weight:600;
-  cursor:pointer;
-}
-.repo-sort-label{
-  font-size:12px;
-  color:var(--sub);
-}
-
-/* Empty state */
-.repo-empty{
-  font-size:14px;
-  color:var(--sub);
-  padding:18px 0 6px;
-}
-
-/* List */
-.repo-list{
-  margin-top:4px;
-}
-.repo-row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:10px 0;
-  border-bottom:1px solid #e5e7eb;
-}
-.repo-row-main{
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-.repo-name{
-  font-size:15px;
-  font-weight:500;
-}
-.repo-tag{
-  font-size:11px;
-  padding:3px 8px;
-  border-radius:999px;
-  background:#f3f4ff;
-  color:#4f46e5;
-}
-.repo-row-right{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-.repo-usage-label{
-  font-size:11px;
-  color:var(--sub);
-  margin-right:2px;
-}
-.repo-usage{
-  font-size:15px;
-  font-variant-numeric:tabular-nums;
-}
-.repo-delete-btn{
-  border:none;
-  background:transparent;
-  cursor:pointer;
-  width:30px;
-  height:30px;
+  background:#f1f5f9;
+  width:32px;
+  height:32px;
   border-radius:999px;
   display:flex;
   align-items:center;
   justify-content:center;
   font-size:16px;
-  color:#ef4444;
-  transition:background .18s ease, transform .12s ease, opacity .18s ease;
+  cursor:pointer;
 }
-.repo-delete-btn.hidden{
+.overlay-title{
+  font-size:18px;
+  font-weight:700;
+}
+.overlay-subtitle{
+  font-size:13px;
+  color:var(--sub);
+  margin-top:2px;
+}
+.overlay-edit-btn{
+  border:none;
+  background:transparent;
+  font-size:14px;
+  font-weight:600;
+  color:var(--brand);
+  cursor:pointer;
+}
+
+/* Repository layout */
+.repo-add-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:14px;
+}
+.repo-add-input{
+  flex:1;
+  border-radius:10px;
+  border:1px solid var(--border-soft);
+  padding:8px 10px;
+  font-size:14px;
+}
+.repo-add-btn{
+  border:none;
+  border-radius:999px;
+  padding:8px 12px;
+  font-size:14px;
+  font-weight:600;
+  background:#111827;
+  color:#fff;
+  cursor:pointer;
+}
+.repo-list{
+  margin-top:4px;
+}
+.repo-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 0;
+  border-bottom:1px solid #f1f5f9;
+}
+.repo-main{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.repo-name{
+  font-size:14px;
+  font-weight:500;
+}
+.repo-usage{
+  font-size:12px;
+  color:var(--sub);
+}
+.repo-delete-btn{
+  border:none;
+  background:transparent;
+  color:#ef4444;
+  font-size:16px;
+  cursor:pointer;
   opacity:0;
   pointer-events:none;
 }
-.repo-delete-btn:not(.hidden):active{
-  transform:scale(.9);
-  background:#fee2e2;
+.overlay.edit-mode .repo-delete-btn{
+  opacity:1;
+  pointer-events:auto;
+}
+.repo-empty{
+  margin-top:8px;
+  font-size:13px;
+  color:var(--sub);
 }
 
-/* Tap feedback for row increment */
-.repo-row-tap{
-  animation:repoTap .18s ease-out;
+/* Builder list */
+.builder-list{
+  margin-top:10px;
 }
-@keyframes repoTap{
-  0%{ transform:scale(1); }
-  50%{ transform:scale(.97); }
-  100%{ transform:scale(1); }
+.builder-section-title{
+  font-size:16px;
+  font-weight:600;
+  margin-top:16px;
+  margin-bottom:8px;
+}
+.builder-exercise-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:8px 0;
+  border-bottom:1px solid #f1f5f9;
+}
+.builder-exercise-name{
+  font-size:14px;
+}
+.builder-toggle{
+  width:28px;
+  height:28px;
+  border-radius:999px;
+  border:1px solid var(--border-soft);
+  background:#ffffff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:17px;
+  cursor:pointer;
+}
+.builder-toggle.selected{
+  background:var(--brand);
+  color:#ffffff;
+  border-color:var(--brand);
 }
 
-/* =========================
-   ACTION SHEET (DELETE CONFIRM)
-   ========================= */
-.sheet{
+/* Confirm modal (action sheet) */
+.modal{
   position:fixed;
   inset:0;
   z-index:50;
-}
-.sheet.hidden{
   display:none;
 }
-.sheet-backdrop{
+.modal.show{
+  display:block;
+}
+.modal-backdrop{
   position:absolute;
   inset:0;
-  background:rgba(15,23,42,0.45);
+  background:rgba(15,23,42,0.35);
 }
-.sheet-card{
+.modal-sheet{
   position:absolute;
   left:50%;
   bottom:0;
   transform:translateX(-50%);
   width:100%;
   max-width:480px;
-  background:#f9fafb;
+  background:#ffffff;
   border-radius:18px 18px 0 0;
-  padding:18px 20px 20px;
-  box-shadow:0 -10px 30px rgba(15,23,42,0.3);
+  padding:16px 18px 20px;
+  box-shadow:0 -10px 24px rgba(15,23,42,0.25);
 }
-.sheet-title{
-  font-size:17px;
-  font-weight:600;
-  margin-bottom:8px;
-}
-.sheet-message{
-  font-size:14px;
-  color:var(--sub);
-  margin-bottom:16px;
-}
-.sheet-actions{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-}
-.sheet-btn{
-  border:none;
-  border-radius:999px;
-  padding:11px 14px;
+.modal-text{
   font-size:15px;
+  font-weight:600;
+  margin-bottom:14px;
+}
+.modal-actions{
+  display:flex;
+  gap:10px;
+}
+.modal-btn{
+  flex:1;
+  height:40px;
+  border-radius:999px;
+  border:none;
+  font-size:14px;
   font-weight:600;
   cursor:pointer;
 }
-.sheet-cancel{
-  background:#ffffff;
-  color:#0f172a;
+.modal-btn.secondary{
+  background:#f3f4f6;
+  color:#111827;
 }
-.sheet-delete{
+.modal-btn.danger{
   background:#ef4444;
   color:#ffffff;
 }
@@ -909,6 +935,15 @@ h1{
   <div id="card">
     <div id="dayTitle"></div>
     <div id="lines"></div>
+
+    <!-- Selected exercises summary -->
+    <div id="selectedSummary" class="hidden">
+      <div class="selected-exercises-label">Exercises you added</div>
+      <div id="selectedChips" class="selected-exercise-chips"></div>
+    </div>
+
+    <!-- Build Workout button -->
+    <button id="buildBtn" class="build-btn">Build Workout</button>
   </div>
 
   <!-- PAST WORKOUT CARD (history) -->
@@ -938,6 +973,9 @@ h1{
 
 </div>
 
+<!-- MAIN GENERATE BUTTON -->
+<button id="mainBtn">Generate</button>
+
 <!-- SLIDE TO COMPLETE -->
 <div id="slideWrap" class="slide-wrap hidden">
   <div class="slide-track">
@@ -947,46 +985,57 @@ h1{
   </div>
 </div>
 
-<!-- MAIN GENERATE BUTTON -->
-<button id="mainBtn">Generate</button>
-
 <!-- REPOSITORY BUTTON -->
 <button id="repoBtn" class="repo-btn hidden">Repository</button>
 
-<!-- REPOSITORY OVERLAY (FULL WHITE) -->
-<div id="repoOverlay" class="repo-overlay hidden">
-  <div class="repo-panel">
-    <div class="repo-header">
-      <div class="repo-header-left">
-        <button id="repoCloseBtn" class="repo-close-btn">←</button>
-        <div class="repo-title-block">
-          <div id="repoTitle">Repository</div>
-          <div class="repo-subtitle">Usage = how many times you used that exercise.</div>
+<!-- REPOSITORY OVERLAY (full white) -->
+<div id="repoOverlay" class="overlay">
+  <div class="overlay-inner">
+    <div class="overlay-header">
+      <div class="overlay-left">
+        <button id="repoCloseBtn" class="overlay-back">←</button>
+        <div>
+          <div id="repoTitle" class="overlay-title">Pull Repository</div>
+          <div class="overlay-subtitle">Manage your exercises</div>
         </div>
       </div>
-      <button id="repoEditToggle">Edit</button>
+      <button id="repoEditBtn" class="overlay-edit-btn">Edit</button>
     </div>
 
-    <div class="repo-toolbar">
-      <button id="repoAddBtn" class="repo-add-btn">+ Add exercise</button>
-      <div class="repo-sort-label">Sorted by most used</div>
+    <div class="repo-add-row">
+      <input id="repoAddInput" class="repo-add-input" placeholder="Add exercise name" />
+      <button id="repoAddBtn" class="repo-add-btn">Add</button>
     </div>
-
-    <div id="repoEmpty" class="repo-empty">No exercises yet. Add your first one.</div>
 
     <div id="repoList" class="repo-list"></div>
   </div>
 </div>
 
-<!-- DELETE CONFIRM SHEET -->
-<div id="confirmSheet" class="sheet hidden">
-  <div class="sheet-backdrop"></div>
-  <div class="sheet-card">
-    <div class="sheet-title">Remove exercise?</div>
-    <div id="sheetMessage" class="sheet-message"></div>
-    <div class="sheet-actions">
-      <button id="sheetCancel" class="sheet-btn sheet-cancel">Cancel</button>
-      <button id="sheetConfirm" class="sheet-btn sheet-delete">Delete</button>
+<!-- BUILDER OVERLAY (Build Workout) -->
+<div id="builderOverlay" class="overlay">
+  <div class="overlay-inner">
+    <div class="overlay-header">
+      <div class="overlay-left">
+        <button id="builderCloseBtn" class="overlay-back">←</button>
+        <div>
+          <div id="builderTitle" class="overlay-title">Build Workout</div>
+          <div id="builderSubtitle" class="overlay-subtitle">Select exercises for today</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="builderList" class="builder-list"></div>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL (Are you sure?) -->
+<div id="confirmModal" class="modal">
+  <div class="modal-backdrop"></div>
+  <div class="modal-sheet">
+    <div id="confirmText" class="modal-text">Remove exercise?</div>
+    <div class="modal-actions">
+      <button id="confirmCancel" class="modal-btn secondary">Cancel</button>
+      <button id="confirmDelete" class="modal-btn danger">Remove</button>
     </div>
   </div>
 </div>
@@ -1082,15 +1131,12 @@ function resetWeekIfNeeded(){
   let streak = getStreak();
 
   if(prev && prev !== cur){
-    // we just rolled into a NEW week, evaluate last week's performance
     if(summary && summary.week === prev){
       if(summary.workouts < 3 && !summary.counted){
-        // didn't hit 3 workouts last week -> lose streak
         streak = 0;
         setStreak(streak);
       }
     }
-    // wipe weekly state for new week
     lsSet("weekKey", cur);
     lsRemove("locks");
     lsRemove("workoutToday");
@@ -1100,7 +1146,6 @@ function resetWeekIfNeeded(){
     summary = {week:cur, workouts:0, counted:false};
     saveWeekSummary(summary);
   }else{
-    // first ever boot or same week; ensure basics exist
     if(!prev) lsSet("weekKey", cur);
     if(!summary || summary.week !== cur){
       summary = {week:cur, workouts:0, counted:false};
@@ -1141,7 +1186,7 @@ function setSubtitle(text){
   },250);
 }
 
-/* STORAGE (locks / workoutToday / completed / history) */
+/* GENERAL STORAGE (locks / workoutToday / completed / history) */
 function loadLocks(){
   try{ return JSON.parse(lsGet("locks")||"{}"); }
   catch{ return {}; }
@@ -1205,29 +1250,32 @@ function loadHistory(){
   }
 }
 
-/* EXERCISE REPOSITORY (per mode, manual usage tracking) */
+/* EXERCISE REPOSITORY STORAGE */
 function loadExerciseRepo(){
+  const raw = lsGet("exercise_repo");
+  if(!raw){
+    return {pull:[], push:[], legs:[]};
+  }
   try{
-    const raw = lsGet("exercise_repo");
-    if(!raw) return {pull:[],push:[],legs:[]};
     const obj = JSON.parse(raw);
     return {
-      pull: Array.isArray(obj.pull)?obj.pull:[],
-      push: Array.isArray(obj.push)?obj.push:[],
-      legs: Array.isArray(obj.legs)?obj.legs:[]
+      pull: obj.pull || [],
+      push: obj.push || [],
+      legs: obj.legs || []
     };
   }catch{
-    return {pull:[],push:[],legs:[]};
+    return {pull:[], push:[], legs:[]};
   }
 }
-function saveExerciseRepo(repo){
-  lsSet("exercise_repo", JSON.stringify(repo));
+function saveExerciseRepo(){
+  lsSet("exercise_repo", JSON.stringify(exerciseRepo));
 }
-function createExercise(name){
+function createExercise(name, group){
   return {
-    id: `ex_${Date.now()}_${Math.random().toString(36).slice(2,8)}`,
-    name: name.trim(),
-    usage: 0
+    id: `${group}_${Date.now()}_${Math.random().toString(16).slice(2,8)}`,
+    name,
+    usage:0,
+    group
   };
 }
 
@@ -1269,42 +1317,54 @@ const pastTitleEl  = qs("#pastTitle");
 const pastMetaEl   = qs("#pastMeta");
 const pastLinesEl  = qs("#pastLines");
 
-/* Repository button DOM */
-const repoBtn         = qs("#repoBtn");
-/* Repository overlay DOM */
-const repoOverlay     = qs("#repoOverlay");
-const repoTitleEl     = qs("#repoTitle");
-const repoEmptyEl     = qs("#repoEmpty");
-const repoListEl      = qs("#repoList");
-const repoCloseBtn    = qs("#repoCloseBtn");
-const repoEditToggle  = qs("#repoEditToggle");
-const repoAddBtn      = qs("#repoAddBtn");
+/* Selected exercises summary in card */
+const selectedSummaryEl = qs("#selectedSummary");
+const selectedChipsEl   = qs("#selectedChips");
+const buildBtn          = qs("#buildBtn");
 
-/* Action sheet DOM */
-const confirmSheet    = qs("#confirmSheet");
-const sheetBackdrop   = qs(".sheet-backdrop");
-const sheetMessageEl  = qs("#sheetMessage");
-const sheetCancelBtn  = qs("#sheetCancel");
-const sheetConfirmBtn = qs("#sheetConfirm");
+/* Repository DOM */
+const repoBtn       = qs("#repoBtn");
+const repoOverlay   = qs("#repoOverlay");
+const repoTitleEl   = qs("#repoTitle");
+const repoCloseBtn  = qs("#repoCloseBtn");
+const repoEditBtn   = qs("#repoEditBtn");
+const repoAddInput  = qs("#repoAddInput");
+const repoAddBtn    = qs("#repoAddBtn");
+const repoListEl    = qs("#repoList");
 
+/* Builder DOM */
+const builderOverlay  = qs("#builderOverlay");
+const builderTitleEl  = qs("#builderTitle");
+const builderSubtitleEl = qs("#builderSubtitle");
+const builderCloseBtn = qs("#builderCloseBtn");
+const builderListEl   = qs("#builderList");
+
+/* Confirm modal DOM */
+const confirmModalEl  = qs("#confirmModal");
+const confirmTextEl   = qs("#confirmText");
+const confirmCancelEl = qs("#confirmCancel");
+const confirmDeleteEl = qs("#confirmDelete");
+
+/* GLOBAL STATE */
 let selectedMode   = null;
 let currentWorkout = null;
 let countdownInterval = null;
 let historyMode = false;
 let lastStreakValue = getStreak();
 
-/* Repository state */
-let activeRepoMode = null;   // "pull" | "push" | "legs" | "full"
-let repoEditMode   = false;
-let pendingDelete  = null;   // {mode, id}
+let exerciseRepo = loadExerciseRepo();
+let builderSelections = []; // array of exercise ids for today
+let repoMode = "pull";
+let repoEditMode = false;
+let pendingDelete = null;
 
-/* SHOW DEV RESET BUTTON ONLY IN DEV */
+/* DEV RESET BUTTON VISIBILITY */
 if(DEV && devResetBtn){
   devResetBtn.classList.remove("hidden");
   devResetBtn.addEventListener("click", devResetAll);
 }
 
-/* WORKOUT GENERATION (same as before – independent of repository) */
+/* WORKOUT GENERATION */
 const METALS = ["Metacon","EMOM","Ladder","AMRAP","Tabata"];
 const rand = arr => arr[Math.floor(Math.random()*arr.length)];
 
@@ -1382,8 +1442,9 @@ function buildWorkout(mode){
       items.push(m);
     }
   }
-  return {mode, items};
+  return {mode, items, selectedExerciseIds: []};
 }
+
 function modeTitle(mode){
   if(mode==="pull") return "Pull Day";
   if(mode==="push") return "Push Day";
@@ -1392,7 +1453,7 @@ function modeTitle(mode){
   return "Workout";
 }
 
-/* PREVIEW CARD */
+/* PREVIEW CARD LOGIC */
 function allowedPreviewTags(mode){
   switch(mode){
     case "pull":
@@ -1426,6 +1487,7 @@ function allowedPreviewTags(mode){
         null
       ];
   }
+  return [];
 }
 function randomPreviewRows(mode){
   const pool = allowedPreviewTags(mode).filter(x => x !== null);
@@ -1508,7 +1570,7 @@ function hidePreviewCard(immediate=false){
   }
 }
 function updatePreviewForMode(mode){
-  if(!mode){ hidePreviewCard(); return; }
+  if(!mode){ hidePreviewCard(true); return; }
   renderPreviewCard(mode);
   showPreviewCard();
 }
@@ -1615,10 +1677,7 @@ function hidePastCard(){
   },220);
 }
 
-/* ==============
-   REPO BUTTON HELPERS
-   ============== */
-
+/* REPOSITORY BUTTON HELPERS */
 function updateRepositoryButton(mode){
   if(!repoBtn || !mode) return;
   const map = {
@@ -1629,13 +1688,11 @@ function updateRepositoryButton(mode){
   };
   repoBtn.textContent = map[mode] || "Repository";
 }
-
 function showRepoButtonUnderSlider(mode){
   if(!repoBtn) return;
   updateRepositoryButton(mode);
   repoBtn.classList.remove("hidden");
 }
-
 function hideRepoButton(){
   if(!repoBtn) return;
   repoBtn.classList.add("hidden");
@@ -1693,6 +1750,7 @@ function showSelectionState(){
 
   hidePreviewCard(true);
   hideRepoButton();
+  selectedSummaryEl.classList.add("hidden");
 }
 function showPreLockedState(){
   historyMode=false;
@@ -1704,13 +1762,13 @@ function showPreLockedState(){
   slideWrap.classList.add("hidden");
   hidePreviewCard(true);
   hideRepoButton();
+  selectedSummaryEl.classList.add("hidden");
 
   if(DEV){
     const unlockAt = getDevUnlockTime();
     if(unlockAt){
       startBigTimer(unlockAt);
     }else{
-      // no lock? just show selection in dev
       showSelectionState();
     }
   }else{
@@ -1724,6 +1782,7 @@ function showWorkoutState(workout){
   bigTimer.classList.remove("show");
 
   currentWorkout = workout;
+  builderSelections = Array.isArray(workout.selectedExerciseIds) ? workout.selectedExerciseIds.slice() : [];
   setSubtitle("Today’s workout");
 
   renderWorkoutCard(workout);
@@ -1732,7 +1791,7 @@ function showWorkoutState(workout){
   slideWrap.classList.remove("hidden");
   resetSlider();
   hidePreviewCard(true);
-
+  renderSelectedChips();
   showRepoButtonUnderSlider(workout.mode);
 }
 function showCompletedState(){
@@ -1748,6 +1807,7 @@ function showCompletedState(){
   mainBtn.classList.add("hidden");
   slideWrap.classList.add("hidden");
   hideRepoButton();
+  selectedSummaryEl.classList.add("hidden");
 
   let target;
   if(DEV){
@@ -1760,7 +1820,6 @@ function showCompletedState(){
   }else{
     target = getStartTime(true);
   }
-
   startBigTimer(target);
 }
 function showAllUsedWeekState(){
@@ -1773,6 +1832,7 @@ function showAllUsedWeekState(){
   slideWrap.classList.add("hidden");
   bigTimer.classList.add("hidden");
   hideRepoButton();
+  selectedSummaryEl.classList.add("hidden");
 }
 
 /* TIMER */
@@ -1832,15 +1892,12 @@ function renderStreakUI(opts={}){
   }
   lastStreakValue = streak;
 }
-
-// called after a workout is fully completed (slide finished)
 function updateWeeklyStatsAfterCompletion(){
   const wk = weekKey();
   let summary = loadWeekSummary() || {week:wk, workouts:0, counted:false};
   if(summary.week !== wk){
     summary = {week:wk, workouts:0, counted:false};
   }
-
   const hist = loadHistory();
   const doneCount = Object.keys(hist).length;
   summary.workouts = doneCount;
@@ -1856,7 +1913,6 @@ function updateWeeklyStatsAfterCompletion(){
     setStreak(streak);
   }
   saveWeekSummary(summary);
-
   return {doneCount, streak, streakIncreased};
 }
 
@@ -1871,12 +1927,14 @@ function handleGenerate(){
   mainBtn.disabled=true;
   mainBtn.textContent="Generating...";
   cardEl.style.display="none";
+  selectedSummaryEl.classList.add("hidden");
+  builderSelections = [];
 
   setTimeout(()=>{
     const workout = buildWorkout(selectedMode);
     currentWorkout = workout;
-
     saveWorkoutToday(workout);
+
     const locks=loadLocks();
     locks[selectedMode]=true;
     saveLocks(locks);
@@ -1884,9 +1942,54 @@ function handleGenerate(){
     aiStage.classList.remove("show");
     aiStage.style.display="none";
     mainBtn.disabled=false;
-
     showWorkoutState(workout);
   },900);
+}
+
+/* SELECTED EXERCISES SUMMARY */
+function findExerciseById(id){
+  for(const g of ["pull","push","legs"]){
+    const arr = exerciseRepo[g] || [];
+    const ex = arr.find(e => e.id === id);
+    if(ex) return ex;
+  }
+  return null;
+}
+function renderSelectedChips(){
+  if(!currentWorkout || !Array.isArray(currentWorkout.selectedExerciseIds) || !currentWorkout.selectedExerciseIds.length){
+    selectedSummaryEl.classList.add("hidden");
+    selectedChipsEl.innerHTML = "";
+    return;
+  }
+  selectedSummaryEl.classList.remove("hidden");
+  selectedChipsEl.innerHTML = "";
+  currentWorkout.selectedExerciseIds.forEach(id=>{
+    const ex = findExerciseById(id);
+    const name = ex ? ex.name : id;
+    const chip = document.createElement("div");
+    chip.className = "selected-chip";
+    chip.textContent = name;
+    selectedChipsEl.appendChild(chip);
+  });
+}
+
+/* USAGE UPDATE (only on slide complete) */
+function incrementUsageFromCurrentSelection(){
+  if(!currentWorkout || !Array.isArray(currentWorkout.selectedExerciseIds)) return;
+  const ids = currentWorkout.selectedExerciseIds;
+  if(!ids.length) return;
+  const groups = ["pull","push","legs"];
+  ids.forEach(id=>{
+    for(const g of groups){
+      const arr = exerciseRepo[g] || [];
+      const ex = arr.find(e => e.id === id);
+      if(ex){
+        ex.usage = (ex.usage || 0) + 1;
+        break;
+      }
+    }
+  });
+  saveExerciseRepo();
 }
 
 /* SLIDE COMPLETE */
@@ -1901,12 +2004,14 @@ function handleComplete(){
   }
   if(navigator.vibrate) navigator.vibrate(15);
 
+  // Update usage counters for selected exercises
+  incrementUsageFromCurrentSelection();
+
   saveCompletedToday(currentWorkout.mode);
   saveHistoryForMode(currentWorkout);
 
-  // DEV: set 30s time lock AFTER completion
   if(DEV){
-    const unlockAt = Date.now() + 30000; // 30 seconds
+    const unlockAt = Date.now() + 30000;
     lsSet("dev_time_lock", String(unlockAt));
   }
 
@@ -1917,10 +2022,11 @@ function handleComplete(){
 
   cardEl.style.display="none";
   slideWrap.classList.add("hidden");
+  selectedSummaryEl.classList.add("hidden");
   setTimeout(()=> showCompletedState(),600);
 }
 
-/* SLIDER LOGIC – smoother, transform-based */
+/* SLIDER LOGIC */
 let sliding=false;
 let startX=0;
 let currentX=0;
@@ -2059,124 +2165,7 @@ function updateWeatherUI(){
   },{timeout:10000,maximumAge:600000});
 }
 
-/* REPOSITORY TITLE HELPER */
-function repoTitleForMode(mode){
-  if(mode==="pull") return "Pull Repository";
-  if(mode==="push") return "Push Repository";
-  if(mode==="legs") return "Legs Repository";
-  return "Full Body Repository";
-}
-
-/* REPOSITORY RENDER */
-function renderRepoList(){
-  if(!activeRepoMode){
-    repoEmptyEl.style.display="block";
-    repoListEl.innerHTML="";
-    return;
-  }
-  const repo = loadExerciseRepo();
-  let items = [];
-  if(activeRepoMode==="pull" || activeRepoMode==="push" || activeRepoMode==="legs"){
-    const list = repo[activeRepoMode] || [];
-    items = list.map(e=>({mode:activeRepoMode, ...e}));
-  }else if(activeRepoMode==="full"){
-    items = [
-      ...(repo.pull || []).map(e=>({mode:"pull", ...e})),
-      ...(repo.push || []).map(e=>({mode:"push", ...e})),
-      ...(repo.legs || []).map(e=>({mode:"legs", ...e}))
-    ];
-  }
-
-  // sort by most used first
-  items.sort((a,b)=> (b.usage|0) - (a.usage|0));
-
-  if(!items.length){
-    repoEmptyEl.style.display="block";
-    repoListEl.innerHTML="";
-    return;
-  }
-  repoEmptyEl.style.display="none";
-  repoListEl.innerHTML="";
-
-  items.forEach(ex=>{
-    const row=document.createElement("div");
-    row.className="repo-row";
-    row.dataset.id = ex.id;
-    row.dataset.mode = ex.mode;
-
-    const left=document.createElement("div");
-    left.className="repo-row-main";
-    const nameEl=document.createElement("div");
-    nameEl.className="repo-name";
-    nameEl.textContent = ex.name;
-    left.appendChild(nameEl);
-
-    if(activeRepoMode==="full"){
-      const tag=document.createElement("span");
-      tag.className="repo-tag";
-      tag.textContent = ex.mode==="pull" ? "Pull" : ex.mode==="push" ? "Push" : "Legs";
-      left.appendChild(tag);
-    }
-
-    const right=document.createElement("div");
-    right.className="repo-row-right";
-
-    const usageLabel=document.createElement("div");
-    usageLabel.className="repo-usage-label";
-    usageLabel.textContent="Usage";
-    right.appendChild(usageLabel);
-
-    const usageEl=document.createElement("div");
-    usageEl.className="repo-usage";
-    usageEl.textContent = ex.usage|0;
-    right.appendChild(usageEl);
-
-    const delBtn=document.createElement("button");
-    delBtn.className="repo-delete-btn";
-    delBtn.innerHTML="🗑";
-    if(!repoEditMode) delBtn.classList.add("hidden");
-    right.appendChild(delBtn);
-
-    row.appendChild(left);
-    row.appendChild(right);
-    repoListEl.appendChild(row);
-  });
-}
-
-/* OPEN / CLOSE REPOSITORY */
-function openRepository(mode){
-  activeRepoMode = mode || "pull";
-  repoEditMode = false;
-  repoTitleEl.textContent = repoTitleForMode(activeRepoMode);
-  repoEditToggle.textContent = "Edit";
-  renderRepoList();
-  repoOverlay.classList.remove("hidden");
-}
-function closeRepository(){
-  repoOverlay.classList.add("hidden");
-  activeRepoMode = null;
-  repoEditMode = false;
-  pendingDelete = null;
-}
-
-/* DELETE SHEET */
-function openDeleteSheet(mode,id,name){
-  pendingDelete = {mode,id};
-  sheetMessageEl.textContent = `Are you sure you want to remove "${name}"?`;
-  confirmSheet.classList.remove("hidden");
-}
-function closeDeleteSheet(){
-  confirmSheet.classList.add("hidden");
-  pendingDelete = null;
-}
-
-/* INIT UI
-   RULES:
-   - If completedToday => always showCompletedState (locked for the day)
-   - Else if workoutToday => always showWorkoutState (stuck on workout)
-   - Else if before start time => pre-locked countdown
-   - Else normal selection
-*/
+/* INIT UI */
 function initUI(){
   resetWeekIfNeeded();
   clearRadioSelection();
@@ -2184,29 +2173,25 @@ function initUI(){
   hidePreviewCard(true);
   hidePastCard();
   hideRepoButton();
-  closeRepository();
-  closeDeleteSheet();
+  selectedSummaryEl.classList.add("hidden");
 
   const workout       = loadWorkoutToday();
   const completedObj  = loadCompletedToday();
   const hasCompleted  = !!completedObj;
-  const lockedByTime  = !afterStart(); // true = before today's 17:30 in prod, or before dev unlock
+  const lockedByTime  = !afterStart();
 
   if(hasCompleted){
-    // Once you've completed today's workout, you're locked to completed view for the rest of the day
     showCompletedState();
   }else if(workout){
-    // Workout generated but not completed -> stuck on workout screen (even after refresh)
+    currentWorkout = workout;
     showWorkoutState(workout);
   }else if(lockedByTime){
-    // Before daily unlock and nothing done yet -> pre-locked countdown
     showPreLockedState();
   }else if(!anyUnlockedModes()){
     showAllUsedWeekState();
   }else{
     showSelectionState();
   }
-
   renderStreakUI();
 }
 
@@ -2232,7 +2217,7 @@ qsa("input[name='mode']").forEach(r=>{
   });
 });
 
-/* CLICK OUTSIDE PAST CARD → hide + show timer */
+/* CLICK OUTSIDE PAST CARD */
 document.addEventListener("click",(e)=>{
   if(!historyMode) return;
   if(pastCardEl.style.display==="none") return;
@@ -2242,13 +2227,11 @@ document.addEventListener("click",(e)=>{
 
   if(!insideCard && !insideRadio){
     hidePastCard();
-
     qsa(".opt").forEach(lbl => {
       lbl.classList.remove("active");
       const inp = lbl.querySelector("input");
       if (inp) inp.checked = false;
     });
-
     selectedMode = null;
   }
 });
@@ -2256,110 +2239,241 @@ document.addEventListener("click",(e)=>{
 /* MAIN BUTTON */
 mainBtn.addEventListener("click", handleGenerate);
 
-/* REPOSITORY BUTTON CLICK */
-if(repoBtn){
-  repoBtn.addEventListener("click",()=>{
-    if(!currentWorkout) return;
-    openRepository(currentWorkout.mode || "pull");
+/* REPOSITORY OVERLAY LOGIC */
+function setRepoModeForCurrentWorkout(){
+  if(!currentWorkout) repoMode = "pull";
+  else if(currentWorkout.mode === "pull") repoMode = "pull";
+  else if(currentWorkout.mode === "push") repoMode = "push";
+  else if(currentWorkout.mode === "legs") repoMode = "legs";
+  else repoMode = "pull"; // for full body default to pull repo
+}
+
+function repoTitleForMode(m){
+  if(m==="pull") return "Pull Repository";
+  if(m==="push") return "Push Repository";
+  if(m==="legs") return "Legs Repository";
+  return "Repository";
+}
+
+function renderRepoList(){
+  repoListEl.innerHTML = "";
+  const list = (exerciseRepo[repoMode] || []).slice().sort((a,b)=>{
+    const ua = a.usage || 0;
+    const ub = b.usage || 0;
+    if(ub !== ua) return ub - ua;
+    return a.name.localeCompare(b.name);
+  });
+
+  if(!list.length){
+    const empty = document.createElement("div");
+    empty.className = "repo-empty";
+    empty.textContent = "No exercises yet. Add your first one above.";
+    repoListEl.appendChild(empty);
+    return;
+  }
+
+  list.forEach(ex=>{
+    const item = document.createElement("div");
+    item.className = "repo-item";
+
+    const main = document.createElement("div");
+    main.className = "repo-main";
+    const name = document.createElement("div");
+    name.className = "repo-name";
+    name.textContent = ex.name;
+    const usage = document.createElement("div");
+    usage.className = "repo-usage";
+    usage.textContent = `Usage: ${ex.usage || 0}`;
+    main.appendChild(name);
+    main.appendChild(usage);
+
+    const delBtn = document.createElement("button");
+    delBtn.className = "repo-delete-btn";
+    delBtn.textContent = "🗑";
+    delBtn.addEventListener("click",()=>{
+      pendingDelete = {group: repoMode, id: ex.id, name: ex.name};
+      confirmTextEl.textContent = `Remove "${ex.name}" from this repository?`;
+      confirmModalEl.classList.add("show");
+    });
+
+    item.appendChild(main);
+    item.appendChild(delBtn);
+    repoListEl.appendChild(item);
   });
 }
 
-/* REPOSITORY CLOSE BUTTON */
-if(repoCloseBtn){
-  repoCloseBtn.addEventListener("click", closeRepository);
+function openRepoOverlay(){
+  setRepoModeForCurrentWorkout();
+  repoTitleEl.textContent = repoTitleForMode(repoMode);
+  repoAddInput.value = "";
+  repoEditMode = false;
+  repoOverlay.classList.remove("edit-mode");
+  repoOverlay.classList.add("show");
+  renderRepoList();
+}
+function closeRepoOverlay(){
+  repoOverlay.classList.remove("show");
 }
 
-/* REPOSITORY EDIT TOGGLE */
-if(repoEditToggle){
-  repoEditToggle.addEventListener("click",()=>{
-    if(!activeRepoMode) return;
-    repoEditMode = !repoEditMode;
-    repoEditToggle.textContent = repoEditMode ? "Done" : "Edit";
-    qsa(".repo-delete-btn").forEach(btn=>{
-      if(repoEditMode){
-        btn.classList.remove("hidden");
+repoBtn.addEventListener("click", openRepoOverlay);
+repoCloseBtn.addEventListener("click", closeRepoOverlay);
+
+repoEditBtn.addEventListener("click",()=>{
+  repoEditMode = !repoEditMode;
+  if(repoEditMode){
+    repoOverlay.classList.add("edit-mode");
+    repoEditBtn.textContent = "Done";
+  }else{
+    repoOverlay.classList.remove("edit-mode");
+    repoEditBtn.textContent = "Edit";
+  }
+});
+
+function handleAddExercise(){
+  const name = repoAddInput.value.trim();
+  if(!name) return;
+  const ex = createExercise(name, repoMode);
+  exerciseRepo[repoMode] = exerciseRepo[repoMode] || [];
+  exerciseRepo[repoMode].push(ex);
+  saveExerciseRepo();
+  repoAddInput.value = "";
+  renderRepoList();
+}
+repoAddBtn.addEventListener("click", handleAddExercise);
+repoAddInput.addEventListener("keydown", e=>{
+  if(e.key === "Enter") handleAddExercise();
+});
+
+/* CONFIRM MODAL HANDLERS */
+confirmCancelEl.addEventListener("click",()=>{
+  pendingDelete = null;
+  confirmModalEl.classList.remove("show");
+});
+confirmModalEl.querySelector(".modal-backdrop").addEventListener("click", ()=>{
+  pendingDelete = null;
+  confirmModalEl.classList.remove("show");
+});
+confirmDeleteEl.addEventListener("click",()=>{
+  if(!pendingDelete){
+    confirmModalEl.classList.remove("show");
+    return;
+  }
+  const {group,id} = pendingDelete;
+  pendingDelete = null;
+
+  exerciseRepo[group] = (exerciseRepo[group] || []).filter(e=>e.id !== id);
+  saveExerciseRepo();
+
+  builderSelections = builderSelections.filter(x=>x!==id);
+  if(currentWorkout && Array.isArray(currentWorkout.selectedExerciseIds)){
+    currentWorkout.selectedExerciseIds = currentWorkout.selectedExerciseIds.filter(x=>x!==id);
+    saveWorkoutToday(currentWorkout);
+    renderSelectedChips();
+  }
+  renderRepoList();
+  if(builderOverlay.classList.contains("show")){
+    renderBuilderList();
+  }
+
+  confirmModalEl.classList.remove("show");
+});
+
+/* BUILDER OVERLAY LOGIC */
+function openBuilderOverlay(){
+  if(!currentWorkout) return;
+  builderTitleEl.textContent = "Build Workout";
+  builderSubtitleEl.textContent = "Select exercises for today";
+  builderSelections = Array.isArray(currentWorkout.selectedExerciseIds)
+    ? currentWorkout.selectedExerciseIds.slice()
+    : [];
+  builderOverlay.classList.add("show");
+  renderBuilderList();
+}
+function closeBuilderOverlay(){
+  builderOverlay.classList.remove("show");
+  if(currentWorkout){
+    currentWorkout.selectedExerciseIds = builderSelections.slice();
+    saveWorkoutToday(currentWorkout);
+    renderSelectedChips();
+  }
+}
+
+builderCloseBtn.addEventListener("click", closeBuilderOverlay);
+buildBtn.addEventListener("click", openBuilderOverlay);
+
+function renderBuilderGroupSection(title, groupKey){
+  const list = exerciseRepo[groupKey] || [];
+  if(!list.length) return;
+
+  const sectionTitle = document.createElement("div");
+  sectionTitle.className = "builder-section-title";
+  sectionTitle.textContent = title;
+  builderListEl.appendChild(sectionTitle);
+
+  list.forEach(ex=>{
+    const row = document.createElement("div");
+    row.className = "builder-exercise-row";
+
+    const name = document.createElement("div");
+    name.className = "builder-exercise-name";
+    name.textContent = ex.name;
+
+    const toggle = document.createElement("button");
+    toggle.className = "builder-toggle";
+    const isSelected = builderSelections.includes(ex.id);
+    if(isSelected){
+      toggle.classList.add("selected");
+      toggle.textContent = "✓";
+    }else{
+      toggle.textContent = "+";
+    }
+
+    toggle.addEventListener("click",()=>{
+      const idx = builderSelections.indexOf(ex.id);
+      if(idx === -1){
+        builderSelections.push(ex.id);
       }else{
-        btn.classList.add("hidden");
+        builderSelections.splice(idx,1);
+      }
+      const nowSelected = builderSelections.includes(ex.id);
+      if(nowSelected){
+        toggle.classList.add("selected");
+        toggle.textContent = "✓";
+      }else{
+        toggle.classList.remove("selected");
+        toggle.textContent = "+";
       }
     });
+
+    row.appendChild(name);
+    row.appendChild(toggle);
+    builderListEl.appendChild(row);
   });
 }
 
-/* REPOSITORY ADD BUTTON */
-if(repoAddBtn){
-  repoAddBtn.addEventListener("click",()=>{
-    if(!activeRepoMode) return;
-    let targetMode = activeRepoMode;
-    if(activeRepoMode==="full"){
-      const choice = (prompt("Add exercise to which list? Type: pull, push, or legs") || "").trim().toLowerCase();
-      if(!["pull","push","legs"].includes(choice)) return;
-      targetMode = choice;
-    }
-    const name = (prompt("Exercise name") || "").trim();
-    if(!name) return;
+function renderBuilderList(){
+  builderListEl.innerHTML = "";
+  if(!currentWorkout) return;
+  const mode = currentWorkout.mode;
 
-    const repo = loadExerciseRepo();
-    const list = repo[targetMode] || (repo[targetMode]=[]);
-    list.push(createExercise(name));
-    saveExerciseRepo(repo);
-    renderRepoList();
-  });
-}
+  if(mode === "pull"){
+    renderBuilderGroupSection("Pull", "pull");
+  }else if(mode === "push"){
+    renderBuilderGroupSection("Push", "push");
+  }else if(mode === "legs"){
+    renderBuilderGroupSection("Legs", "legs");
+  }else if(mode === "full"){
+    renderBuilderGroupSection("Pull", "pull");
+    renderBuilderGroupSection("Push", "push");
+    renderBuilderGroupSection("Legs", "legs");
+  }
 
-/* REPOSITORY LIST INTERACTIONS (tap to increment, trash to delete) */
-if(repoListEl){
-  repoListEl.addEventListener("click",(e)=>{
-    const delBtn = e.target.closest(".repo-delete-btn");
-    if(delBtn && !delBtn.classList.contains("hidden")){
-      const row = delBtn.closest(".repo-row");
-      if(!row) return;
-      const id = row.dataset.id;
-      const mode = row.dataset.mode;
-      const name = row.querySelector(".repo-name")?.textContent || "this exercise";
-      openDeleteSheet(mode,id,name);
-      return;
-    }
-
-    // Tap row to increment usage
-    const row = e.target.closest(".repo-row");
-    if(!row) return;
-    const id = row.dataset.id;
-    const mode = row.dataset.mode;
-    if(!id || !mode) return;
-
-    const repo = loadExerciseRepo();
-    const list = repo[mode] || [];
-    const ex = list.find(x=>x.id===id);
-    if(!ex) return;
-    ex.usage = (ex.usage|0) + 1;
-    saveExerciseRepo(repo);
-
-    row.classList.remove("repo-row-tap");
-    void row.offsetWidth;
-    row.classList.add("repo-row-tap");
-
-    renderRepoList();
-  });
-}
-
-/* SHEET BUTTONS */
-if(sheetCancelBtn){
-  sheetCancelBtn.addEventListener("click", closeDeleteSheet);
-}
-if(sheetBackdrop){
-  sheetBackdrop.addEventListener("click", closeDeleteSheet);
-}
-if(sheetConfirmBtn){
-  sheetConfirmBtn.addEventListener("click",()=>{
-    if(!pendingDelete) return;
-    const repo = loadExerciseRepo();
-    const list = repo[pendingDelete.mode] || [];
-    const idx = list.findIndex(e=>e.id===pendingDelete.id);
-    if(idx>=0) list.splice(idx,1);
-    saveExerciseRepo(repo);
-    closeDeleteSheet();
-    renderRepoList();
-  });
+  if(!builderListEl.children.length){
+    const empty = document.createElement("div");
+    empty.className = "repo-empty";
+    empty.textContent = "No exercises yet. Add them in the repository first.";
+    builderListEl.appendChild(empty);
+  }
 }
 
 /* BOOT */
