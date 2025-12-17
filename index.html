@@ -913,7 +913,7 @@ let prUsed = false;
           <div class="history-date">${formatDate(entry.date)}</div>
         </div>
         <div class="history-right">
-          ${entry.time === bestTime ? `<span class="pr-badge">PR</span>` : ""}
+         ${entry.time === bestTime && !prUsed ? (prUsed = true, '<span class="pr-badge">PR</span>') : ""}
           <button class="history-delete">×</button>
         </div>
       `;
