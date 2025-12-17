@@ -51,6 +51,46 @@ h1{
   font-size:16px;
 }
 
+/* ===== AI GRADIENT ===== */
+.ai-stage{
+  position:absolute;
+  left:50%;
+  top:260px;
+  transform:translateX(-50%);
+  width:260px;
+  height:260px;
+  border-radius:50%;
+  pointer-events:none;
+  display:none;
+}
+.ai-stage::before{
+  content:"";
+  position:absolute;
+  inset:-20%;
+  filter:blur(90px) saturate(160%);
+  opacity:0;
+  background:
+    radial-gradient(22rem 22rem at 30% 36%, #3A7BFF77 0, #0000 50%),
+    radial-gradient(22rem 22rem at 72% 34%, #7DFF5C77 0, #0000 54%),
+    radial-gradient(24rem 20rem at 40% 72%, #FFA43A77 0, #0000 54%),
+    radial-gradient(20rem 20rem at 70% 74%, #9B8FFF99 0, #0000 80%);
+  background-blend-mode:screen;
+  animation:meshBreath 2s ease-in-out infinite, meshDrift 3s ease-in-out infinite;
+  transition:opacity .25s ease;
+}
+.ai-stage.show::before{ opacity:.9; }
+
+@keyframes meshBreath{
+  0%,100%{ transform:scale(1); }
+  50%{ transform:scale(1.05); }
+}
+@keyframes meshDrift{
+  0%{ transform:translate(0,0); }
+  50%{ transform:translate(2%,-1.5%); }
+  100%{ transform:translate(0,0); }
+}
+
+/* ===== CARD ===== */
 .card{
   background:var(--card);
   border-radius:18px;
@@ -61,7 +101,6 @@ h1{
   transform:translateY(12px);
   transition:.25s ease;
 }
-
 .card.show{
   display:block;
   opacity:1;
@@ -82,7 +121,6 @@ h1{
   font-size:12px;
   font-weight:600;
 }
-
 .pill-push{ background:var(--pill-push); color:#2453f5; }
 .pill-pull{ background:var(--pill-pull); color:#16a34a; }
 .pill-legs{ background:var(--pill-legs); color:#ea580c; }
@@ -119,122 +157,75 @@ h1{
   <h1>Welcome back Jy</h1>
   <div class="subtitle">Today’s mixed workout</div>
 
+  <div id="aiStage" class="ai-stage"></div>
   <div id="workoutCard" class="card"></div>
 </div>
 
 <button id="generateBtn">Generate Workout</button>
 
 <script>
-/* ===================== MOVEMENT GROUPS ===================== */
-
+/* ===== GROUPS ===== */
 const GROUPS = [
-  {
-    chance: 0.8,
-    variants: ["1 Rep Muscle-Up"],
-    tags: ["push","pull"]
-  },
-  {
-    chance: 0.8,
-    variants: ["5 Pull-Ups","5 Chin-Ups"],
-    tags: ["pull"]
-  },
-  {
-    chance: 0.8,
-    variants: [
-      "10 Push-Ups",
-      "10 Dips",
-      "10 Decline Push-Ups",
-      "10 Diamond Push-Ups"
-    ],
-    tags: ["push"]
-  },
-  {
-    chance: 0.5,
-    variants: [
-      "10 Dolphin Push-Ups",
-      "10 Pike Push-Ups"
-    ],
-    tags: ["shoulders"]
-  },
-  {
-    chance: 0.5,
-    variants: [
-      "15 Jumping Squats",
-      "15 Jumping Lunges"
-    ],
-    tags: ["legs"]
-  },
-  {
-    chance: 0.5,
-    variants: [
-      "20 Knee Raises",
-      "20 Full Body Raises"
-    ],
-    tags: ["abs"]
-  },
-  {
-    chance: 0.5,
-    variants: [
-      "10 Burpees",
-      "10 Kettlebell Swings"
-    ],
-    tags: ["fullbody"]
-  },
-  {
-    chance: 0.5,
-    variants: [
-      "20 Jumping Jacks",
-      "20 Mountain Climbers"
-    ],
-    tags: ["cardio"]
-  }
+  { weight:3, variants:["5 Pull-Ups","5 Chin-Ups"], tags:["pull"] },
+  { weight:3, variants:["10 Push-Ups","10 Dips","10 Decline Push-Ups","10 Diamond Push-Ups"], tags:["push"] },
+  { weight:2, variants:["1 Rep Muscle-Up"], tags:["push","pull"] },
+  { weight:1, variants:["10 Dolphin Push-Ups","10 Pike Push-Ups"], tags:["shoulders"] },
+  { weight:1, variants:["15 Jumping Squats","15 Jumping Lunges"], tags:["legs"] },
+  { weight:1, variants:["20 Knee Raises","20 Full Body Raises"], tags:["abs"] },
+  { weight:1, variants:["10 Burpees","10 Kettlebell Swings"], tags:["fullbody"] },
+  { weight:1, variants:["20 Jumping Jacks","20 Mountain Climbers"], tags:["cardio"] }
 ];
 
-/* ===================== HELPERS ===================== */
+function rand(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
-function rand(arr){
-  return arr[Math.floor(Math.random() * arr.length)];
+function weightedPick(pool){
+  const total = pool.reduce((s,g)=>s+g.weight,0);
+  let r = Math.random()*total;
+  for(const g of pool){ if((r-=g.weight)<=0) return g; }
 }
 
-/* ===================== GENERATOR ===================== */
-
+/* ===== GENERATE ===== */
 function generateWorkout(){
   const card = document.getElementById("workoutCard");
-  card.innerHTML = "";
-
-  const picked = GROUPS.filter(g => Math.random() < g.chance);
-
-  // Safety: ensure at least 2 exercises
-  while(picked.length < 2){
-    picked.push(GROUPS[Math.floor(Math.random() * GROUPS.length)]);
-  }
-
-  picked.forEach(g => {
-    const line = document.createElement("div");
-    line.className = "line";
-
-    line.appendChild(document.createTextNode(rand(g.variants)));
-
-    g.tags.forEach(tag => {
-      const pill = document.createElement("span");
-      pill.className = `pill pill-${tag}`;
-      pill.textContent = tag;
-      line.appendChild(pill);
-    });
-
-    card.appendChild(line);
-  });
+  const ai   = document.getElementById("aiStage");
 
   card.classList.remove("show");
-  void card.offsetWidth;
-  card.classList.add("show");
+  card.style.display="none";
+
+  ai.style.display="block";
+  ai.classList.add("show");
+
+  setTimeout(()=>{
+    ai.classList.remove("show");
+    ai.style.display="none";
+
+    card.innerHTML="";
+    const count = Math.floor(Math.random()*3)+2; // 2–4
+    const used=new Set();
+
+    while(used.size<count){
+      used.add(weightedPick(GROUPS));
+    }
+
+    [...used].forEach(g=>{
+      const line=document.createElement("div");
+      line.className="line";
+      line.appendChild(document.createTextNode(rand(g.variants)));
+      g.tags.forEach(tag=>{
+        const pill=document.createElement("span");
+        pill.className=`pill pill-${tag}`;
+        pill.textContent=tag;
+        line.appendChild(pill);
+      });
+      card.appendChild(line);
+    });
+
+    card.style.display="block";
+    requestAnimationFrame(()=>card.classList.add("show"));
+  },900);
 }
 
-/* ===================== INIT ===================== */
-
-document
-  .getElementById("generateBtn")
-  .addEventListener("click", generateWorkout);
+document.getElementById("generateBtn").addEventListener("click",generateWorkout);
 </script>
 
 </body>
