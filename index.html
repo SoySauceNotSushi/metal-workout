@@ -909,10 +909,16 @@ function showWorkoutState(workout){
   exerciseBtn.classList.add("hidden");
   slideWrap.classList.add("show");
 
+  // 🔥 TIMER BUTTON (METACON ONLY)
+  if(workout.type === "Metabolic Conditioning"){
+    startTimerBtn.classList.remove("hidden");
+  }else{
+    startTimerBtn.classList.add("hidden");
+  }
+
   plannedReps = {};
   resetSlider();
 }
-
 /* =========================================================
    GENERATE FLOW + MESH
 ========================================================= */
