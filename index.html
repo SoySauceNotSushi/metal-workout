@@ -719,9 +719,7 @@ function getLastDoneDate(){
 
 function setLastDoneDate(dateStr){
   localStorage.setItem(LS.lastDone, dateStr);
-  
-function loadJSON(key, fallback){
-  try{
+}
     const raw = localStorage.getItem(key);
     if(!raw) return fallback;
     return JSON.parse(raw);
