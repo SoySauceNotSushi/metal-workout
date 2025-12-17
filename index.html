@@ -1,486 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Jy Workout</title>
-
 <style>
 :root{
-  --brand:#2453f5;
-  --bg:#f7f8f9;
+  --bg:#ffffff;
   --ink:#0f172a;
   --sub:#64748b;
+  --brand:#2453f5;
   --card:#ffffff;
-
-  --shadow:0 12px 32px rgba(15,23,42,.15);
-
-  /* TAG COLORS */
-  --push:#3b82f6;
-  --pull:#22c55e;
-  --upper:#8b5cf6;
-  --shoulders:#ec4899;
-  --legs:#f97316;
-  --abs:#eab308;
-  --cardio:#14b8a6;
-  --fullbody:#ef4444;
+  --track:#e5e7eb;
 }
-
 *{box-sizing:border-box}
 body{
   margin:0;
+  background:linear-gradient(180deg,#f8fafc 0%,#ffffff 60%);
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro",Segoe UI,Roboto,sans-serif;
-  background:var(--bg);
   color:var(--ink);
 }
 .container{
   max-width:480px;
   margin:0 auto;
-  padding:20px 24px 160px;
+  padding:24px;
+  padding-bottom:160px;
 }
-
-/* ===== STREAK ===== */
-.streak-row{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  margin-bottom:10px;
-}
-.streak-fire{
-  font-weight:700;
-  color:#f97316;
-}
-.streak-bar{
-  width:150px;
-  height:8px;
-  background:#e5e7eb;
-  border-radius:999px;
-  overflow:hidden;
-}
-.streak-fill{
-  height:100%;
-  width:0%;
-  background:#f97316;
-  transition:.3s;
-}
-
-/* ===== HEADER ===== */
-h1{font-size:28px;margin:6px 0}
-.subtitle{color:var(--sub);margin-bottom:18px}
-
-/* ===== AI GRADIENT ===== */
-.ai-stage{
-  position:absolute;
-  left:50%;
-  top:260px;
-  transform:translateX(-50%);
-  width:260px;
-  height:260px;
-  display:none;
-}
-.ai-stage::before{
-  content:"";
-  position:absolute;
-  inset:-20%;
-  filter:blur(90px);
-  opacity:0;
-  background:
-    radial-gradient(22rem 22rem at 30% 36%, #3A7BFF77 0, #0000 50%),
-    radial-gradient(22rem 22rem at 72% 34%, #7DFF5C77 0, #0000 54%),
-    radial-gradient(24rem 20rem at 40% 72%, #FFA43A77 0, #0000 54%),
-    radial-gradient(20rem 20rem at 70% 74%, #9B8FFF99 0, #0000 80%);
-  animation:mesh 2.5s ease-in-out infinite;
-}
-.ai-stage.show::before{opacity:.9}
-@keyframes mesh{
-  0%,100%{transform:scale(1)}
-  50%{transform:scale(1.05)}
-}
-
-/* ===== CARD ===== */
+/* STREAK */
+.streak-wrap{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.streak-bar{width:150px;height:8px;border-radius:999px;background:#e5e7eb;overflow:hidden}
+.streak-fill{height:100%;width:0%;background:#f97316;transition:width .3s ease}
+/* TITLES */
+h1{font-size:30px;margin:8px 0 4px}
+.subtitle{color:var(--sub);margin-bottom:20px}
+/* CARD */
 .card{
   background:var(--card);
   border-radius:18px;
   padding:20px;
-  box-shadow:var(--shadow);
-  display:none;
+  box-shadow:0 18px 48px rgba(15,23,42,.12);
+  opacity:0;
+  transform:translateY(20px) scale(.97);
+  transition:all .35s cubic-bezier(.18,.84,.32,1.1);
 }
-.card.show{display:block}
-.card-title{
-  font-weight:700;
-  margin-bottom:14px;
-}
-.line{
-  font-size:16px;
-  margin-bottom:10px;
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-}
-
-/* ===== PILLS ===== */
-.pill{
-  padding:4px 10px;
-  border-radius:999px;
-  font-size:12px;
-  font-weight:600;
-  color:white;
-}
-.pill-push{background:var(--push)}
-.pill-pull{background:var(--pull)}
-.pill-upper{background:var(--upper)}
-.pill-shoulders{background:var(--shoulders)}
-.pill-legs{background:var(--legs)}
-.pill-abs{background:var(--abs)}
-.pill-cardio{background:var(--cardio)}
-.pill-fullbody{background:var(--fullbody)}
-
-/* ===== BUTTONS ===== */
-button{
-  border:none;
+.card.show{opacity:1;transform:none}
+.card h3{margin:0 0 14px;font-size:20px}
+.row{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+/* TAGS */
+.tag{font-size:13px;font-weight:600;padding:4px 10px;border-radius:999px}
+.tag-push{background:#e4ecff;color:#2453f5}
+.tag-pull{background:#d9fbe3;color:#22c55e}
+.tag-upper{background:#ede9fe;color:#7c3aed}
+.tag-shoulders{background:#fce7f3;color:#db2777}
+.tag-legs{background:#fff7ed;color:#ea580c}
+.tag-abs{background:#ecfeff;color:#0891b2}
+.tag-cardio{background:#fef9c3;color:#ca8a04}
+.tag-fullbody{background:#fee2e2;color:#dc2626}
+/* BUTTONS */
+.btn{
+  width:100%;
+  height:56px;
   border-radius:28px;
+  border:none;
+  font-size:18px;
   font-weight:600;
 }
-#generateBtn{
-  position:fixed;
-  bottom:70px;
-  left:50%;
-  transform:translateX(-50%);
-  width:calc(100% - 48px);
-  max-width:480px;
-  height:52px;
-  background:var(--brand);
-  color:white;
-  font-size:18px;
-}
+#generateBtn{background:var(--brand);color:#fff}
 #exerciseBtn{
-  position:fixed;
-  bottom:16px;
-  left:50%;
-  transform:translateX(-50%);
-  width:calc(100% - 48px);
-  max-width:480px;
-  height:44px;
-  background:#e5e7eb;
+  margin-top:12px;
+  background:#f3f4f6;
+  color:#2453f5;
 }
-
-/* ===== SLIDE ===== */
-.slide-wrap{
-  position:fixed;
-  bottom:70px;
-  left:50%;
-  transform:translateX(-50%);
-  width:calc(100% - 48px);
-  max-width:480px;
-  display:none;
-}
-.slide-track{
-  height:52px;
+/* SLIDER */
+.slider-wrap{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);width:calc(100% - 48px);max-width:480px;display:none}
+.slider{
+  height:56px;
+  background:#f3f4f6;
   border-radius:999px;
-  background:#e5e7eb;
   position:relative;
 }
-.slide-fill{
-  position:absolute;
-  inset:0;
-  background:var(--brand);
-  transform:scaleX(0);
-  transform-origin:left;
+.knob{
+  position:absolute;top:4px;left:4px;width:48px;height:48px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 16px rgba(0,0,0,.15)
 }
-.slide-label{
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:600;
+/* AI GRADIENT */
+.ai{position:fixed;inset:0;pointer-events:none;display:none}
+.ai::before{
+  content:"";position:absolute;inset:-20%;filter:blur(90px);
+  background:
+    radial-gradient(20rem 20rem at 20% 30%,#3b82f680,transparent 60%),
+    radial-gradient(18rem 18rem at 80% 40%,#22c55e80,transparent 60%),
+    radial-gradient(22rem 22rem at 50% 70%,#f9731680,transparent 60%);
 }
-.slide-knob{
-  position:absolute;
-  top:4px;
-  left:4px;
-  width:44px;
-  height:44px;
-  background:white;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  touch-action:none;
-}
-
-/* ===== MODAL ===== */
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.3);
-  display:none;
-}
-.modal.show{display:block}
-.modal-content{
-  position:absolute;
-  bottom:0;
-  width:100%;
-  max-height:80%;
-  background:white;
-  border-radius:18px 18px 0 0;
-  padding:16px;
-  overflow:auto;
-}
-.tabs{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-}
-.tab{
-  padding:6px 12px;
-  border-radius:999px;
-  background:#f1f5f9;
-}
-.tab.active{
-  background:#e0e7ff;
-  color:#1d4ed8;
-}
-.exercise{
-  display:flex;
-  gap:8px;
-  margin:8px 0;
-}
-.exercise input{flex:1;padding:6px}
-.exercise button{
-  background:#fee2e2;
-  color:#b91c1c;
-}
-.add-row{
-  display:flex;
-  gap:8px;
-  margin-top:12px;
-}
-.add-row input{flex:1;padding:6px}
-.add-row button{background:#dcfce7}
 </style>
 </head>
-
 <body>
-
 <div class="container">
-
-  <div class="streak-row">
-    <div class="streak-fire">🔥 <span id="streakCount">0</span></div>
-    <div class="streak-bar"><div id="streakFill" class="streak-fill"></div></div>
+  <div class="streak-wrap">
+    <span>🔥 <span id="streakCount">0</span></span>
+    <div class="streak-bar"><div class="streak-fill" id="streakFill"></div></div>
   </div>
-
   <h1>Welcome back Jy</h1>
-  <div class="subtitle">Today’s mixed workout</div>
-
-  <div id="aiStage" class="ai-stage"></div>
-  <div id="workoutCard" class="card"></div>
+  <div class="subtitle">Today's mixed workout</div>
+  <div id="card" class="card"></div>
+  <button id="generateBtn" class="btn">Generate Workout</button>
+  <button id="exerciseBtn" class="btn">Exercises</button>
 </div>
-
-<button id="generateBtn">Generate Workout</button>
-<button id="exerciseBtn">Exercises</button>
-
-<div id="slideWrap" class="slide-wrap">
-  <div class="slide-track">
-    <div id="slideFill" class="slide-fill"></div>
-    <div class="slide-label">Slide to Complete</div>
-    <div id="slideKnob" class="slide-knob">→</div>
+<div class="slider-wrap" id="sliderWrap">
+  <div class="slider">
+    <div class="knob">→</div>
   </div>
 </div>
-
-<div id="modal" class="modal">
-  <div class="modal-content">
-    <div class="tabs" id="tabs"></div>
-    <div id="exerciseList"></div>
-    <div class="add-row">
-      <input id="newName" placeholder="Exercise"/>
-      <input id="newReps" placeholder="Reps"/>
-      <button id="addExercise">Add</button>
-    </div>
-  </div>
-</div>
-
+<div class="ai" id="ai"></div>
 <script>
-const KEYS = ["push","pull","upper","shoulders","legs","abs","cardio","fullbody"];
-
-const DEFAULT = {
-  push:[{name:"Push-Ups",reps:"10"}],
-  pull:[{name:"Pull-Ups",reps:"5"}],
-  upper:[{name:"Muscle-Up",reps:"1"}],
-  shoulders:[{name:"Pike Push-Ups",reps:"10"}],
-  legs:[{name:"Jumping Squats",reps:"15"}],
-  abs:[{name:"Knee Raises",reps:"20"}],
-  cardio:[{name:"Jumping Jacks",reps:"20"}],
-  fullbody:[{name:"Burpees",reps:"10"}]
+/* DATA */
+const KEYS=[
+  {key:'push',p:1},
+  {key:'pull',p:1},
+  {key:'upper',p:.5},
+  {key:'shoulders',p:.5},
+  {key:'legs',p:1},
+  {key:'abs',p:1},
+  {key:'cardio',p:1},
+  {key:'fullbody',p:1}
+];
+const EX={
+  push:['Push-Ups','Dips','Diamond Push-Ups'],
+  pull:['Pull-Ups','Chin-Ups'],
+  upper:['Muscle-Up'],
+  shoulders:['Pike Push-Ups','Dolphin Push-Ups'],
+  legs:['Jumping Squats','Jumping Lunges'],
+  abs:['Knee Raises','Full Body Raises'],
+  cardio:['Jumping Jacks','Mountain Climbers'],
+  fullbody:['Burpees','Kettlebell Swings']
 };
-
-let data = JSON.parse(localStorage.getItem("exercises")) || DEFAULT;
-localStorage.setItem("exercises", JSON.stringify(data));
-
-function shuffle(a){return a.slice().sort(()=>Math.random()-0.5)}
+const card=document.getElementById('card');
+const gen=document.getElementById('generateBtn');
+const exBtn=document.getElementById('exerciseBtn');
+const slider=document.getElementById('sliderWrap');
+const ai=document.getElementById('ai');
+/* STREAK */
+let weekKey=new Date().getWeek?.||(()=>{const d=new Date();const j=new Date(d.getFullYear(),0,1);return Math.ceil((((d-j)/86400000)+j.getDay()+1)/7)})();
+let done=JSON.parse(localStorage.getItem('done')||'{}');
+function renderStreak(){
+  const c=Object.keys(done).length;
+  document.getElementById('streakCount').textContent=c>=3?1:0;
+  document.getElementById('streakFill').style.width=Math.min(c/3*100,100)+'%';
+}
+renderStreak();
+/* GEN */
 function rand(a){return a[Math.floor(Math.random()*a.length)]}
-
-/* ===== STREAK ===== */
-function weekKey(){
-  const d=new Date();
-  const j=new Date(d.getFullYear(),0,1);
-  return d.getFullYear()+"-W"+Math.ceil((((d-j)/86400000)+j.getDay()+1)/7);
-}
-let streak=+localStorage.getItem("streak")||0;
-let wk=localStorage.getItem("weekKey");
-let count=+localStorage.getItem("weekCount")||0;
-if(wk!==weekKey()){
-  if(count<3) streak=0;
-  count=0;
-  wk=weekKey();
-}
-localStorage.setItem("streak",streak);
-localStorage.setItem("weekKey",wk);
-localStorage.setItem("weekCount",count);
-function updateStreak(){
-  document.getElementById("streakCount").textContent=streak;
-  document.getElementById("streakFill").style.width=Math.min(count/3*100,100)+"%";
-}
-updateStreak();
-
-/* ===== WORKOUT ===== */
-let active=false;
 function generate(){
-  if(active) return;
-  document.getElementById("exerciseBtn").style.display="none";
-  document.getElementById("generateBtn").style.display="none";
-  document.getElementById("slideWrap").style.display="block";
-  const ai=document.getElementById("aiStage");
-  ai.style.display="block";
-  ai.classList.add("show");
-
+  ai.style.display='block';
+  gen.disabled=true;
   setTimeout(()=>{
-    ai.classList.remove("show");
-    ai.style.display="none";
-
-    const card=document.getElementById("workoutCard");
-    card.innerHTML="";
-    const amrap=Math.random()<0.6;
-    card.innerHTML+=`<div class="card-title">${
-      amrap?"As Many Rounds As Possible":"Metabolic Conditioning"
-    }</div>`;
-
-    let cats;
-    if(amrap){
-      cats=shuffle(KEYS).filter(c=>{
-        if(c==="upper"||c==="shoulders") return Math.random()<0.5;
-        return true;
-      }).slice(0,Math.floor(Math.random()*3)+2);
-    }else{
-      cats=shuffle(KEYS);
-    }
-
-    cats.forEach(c=>{
-      const ex=rand(data[c]);
-      const line=document.createElement("div");
-      line.className="line";
-      line.textContent=amrap?`${ex.reps} ${ex.name}`:ex.name;
-      const pill=document.createElement("span");
-      pill.className=`pill pill-${c}`;
-      pill.textContent=c;
-      line.appendChild(pill);
-      card.appendChild(line);
-    });
-
-    card.style.display="block";
-    card.classList.add("show");
-    active=true;
+    const picked=KEYS.filter(k=>Math.random()<k.p)
+      .sort(()=>Math.random()-.5)
+      .slice(0,Math.floor(Math.random()*3)+2)
+      .map(k=>({name:rand(EX[k.key]),tag:k.key}));
+    card.innerHTML='<h3>As Many Rounds As Possible</h3>'+picked.map(i=>
+      `<div class="row">${i.name}<span class="tag tag-${i.tag}">${i.tag}</span></div>`
+    ).join('');
+    card.classList.add('show');
+    ai.style.display='none';
+    gen.style.display='none';
+    exBtn.style.display='none';
+    slider.style.display='block';
   },900);
 }
-document.getElementById("generateBtn").onclick=generate;
-
-/* ===== SLIDE ===== */
-let startX=0,curX=0,max=0,sliding=false;
-const knob=document.getElementById("slideKnob");
-const fill=document.getElementById("slideFill");
-
-knob.addEventListener("pointerdown",e=>{
-  sliding=true;
-  startX=e.clientX;
-  const r=knob.parentElement.getBoundingClientRect();
-  max=r.width-48;
-});
-knob.addEventListener("pointermove",e=>{
-  if(!sliding) return;
-  curX=Math.max(0,Math.min(max,e.clientX-startX));
-  knob.style.transform=`translateX(${curX}px)`;
-  fill.style.transform=`scaleX(${curX/max})`;
-});
-knob.addEventListener("pointerup",()=>{
-  if(curX/max>0.9){
-    count++;
-    if(count>=3){streak++;count=3}
-    localStorage.setItem("streak",streak);
-    localStorage.setItem("weekCount",count);
-    updateStreak();
-    document.getElementById("workoutCard").style.display="none";
-    document.getElementById("slideWrap").style.display="none";
-    document.getElementById("generateBtn").style.display="block";
-    document.getElementById("exerciseBtn").style.display="block";
-    knob.style.transform="translateX(0)";
-    fill.style.transform="scaleX(0)";
-    active=false;
-  }else{
-    knob.style.transform="translateX(0)";
-    fill.style.transform="scaleX(0)";
-  }
-  sliding=false;
-});
-
-/* ===== MODAL ===== */
-const modal=document.getElementById("modal");
-const tabs=document.getElementById("tabs");
-const list=document.getElementById("exerciseList");
-let tab=KEYS[0];
-
-function renderTabs(){
-  tabs.innerHTML="";
-  KEYS.forEach(k=>{
-    const t=document.createElement("div");
-    t.className="tab"+(k===tab?" active":"");
-    t.textContent=k;
-    t.onclick=()=>{tab=k;renderList()};
-    tabs.appendChild(t);
-  });
-}
-function renderList(){
-  renderTabs();
-  list.innerHTML="";
-  data[tab].forEach((e,i)=>{
-    const r=document.createElement("div");
-    r.className="exercise";
-    r.innerHTML=`<input value="${e.name}">
-      <input value="${e.reps}">
-      <button>✕</button>`;
-    r.children[0].onchange=ev=>{e.name=ev.target.value;save()};
-    r.children[1].onchange=ev=>{e.reps=ev.target.value;save()};
-    r.children[2].onclick=()=>{data[tab].splice(i,1);save();renderList()};
-    list.appendChild(r);
-  });
-}
-function save(){
-  localStorage.setItem("exercises",JSON.stringify(data));
-}
-document.getElementById("exerciseBtn").onclick=()=>{
-  modal.classList.add("show");
-  renderList();
-};
-modal.onclick=e=>{if(e.target===modal)modal.classList.remove("show")};
-document.getElementById("addExercise").onclick=()=>{
-  const n=document.getElementById("newName");
-  const r=document.getElementById("newReps");
-  if(!n.value) return;
-  data[tab].push({name:n.value,reps:r.value});
-  save();
-  n.value="";r.value="";
-  renderList();
-};
+gen.onclick=generate;
 </script>
-
 </body>
 </html>
