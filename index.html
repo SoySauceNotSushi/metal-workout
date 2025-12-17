@@ -698,6 +698,29 @@ function isoWeekKey(d=new Date()){
   return `${date.getUTCFullYear()}-W${String(weekNo).padStart(2,"0")}`;
 }
 
+/* ===============================
+   DAILY / TOTAL HELPERS  👇 ADD HERE
+=============================== */
+function todayKey(){
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+
+function getTotalDays(){
+  return parseInt(localStorage.getItem(LS.totalDays) || "0", 10);
+}
+
+function setTotalDays(n){
+  localStorage.setItem(LS.totalDays, String(Math.max(0, n|0)));
+}
+
+function getLastDoneDate(){
+  return localStorage.getItem(LS.lastDone);
+}
+
+function setLastDoneDate(dateStr){
+  localStorage.setItem(LS.lastDone, dateStr);
+  
 function loadJSON(key, fallback){
   try{
     const raw = localStorage.getItem(key);
