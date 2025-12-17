@@ -111,7 +111,6 @@ h1{
   font-size:18px;
   font-weight:700;
   margin-bottom:14px;
-  letter-spacing:.3px;
 }
 
 .line{
@@ -174,14 +173,14 @@ h1{
 <script>
 /* ===== MOVEMENT GROUPS ===== */
 const GROUPS = [
-  { weight:3, variants:["5 Pull-Ups","5 Chin-Ups"], base:"Pull", tags:["pull"] },
-  { weight:3, variants:["10 Push-Ups","10 Dips","10 Decline Push-Ups","10 Diamond Push-Ups"], base:"Push", tags:["push"] },
-  { weight:2, variants:["1 Rep Muscle-Up"], base:"Muscle-Up", tags:["push","pull"] },
-  { weight:1, variants:["Dolphin Push-Ups","Pike Push-Ups"], base:"Shoulders", tags:["shoulders"] },
-  { weight:1, variants:["Jumping Squats","Jumping Lunges"], base:"Legs", tags:["legs"] },
-  { weight:1, variants:["Knee Raises","Full Body Raises"], base:"Abs", tags:["abs"] },
-  { weight:1, variants:["Burpees","Kettlebell Swings"], base:"Full Body", tags:["fullbody"] },
-  { weight:1, variants:["Jumping Jacks","Mountain Climbers"], base:"Cardio", tags:["cardio"] }
+  { weight:3, variants:["5 Pull-Ups","5 Chin-Ups"], tags:["pull"] },
+  { weight:3, variants:["10 Push-Ups","10 Dips","10 Decline Push-Ups","10 Diamond Push-Ups"], tags:["push"] },
+  { weight:2, variants:["1 Rep Muscle-Up"], tags:["push","pull"] },
+  { weight:1, variants:["10 Dolphin Push-Ups","10 Pike Push-Ups"], tags:["shoulders"] },
+  { weight:1, variants:["15 Jumping Squats","15 Jumping Lunges"], tags:["legs"] },
+  { weight:1, variants:["20 Knee Raises","20 Full Body Raises"], tags:["abs"] },
+  { weight:1, variants:["10 Burpees","10 Kettlebell Swings"], tags:["fullbody"] },
+  { weight:1, variants:["20 Jumping Jacks","20 Mountain Climbers"], tags:["cardio"] }
 ];
 
 function rand(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
@@ -208,10 +207,12 @@ function generateWorkout(){
 
     card.innerHTML="";
 
-    const isAMRAP = Math.random() < 0.6; // 60% AMRAP / 40% METACON
+    const isAMRAP = Math.random() < 0.6;
     const title = document.createElement("div");
     title.className="card-title";
-    title.textContent = isAMRAP ? "AMRAP" : "METACON";
+    title.textContent = isAMRAP
+      ? "As Many Rounds As Possible"
+      : "Metabolic Conditioning";
     card.appendChild(title);
 
     let picked = [];
@@ -227,11 +228,11 @@ function generateWorkout(){
         tags: g.tags
       }));
     }else{
-      // METACON = show ALL categories (no reps)
-      picked = GROUPS.map(g => ({
-        label: g.base,
-        tags: g.tags
-      }));
+      picked = GROUPS.map(g => {
+        const raw = rand(g.variants);
+        const clean = raw.replace(/^\d+\s*(Rep)?\s*/i, "");
+        return { label: clean, tags: g.tags };
+      });
     }
 
     picked.forEach(item=>{
