@@ -819,13 +819,21 @@ function generateAMRAP(){
 }
 
 function generateMETACON(){
-  const tags = ["pull","push","upper","shoulders","legs","abs","fullbody","cardio"];
-  const shuffled = tags.slice().sort(()=>Math.random()-0.5);
-  const rows = shuffled.map(tag=>{
-    const ex = pickExercise(tag);
-    return { text: ex.name, tags:[tag] };
-  });
-  return { type:"Metabolic Conditioning", rows };
+  return {
+    type: "Metabolic Conditioning",
+    rows: [
+      { text: "50 Pull-Ups", tags:["pull"] },
+      { text: "50 Dips", tags:["push"] },
+      { text: "100 Jumping Squats", tags:["legs"] },
+      { text: "50 Pike Push-Ups", tags:["shoulders"] },
+      { text: "50 Push-Ups", tags:["push"] },
+      { text: "100 Full Body Crunches", tags:["abs"] },
+      { text: "50 Kettlebell Swings", tags:["fullbody"] },
+      { text: "50 Australian Rows", tags:["pull"] },
+      { text: "100 Jumping Jacks", tags:["cardio"] },
+      { text: "10 Muscle-Ups", tags:["upper"] }
+    ]
+  };
 }
 
 function showPlanButton(workout){
