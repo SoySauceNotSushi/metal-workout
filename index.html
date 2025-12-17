@@ -1118,6 +1118,20 @@ function shootConfettiFromUnderButtons(){
 }
 
 function completeWorkout(){
+   /* ===============================
+     RESET METACON TIMER (ADD HERE)
+  =============================== */
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+  timerStart = null;
+
+  if (startTimerBtn) {
+    startTimerBtn.textContent = "Start Timer";
+    startTimerBtn.classList.add("hidden");
+  }
+
   ensureWeekState();
 
   // LIFETIME days trained (max 1 per day)
