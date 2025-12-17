@@ -1140,6 +1140,12 @@ function setSliderProgress(px){
     setSliderProgressImmediate(pendingX);
   });
 }
+  function snapBack(){
+  applyTransitions(true);
+  requestAnimationFrame(() => {
+    setSliderProgressImmediate(0);
+  });
+}
 
 slideKnob.addEventListener("pointerdown", (e)=>{
   sliding=true;
