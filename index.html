@@ -12,10 +12,14 @@
   --sub:#64748b;
   --bg:#f7f8f9;
   --card:#ffffff;
+
+  --streak-bg:#e5e7eb;
+  --streak-fill:#f97316;
+
   --shadow:0 12px 32px rgba(15,23,42,.15);
 }
 
-*{box-sizing:border-box}
+*{ box-sizing:border-box; }
 body{
   margin:0;
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro",Segoe UI,Roboto,sans-serif;
@@ -25,13 +29,44 @@ body{
 .container{
   max-width:480px;
   margin:0 auto;
-  padding:24px;
-  padding-bottom:150px;
+  padding:20px 24px 170px;
+}
+
+/* ===== STREAK ROW ===== */
+.streak-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:10px;
+}
+.streak-fire{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-weight:700;
+  color:var(--streak-fill);
+}
+.streak-count{
+  min-width:16px;
+  font-variant-numeric:tabular-nums;
+}
+.streak-bar{
+  flex:1;
+  height:8px;
+  background:var(--streak-bg);
+  border-radius:999px;
+  overflow:hidden;
+}
+.streak-bar-fill{
+  height:100%;
+  width:0%;
+  background:var(--streak-fill);
+  transition:width .32s ease;
 }
 
 /* ===== HEADER ===== */
-h1{font-size:28px;margin:0 0 6px}
-.subtitle{color:var(--sub);margin-bottom:18px}
+h1{ font-size:28px; margin:6px 0; }
+.subtitle{ color:var(--sub); margin-bottom:18px; }
 
 /* ===== AI GRADIENT ===== */
 .ai-stage{
@@ -49,7 +84,7 @@ h1{font-size:28px;margin:0 0 6px}
   content:"";
   position:absolute;
   inset:-20%;
-  filter:blur(90px) saturate(160%);
+  filter:blur(90px) saturate(160%) contrast(115%);
   opacity:0;
   background:
     radial-gradient(22rem 22rem at 30% 36%, #3A7BFF77 0, #0000 50%),
@@ -60,19 +95,18 @@ h1{font-size:28px;margin:0 0 6px}
   animation:meshBreath 2s ease-in-out infinite, meshDrift 3s ease-in-out infinite;
   transition:opacity .25s ease;
 }
-.ai-stage.show::before{opacity:.9}
-
+.ai-stage.show::before{ opacity:.9; }
 @keyframes meshBreath{
-  0%,100%{transform:scale(1)}
-  50%{transform:scale(1.05)}
+  0%,100%{ transform:scale(1); }
+  50%{ transform:scale(1.05); }
 }
 @keyframes meshDrift{
-  0%{transform:translate(0,0)}
-  50%{transform:translate(2%,-1.5%)}
-  100%{transform:translate(0,0)}
+  0%{ transform:translate(0,0); }
+  50%{ transform:translate(2%,-1.5%); }
+  100%{ transform:translate(0,0); }
 }
 
-/* ===== CARD ===== */
+/* ===== WORKOUT CARD ===== */
 .card{
   background:var(--card);
   border-radius:18px;
@@ -80,14 +114,12 @@ h1{font-size:28px;margin:0 0 6px}
   box-shadow:var(--shadow);
   display:none;
 }
-.card.show{display:block}
+.card.show{ display:block; }
 .card-title{
   font-size:18px;
   font-weight:700;
   margin-bottom:14px;
 }
-
-/* ===== LINES ===== */
 .line{
   font-size:16px;
   margin-bottom:10px;
@@ -110,12 +142,8 @@ h1{font-size:28px;margin:0 0 6px}
 .pill-cardio{background:#e0f2fe;color:#0284c7}
 .pill-fullbody{background:#ffe4e6;color:#e11d48}
 
-/* ===== BUTTONS ===== */
-button{
-  border:none;
-  border-radius:28px;
-  font-weight:600;
-}
+/* ===== FIXED BUTTONS ===== */
+button{ border:none; border-radius:28px; font-weight:600; }
 #generateBtn{
   position:fixed;
   bottom:70px;
@@ -127,7 +155,10 @@ button{
   background:var(--brand);
   color:white;
   font-size:18px;
+  box-shadow:0 15px 30px rgba(36,83,245,.35);
 }
+#generateBtn:active{ transform:translateX(-50%) scale(.97); }
+
 #exerciseBtn{
   position:fixed;
   bottom:16px;
@@ -141,6 +172,73 @@ button{
   font-size:15px;
 }
 
+/* ===== SLIDE TO COMPLETE ===== */
+.slide-wrap{
+  position:fixed;
+  bottom:70px;
+  left:50%;
+  transform:translateX(-50%);
+  width:calc(100% - 48px);
+  max-width:480px;
+  display:none;
+}
+.slide-track{
+  position:relative;
+  height:52px;
+  border-radius:999px;
+  background:#e5e7eb;
+  overflow:hidden;
+  user-select:none;
+  touch-action:none;
+  box-shadow:0 15px 30px rgba(15,23,42,.12);
+}
+.slide-track.filled{
+  background:linear-gradient(135deg,#2453f5,#4f8cff);
+}
+.slide-fill{
+  position:absolute;
+  inset:0;
+  border-radius:999px;
+  background:linear-gradient(120deg,#2453f5,#4f8cff);
+  transform:scaleX(0);
+  transform-origin:left;
+  transition:transform .18s ease-out;
+}
+.slide-label{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none;
+  font-size:16px;
+  font-weight:600;
+}
+.slide-label span{
+  color:#2453f5;
+  opacity:.9;
+}
+.slide-track.filled .slide-label span{ color:#fff; }
+.slide-knob{
+  position:absolute;
+  top:4px;
+  left:4px;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  background:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 8px 16px rgba(15,23,42,.18);
+  touch-action:none;
+  transition:transform .18s ease;
+}
+.slide-knob .arrow{
+  font-size:20px;
+  color:#2453f5;
+}
+
 /* ===== MODAL ===== */
 .modal{
   position:fixed;
@@ -148,7 +246,7 @@ button{
   background:rgba(0,0,0,.3);
   display:none;
 }
-.modal.show{display:block}
+.modal.show{ display:block; }
 .modal-content{
   position:absolute;
   bottom:0;
@@ -186,28 +284,38 @@ button{
 }
 .exercise input{
   flex:1;
-  padding:6px 8px;
+  padding:8px 10px;
+  border:1px solid #e5e7eb;
+  border-radius:10px;
+  font-size:14px;
 }
 .exercise button{
   background:#fee2e2;
   color:#b91c1c;
-  border-radius:8px;
-  padding:6px 10px;
+  border-radius:10px;
+  padding:8px 10px;
   font-size:12px;
 }
 
-/* ===== ADD ===== */
+/* ===== ADD ROW ===== */
 .add-row{
   margin-top:12px;
   display:flex;
   gap:8px;
 }
-.add-row input{flex:1;padding:6px}
+.add-row input{
+  flex:1;
+  padding:8px 10px;
+  border:1px solid #e5e7eb;
+  border-radius:10px;
+  font-size:14px;
+}
 .add-row button{
   background:#dcfce7;
   color:#166534;
-  border-radius:8px;
-  padding:6px 10px;
+  border-radius:10px;
+  padding:8px 12px;
+  font-size:13px;
 }
 </style>
 </head>
@@ -215,6 +323,18 @@ button{
 <body>
 
 <div class="container">
+
+  <!-- STREAKS -->
+  <div class="streak-row">
+    <div class="streak-fire">
+      <span>🔥</span>
+      <span id="streakCount" class="streak-count">0</span>
+    </div>
+    <div class="streak-bar">
+      <div id="streakBarFill" class="streak-bar-fill"></div>
+    </div>
+  </div>
+
   <h1>Welcome back Jy</h1>
   <div class="subtitle">Today’s mixed workout</div>
 
@@ -223,6 +343,15 @@ button{
 </div>
 
 <button id="generateBtn">Generate Workout</button>
+
+<div id="slideWrap" class="slide-wrap">
+  <div id="slideTrack" class="slide-track">
+    <div id="slideFill" class="slide-fill"></div>
+    <div class="slide-label"><span>Slide to Complete</span></div>
+    <div id="slideKnob" class="slide-knob"><span class="arrow">→</span></div>
+  </div>
+</div>
+
 <button id="exerciseBtn">Exercises</button>
 
 <!-- MODAL -->
@@ -232,144 +361,395 @@ button{
     <div id="exerciseList"></div>
     <div class="add-row">
       <input id="newName" placeholder="Exercise name"/>
-      <input id="newReps" placeholder="Rep range (e.g. 5–10)"/>
+      <input id="newReps" placeholder="Rep range (used for As Many Rounds As Possible)"/>
       <button id="addExercise">Add</button>
     </div>
   </div>
 </div>
 
 <script>
-/* ===== DEFAULT EXERCISES ===== */
-const DEFAULT = {
-  push:[{name:"Push-Ups",reps:"10–20"}],
-  pull:[{name:"Pull-Ups",reps:"5–10"}],
-  legs:[{name:"Jumping Squats",reps:"15–25"}],
-  abs:[{name:"Knee Raises",reps:"20–30"}],
-  cardio:[{name:"Burpees",reps:"10–20"}],
-  fullbody:[{name:"Kettlebell Swings",reps:"10–20"}]
+/* ===================== STORAGE KEYS ===================== */
+const LS = {
+  exercises: "jy_exercises_v1",
+  streak: "jy_streak",
+  weekKey: "jy_week_key",
+  weekWorkouts: "jy_week_workouts",
+  weekCounted: "jy_week_counted"
 };
 
-const KEYS = Object.keys(DEFAULT);
-let data = JSON.parse(localStorage.getItem("exercises")) || DEFAULT;
-localStorage.setItem("exercises", JSON.stringify(data));
-
-function shuffle(arr){
-  return arr.slice().sort(() => Math.random() - 0.5);
+/* ===================== WEEK HELPERS ===================== */
+function weekKey(){
+  const d = new Date();
+  const jan1 = new Date(d.getFullYear(),0,1);
+  const days = Math.floor((d - jan1) / 86400000);
+  const week = Math.ceil((days + d.getDay() + 1) / 7);
+  return `${d.getFullYear()}-W${week}`;
 }
 
-/* ===== GENERATE WORKOUT ===== */
-function generateWorkout(){
+/* ===================== STREAK STATE ===================== */
+let streak = parseInt(localStorage.getItem(LS.streak) || "0", 10);
+let storedWeekKey = localStorage.getItem(LS.weekKey);
+let weekWorkouts = parseInt(localStorage.getItem(LS.weekWorkouts) || "0", 10);
+let weekCounted = localStorage.getItem(LS.weekCounted) === "1";
+const thisWeek = weekKey();
+
+function rolloverWeekIfNeeded(){
+  if(storedWeekKey && storedWeekKey !== thisWeek){
+    // last week ended → streak survives only if >=3
+    if(weekWorkouts < 3) streak = 0;
+
+    // reset weekly counters for new week
+    weekWorkouts = 0;
+    weekCounted = false;
+  }
+
+  if(!storedWeekKey) storedWeekKey = thisWeek;
+  if(storedWeekKey !== thisWeek) storedWeekKey = thisWeek;
+
+  localStorage.setItem(LS.streak, String(streak));
+  localStorage.setItem(LS.weekKey, storedWeekKey);
+  localStorage.setItem(LS.weekWorkouts, String(weekWorkouts));
+  localStorage.setItem(LS.weekCounted, weekCounted ? "1" : "0");
+}
+
+function updateStreakUI(){
+  document.getElementById("streakCount").textContent = String(streak);
+  const pct = Math.min(weekWorkouts / 3, 1) * 100;
+  document.getElementById("streakBarFill").style.width = pct + "%";
+}
+
+/* call on boot */
+rolloverWeekIfNeeded();
+updateStreakUI();
+
+/* ===================== DEFAULT EXERCISES ===================== */
+const DEFAULT = {
+  push:     [{name:"Push-Ups", reps:"10–20"}, {name:"Dips", reps:"8–15"}, {name:"Diamond Push-Ups", reps:"8–15"}, {name:"Decline Push-Ups", reps:"10–20"}],
+  pull:     [{name:"Pull-Ups", reps:"5–10"}, {name:"Chin-Ups", reps:"5–10"}, {name:"Muscle-Up", reps:"1–3"}],
+  legs:     [{name:"Jumping Squats", reps:"15–25"}, {name:"Jumping Lunges", reps:"15–25"}],
+  abs:      [{name:"Knee Raises", reps:"15–30"}, {name:"Full Body Raises", reps:"10–20"}],
+  cardio:   [{name:"Jumping Jacks", reps:"20–50"}, {name:"Mountain Climbers", reps:"20–60"}],
+  fullbody: [{name:"Burpees", reps:"8–20"}, {name:"Kettlebell Swings", reps:"10–25"}]
+};
+
+const KEYS = ["push","pull","legs","abs","cardio","fullbody"];
+
+function loadExercises(){
+  const raw = localStorage.getItem(LS.exercises);
+  if(!raw){
+    localStorage.setItem(LS.exercises, JSON.stringify(DEFAULT));
+    return JSON.parse(JSON.stringify(DEFAULT));
+  }
+  try{
+    const obj = JSON.parse(raw);
+    // ensure all keys exist
+    KEYS.forEach(k => { if(!Array.isArray(obj[k])) obj[k] = []; });
+    return obj;
+  }catch{
+    localStorage.setItem(LS.exercises, JSON.stringify(DEFAULT));
+    return JSON.parse(JSON.stringify(DEFAULT));
+  }
+}
+function saveExercises(obj){
+  localStorage.setItem(LS.exercises, JSON.stringify(obj));
+}
+
+let data = loadExercises();
+
+/* ===================== UTILS ===================== */
+function rand(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function shuffle(arr){ return arr.slice().sort(() => Math.random() - 0.5); }
+
+/* ===================== WORKOUT STATE ===================== */
+let activeWorkout = null; // {type, items:[{cat, name, reps}]}
+
+/* ===================== RENDER WORKOUT ===================== */
+function renderWorkout(workout){
   const card = document.getElementById("workoutCard");
+  card.innerHTML = "";
+
+  const title = document.createElement("div");
+  title.className = "card-title";
+  title.textContent = workout.type === "amrap"
+    ? "As Many Rounds As Possible"
+    : "Metabolic Conditioning";
+  card.appendChild(title);
+
+  workout.items.forEach(it => {
+    const row = document.createElement("div");
+    row.className = "line";
+
+    const text = workout.type === "amrap"
+      ? `${it.reps || ""} ${it.name}`.trim()
+      : it.name;
+
+    row.appendChild(document.createTextNode(text));
+
+    const pill = document.createElement("span");
+    pill.className = `pill pill-${it.cat}`;
+    pill.textContent = it.cat;
+    row.appendChild(pill);
+
+    card.appendChild(row);
+  });
+
+  card.classList.add("show");
+  card.style.display = "block";
+}
+
+/* ===================== GENERATE WORKOUT ===================== */
+function buildWorkout(){
+  const isAMRAP = Math.random() < 0.6;
+
+  if(isAMRAP){
+    const cats = shuffle(KEYS).slice(0, Math.floor(Math.random()*3)+2); // 2–4
+    const items = cats.map(cat => {
+      const list = data[cat] || [];
+      const ex = list.length ? rand(list) : {name: cat, reps:""};
+      return {cat, name: ex.name, reps: ex.reps};
+    });
+    return {type:"amrap", items};
+  }else{
+    const cats = shuffle(KEYS); // ALL categories, shuffled order
+    const items = cats.map(cat => {
+      const list = data[cat] || [];
+      const ex = list.length ? rand(list) : {name: cat, reps:""};
+      return {cat, name: ex.name, reps: ex.reps};
+    });
+    return {type:"metcon", items};
+  }
+}
+
+function showGenerating(on){
   const ai = document.getElementById("aiStage");
+  if(on){
+    ai.style.display = "block";
+    ai.classList.add("show");
+  }else{
+    ai.classList.remove("show");
+    ai.style.display = "none";
+  }
+}
 
-  card.classList.remove("show");
-  card.style.display="none";
+function showGenerateButton(){
+  document.getElementById("generateBtn").style.display = "block";
+  document.getElementById("slideWrap").style.display = "none";
+}
+function showSlideToComplete(){
+  document.getElementById("generateBtn").style.display = "none";
+  document.getElementById("slideWrap").style.display = "block";
+  resetSlider();
+}
 
-  ai.style.display="block";
-  ai.classList.add("show");
+document.getElementById("generateBtn").addEventListener("click", ()=>{
+  // prevent generating if one is active (must complete first)
+  if(activeWorkout) return;
+
+  showGenerating(true);
 
   setTimeout(()=>{
-    ai.classList.remove("show");
-    ai.style.display="none";
+    showGenerating(false);
 
-    card.innerHTML="";
+    activeWorkout = buildWorkout();
+    renderWorkout(activeWorkout);
+    showSlideToComplete();
+  }, 900);
+});
 
-    const isAMRAP = Math.random() < 0.6;
-    card.innerHTML += `<div class="card-title">${
-      isAMRAP
-        ? "As Many Rounds As Possible"
-        : "Metabolic Conditioning"
-    }</div>`;
+/* ===================== COMPLETE WORKOUT (STREAK UPDATE) ===================== */
+function completeWorkout(){
+  if(!activeWorkout) return;
 
-    let keysToUse = isAMRAP
-      ? shuffle(KEYS).slice(0, Math.floor(Math.random()*3)+2)
-      : shuffle(KEYS);
+  // count this completion
+  rolloverWeekIfNeeded(); // ensure week is correct right now
+  weekWorkouts += 1;
 
-    keysToUse.forEach(k=>{
-      const list = data[k];
-      if(!list.length) return;
-      const ex = list[Math.floor(Math.random()*list.length)];
-      const label = isAMRAP
-        ? `${ex.reps} ${ex.name}`
-        : ex.name;
+  // clamp progress (UI only) but keep real count if you want; we'll cap at 3 for simplicity
+  if(weekWorkouts > 3) weekWorkouts = 3;
 
-      const line = document.createElement("div");
-      line.className="line";
-      line.textContent = label;
+  // if reached 3 and not yet counted this week -> +1 streak
+  if(weekWorkouts >= 3 && !weekCounted){
+    streak += 1;
+    weekCounted = true;
+  }
 
-      const pill = document.createElement("span");
-      pill.className = `pill pill-${k}`;
-      pill.textContent = k;
-      line.appendChild(pill);
+  localStorage.setItem(LS.streak, String(streak));
+  localStorage.setItem(LS.weekKey, thisWeek); // safe
+  localStorage.setItem(LS.weekWorkouts, String(weekWorkouts));
+  localStorage.setItem(LS.weekCounted, weekCounted ? "1" : "0");
 
-      card.appendChild(line);
-    });
+  updateStreakUI();
 
-    card.style.display="block";
-    card.classList.add("show");
-  },900);
+  // reset state to allow new generate
+  activeWorkout = null;
+  showGenerateButton();
+
+  // optional: small haptic
+  if(navigator.vibrate) navigator.vibrate(12);
 }
 
-/* ===== MODAL EDITOR ===== */
-let activeTab = KEYS[0];
+/* ===================== SLIDE TO COMPLETE LOGIC ===================== */
+const slideTrack = document.getElementById("slideTrack");
+const slideFill  = document.getElementById("slideFill");
+const slideKnob  = document.getElementById("slideKnob");
+
+let sliding=false, startX=0, currentX=0, maxSlide=0;
+
+function resetSlider(){
+  slideTrack.classList.remove("filled");
+  slideKnob.style.transition = "none";
+  slideFill.style.transition = "none";
+  slideKnob.style.transform = "translate(0,0)";
+  slideFill.style.transform = "scaleX(0)";
+
+  // calculate max travel
+  const trackRect = slideTrack.getBoundingClientRect();
+  const knobRect = slideKnob.getBoundingClientRect();
+  maxSlide = (trackRect.width - knobRect.width - 8);
+
+  setTimeout(()=>{
+    slideKnob.style.transition = "transform .2s ease-out";
+    slideFill.style.transition = "transform .2s ease-out";
+  }, 20);
+}
+
+slideKnob.addEventListener("pointerdown",(e)=>{
+  if(!activeWorkout) return;
+  e.preventDefault();
+  sliding=true;
+  slideKnob.setPointerCapture(e.pointerId);
+
+  const trackRect = slideTrack.getBoundingClientRect();
+  const knobRect = slideKnob.getBoundingClientRect();
+  maxSlide = (trackRect.width - knobRect.width - 8);
+
+  startX = e.clientX;
+  currentX = 0;
+
+  slideKnob.style.transition = "none";
+  slideFill.style.transition = "none";
+});
+
+slideKnob.addEventListener("pointermove",(e)=>{
+  if(!sliding) return;
+  const dx = e.clientX - startX;
+  const x = Math.max(0, Math.min(maxSlide, dx));
+  currentX = x;
+
+  const progress = maxSlide === 0 ? 0 : (x / maxSlide);
+  slideKnob.style.transform = `translate(${x}px,0)`;
+  slideFill.style.transform = `scaleX(${progress})`;
+});
+
+function endSlide(e){
+  if(!sliding) return;
+  sliding=false;
+
+  try{ slideKnob.releasePointerCapture(e.pointerId); }catch{}
+
+  slideKnob.style.transition = "transform .22s ease-out";
+  slideFill.style.transition = "transform .22s ease-out";
+
+  const progress = maxSlide === 0 ? 0 : (currentX / maxSlide);
+  if(progress > 0.92){
+    slideKnob.style.transform = `translate(${maxSlide}px,0)`;
+    slideFill.style.transform = `scaleX(1)`;
+    slideTrack.classList.add("filled");
+
+    setTimeout(()=> completeWorkout(), 120);
+  }else{
+    slideTrack.classList.remove("filled");
+    slideKnob.style.transform = "translate(0,0)";
+    slideFill.style.transform = "scaleX(0)";
+  }
+}
+slideKnob.addEventListener("pointerup", endSlide);
+slideKnob.addEventListener("pointercancel", endSlide);
+
+/* ===================== EXERCISE MODAL EDITOR ===================== */
 const modal = document.getElementById("modal");
-const tabs = document.getElementById("tabs");
-const list = document.getElementById("exerciseList");
+const tabsEl = document.getElementById("tabs");
+const listEl = document.getElementById("exerciseList");
+let activeTab = "push";
 
 function renderTabs(){
-  tabs.innerHTML="";
-  KEYS.forEach(k=>{
-    const t=document.createElement("div");
-    t.className="tab"+(k===activeTab?" active":"");
-    t.textContent=k;
-    t.onclick=()=>{activeTab=k;renderList()};
-    tabs.appendChild(t);
+  tabsEl.innerHTML = "";
+  KEYS.forEach(cat=>{
+    const t = document.createElement("div");
+    t.className = "tab" + (cat===activeTab ? " active" : "");
+    t.textContent = cat;
+    t.onclick = ()=>{ activeTab = cat; renderList(); };
+    tabsEl.appendChild(t);
   });
 }
 
 function renderList(){
+  data = loadExercises();
   renderTabs();
-  list.innerHTML="";
-  data[activeTab].forEach((e,i)=>{
-    const row=document.createElement("div");
-    row.className="exercise";
-    row.innerHTML=`
-      <input value="${e.name}" onchange="editEx('${activeTab}',${i},'name',this.value)">
-      <input value="${e.reps}" onchange="editEx('${activeTab}',${i},'reps',this.value)">
-      <button onclick="delEx('${activeTab}',${i})">✕</button>`;
-    list.appendChild(row);
+  listEl.innerHTML = "";
+
+  (data[activeTab] || []).forEach((ex, idx)=>{
+    const row = document.createElement("div");
+    row.className = "exercise";
+
+    const name = document.createElement("input");
+    name.value = ex.name || "";
+    name.placeholder = "Exercise name";
+    name.addEventListener("change", ()=>{
+      data[activeTab][idx].name = name.value;
+      saveExercises(data);
+    });
+
+    const reps = document.createElement("input");
+    reps.value = ex.reps || "";
+    reps.placeholder = "Rep range (AMRAP only)";
+    reps.addEventListener("change", ()=>{
+      data[activeTab][idx].reps = reps.value;
+      saveExercises(data);
+    });
+
+    const del = document.createElement("button");
+    del.textContent = "✕";
+    del.onclick = ()=>{
+      data[activeTab].splice(idx,1);
+      saveExercises(data);
+      renderList();
+    };
+
+    row.appendChild(name);
+    row.appendChild(reps);
+    row.appendChild(del);
+    listEl.appendChild(row);
   });
 }
 
-function editEx(cat,i,key,val){
-  data[cat][i][key]=val;
-  localStorage.setItem("exercises",JSON.stringify(data));
-}
-function delEx(cat,i){
-  data[cat].splice(i,1);
-  localStorage.setItem("exercises",JSON.stringify(data));
-  renderList();
-}
-
-document.getElementById("addExercise").onclick=()=>{
-  const n=document.getElementById("newName");
-  const r=document.getElementById("newReps");
-  if(!n.value) return;
-  data[activeTab].push({name:n.value,reps:r.value});
-  n.value=""; r.value="";
-  localStorage.setItem("exercises",JSON.stringify(data));
-  renderList();
-};
-
-/* ===== EVENTS ===== */
-document.getElementById("generateBtn").onclick=generateWorkout;
-document.getElementById("exerciseBtn").onclick=()=>{
+document.getElementById("exerciseBtn").addEventListener("click", ()=>{
   modal.classList.add("show");
   renderList();
-};
-modal.onclick=e=>{
-  if(e.target===modal) modal.classList.remove("show");
-};
+});
+modal.addEventListener("click", (e)=>{
+  if(e.target === modal) modal.classList.remove("show");
+});
+
+document.getElementById("addExercise").addEventListener("click", ()=>{
+  const n = document.getElementById("newName");
+  const r = document.getElementById("newReps");
+  const name = (n.value || "").trim();
+  const reps = (r.value || "").trim();
+  if(!name) return;
+
+  data = loadExercises();
+  data[activeTab] = data[activeTab] || [];
+  data[activeTab].push({name, reps});
+  saveExercises(data);
+
+  n.value = "";
+  r.value = "";
+  renderList();
+});
+
+/* ===================== BOOT ===================== */
+showGenerateButton(); // start with generate visible
 </script>
 
 </body>
