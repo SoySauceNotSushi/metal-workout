@@ -17,7 +17,7 @@
     --card:#ffffff;
     --shadow-soft:0 18px 48px rgba(15,23,42,0.12);
 
-    /* 8 unique tag colors (soft, like your earlier good set) */
+    /* 8 unique tag colors */
     --tag-purple-bg:#ede9fe; --tag-purple-ink:#6d28d9; /* upper */
     --tag-green-bg:#dcfce7;  --tag-green-ink:#16a34a;  /* pull */
     --tag-blue-bg:#e4ecff;   --tag-blue-ink:#2453f5;   /* push */
@@ -53,7 +53,7 @@
     flex-direction:column;
   }
 
-  /* TOP ROW: optional weather + streak */
+  /* TOP ROW */
   .top-row{
     display:flex;
     align-items:center;
@@ -93,7 +93,7 @@
     font-variant-numeric:tabular-nums;
   }
   .streak-bar{
-    width:100px; /* per your request */
+    width:100px;
     height:8px;
     border-radius:999px;
     background:var(--streak-bg);
@@ -111,7 +111,7 @@
 
   h1{
     margin:6px 0 6px;
-    font-size:36px;       /* back to sane */
+    font-size:36px;
     font-weight:800;
     letter-spacing:-0.02em;
   }
@@ -126,12 +126,12 @@
     position:relative;
     flex:1;
     display:flex;
-    align-items:flex-start; /* keep card higher */
+    align-items:flex-start;
     justify-content:center;
     padding-top:18px;
   }
 
-  /* BIG WEEKLY COUNT (engraved style) */
+  /* BIG WEEKLY COUNT */
   .weekly-center{
     position:absolute;
     inset:0;
@@ -175,7 +175,7 @@
     transform:translateY(18px) scale(.98);
     transition:opacity .28s ease, transform .28s cubic-bezier(.18,.84,.32,1.12);
     position:relative;
-    z-index:3; /* above mesh */
+    z-index:3;
   }
   .card.visible{
     opacity:1;
@@ -237,7 +237,21 @@
   .pill-fullbody{ background:var(--tag-red-bg); color:var(--tag-red-ink); }
   .pill-cardio{ background:var(--tag-yellow-bg); color:var(--tag-yellow-ink); }
 
-  /* MESH GRADIENT (only while generating) */
+  /* PLAN WORKOUT BUTTON (inside card) */
+  .plan-btn{
+    margin-top:14px;
+    width:100%;
+    background:none;
+    border:none;
+    color:var(--brand);
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    padding:6px 0;
+  }
+  .plan-btn.hidden{ display:none; }
+
+  /* MESH GRADIENT */
   .ai-stage{
     position:absolute;
     left:50%;
@@ -248,7 +262,7 @@
     border-radius:50%;
     pointer-events:none;
     display:none;
-    z-index:1; /* behind card */
+    z-index:1;
     overflow:visible;
   }
   .ai-stage::before{
@@ -277,11 +291,11 @@
     100%{ transform:translate3d(0,0,0); }
   }
 
-  /* ACTION BAR (fixed) */
+  /* ACTIONS */
   .actions{
     position:relative;
     padding:12px 0 18px;
-    z-index:10; /* always above mesh/confetti */
+    z-index:10;
   }
   .btn{
     width:100%;
@@ -289,11 +303,11 @@
     border:none;
     border-radius:999px;
     font-size:18px;
-    font-weight:500; /* back to normal */
+    font-weight:500;
     cursor:pointer;
     background:var(--brand);
     color:white;
-    box-shadow:none; /* remove shadow per your request */
+    box-shadow:none;
   }
   .btn.secondary{
     margin-top:12px;
@@ -302,7 +316,6 @@
     font-weight:500;
   }
   .btn:active{ transform:scale(.99); }
-
   .btn.hidden{ display:none; }
 
   /* SLIDER */
@@ -313,21 +326,20 @@
     background:#eef2f7;
     position:relative;
     overflow:hidden;
-    box-shadow:none; /* no shadow */
+    box-shadow:none;
     display:none;
   }
   .slide-wrap.show{ display:block; }
 
+  /* FIXED: use WIDTH not transform to avoid lag */
   .slide-fill{
     position:absolute;
     inset:0;
+    width:0%;
     background:linear-gradient(135deg,#2453f5,#4f8cff);
-    transform-origin:left center;
-    transform:scaleX(0);
-    transition:transform .12s linear;
+    transition:width .06s linear;
   }
 
-  /* Label trick: base grey text + white text clipped by fill */
   .slide-label{
     position:absolute;
     inset:0;
@@ -348,8 +360,8 @@
     align-items:center;
     justify-content:center;
     color:#fff;
-    clip-path:inset(0 100% 0 0); /* reveal from left */
-    transition:clip-path .12s linear;
+    clip-path:inset(0 100% 0 0);
+    transition:clip-path .06s linear;
   }
 
   .slide-knob{
@@ -373,15 +385,15 @@
     font-weight:500;
   }
 
-  /* CONFETTI CANVAS (behind buttons) */
+  /* CONFETTI */
   #confettiCanvas{
     position:fixed;
     inset:0;
     pointer-events:none;
-    z-index:6; /* below actions (10), above background */
+    z-index:6;
   }
 
-  /* MODAL (full screen height) */
+  /* MODAL BASE */
   .modal{
     position:fixed;
     inset:0;
@@ -394,7 +406,7 @@
     position:absolute;
     inset:0;
     background:#fff;
-    border-radius:0; /* full screen */
+    border-radius:0;
     display:flex;
     flex-direction:column;
   }
@@ -417,6 +429,7 @@
     height:38px;
     padding:0 14px;
     font-weight:700;
+    cursor:pointer;
   }
   .tabs{
     display:flex;
@@ -434,16 +447,15 @@
     border-radius:999px;
     font-weight:800;
     white-space:nowrap;
+    cursor:pointer;
   }
   .tab.active{
     background:#e4ecff;
     color:var(--brand);
   }
-
-  /* content scroll area (fixed height because modal is full screen) */
   .modal-body{
     padding:14px 18px 18px;
-    overflow:auto; /* scroll only inside modal */
+    overflow:auto;
     flex:1;
   }
 
@@ -454,20 +466,21 @@
     margin-bottom:14px;
   }
   .input{
-    height:48px; /* bigger */
+    height:48px;
     border-radius:12px;
     border:1px solid rgba(15,23,42,0.12);
     padding:0 14px;
     font-size:16px;
   }
   .add-btn{
-    height:48px; /* bigger */
+    height:48px;
     border-radius:12px;
     border:none;
     background:var(--brand);
     color:#fff;
     font-weight:800;
     font-size:16px;
+    cursor:pointer;
   }
 
   .list{
@@ -509,6 +522,28 @@
     color:#dc2626;
     font-weight:900;
     font-size:18px;
+    cursor:pointer;
+  }
+
+  /* PLAN MODAL LAYOUT */
+  .plan-list{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .plan-row{
+    display:grid;
+    grid-template-columns: 86px 1fr;
+    gap:12px;
+    align-items:center;
+  }
+  .plan-name{
+    font-size:16px;
+    font-weight:600;
+    color:var(--ink);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
   }
 </style>
 </head>
@@ -531,10 +566,8 @@
   <div class="subtitle">Today's mixed workout</div>
 
   <div class="center">
-    <!-- mesh -->
     <div class="ai-stage" id="aiStage"></div>
 
-    <!-- weekly count center -->
     <div class="weekly-center" id="weeklyCenter">
       <div class="weekly-count">
         <div class="num" id="weekNum">0</div>
@@ -542,16 +575,17 @@
       </div>
     </div>
 
-    <!-- card -->
     <div class="card hidden" id="card">
       <div class="card-title" id="cardTitle"></div>
       <div id="cardRows"></div>
+
+      <!-- NEW: Plan Workout -->
+      <button class="plan-btn hidden" id="planWorkoutBtn">Plan Workout</button>
     </div>
   </div>
 
   <div class="actions">
     <button class="btn" id="generateBtn">Generate Workout</button>
-
     <button class="btn secondary" id="exerciseBtn">Exercises</button>
 
     <div class="slide-wrap" id="slideWrap" aria-label="Slide to Complete">
@@ -566,7 +600,7 @@
 
 </div>
 
-<!-- MODAL -->
+<!-- LIBRARY MODAL -->
 <div class="modal" id="modal">
   <div class="modal-sheet">
     <div class="modal-head">
@@ -590,13 +624,26 @@
   </div>
 </div>
 
+<!-- NEW: PLAN MODAL (ephemeral) -->
+<div class="modal" id="planModal">
+  <div class="modal-sheet">
+    <div class="modal-head">
+      <div class="modal-title">Plan Workout</div>
+      <button class="modal-close" id="closePlanModal">Save</button>
+    </div>
+    <div class="modal-body">
+      <div class="plan-list" id="planBody"></div>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <script>
 /* =========================================================
    CONFIG
 ========================================================= */
 
-const SHOW_WEATHER = true; // set false if you want it gone
+const SHOW_WEATHER = true;
 
 const TAGS = [
   { key:"upper",     label:"upper",     pill:"pill-upper" },
@@ -610,50 +657,22 @@ const TAGS = [
 ];
 
 const DEFAULT_LIBRARY = {
-  upper: [
-    { name:"Muscle-Up", reps:"1" }
-  ],
-  pull: [
-    { name:"Pull-Ups", reps:"5" },
-    { name:"Chin-Ups", reps:"5" },
-    { name:"Australian Chin-Ups", reps:"10" }
-  ],
-  push: [
-    { name:"Push-Ups", reps:"10" },
-    { name:"Dips", reps:"10" },
-    { name:"Decline Push-Ups", reps:"10" },
-    { name:"Diamond Push-Ups", reps:"10" }
-  ],
-  shoulders: [
-    { name:"Dolphin Push-Ups", reps:"10" },
-    { name:"Pike Push-Ups", reps:"10" }
-  ],
-  legs: [
-    { name:"Jumping Squats", reps:"15" },
-    { name:"Jumping Lunges", reps:"15" }
-  ],
-  abs: [
-    { name:"Knee Raises", reps:"20" },
-    { name:"Full Body Raises", reps:"20" },
-    { name:"Oblique Twists", reps:"10" }
-  ],
-  fullbody: [
-    { name:"Burpees", reps:"10" },
-    { name:"Kettlebell Swings", reps:"10" }
-  ],
-  cardio: [
-    { name:"Jumping Jacks", reps:"20" },
-    { name:"Mountain Climbers", reps:"20" }
-  ],
+  upper: [ { name:"Muscle-Up", reps:"1" } ],
+  pull:  [ { name:"Pull-Ups", reps:"5" }, { name:"Chin-Ups", reps:"5" }, { name:"Australian Chin-Ups", reps:"10" } ],
+  push:  [ { name:"Push-Ups", reps:"10" }, { name:"Dips", reps:"10" }, { name:"Decline Push-Ups", reps:"10" }, { name:"Diamond Push-Ups", reps:"10" } ],
+  shoulders:[ { name:"Dolphin Push-Ups", reps:"10" }, { name:"Pike Push-Ups", reps:"10" } ],
+  legs:  [ { name:"Jumping Squats", reps:"15" }, { name:"Jumping Lunges", reps:"15" } ],
+  abs:   [ { name:"Knee Raises", reps:"20" }, { name:"Full Body Raises", reps:"20" }, { name:"Oblique Twists", reps:"10" } ],
+  fullbody:[ { name:"Burpees", reps:"10" }, { name:"Kettlebell Swings", reps:"10" } ],
+  cardio:[ { name:"Jumping Jacks", reps:"20" }, { name:"Mountain Climbers", reps:"20" } ],
 };
 
-/* Storage keys */
 const LS = {
   library: "jy_library_v1",
   streak: "jy_streak_v1",
   weekKey: "jy_weekKey_v1",
-  weekCount: "jy_weekCount_v1",     // number of completed workouts this week
-  weekCounted: "jy_week_counted_v1" // whether streak increment already applied this week
+  weekCount: "jy_weekCount_v1",
+  weekCounted: "jy_week_counted_v1"
 };
 
 /* =========================================================
@@ -664,7 +683,6 @@ const rand = arr => arr[Math.floor(Math.random()*arr.length)];
 const clamp = (n,min,max)=>Math.max(min,Math.min(max,n));
 
 function isoWeekKey(d=new Date()){
-  // ISO-ish week key: YYYY-Wxx (good enough for weekly reset)
   const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
   const dayNum = date.getUTCDay() || 7;
   date.setUTCDate(date.getUTCDate() + 4 - dayNum);
@@ -696,12 +714,10 @@ function ensureWeekState(){
   }
 
   if(storedWeek !== current){
-    // week rolled over: if last week < 3 -> lose streak
     const lastCount = parseInt(localStorage.getItem(LS.weekCount)||"0",10);
     if(lastCount < 3){
       localStorage.setItem(LS.streak, "0");
     }
-    // reset for new week
     localStorage.setItem(LS.weekKey, current);
     localStorage.setItem(LS.weekCount, "0");
     localStorage.setItem(LS.weekCounted, "0");
@@ -722,6 +738,7 @@ const weekLabelEl  = qs("#weekLabel");
 const card      = qs("#card");
 const cardTitle = qs("#cardTitle");
 const cardRows  = qs("#cardRows");
+const planWorkoutBtn = qs("#planWorkoutBtn");
 
 const aiStage   = qs("#aiStage");
 
@@ -741,6 +758,11 @@ const addName   = qs("#addName");
 const addReps   = qs("#addReps");
 const addBtn    = qs("#addBtn");
 
+/* Plan modal */
+const planModal = qs("#planModal");
+const planBody  = qs("#planBody");
+const closePlanModal = qs("#closePlanModal");
+
 /* Confetti */
 const confettiCanvas = qs("#confettiCanvas");
 const confettiInstance = window.confetti
@@ -756,7 +778,8 @@ if(!library){
   saveJSON(LS.library, library);
 }
 
-let currentWorkout = null; // {type, rows: [{text, tags:[...]}]}
+let currentWorkout = null; // {type, rows:[{text,tags:[...]}]}
+let plannedReps = {};      // ephemeral per METACON only
 
 /* =========================================================
    WEATHER (optional)
@@ -785,14 +808,9 @@ function getWeatherEmoji(cond){
   return "🌡️";
 }
 async function updateWeather(){
-  if(!SHOW_WEATHER){
-    weatherEl.textContent="";
-    return;
-  }
-  if(!navigator.geolocation){
-    weatherEl.textContent="";
-    return;
-  }
+  if(!SHOW_WEATHER){ weatherEl.textContent=""; return; }
+  if(!navigator.geolocation){ weatherEl.textContent=""; return; }
+
   weatherEl.textContent="Loading…";
   navigator.geolocation.getCurrentPosition(async pos=>{
     const lat=pos.coords.latitude;
@@ -804,6 +822,7 @@ async function updateWeather(){
       const temp=Math.round(data.current_weather.temperature);
       const cond=weatherCodeToText(data.current_weather.weathercode);
       const emoji=getWeatherEmoji(cond);
+
       let city="Your area";
       try{
         const rev=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
@@ -822,24 +841,12 @@ async function updateWeather(){
 /* =========================================================
    STREAK + WEEK COUNT UI
 ========================================================= */
-function getStreak(){
-  return parseInt(localStorage.getItem(LS.streak)||"0",10);
-}
-function setStreak(n){
-  localStorage.setItem(LS.streak, String(Math.max(0, n|0)));
-}
-function getWeekCount(){
-  return parseInt(localStorage.getItem(LS.weekCount)||"0",10);
-}
-function setWeekCount(n){
-  localStorage.setItem(LS.weekCount, String(Math.max(0, n|0)));
-}
-function getWeekCounted(){
-  return localStorage.getItem(LS.weekCounted)==="1";
-}
-function setWeekCounted(v){
-  localStorage.setItem(LS.weekCounted, v ? "1" : "0");
-}
+function getStreak(){ return parseInt(localStorage.getItem(LS.streak)||"0",10); }
+function setStreak(n){ localStorage.setItem(LS.streak, String(Math.max(0, n|0))); }
+function getWeekCount(){ return parseInt(localStorage.getItem(LS.weekCount)||"0",10); }
+function setWeekCount(n){ localStorage.setItem(LS.weekCount, String(Math.max(0, n|0))); }
+function getWeekCounted(){ return localStorage.getItem(LS.weekCounted)==="1"; }
+function setWeekCounted(v){ localStorage.setItem(LS.weekCounted, v ? "1" : "0"); }
 
 function renderStreakUI(){
   const streak = getStreak();
@@ -848,7 +855,6 @@ function renderStreakUI(){
   const pct = clamp(done/3, 0, 1);
   streakFill.style.transform = `scaleX(${pct})`;
 
-  // weekly center
   weekNumEl.textContent = String(done);
   weekLabelEl.textContent = (done===1) ? "workout completed this week" : "workouts completed this week";
 }
@@ -856,7 +862,6 @@ function renderStreakUI(){
 /* =========================================================
    WORKOUT GENERATION
 ========================================================= */
-
 function pillForTag(tagKey){
   const t = TAGS.find(t=>t.key===tagKey);
   return t ? t.pill : "";
@@ -864,13 +869,10 @@ function pillForTag(tagKey){
 
 function pickExercise(tagKey){
   const arr = library[tagKey] || [];
-  if(!arr.length){
-    return { name:"(Add an exercise)", reps:"" };
-  }
+  if(!arr.length) return { name:"(Add an exercise)", reps:"" };
   return rand(arr);
 }
 
-/* AMRAP: 3-4 items; weights: pull 80%, push 80%, others 50% (upper/shoulders also 50%) */
 function generateAMRAP(){
   const candidates = [
     { tag:"pull",      p:0.80 },
@@ -883,15 +885,11 @@ function generateAMRAP(){
     { tag:"cardio",    p:0.50 },
   ];
 
-  // roll candidates into a pool
   let pool = [];
   for(const c of candidates){
     if(Math.random() < c.p) pool.push(c.tag);
   }
-
-  // ensure we have enough variety
   if(pool.length < 3){
-    // force add until >=3
     const order = ["pull","push","fullbody","legs","cardio","abs","shoulders","upper"];
     for(const t of order){
       if(!pool.includes(t)) pool.push(t);
@@ -899,11 +897,9 @@ function generateAMRAP(){
     }
   }
 
-  // limit to 3-4 unique tags
   pool = [...new Set(pool)];
-  // shuffle
   pool.sort(()=>Math.random()-0.5);
-  const count = (Math.random() < 0.55) ? 3 : 4; // mostly 3, sometimes 4
+  const count = (Math.random() < 0.55) ? 3 : 4;
   const chosen = pool.slice(0,count);
 
   const rows = chosen.map(tag=>{
@@ -916,7 +912,6 @@ function generateAMRAP(){
   return { type:"As Many Rounds As Possible", rows };
 }
 
-/* Metacon: all 8 categories, shuffled, no reps in text */
 function generateMETACON(){
   const tags = ["pull","push","upper","shoulders","legs","abs","fullbody","cardio"];
   const shuffled = tags.slice().sort(()=>Math.random()-0.5);
@@ -927,6 +922,14 @@ function generateMETACON(){
   });
 
   return { type:"Metabolic Conditioning", rows };
+}
+
+function showPlanButton(workout){
+  if(workout && workout.type === "Metabolic Conditioning"){
+    planWorkoutBtn.classList.remove("hidden");
+  }else{
+    planWorkoutBtn.classList.add("hidden");
+  }
 }
 
 function renderWorkout(workout){
@@ -943,6 +946,7 @@ function renderWorkout(workout){
     const txt = document.createElement("div");
     txt.className = "row-text";
     txt.textContent = r.text;
+    txt.dataset.base = r.text; // IMPORTANT: keep base text (used for Plan Workout)
 
     left.appendChild(txt);
 
@@ -962,6 +966,9 @@ function renderWorkout(workout){
 
   card.classList.remove("hidden");
   requestAnimationFrame(()=> card.classList.add("visible"));
+
+  // show/hide Plan Workout
+  showPlanButton(workout);
 }
 
 /* =========================================================
@@ -972,24 +979,24 @@ function showWeeklyCenter(){
   card.classList.remove("visible");
   setTimeout(()=> card.classList.add("hidden"), 160);
 
-  // buttons visible
   generateBtn.classList.remove("hidden");
   exerciseBtn.classList.remove("hidden");
   slideWrap.classList.remove("show");
 
   currentWorkout = null;
+  plannedReps = {};
+  showPlanButton(null);
 }
 
 function showWorkoutState(workout){
   weeklyCenter.classList.add("hidden");
-
   renderWorkout(workout);
 
-  // swap buttons: hide Generate + Exercises; show slider
   generateBtn.classList.add("hidden");
   exerciseBtn.classList.add("hidden");
   slideWrap.classList.add("show");
 
+  plannedReps = {}; // reset each time you generate a new workout
   resetSlider();
 }
 
@@ -1008,19 +1015,68 @@ function showMesh(on){
 
 generateBtn.addEventListener("click", ()=>{
   showMesh(true);
-
-  // small delay like your original "AI generating"
   setTimeout(()=>{
-    const workout = (Math.random() < 0.55) ? generateAMRAP() : generateMETACON(); // AMRAP slightly more frequent
+    const workout = (Math.random() < 0.55) ? generateAMRAP() : generateMETACON();
     currentWorkout = workout;
-
     showMesh(false);
     showWorkoutState(workout);
   }, 850);
 });
 
 /* =========================================================
-   SLIDER (with white text under fill)
+   PLAN WORKOUT (METACON ONLY, EPHEMERAL)
+========================================================= */
+planWorkoutBtn.addEventListener("click", ()=>{
+  if(!currentWorkout || currentWorkout.type !== "Metabolic Conditioning") return;
+
+  planBody.innerHTML = "";
+
+  currentWorkout.rows.forEach(r=>{
+    const base = r.text; // METACON base name
+
+    const wrap = document.createElement("div");
+    wrap.className = "plan-row";
+
+    const reps = document.createElement("input");
+    reps.className = "input";
+    reps.placeholder = "Reps";
+    reps.inputMode = "numeric";
+    reps.value = plannedReps[base] || "";
+    reps.addEventListener("input", ()=>{
+      plannedReps[base] = reps.value;
+    });
+
+    const name = document.createElement("div");
+    name.className = "plan-name";
+    name.textContent = base;
+
+    wrap.appendChild(reps);
+    wrap.appendChild(name);
+    planBody.appendChild(wrap);
+  });
+
+  planModal.classList.add("show");
+});
+
+// Save (apply to UI only, NOT persisted)
+closePlanModal.addEventListener("click", ()=>{
+  planModal.classList.remove("show");
+
+  // update the visible card text
+  [...cardRows.querySelectorAll(".row-text")].forEach(el=>{
+    const base = el.dataset.base || el.textContent;
+    const r = (plannedReps[base] || "").trim();
+    el.textContent = r ? `${r} ${base}` : base;
+  });
+});
+
+// Tap outside to close (no save changes)
+planModal.addEventListener("click",(e)=>{
+  if(e.target === planModal) planModal.classList.remove("show");
+});
+
+/* =========================================================
+   SLIDER (FIXED)
 ========================================================= */
 let sliding=false;
 let startX=0;
@@ -1032,10 +1088,10 @@ let trackWidth=0;
 function resetSlider(){
   const rect = slideWrap.getBoundingClientRect();
   trackWidth = rect.width || 1;
-  maxSlide = trackWidth - knobWidth - 14; // left 7 + right 7
+  maxSlide = trackWidth - knobWidth - 14;
   currentX = 0;
 
-  slideFill.style.transform = "scaleX(0)";
+  slideFill.style.width = "0%";
   slideKnob.style.transform = "translate(0,-50%)";
   slideWhite.style.clipPath = "inset(0 100% 0 0)";
 }
@@ -1043,14 +1099,12 @@ function resetSlider(){
 function setSliderProgress(px){
   const x = clamp(px, 0, maxSlide);
   currentX = x;
-  const progress = (maxSlide===0) ? 0 : (x/maxSlide);
 
+  const progress = maxSlide ? (x / maxSlide) : 0;
   slideKnob.style.transform = `translate(${x}px,-50%)`;
-  slideFill.style.transform = `scaleX(${progress})`;
 
-  // Reveal white label from left as fill grows
-  const rightInset = Math.round((1-progress)*100);
-  slideWhite.style.clipPath = `inset(0 ${rightInset}% 0 0)`;
+  slideFill.style.width = `${progress * 100}%`;
+  slideWhite.style.clipPath = `inset(0 ${100 - progress*100}% 0 0)`;
 }
 
 slideKnob.addEventListener("pointerdown", (e)=>{
@@ -1071,13 +1125,12 @@ function finishSlide(e){
   sliding=false;
   try{ slideKnob.releasePointerCapture(e.pointerId); }catch{}
 
-  const progress = (maxSlide===0) ? 0 : (currentX/maxSlide);
+  const progress = maxSlide ? (currentX/maxSlide) : 0;
 
   if(progress > 0.92){
     setSliderProgress(maxSlide);
     completeWorkout();
   }else{
-    // snap back
     setSliderProgress(0);
   }
 }
@@ -1089,8 +1142,6 @@ slideKnob.addEventListener("pointercancel", finishSlide);
 ========================================================= */
 function shootConfettiFromUnderButtons(){
   if(!confettiInstance) return;
-
-  // origin near bottom-center, slightly ABOVE the bottom edge, and BEHIND buttons (canvas z-index is below actions)
   confettiInstance({
     particleCount:160,
     spread:90,
@@ -1100,26 +1151,20 @@ function shootConfettiFromUnderButtons(){
 }
 
 function completeWorkout(){
-  // update week count
   ensureWeekState();
   let count = getWeekCount();
   count += 1;
   setWeekCount(count);
 
-  // streak logic: when reaching 3, increment streak ONCE
   if(count >= 3 && !getWeekCounted()){
     setStreak(getStreak()+1);
     setWeekCounted(true);
   }
 
   renderStreakUI();
-
   shootConfettiFromUnderButtons();
-
-  // haptic
   if(navigator.vibrate) navigator.vibrate(18);
 
-  // hide workout and show weekly center again
   showWeeklyCenter();
 }
 
@@ -1136,7 +1181,6 @@ function openModal(){
 }
 function closeModalFn(){
   modal.classList.remove("show");
-  // save
   saveJSON(LS.library, library);
 }
 exerciseBtn.addEventListener("click", openModal);
@@ -1220,10 +1264,7 @@ addBtn.addEventListener("click", ()=>{
 function init(){
   ensureWeekState();
   renderStreakUI();
-
-  // show weekly count screen initially
   showWeeklyCenter();
-
   updateWeather();
 }
 init();
