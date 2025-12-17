@@ -559,7 +559,7 @@
 <div class="container">
 
   <div class="top-row">
-    <div class="weather" id="weather"> </div>
+
 
     <div class="streak-wrap">
       <div class="streak-fire"><span>🔥</span><span id="streakCount" class="streak-count">0</span></div>
@@ -645,7 +645,6 @@
    CONFIG
 ========================================================= */
 
-const SHOW_WEATHER = true;
 
 const TAGS = [
   { key:"upper",     label:"upper",     pill:"pill-upper" },
@@ -729,7 +728,6 @@ function ensureWeekState(){
 /* =========================================================
    DOM
 ========================================================= */
-const weatherEl   = qs("#weather");
 const streakCount = qs("#streakCount");
 const streakFill  = qs("#streakFill");
 
@@ -783,62 +781,6 @@ if(!library){
 let currentWorkout = null; // {type, rows:[{text,tags:[...]}]}
 let plannedReps = {};      // ephemeral per METACON only
 
-/* =========================================================
-   WEATHER (optional)
-========================================================= */
-function weatherCodeToText(code){
-  const map={
-    0:"Clear sky",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",
-    45:"Fog",48:"Fog",
-    51:"Drizzle",53:"Drizzle",55:"Drizzle",
-    61:"Rain",63:"Rain",65:"Rain",
-    71:"Snow",73:"Snow",75:"Snow",
-    80:"Rain shower",81:"Rain shower",82:"Rain shower",
-    95:"Thunderstorm",96:"Thunderstorm",99:"Thunderstorm"
-  };
-  return map[code] || "Weather";
-}
-function getWeatherEmoji(cond){
-  const c=cond.toLowerCase();
-  if(c.includes("clear")) return "☀️";
-  if(c.includes("cloud")) return "⛅";
-  if(c.includes("rain")) return "🌧️";
-  if(c.includes("drizzle")) return "🌦️";
-  if(c.includes("thunder")) return "🌩️";
-  if(c.includes("snow")) return "❄️";
-  if(c.includes("fog")||c.includes("mist")) return "🌫️";
-  return "🌡️";
-}
-async function updateWeather(){
-  if(!SHOW_WEATHER){ weatherEl.textContent=""; return; }
-  if(!navigator.geolocation){ weatherEl.textContent=""; return; }
-
-  weatherEl.textContent="Loading…";
-  navigator.geolocation.getCurrentPosition(async pos=>{
-    const lat=pos.coords.latitude;
-    const lon=pos.coords.longitude;
-    try{
-      const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`;
-      const res=await fetch(url);
-      const data=await res.json();
-      const temp=Math.round(data.current_weather.temperature);
-      const cond=weatherCodeToText(data.current_weather.weathercode);
-      const emoji=getWeatherEmoji(cond);
-
-      let city="Your area";
-      try{
-        const rev=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
-        const r=await rev.json();
-        city=r.address.city||r.address.town||r.address.village||r.address.county||city;
-      }catch{}
-      weatherEl.textContent=`${emoji} ${temp}°C ${city}`;
-    }catch{
-      weatherEl.textContent="";
-    }
-  },()=>{
-    weatherEl.textContent="";
-  },{timeout:8000,maximumAge:600000});
-}
 
 /* =========================================================
    STREAK + WEEK COUNT UI
