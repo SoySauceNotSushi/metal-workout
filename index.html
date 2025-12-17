@@ -1,94 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Jy Workout</title>
 
 <style>
+/* ===== BASE ===== */
 :root{
   --brand:#2453f5;
   --ink:#0f172a;
   --sub:#64748b;
   --bg:#f7f8f9;
   --card:#ffffff;
-
-  --pill-push:#e4ecff;
-  --pill-pull:#dcfce7;
-  --pill-legs:#fff7ed;
-  --pill-shoulders:#ede9fe;
-  --pill-abs:#d1fae5;
-  --pill-fullbody:#ffe4e6;
-  --pill-cardio:#e0f2fe;
-
   --shadow:0 12px 32px rgba(15,23,42,.15);
 }
 
-*{ box-sizing:border-box; }
-
+*{box-sizing:border-box}
 body{
   margin:0;
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro",Segoe UI,Roboto,sans-serif;
   background:var(--bg);
   color:var(--ink);
 }
-
 .container{
   max-width:480px;
   margin:0 auto;
   padding:24px;
-  padding-bottom:120px;
+  padding-bottom:140px;
 }
 
-h1{
-  font-size:28px;
-  margin-bottom:6px;
-}
-
-.subtitle{
-  color:var(--sub);
-  margin-bottom:18px;
-  font-size:16px;
-}
-
-/* ===== AI GRADIENT ===== */
-.ai-stage{
-  position:absolute;
-  left:50%;
-  top:260px;
-  transform:translateX(-50%);
-  width:260px;
-  height:260px;
-  border-radius:50%;
-  pointer-events:none;
-  display:none;
-}
-.ai-stage::before{
-  content:"";
-  position:absolute;
-  inset:-20%;
-  filter:blur(90px) saturate(160%);
-  opacity:0;
-  background:
-    radial-gradient(22rem 22rem at 30% 36%, #3A7BFF77 0, #0000 50%),
-    radial-gradient(22rem 22rem at 72% 34%, #7DFF5C77 0, #0000 54%),
-    radial-gradient(24rem 20rem at 40% 72%, #FFA43A77 0, #0000 54%),
-    radial-gradient(20rem 20rem at 70% 74%, #9B8FFF99 0, #0000 80%);
-  background-blend-mode:screen;
-  animation:meshBreath 2s ease-in-out infinite, meshDrift 3s ease-in-out infinite;
-  transition:opacity .25s ease;
-}
-.ai-stage.show::before{ opacity:.9; }
-
-@keyframes meshBreath{
-  0%,100%{ transform:scale(1); }
-  50%{ transform:scale(1.05); }
-}
-@keyframes meshDrift{
-  0%{ transform:translate(0,0); }
-  50%{ transform:translate(2%,-1.5%); }
-  100%{ transform:translate(0,0); }
-}
+/* ===== HEADER ===== */
+h1{font-size:28px;margin:0 0 6px}
+.subtitle{color:var(--sub);margin-bottom:20px}
 
 /* ===== CARD ===== */
 .card{
@@ -97,63 +41,102 @@ h1{
   padding:20px;
   box-shadow:var(--shadow);
   display:none;
-  opacity:0;
-  transform:translateY(12px);
-  transition:.25s ease;
 }
-.card.show{
-  display:block;
-  opacity:1;
-  transform:translateY(0);
-}
+.card.show{display:block}
+.card-title{font-weight:700;margin-bottom:14px}
 
-.card-title{
-  font-size:18px;
-  font-weight:700;
-  margin-bottom:14px;
-}
+/* ===== LINES ===== */
+.line{margin-bottom:10px;font-size:16px}
 
-.line{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  margin-bottom:12px;
+/* ===== BUTTONS ===== */
+button{
+  border:none;
+  border-radius:28px;
   font-size:16px;
-}
-
-.pill{
-  padding:4px 10px;
-  border-radius:999px;
-  font-size:12px;
   font-weight:600;
 }
-
-.pill-push{ background:var(--pill-push); color:#2453f5; }
-.pill-pull{ background:var(--pill-pull); color:#16a34a; }
-.pill-legs{ background:var(--pill-legs); color:#ea580c; }
-.pill-shoulders{ background:var(--pill-shoulders); color:#7c3aed; }
-.pill-abs{ background:var(--pill-abs); color:#059669; }
-.pill-fullbody{ background:var(--pill-fullbody); color:#e11d48; }
-.pill-cardio{ background:var(--pill-cardio); color:#0284c7; }
-
 #generateBtn{
   position:fixed;
-  bottom:24px;
+  bottom:72px;
   left:50%;
   transform:translateX(-50%);
   width:calc(100% - 48px);
   max-width:480px;
-  height:56px;
-  border:none;
-  border-radius:28px;
+  height:52px;
   background:var(--brand);
   color:white;
-  font-size:18px;
-  font-weight:600;
-  box-shadow:0 15px 30px rgba(36,83,245,.35);
 }
-#generateBtn:active{
-  transform:translateX(-50%) scale(.97);
+#exerciseBtn{
+  position:fixed;
+  bottom:16px;
+  left:50%;
+  transform:translateX(-50%);
+  width:calc(100% - 48px);
+  max-width:480px;
+  height:44px;
+  background:#e5e7eb;
+  color:#111827;
+}
+
+/* ===== MODAL ===== */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.3);
+  display:none;
+}
+.modal.show{display:block}
+.modal-content{
+  position:absolute;
+  bottom:0;
+  width:100%;
+  max-height:80%;
+  background:white;
+  border-radius:18px 18px 0 0;
+  padding:16px;
+  overflow:auto;
+}
+
+/* ===== TABS ===== */
+.tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.tab{
+  padding:6px 12px;
+  border-radius:999px;
+  background:#f1f5f9;
+  font-size:14px;
+}
+.tab.active{background:#e0e7ff;color:#1d4ed8}
+
+/* ===== EXERCISE ROW ===== */
+.exercise{
+  display:flex;
+  gap:8px;
+  margin-bottom:8px;
+}
+.exercise input{
+  flex:1;
+  padding:6px 8px;
+}
+.exercise button{
+  background:#fee2e2;
+  color:#b91c1c;
+  border-radius:8px;
+  padding:6px 10px;
+  font-size:12px;
+}
+
+/* ===== ADD ===== */
+.add-row{
+  margin-top:12px;
+  display:flex;
+  gap:8px;
+}
+.add-row input{flex:1;padding:6px}
+.add-row button{
+  background:#dcfce7;
+  color:#166534;
+  border-radius:8px;
+  padding:6px 10px;
 }
 </style>
 </head>
@@ -163,97 +146,120 @@ h1{
 <div class="container">
   <h1>Welcome back Jy</h1>
   <div class="subtitle">Today’s mixed workout</div>
-
-  <div id="aiStage" class="ai-stage"></div>
   <div id="workoutCard" class="card"></div>
 </div>
 
 <button id="generateBtn">Generate Workout</button>
+<button id="exerciseBtn">Exercises</button>
+
+<!-- MODAL -->
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <div class="tabs" id="tabs"></div>
+    <div id="exerciseList"></div>
+    <div class="add-row">
+      <input id="newName" placeholder="Exercise name"/>
+      <input id="newReps" placeholder="Rep range (e.g. 5–10)"/>
+      <button id="addExercise">Add</button>
+    </div>
+  </div>
+</div>
 
 <script>
-/* ===== MOVEMENT GROUPS ===== */
-const GROUPS = [
-  { weight:3, variants:["5 Pull-Ups","5 Chin-Ups"], tags:["pull"] },
-  { weight:3, variants:["10 Push-Ups","10 Dips","10 Decline Push-Ups","10 Diamond Push-Ups"], tags:["push"] },
-  { weight:2, variants:["1 Rep Muscle-Up"], tags:["push","pull"] },
-  { weight:1, variants:["10 Dolphin Push-Ups","10 Pike Push-Ups"], tags:["shoulders"] },
-  { weight:1, variants:["15 Jumping Squats","15 Jumping Lunges"], tags:["legs"] },
-  { weight:1, variants:["20 Knee Raises","20 Full Body Raises"], tags:["abs"] },
-  { weight:1, variants:["10 Burpees","10 Kettlebell Swings"], tags:["fullbody"] },
-  { weight:1, variants:["20 Jumping Jacks","20 Mountain Climbers"], tags:["cardio"] }
-];
+/* ===== DEFAULT DATA ===== */
+const DEFAULT = {
+  push:[{name:"Push-Ups",reps:"10–20"}],
+  pull:[{name:"Pull-Ups",reps:"5–10"}],
+  legs:[{name:"Jumping Squats",reps:"15–25"}],
+  abs:[{name:"Knee Raises",reps:"20–30"}],
+  cardio:[{name:"Burpees",reps:"10–20"}],
+  fullbody:[{name:"Kettlebell Swings",reps:"10–20"}]
+};
 
-function rand(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-function weightedPick(pool){
-  const total = pool.reduce((s,g)=>s+g.weight,0);
-  let r = Math.random()*total;
-  for(const g of pool){ if((r-=g.weight)<=0) return g; }
-}
+const KEYS=Object.keys(DEFAULT);
+let data=JSON.parse(localStorage.getItem("exercises"))||DEFAULT;
+localStorage.setItem("exercises",JSON.stringify(data));
 
-/* ===== GENERATE ===== */
+/* ===== WORKOUT ===== */
 function generateWorkout(){
-  const card = document.getElementById("workoutCard");
-  const ai   = document.getElementById("aiStage");
+  const card=document.getElementById("workoutCard");
+  card.innerHTML="";
+  const isAMRAP=Math.random()<0.6;
+  card.innerHTML+=`<div class="card-title">${
+    isAMRAP?"As Many Rounds As Possible":"Metabolic Conditioning"
+  }</div>`;
 
-  card.classList.remove("show");
-  card.style.display="none";
-
-  ai.style.display="block";
-  ai.classList.add("show");
-
-  setTimeout(()=>{
-    ai.classList.remove("show");
-    ai.style.display="none";
-
-    card.innerHTML="";
-
-    const isAMRAP = Math.random() < 0.6;
-    const title = document.createElement("div");
-    title.className="card-title";
-    title.textContent = isAMRAP
-      ? "As Many Rounds As Possible"
-      : "Metabolic Conditioning";
-    card.appendChild(title);
-
-    let picked = [];
-
-    if(isAMRAP){
-      const count = Math.floor(Math.random()*3)+2; // 2–4
-      const used = new Set();
-      while(used.size < count){
-        used.add(weightedPick(GROUPS));
-      }
-      picked = [...used].map(g => ({
-        label: rand(g.variants),
-        tags: g.tags
-      }));
-    }else{
-      picked = GROUPS.map(g => {
-        const raw = rand(g.variants);
-        const clean = raw.replace(/^\d+\s*(Rep)?\s*/i, "");
-        return { label: clean, tags: g.tags };
-      });
-    }
-
-    picked.forEach(item=>{
-      const line=document.createElement("div");
-      line.className="line";
-      line.appendChild(document.createTextNode(item.label));
-      item.tags.forEach(tag=>{
-        const pill=document.createElement("span");
-        pill.className=`pill pill-${tag}`;
-        pill.textContent=tag;
-        line.appendChild(pill);
-      });
-      card.appendChild(line);
-    });
-
-    card.style.display="block";
-    requestAnimationFrame(()=>card.classList.add("show"));
-  },900);
+  KEYS.forEach(k=>{
+    const ex=data[k];
+    if(!ex.length) return;
+    const e=ex[Math.floor(Math.random()*ex.length)];
+    card.innerHTML+=`<div class="line">${
+      isAMRAP?`${e.reps} ${e.name}`:e.name
+    }</div>`;
+  });
+  card.classList.add("show");
 }
 
-document.getElementById("generateBtn").addEventListener("click",generateWorkout);
+/* ===== MODAL ===== */
+let activeTab="push";
+const modal=document.getElementById("modal");
+const tabs=document.getElementById("tabs");
+const list=document.getElementById("exerciseList");
+
+function renderTabs(){
+  tabs.innerHTML="";
+  KEYS.forEach(k=>{
+    const t=document.createElement("div");
+    t.className="tab"+(k===activeTab?" active":"");
+    t.textContent=k;
+    t.onclick=()=>{activeTab=k;render()};
+    tabs.appendChild(t);
+  });
+}
+
+function render(){
+  renderTabs();
+  list.innerHTML="";
+  data[activeTab].forEach((e,i)=>{
+    const row=document.createElement("div");
+    row.className="exercise";
+    row.innerHTML=`
+      <input value="${e.name}" onchange="edit('${activeTab}',${i},'name',this.value)"/>
+      <input value="${e.reps}" onchange="edit('${activeTab}',${i},'reps',this.value)"/>
+      <button onclick="del('${activeTab}',${i})">✕</button>`;
+    list.appendChild(row);
+  });
+}
+
+function edit(cat,i,key,val){
+  data[cat][i][key]=val;
+  localStorage.setItem("exercises",JSON.stringify(data));
+}
+function del(cat,i){
+  data[cat].splice(i,1);
+  localStorage.setItem("exercises",JSON.stringify(data));
+  render();
+}
+
+document.getElementById("addExercise").onclick=()=>{
+  const n=document.getElementById("newName");
+  const r=document.getElementById("newReps");
+  if(!n.value) return;
+  data[activeTab].push({name:n.value,reps:r.value});
+  n.value="";r.value="";
+  localStorage.setItem("exercises",JSON.stringify(data));
+  render();
+};
+
+/* ===== EVENTS ===== */
+document.getElementById("generateBtn").onclick=generateWorkout;
+document.getElementById("exerciseBtn").onclick=()=>{
+  modal.classList.add("show");
+  render();
+};
+modal.onclick=e=>{
+  if(e.target===modal) modal.classList.remove("show");
+};
 </script>
 
 </body>
