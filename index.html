@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Jy Workout</title>
 
-<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <style>
   :root{
@@ -14,14 +14,14 @@
     --sub:#64748b;
     --bg:#f8fafc;
 
-    --shadow-soft:0 18px 48px rgba(15,23,42,0.14);
-    --shadow-subtle:0 8px 18px rgba(15,23,42,0.10);
+    --shadow-soft:0 18px 48px rgba(15,23,42,0.16);
+    --shadow-subtle:0 8px 18px rgba(15,23,42,0.12);
 
     /* streak */
     --streak-bg:#e5e7eb;
     --streak-fill:#f97316;
 
-    /* 8 distinct soft pills (previous vibe, none duplicated) */
+    /* 8 distinct tag colours (soft, like your older set) */
     --pill-blue-bg:#e4ecff;   --pill-blue-tx:#2453f5;  /* push */
     --pill-green-bg:#d9fbe3;  --pill-green-tx:#22c55e; /* pull */
     --pill-purple-bg:#ede9fe; --pill-purple-tx:#7c3aed;/* upper */
@@ -47,9 +47,10 @@
     margin:0 auto;
     padding:24px;
     padding-bottom:200px;
+    position:relative; /* for ai-stage positioning */
   }
 
-  /* STREAK (top-left) */
+  /* streak top-left */
   .streak-row{
     display:flex;
     align-items:center;
@@ -60,10 +61,13 @@
     display:flex;
     align-items:center;
     gap:6px;
-    font-weight:800;
+    font-weight:600;
     color:var(--streak-fill);
   }
-  .streak-count{ min-width:18px; font-variant-numeric:tabular-nums; }
+  .streak-count{
+    min-width:18px;
+    font-variant-numeric:tabular-nums;
+  }
   .streak-bar{
     width:150px;
     height:8px;
@@ -80,30 +84,41 @@
 
   h1{
     font-size:30px;
-    font-weight:900;
+    font-weight:800;
     margin:6px 0 6px;
     letter-spacing:-0.2px;
   }
   .subtitle{
     font-size:17px;
+    font-weight:400;
     color:var(--sub);
     margin:0 0 18px;
   }
 
-  /* AI gradient loader */
-  .ai{
-    position:fixed;
-    inset:0;
+  /* AI MESH GRADIENT — restored to your original behavior:
+     - lives inside the container
+     - cannot overlap fixed buttons because it’s not fixed
+  */
+  .ai-stage{
+    position:absolute;
+    left:50%;
+    top:260px;
+    transform:translateX(-50%);
+    width:260px;
+    height:260px;
+    border-radius:50%;
     display:none;
     pointer-events:none;
-    z-index:20;
+    overflow:visible;
+    z-index:0;
   }
-  .ai::before{
+  .ai-stage::before{
     content:"";
     position:absolute;
-    inset:-20%;
-    filter:blur(90px) saturate(160%) contrast(115%);
-    opacity:.95;
+    inset:-20% -15% -25% -15%;
+    filter:blur(84px) saturate(160%) contrast(115%);
+    opacity:0;
+    transition:opacity .25s ease;
     background:
       radial-gradient(22rem 22rem at 30% 36%, #3A7BFF77 0, #0000 50%),
       radial-gradient(22rem 22rem at 72% 34%, #7DFF5C77 0, #0000 54%),
@@ -112,9 +127,10 @@
     background-blend-mode:screen;
     animation:meshBreath 2s ease-in-out infinite, meshDrift 3s ease-in-out infinite;
   }
+  .ai-stage.show::before{ opacity:.9; }
   @keyframes meshBreath{
-    0%,100%{ transform:scale(1); opacity:.75 }
-    50%{ transform:scale(1.05); opacity:.35 }
+    0%,100%{ transform:scale(1); opacity:.7 }
+    50%{ transform:scale(1.04); opacity:.35 }
   }
   @keyframes meshDrift{
     0%{ transform:translate3d(0,0,0); }
@@ -134,20 +150,20 @@
     transition:
       opacity .35s ease,
       transform .35s cubic-bezier(.18,.84,.32,1.12);
+    position:relative;
+    z-index:1; /* above mesh */
   }
   .card.show{ display:block; }
   .card.visible{
     opacity:1;
     transform:translateY(0) scale(1);
   }
-
   .card-title{
     font-size:20px;
-    font-weight:900;
+    font-weight:800;
     margin:0 0 16px;
     letter-spacing:-0.2px;
   }
-
   .line{
     font-size:16px;
     margin-bottom:10px;
@@ -161,12 +177,11 @@
     padding:4px 10px;
     border-radius:999px;
     font-size:12px;
-    font-weight:800;
+    font-weight:600;
     line-height:1;
     box-shadow:0 0 0 1px rgba(15,23,42,0.04);
     text-transform:lowercase;
   }
-
   .pill-push{ background:var(--pill-blue-bg); color:var(--pill-blue-tx); }
   .pill-pull{ background:var(--pill-green-bg); color:var(--pill-green-tx); }
   .pill-upper{ background:var(--pill-purple-bg); color:var(--pill-purple-tx); }
@@ -176,16 +191,18 @@
   .pill-cardio{ background:var(--pill-yellow-bg); color:var(--pill-yellow-tx); }
   .pill-fullbody{ background:var(--pill-red-bg); color:var(--pill-red-tx); }
 
-  /* WEEK SUMMARY (engraved) */
+  /* WEEK SUMMARY (engraved number only, no trophy) */
   .summary{
     display:none;
     text-align:center;
     margin-top:28px;
+    position:relative;
+    z-index:1;
   }
   .summary.show{ display:block; }
   .summary-num{
     font-size:96px;
-    font-weight:950;
+    font-weight:800;
     letter-spacing:-2px;
     color:#e5e7eb;
     text-shadow:
@@ -215,7 +232,7 @@
     border-radius:28px;
     border:none;
     font-size:18px;
-    font-weight:800;
+    font-weight:600; /* back to normal */
     cursor:pointer;
   }
 
@@ -227,18 +244,18 @@
   }
   #generateBtn:active{ transform:scale(.985); }
 
-  /* Exercises full-size */
+  /* Exercises */
   #exerciseBtn{
     margin-top:12px;
     background:#eef2f7;
     color:var(--brand);
     box-shadow:none;
     font-size:16px;
-    font-weight:900;
+    font-weight:600;
   }
   #exerciseBtn:active{ transform:scale(.99); }
 
-  /* SLIDER (sits where exercise button was) */
+  /* SLIDER (lower position where Exercises was) */
   #slideWrap{
     margin-top:12px;
     display:none;
@@ -253,9 +270,6 @@
     touch-action:none;
     box-shadow:0 10px 22px rgba(15,23,42,0.12);
   }
-  .slide-track.filled{
-    background:linear-gradient(135deg,#2453f5,#4f8cff);
-  }
   .slide-fill{
     position:absolute;
     inset:0;
@@ -265,6 +279,7 @@
     transform-origin:left center;
     transform:scaleX(0);
     transition:transform .18s ease-out;
+    z-index:1;
   }
   .slide-label{
     position:absolute;
@@ -274,12 +289,13 @@
     justify-content:center;
     pointer-events:none;
     font-size:16px;
-    font-weight:900;
-    color:#2453f5;
+    font-weight:600; /* not crazy bold */
+    color:#2453f5;   /* stays blue while sliding */
+    z-index:2;
   }
-  /* accessibility: when filled text becomes white */
-  .slide-track.filled .slide-label{ color:#fff; }
-
+  .slide-track.filled .slide-label{
+    color:#fff; /* ONLY becomes white when filled */
+  }
   .slide-knob{
     position:absolute;
     top:50%;
@@ -294,11 +310,15 @@
     box-shadow:0 8px 16px rgba(15,23,42,0.18);
     transform:translate(0,-50%);
     touch-action:none;
+    z-index:3;
   }
   .slide-knob .arrow{
     font-size:20px;
     color:var(--brand);
-    font-weight:900;
+    font-weight:700;
+  }
+  .slide-track.filled{
+    background:linear-gradient(135deg,#2453f5,#4f8cff);
   }
 
   /* MODAL */
@@ -331,14 +351,14 @@
   }
   .modal-title{
     font-size:16px;
-    font-weight:950;
+    font-weight:800;
   }
   .modal-close{
     border:none;
     background:#eef2f7;
     border-radius:10px;
     padding:8px 10px;
-    font-weight:950;
+    font-weight:700;
     cursor:pointer;
   }
 
@@ -353,7 +373,7 @@
     border-radius:999px;
     background:#f1f5f9;
     font-size:13px;
-    font-weight:900;
+    font-weight:700;
     cursor:pointer;
     text-transform:lowercase;
   }
@@ -381,7 +401,7 @@
     color:#be123c;
     border-radius:12px;
     padding:10px 12px;
-    font-weight:950;
+    font-weight:700;
     cursor:pointer;
   }
 
@@ -403,24 +423,14 @@
     color:#166534;
     border-radius:12px;
     padding:10px 14px;
-    font-weight:950;
+    font-weight:700;
     cursor:pointer;
-  }
-
-  /* LOTTIE overlay */
-  #celebration{
-    position:fixed;
-    inset:0;
-    display:none;
-    pointer-events:none;
-    z-index:9999;
   }
 </style>
 </head>
 
 <body>
   <div class="container">
-    <!-- STREAK -->
     <div class="streak-row">
       <div class="streak-fire">
         <span>🔥</span>
@@ -434,6 +444,9 @@
     <h1>Welcome back Jy</h1>
     <div class="subtitle">Today's mixed workout</div>
 
+    <!-- AI mesh gradient (only while generating) -->
+    <div id="aiStage" class="ai-stage"></div>
+
     <!-- Workout Card -->
     <div id="workoutCard" class="card"></div>
 
@@ -446,15 +459,11 @@
     </div>
   </div>
 
-  <!-- AI Gradient -->
-  <div id="ai" class="ai"></div>
-
-  <!-- FIXED BUTTONS -->
+  <!-- Fixed buttons -->
   <div class="fixed-stack">
     <button id="generateBtn" class="btn">Generate Workout</button>
     <button id="exerciseBtn" class="btn">Exercises</button>
 
-    <!-- Slider replaces exercise button when workout is active -->
     <div id="slideWrap">
       <div id="slideTrack" class="slide-track">
         <div id="slideFill" class="slide-fill"></div>
@@ -464,7 +473,7 @@
     </div>
   </div>
 
-  <!-- MODAL -->
+  <!-- Modal -->
   <div id="modal" class="modal">
     <div class="sheet" role="dialog" aria-modal="true">
       <div class="modal-top">
@@ -483,30 +492,19 @@
     </div>
   </div>
 
-  <!-- LOTTIE -->
-  <div id="celebration">
-    <lottie-player
-      src="https://assets10.lottiefiles.com/packages/lf20_touohxv0.json"
-      background="transparent"
-      speed="1"
-      style="width:100%;height:100%;"
-      autoplay>
-    </lottie-player>
-  </div>
-
 <script>
 /* =========================
    STORAGE KEYS
 ========================= */
 const LS = {
-  exercises:   "jy_exercises_v3",
-  weekKey:     "jy_week_key_v3",
-  weekSummary: "jy_week_summary_v3",  // {week, workouts, counted}
-  streak:      "jy_streak_v3"
+  exercises:   "jy_exercises_v4",
+  weekKey:     "jy_week_key_v4",
+  weekSummary: "jy_week_summary_v4",  // {week, workouts, counted}
+  streak:      "jy_streak_v4"
 };
 
 /* =========================
-   WEEK KEY (stable)
+   WEEK KEY
 ========================= */
 function weekKey(){
   const d = new Date();
@@ -518,8 +516,6 @@ function weekKey(){
 
 /* =========================
    STREAK + WEEKLY ROLLOVER
-   - 3 completions in a week -> +1 streak (once)
-   - if week ends with <3 -> streak resets to 0
 ========================= */
 function getStreak(){
   const n = parseInt(localStorage.getItem(LS.streak) || "0", 10);
@@ -536,7 +532,6 @@ function loadWeekSummary(){
 function saveWeekSummary(obj){
   localStorage.setItem(LS.weekSummary, JSON.stringify(obj));
 }
-
 function rolloverWeekIfNeeded(){
   const curWeek = weekKey();
   const prevWeek = localStorage.getItem(LS.weekKey);
@@ -544,14 +539,12 @@ function rolloverWeekIfNeeded(){
   let summary = loadWeekSummary();
 
   if(prevWeek && prevWeek !== curWeek){
-    // week changed -> evaluate last week
     if(summary && summary.week === prevWeek){
       if(summary.workouts < 3){
         streak = 0;
         setStreak(streak);
       }
     }
-    // new week reset
     localStorage.setItem(LS.weekKey, curWeek);
     summary = {week:curWeek, workouts:0, counted:false};
     saveWeekSummary(summary);
@@ -563,8 +556,6 @@ function rolloverWeekIfNeeded(){
     }
   }
 }
-
-/* update streak + progress after a completion */
 function recordCompletion(){
   rolloverWeekIfNeeded();
   let streak = getStreak();
@@ -572,21 +563,17 @@ function recordCompletion(){
 
   summary.workouts = Math.max(0, (summary.workouts|0) + 1);
 
-  let streakIncreased = false;
   if(summary.workouts >= 3 && !summary.counted){
     streak += 1;
     summary.counted = true;
     setStreak(streak);
-    streakIncreased = true;
   }else{
     setStreak(streak);
   }
   saveWeekSummary(summary);
 
-  return { streak, workouts: summary.workouts, streakIncreased };
+  return { streak, workouts: summary.workouts };
 }
-
-/* render streak UI */
 function renderStreakUI(){
   rolloverWeekIfNeeded();
   const streak = getStreak();
@@ -596,8 +583,6 @@ function renderStreakUI(){
   document.getElementById("streakCount").textContent = String(streak);
   document.getElementById("streakBarFill").style.width = (Math.min(done/3,1)*100) + "%";
 }
-
-/* render week summary screen */
 function renderWeekSummary(){
   rolloverWeekIfNeeded();
   const summary = loadWeekSummary() || {workouts:0};
@@ -609,17 +594,12 @@ function renderWeekSummary(){
 
   num.textContent = String(done);
   plural.textContent = done === 1 ? "" : "s";
-
   el.classList.add("show");
 }
 
 /* =========================
    CATEGORIES (8 tags)
-   - pull: 80%
-   - push: 80%
-   - upper: 50%
-   - shoulders: 50%
-   - rest: 50%
+   pull 80%, push 80%, upper 50%, shoulders 50%, rest 50%
 ========================= */
 const CATS = [
   { key:"pull",      pill:"pill-pull",      p:0.80 },
@@ -632,7 +612,6 @@ const CATS = [
   { key:"fullbody",  pill:"pill-fullbody",  p:0.50 }
 ];
 const CAT_KEYS = CATS.map(c => c.key);
-
 function pillClass(cat){
   const c = CATS.find(x => x.key === cat);
   return c ? c.pill : "pill-push";
@@ -640,8 +619,6 @@ function pillClass(cat){
 
 /* =========================
    DEFAULT EXERCISES
-   - reps are single reps (not range)
-   - MetCon will NOT show reps
 ========================= */
 const DEFAULT = {
   push:      [{name:"Push-Ups", reps:"10"}, {name:"Dips", reps:"10"}, {name:"Decline Push-Ups", reps:"10"}, {name:"Diamond Push-Ups", reps:"10"}],
@@ -653,9 +630,7 @@ const DEFAULT = {
   cardio:    [{name:"Jumping Jacks", reps:"20"}, {name:"Mountain Climbers", reps:"20"}],
   fullbody:  [{name:"Burpees", reps:"10"}, {name:"Kettlebell Swings", reps:"10"}]
 };
-
 function deepClone(x){ return JSON.parse(JSON.stringify(x)); }
-
 function loadExercises(){
   const raw = localStorage.getItem(LS.exercises);
   if(!raw){
@@ -681,17 +656,13 @@ function saveExercises(obj){
 const workoutCard = document.getElementById("workoutCard");
 const generateBtn = document.getElementById("generateBtn");
 const exerciseBtn = document.getElementById("exerciseBtn");
-
-const ai = document.getElementById("ai");
+const aiStage = document.getElementById("aiStage");
+const weekSummaryEl = document.getElementById("weekSummary");
 
 const slideWrap = document.getElementById("slideWrap");
 const slideTrack = document.getElementById("slideTrack");
 const slideFill = document.getElementById("slideFill");
 const slideKnob = document.getElementById("slideKnob");
-
-const weekSummaryEl = document.getElementById("weekSummary");
-
-const celebration = document.getElementById("celebration");
 
 /* modal */
 const modal = document.getElementById("modal");
@@ -707,8 +678,14 @@ let activeWorkout = null;
 /* =========================
    UI STATES
 ========================= */
-function showAI(on){
-  ai.style.display = on ? "block" : "none";
+function showMesh(on){
+  if(on){
+    aiStage.style.display="block";
+    aiStage.classList.add("show");
+  }else{
+    aiStage.classList.remove("show");
+    setTimeout(()=>{ aiStage.style.display="none"; }, 180);
+  }
 }
 function showCard(html){
   workoutCard.innerHTML = html;
@@ -724,17 +701,16 @@ function hideCard(){
     workoutCard.innerHTML = "";
   },180);
 }
-
 function setIdle(){
-  generateBtn.style.display = "block";
-  exerciseBtn.style.display = "block";
-  slideWrap.style.display = "none";
+  generateBtn.style.display="block";
+  exerciseBtn.style.display="block";
+  slideWrap.style.display="none";
   resetSlider();
 }
 function setInWorkout(){
-  generateBtn.style.display = "none";
-  exerciseBtn.style.display = "none";
-  slideWrap.style.display = "block";
+  generateBtn.style.display="none";
+  exerciseBtn.style.display="none";
+  slideWrap.style.display="block";
   resetSlider();
 }
 
@@ -743,13 +719,19 @@ function setInWorkout(){
 ========================= */
 function rand(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 function shuffle(arr){ return arr.slice().sort(()=>Math.random()-0.5); }
+function escapeHtml(str){
+  return String(str)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll("\"","&quot;")
+    .replaceAll("'","&#039;");
+}
 
 function buildAMRAP(exData){
-  // pick categories based on probability -> then clamp to 2..4
   let eligible = CATS.filter(c => Math.random() < c.p).map(c => c.key);
   eligible = shuffle(eligible);
 
-  // ensure at least 2
   if(eligible.length < 2){
     const pool = shuffle(CAT_KEYS.filter(k => !eligible.includes(k)));
     while(eligible.length < 2 && pool.length) eligible.push(pool.pop());
@@ -758,7 +740,6 @@ function buildAMRAP(exData){
   const target = Math.floor(Math.random()*3) + 2; // 2..4
   eligible = eligible.slice(0, Math.min(4, target));
 
-  // safety
   if(eligible.length < 2){
     const pool = shuffle(CAT_KEYS.filter(k => !eligible.includes(k)));
     while(eligible.length < 2 && pool.length) eligible.push(pool.pop());
@@ -774,7 +755,7 @@ function buildAMRAP(exData){
 }
 
 function buildMetCon(exData){
-  const cats = shuffle(CAT_KEYS); // all categories, random order each time
+  const cats = shuffle(CAT_KEYS); // random order each time
   const items = cats.map(cat=>{
     const list = exData[cat] || [];
     const ex = list.length ? rand(list) : {name:cat, reps:""};
@@ -783,18 +764,8 @@ function buildMetCon(exData){
   return { type:"metcon", title:"Metabolic Conditioning", items };
 }
 
-function escapeHtml(str){
-  return String(str)
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll("\"","&quot;")
-    .replaceAll("'","&#039;");
-}
-
 function renderWorkout(workout){
   const header = `<div class="card-title">${escapeHtml(workout.title)}</div>`;
-
   const rows = workout.items.map(it=>{
     const left = workout.type === "amrap"
       ? `${(it.reps||"").trim()} ${it.name}`.trim()
@@ -807,27 +778,22 @@ function renderWorkout(workout){
       </div>
     `;
   }).join("");
-
   showCard(header + rows);
 }
 
 function generateWorkout(){
   if(activeWorkout) return;
 
-  // hide week summary if visible
   weekSummaryEl.classList.remove("show");
+  showMesh(true);
 
-  showAI(true);
   generateBtn.disabled = true;
-
   setTimeout(()=>{
-    showAI(false);
+    showMesh(false);
     generateBtn.disabled = false;
 
     const exData = loadExercises();
-
-    // 60% AMRAP, 40% MetCon (tweak if you want)
-    const isAMRAP = Math.random() < 0.6;
+    const isAMRAP = Math.random() < 0.6; // keep your mix
     activeWorkout = isAMRAP ? buildAMRAP(exData) : buildMetCon(exData);
 
     renderWorkout(activeWorkout);
@@ -870,7 +836,6 @@ slideKnob.addEventListener("pointerdown",(e)=>{
 
   slideKnob.style.transition = "none";
   slideFill.style.transition = "none";
-
   if(navigator.vibrate) navigator.vibrate(6);
 });
 
@@ -898,25 +863,30 @@ function endSlide(e){
   if(progress > 0.92){
     slideKnob.style.transform = `translate(${maxSlide}px,-50%)`;
     slideFill.style.transform = "scaleX(1)";
-    slideTrack.classList.add("filled"); // text becomes white here (CSS)
+    slideTrack.classList.add("filled"); // label becomes white ONLY here
     if(navigator.vibrate) navigator.vibrate(15);
 
-    // Lottie celebration
-    celebration.style.display = "block";
-    setTimeout(()=>{ celebration.style.display = "none"; }, 2200);
+    // confetti (your original vibe)
+    if(window.confetti){
+      confetti({
+        particleCount:160,
+        spread:90,
+        startVelocity:35,
+        origin:{x:0.5,y:1.05}
+      });
+    }
 
-    // Record completion (streak/progress)
-    const stats = recordCompletion();
+    // record completion + update streak/progress
+    recordCompletion();
     renderStreakUI();
 
-    // Hide workout + return to idle + show summary
+    // hide workout & return idle, show weekly summary
     setTimeout(()=>{
       hideCard();
       activeWorkout = null;
-      slideWrap.style.display = "none";
       setIdle();
       renderWeekSummary();
-    }, 200);
+    }, 250);
 
   }else{
     slideTrack.classList.remove("filled");
@@ -930,7 +900,7 @@ slideKnob.addEventListener("pointerup", endSlide);
 slideKnob.addEventListener("pointercancel", endSlide);
 
 /* =========================
-   MODAL EDITOR (8 tabs)
+   MODAL EDITOR
 ========================= */
 let activeTab = "push";
 
@@ -1026,9 +996,8 @@ addExerciseBtn.addEventListener("click", ()=>{
 ========================= */
 rolloverWeekIfNeeded();
 renderStreakUI();
-renderWeekSummary();      // show current week count (0 on new week)
+renderWeekSummary();
 setIdle();
-
 generateBtn.addEventListener("click", generateWorkout);
 </script>
 </body>
