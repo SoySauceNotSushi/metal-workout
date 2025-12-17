@@ -772,6 +772,18 @@ const confettiInstance = window.confetti
   ? window.confetti.create(confettiCanvas, { resize:true, useWorker:true })
   : null;
 
+function sizeConfettiCanvas(){
+  const dpr = Math.max(1, window.devicePixelRatio || 1);
+  confettiCanvas.width  = Math.floor(window.innerWidth  * dpr);
+  confettiCanvas.height = Math.floor(window.innerHeight * dpr);
+  // match CSS pixels
+  confettiCanvas.style.width  = "100vw";
+  confettiCanvas.style.height = "100vh";
+}
+
+window.addEventListener("resize", sizeConfettiCanvas, { passive:true });
+sizeConfettiCanvas();
+  
 /* =========================================================
    STATE
 ========================================================= */
