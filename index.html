@@ -836,12 +836,8 @@ function generateMETACON(){
   };
 }
 
-function showPlanButton(workout){
-  if(workout && workout.type === "Metabolic Conditioning"){
-    planWorkoutBtn.classList.remove("hidden");
-  }else{
-    planWorkoutBtn.classList.add("hidden");
-  }
+function showPlanButton(){
+  planWorkoutBtn.classList.add("hidden");
 }
 
 function renderWorkout(workout){
