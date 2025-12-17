@@ -969,6 +969,9 @@ function showWeeklyCenter(){
   currentWorkout = null;
   plannedReps = {};
   showPlanButton(null);
+
+  // 👇 ADD THIS LINE
+  weekNumEl.textContent = String(getTotalDays());
 }
 
 function showWorkoutState(workout){
