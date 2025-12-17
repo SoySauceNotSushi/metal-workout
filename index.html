@@ -836,12 +836,10 @@ function setWeekCounted(v){ localStorage.setItem(LS.weekCounted, v ? "1" : "0");
 function renderStreakUI(){
   const streak = getStreak();
   const done = getWeekCount();
+
   streakCount.textContent = String(streak);
   const pct = clamp(done/3, 0, 1);
   streakFill.style.transform = `scaleX(${pct})`;
-
-  weekNumEl.textContent = String(done);
-  weekLabelEl.textContent = (done===1) ? "workout completed this week" : "workouts completed this week";
 }
 
 /* =========================================================
