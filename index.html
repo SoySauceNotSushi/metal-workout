@@ -109,18 +109,6 @@
     transition:transform .35s cubic-bezier(.22,.8,.4,1);
   }
 
-  h1{
-    margin:6px 0 6px;
-    font-size:36px;
-    font-weight:800;
-    letter-spacing:-0.02em;
-  }
-  .subtitle{
-    margin:0 0 14px;
-    font-size:16px;
-    color:var(--sub);
-  }
-
   /* CENTER AREA */
   .center{
     position:relative;
@@ -131,7 +119,7 @@
     padding-top:18px;
   }
 
-  /* BIG WEEKLY COUNT */
+  /* BIG COUNT */
   .weekly-center{
     position:absolute;
     inset:0;
@@ -237,7 +225,7 @@
   .pill-fullbody{ background:var(--tag-red-bg); color:var(--tag-red-ink); }
   .pill-cardio{ background:var(--tag-yellow-bg); color:var(--tag-yellow-ink); }
 
-  /* PLAN WORKOUT BUTTON (inside card) */
+  /* PLAN WORKOUT BUTTON */
   .plan-btn{
     margin-top:14px;
     width:100%;
@@ -292,12 +280,12 @@
   }
 
   /* ACTIONS */
-.actions{
-  position:relative;
-  padding:12px 0 18px;
-  z-index:10;
-  transform: translateY(-1.5rem);
-}
+  .actions{
+    position:relative;
+    padding:12px 0 18px;
+    z-index:10;
+    transform: translateY(-1.5rem);
+  }
   .btn{
     width:100%;
     height:52px;
@@ -320,21 +308,18 @@
   .btn.hidden{ display:none; }
 
   /* SLIDER */
- .slide-wrap{
-  width:100%;
-  height:52px;
-  border-radius:999px;
-  background:#eef2f7;
-  position:relative;
-  overflow:hidden;
-  box-shadow:none;
-  display:none;
-
-  touch-action: pan-y;
-}
+  .slide-wrap{
+    width:100%;
+    height:52px;
+    border-radius:999px;
+    background:#eef2f7;
+    position:relative;
+    overflow:hidden;
+    box-shadow:none;
+    display:none;
+    touch-action: pan-y;
+  }
   .slide-wrap.show{ display:block; }
-
-  /* === CHANGED: transitions are OFF by default; we animate only on release in JS === */
   .slide-fill{
     position:absolute;
     inset:0;
@@ -343,7 +328,6 @@
     transition:none;
     will-change: width;
   }
-
   .slide-label{
     position:absolute;
     inset:0;
@@ -368,7 +352,6 @@
     transition:none;
     will-change: clip-path;
   }
-
   .slide-knob{
     position:absolute;
     left:7px;
@@ -392,14 +375,14 @@
   }
 
   /* CONFETTI */
-#confettiCanvas{
-  position:fixed;
-  left:0; top:0;
-  width:100vw;
-  height:100vh;
-  pointer-events:none;
-  z-index:2; /* behind actions (z=10) */
-}
+  #confettiCanvas{
+    position:fixed;
+    left:0; top:0;
+    width:100vw;
+    height:100vh;
+    pointer-events:none;
+    z-index:2;
+  }
 
   /* MODAL BASE */
   .modal{
@@ -533,7 +516,7 @@
     cursor:pointer;
   }
 
-  /* PLAN MODAL LAYOUT */
+  /* PLAN MODAL */
   .plan-list{
     display:flex;
     flex-direction:column;
@@ -560,16 +543,14 @@
 <canvas id="confettiCanvas"></canvas>
 
 <div class="container">
-
   <div class="top-row">
-
-
+    <div></div>
     <div class="streak-wrap">
       <div class="streak-fire"><span>🔥</span><span id="streakCount" class="streak-count">0</span></div>
       <div class="streak-bar"><div class="streak-bar-fill" id="streakFill"></div></div>
     </div>
   </div>
-  
+
   <div class="center">
     <div class="ai-stage" id="aiStage"></div>
 
@@ -583,8 +564,6 @@
     <div class="card hidden" id="card">
       <div class="card-title" id="cardTitle"></div>
       <div id="cardRows"></div>
-
-      <!-- NEW: Plan Workout -->
       <button class="plan-btn hidden" id="planWorkoutBtn">Plan Workout</button>
     </div>
   </div>
@@ -602,34 +581,29 @@
       <div class="slide-knob" id="slideKnob"><span>→</span></div>
     </div>
   </div>
-
 </div>
 
-<!-- LIBRARY MODAL -->
+<!-- EXERCISE LIBRARY MODAL -->
 <div class="modal" id="modal">
   <div class="modal-sheet">
     <div class="modal-head">
       <div class="modal-title">Exercises</div>
       <button class="modal-close" id="closeModal">Done</button>
     </div>
-
     <div class="tabs" id="tabs"></div>
-
     <div class="modal-body">
       <div class="add-row">
         <input class="input" id="addName" placeholder="Exercise name (e.g. Dips)" />
         <input class="input" id="addReps" placeholder="Reps (e.g. 10)" />
       </div>
       <button class="add-btn" id="addBtn">Add Exercise</button>
-
       <div style="height:12px"></div>
-
       <div class="list" id="list"></div>
     </div>
   </div>
 </div>
 
-<!-- NEW: PLAN MODAL (ephemeral) -->
+<!-- PLAN MODAL -->
 <div class="modal" id="planModal">
   <div class="modal-sheet">
     <div class="modal-head">
@@ -647,8 +621,6 @@
 /* =========================================================
    CONFIG
 ========================================================= */
-
-
 const TAGS = [
   { key:"upper",     label:"upper",     pill:"pill-upper" },
   { key:"pull",      label:"pull",      pill:"pill-pull" },
@@ -672,20 +644,20 @@ const DEFAULT_LIBRARY = {
 };
 
 const LS = {
-  library: "jy_library_v1",
-  streak: "jy_streak_v1",
-  weekKey: "jy_weekKey_v1",
+  library:   "jy_library_v1",
+  streak:    "jy_streak_v1",
+  weekKey:   "jy_weekKey_v1",
   weekCount: "jy_weekCount_v1",
-  weekCounted: "jy_week_counted_v1",
+  weekCounted:"jy_week_counted_v1",
   totalDays: "jy_total_days_trained_v1",
-  lastDone: "jy_last_workout_date_v1"
+  lastDone:  "jy_last_workout_date_v1"
 };
 
 /* =========================================================
    UTIL
 ========================================================= */
-const qs  = s => document.querySelector(s);
-const rand = arr => arr[Math.floor(Math.random()*arr.length)];
+const qs    = s => document.querySelector(s);
+const rand  = arr => arr[Math.floor(Math.random()*arr.length)];
 const clamp = (n,min,max)=>Math.max(min,Math.min(max,n));
 
 function isoWeekKey(d=new Date()){
@@ -697,29 +669,13 @@ function isoWeekKey(d=new Date()){
   return `${date.getUTCFullYear()}-W${String(weekNo).padStart(2,"0")}`;
 }
 
-/* ===============================
-   DAILY / TOTAL HELPERS  👇 ADD HERE
-=============================== */
 function todayKey(){
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 }
 
-function getTotalDays(){
-  return parseInt(localStorage.getItem(LS.totalDays) || "0", 10);
-}
-
-function setTotalDays(n){
-  localStorage.setItem(LS.totalDays, String(Math.max(0, n|0)));
-}
-
-function getLastDoneDate(){
-  return localStorage.getItem(LS.lastDone);
-}
-
-function setLastDoneDate(dateStr){
-  localStorage.setItem(LS.lastDone, dateStr);
-}
+function loadJSON(key, fallback){
+  try{
     const raw = localStorage.getItem(key);
     if(!raw) return fallback;
     return JSON.parse(raw);
@@ -727,6 +683,19 @@ function setLastDoneDate(dateStr){
 }
 function saveJSON(key, val){
   localStorage.setItem(key, JSON.stringify(val));
+}
+
+function getTotalDays(){
+  return parseInt(localStorage.getItem(LS.totalDays) || "0", 10);
+}
+function setTotalDays(n){
+  localStorage.setItem(LS.totalDays, String(Math.max(0, n|0)));
+}
+function getLastDoneDate(){
+  return localStorage.getItem(LS.lastDone);
+}
+function setLastDoneDate(dateStr){
+  localStorage.setItem(LS.lastDone, dateStr);
 }
 
 function ensureWeekState(){
@@ -784,12 +753,10 @@ const addName   = qs("#addName");
 const addReps   = qs("#addReps");
 const addBtn    = qs("#addBtn");
 
-/* Plan modal */
 const planModal = qs("#planModal");
 const planBody  = qs("#planBody");
 const closePlanModal = qs("#closePlanModal");
 
-/* Confetti */
 const confettiCanvas = qs("#confettiCanvas");
 const confettiInstance = window.confetti
   ? window.confetti.create(confettiCanvas, { resize:true, useWorker:true })
@@ -799,14 +766,12 @@ function sizeConfettiCanvas(){
   const dpr = Math.max(1, window.devicePixelRatio || 1);
   confettiCanvas.width  = Math.floor(window.innerWidth  * dpr);
   confettiCanvas.height = Math.floor(window.innerHeight * dpr);
-  // match CSS pixels
   confettiCanvas.style.width  = "100vw";
   confettiCanvas.style.height = "100vh";
 }
-
 window.addEventListener("resize", sizeConfettiCanvas, { passive:true });
 sizeConfettiCanvas();
-  
+
 /* =========================================================
    STATE
 ========================================================= */
@@ -815,10 +780,8 @@ if(!library){
   library = structuredClone(DEFAULT_LIBRARY);
   saveJSON(LS.library, library);
 }
-
-let currentWorkout = null; // {type, rows:[{text,tags:[...]}]}
-let plannedReps = {};      // ephemeral per METACON only
-
+let currentWorkout = null;
+let plannedReps = {};
 
 /* =========================================================
    STREAK + WEEK COUNT UI
@@ -833,7 +796,6 @@ function setWeekCounted(v){ localStorage.setItem(LS.weekCounted, v ? "1" : "0");
 function renderStreakUI(){
   const streak = getStreak();
   const done = getWeekCount();
-
   streakCount.textContent = String(streak);
   const pct = clamp(done/3, 0, 1);
   streakFill.style.transform = `scaleX(${pct})`;
@@ -846,13 +808,11 @@ function pillForTag(tagKey){
   const t = TAGS.find(t=>t.key===tagKey);
   return t ? t.pill : "";
 }
-
 function pickExercise(tagKey){
   const arr = library[tagKey] || [];
   if(!arr.length) return { name:"(Add an exercise)", reps:"" };
   return rand(arr);
 }
-
 function generateAMRAP(){
   const candidates = [
     { tag:"pull",      p:0.80 },
@@ -895,12 +855,10 @@ function generateAMRAP(){
 function generateMETACON(){
   const tags = ["pull","push","upper","shoulders","legs","abs","fullbody","cardio"];
   const shuffled = tags.slice().sort(()=>Math.random()-0.5);
-
   const rows = shuffled.map(tag=>{
     const ex = pickExercise(tag);
     return { text: ex.name, tags:[tag] };
   });
-
   return { type:"Metabolic Conditioning", rows };
 }
 
@@ -926,7 +884,7 @@ function renderWorkout(workout){
     const txt = document.createElement("div");
     txt.className = "row-text";
     txt.textContent = r.text;
-    txt.dataset.base = r.text; // IMPORTANT: keep base text (used for Plan Workout)
+    txt.dataset.base = r.text;
 
     left.appendChild(txt);
 
@@ -946,8 +904,6 @@ function renderWorkout(workout){
 
   card.classList.remove("hidden");
   requestAnimationFrame(()=> card.classList.add("visible"));
-
-  // show/hide Plan Workout
   showPlanButton(workout);
 }
 
@@ -967,7 +923,7 @@ function showWeeklyCenter(){
   plannedReps = {};
   showPlanButton(null);
 
-  // 👇 ADD THIS LINE
+  // BIG NUMBER = lifetime days trained
   weekNumEl.textContent = String(getTotalDays());
 }
 
@@ -979,7 +935,7 @@ function showWorkoutState(workout){
   exerciseBtn.classList.add("hidden");
   slideWrap.classList.add("show");
 
-  plannedReps = {}; // reset each time you generate a new workout
+  plannedReps = {};
   resetSlider();
 }
 
@@ -1015,7 +971,7 @@ planWorkoutBtn.addEventListener("click", ()=>{
   planBody.innerHTML = "";
 
   currentWorkout.rows.forEach(r=>{
-    const base = r.text; // METACON base name
+    const base = r.text;
 
     const wrap = document.createElement("div");
     wrap.className = "plan-row";
@@ -1025,9 +981,7 @@ planWorkoutBtn.addEventListener("click", ()=>{
     reps.placeholder = "Reps";
     reps.inputMode = "numeric";
     reps.value = plannedReps[base] || "";
-    reps.addEventListener("input", ()=>{
-      plannedReps[base] = reps.value;
-    });
+    reps.addEventListener("input", ()=>{ plannedReps[base] = reps.value; });
 
     const name = document.createElement("div");
     name.className = "plan-name";
@@ -1041,11 +995,8 @@ planWorkoutBtn.addEventListener("click", ()=>{
   planModal.classList.add("show");
 });
 
-// Save (apply to UI only, NOT persisted)
 closePlanModal.addEventListener("click", ()=>{
   planModal.classList.remove("show");
-
-  // update the visible card text
   [...cardRows.querySelectorAll(".row-text")].forEach(el=>{
     const base = el.dataset.base || el.textContent;
     const r = (plannedReps[base] || "").trim();
@@ -1053,26 +1004,22 @@ closePlanModal.addEventListener("click", ()=>{
   });
 });
 
-// Tap outside to close (no save changes)
 planModal.addEventListener("click",(e)=>{
   if(e.target === planModal) planModal.classList.remove("show");
 });
 
 /* =========================================================
-   SLIDER (FIXED — NO LAG)
+   SLIDER (NO LAG)
 ========================================================= */
 let sliding=false;
 let startClientX=0;
 let startOffsetX=0;
 let currentX=0;
 let maxSlide=0;
-let knobWidth=42;
-let trackWidth=0;
 let rafPending=false;
 let pendingX=0;
 
 function applyTransitions(on){
-  // animate only when releasing/snapping
   if(on){
     slideFill.style.transition = "width .18s ease";
     slideWhite.style.transition = "clip-path .18s ease";
@@ -1084,10 +1031,8 @@ function applyTransitions(on){
 
 function resetSlider(){
   const rect = slideWrap.getBoundingClientRect();
-
-  trackWidth = rect.width;
-  knobWidth  = slideKnob.getBoundingClientRect().width;
-
+  const trackWidth = rect.width;
+  const knobWidth  = slideKnob.getBoundingClientRect().width;
   maxSlide = Math.max(0, trackWidth - knobWidth);
   currentX = 0;
 
@@ -1100,7 +1045,6 @@ function resetSlider(){
 function setSliderProgressImmediate(px){
   const x = Math.max(0, Math.min(px, maxSlide));
   currentX = x;
-
   const progress = maxSlide ? (x / maxSlide) : 0;
 
   slideKnob.style.transform = `translate3d(${x}px,-50%,0)`;
@@ -1109,7 +1053,6 @@ function setSliderProgressImmediate(px){
 }
 
 function setSliderProgress(px){
-  // throttle with rAF for iOS smoothness
   pendingX = px;
   if(rafPending) return;
   rafPending = true;
@@ -1118,22 +1061,18 @@ function setSliderProgress(px){
     setSliderProgressImmediate(pendingX);
   });
 }
-  function snapBack(){
+
+function snapBack(){
   applyTransitions(true);
-  requestAnimationFrame(() => {
-    setSliderProgressImmediate(0);
-  });
+  requestAnimationFrame(()=> setSliderProgressImmediate(0));
 }
 
 slideKnob.addEventListener("pointerdown", (e)=>{
   sliding=true;
   slideKnob.setPointerCapture(e.pointerId);
-
   applyTransitions(false);
-
   startClientX = e.clientX;
   startOffsetX = currentX;
-
   if(navigator.vibrate) navigator.vibrate(6);
 });
 
@@ -1145,20 +1084,19 @@ slideKnob.addEventListener("pointermove",(e)=>{
 
 function finishSlide(e){
   if(!sliding) return;
-  sliding = false;
-
+  sliding=false;
   try{ slideKnob.releasePointerCapture(e.pointerId); }catch{}
 
   const progress = maxSlide ? (currentX / maxSlide) : 0;
 
   if(progress > 0.92){
     applyTransitions(true);
-    requestAnimationFrame(() => {
+    requestAnimationFrame(()=>{
       setSliderProgressImmediate(maxSlide);
       completeWorkout();
     });
   } else {
-    snapBack(); // 👈 THIS is the missing piece
+    snapBack();
   }
 }
 slideKnob.addEventListener("pointerup", finishSlide);
@@ -1169,49 +1107,34 @@ slideKnob.addEventListener("pointercancel", finishSlide);
 ========================================================= */
 function shootConfettiFromUnderButtons(){
   if(!confettiInstance) return;
-
-  // Spawn from the slider (under the knob area)
   const rect = slideWrap.getBoundingClientRect();
   const x = (rect.left + rect.width * 0.5) / window.innerWidth;
-  const y = (rect.bottom - 6) / window.innerHeight; // slightly above bottom edge of slider
-
-  confettiInstance({
-    particleCount:160,
-    spread:90,
-    startVelocity:35,
-    origin:{ x, y }
-  });
+  const y = (rect.bottom - 6) / window.innerHeight;
+  confettiInstance({ particleCount:160, spread:90, startVelocity:35, origin:{ x, y } });
 }
 
 function completeWorkout(){
   ensureWeekState();
 
-  /* ===============================
-     DAILY TOTAL (LIFETIME COUNTER)
-  =============================== */
+  // LIFETIME days trained (max 1 per day)
   const today = todayKey();
   const lastDone = getLastDoneDate();
-
   if(lastDone !== today){
     setTotalDays(getTotalDays() + 1);
     setLastDoneDate(today);
   }
 
-  /* ===============================
-     WEEKLY STREAK (UNCHANGED)
-  =============================== */
+  // WEEKLY count (can be >1/day)
   let count = getWeekCount();
   count += 1;
   setWeekCount(count);
 
+  // streak logic: weekly threshold (3+)
   if(count >= 3 && !getWeekCounted()){
     setStreak(getStreak() + 1);
     setWeekCounted(true);
   }
 
-  /* ===============================
-     UI
-  =============================== */
   weekNumEl.textContent = String(getTotalDays());
   renderStreakUI();
 
@@ -1238,9 +1161,7 @@ function closeModalFn(){
 }
 exerciseBtn.addEventListener("click", openModal);
 closeModal.addEventListener("click", closeModalFn);
-modal.addEventListener("click",(e)=>{
-  if(e.target === modal) closeModalFn();
-});
+modal.addEventListener("click",(e)=>{ if(e.target === modal) closeModalFn(); });
 
 function renderTabs(){
   tabsEl.innerHTML = "";
@@ -1248,11 +1169,7 @@ function renderTabs(){
     const b = document.createElement("button");
     b.className = "tab" + (k===activeTab ? " active":"");
     b.textContent = k;
-    b.addEventListener("click", ()=>{
-      activeTab = k;
-      renderTabs();
-      renderList();
-    });
+    b.addEventListener("click", ()=>{ activeTab = k; renderTabs(); renderList(); });
     tabsEl.appendChild(b);
   });
 }
