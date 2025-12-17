@@ -105,14 +105,14 @@
   }
 
   /* CENTER AREA (no scroll) */
-  .center{
-    flex:1;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    position:relative;
-    min-height:0; /* important for fixed footer */
-  }
+ .center{
+  flex:1;
+  display:flex;
+  align-items:flex-start;   /* 👈 key change */
+  justify-content:center;
+  padding-top:32px;         /* 👈 controlled upward offset */
+  position:relative;
+}
 
   /* WORKOUT CARD */
   .card{
