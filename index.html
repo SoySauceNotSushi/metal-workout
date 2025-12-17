@@ -1187,16 +1187,36 @@ function shootConfettiFromUnderButtons(){
 
 function completeWorkout(){
   ensureWeekState();
+
+  /* ===============================
+     DAILY TOTAL (LIFETIME COUNTER)
+  =============================== */
+  const today = todayKey();
+  const lastDone = getLastDoneDate();
+
+  if(lastDone !== today){
+    setTotalDays(getTotalDays() + 1);
+    setLastDoneDate(today);
+  }
+
+  /* ===============================
+     WEEKLY STREAK (UNCHANGED)
+  =============================== */
   let count = getWeekCount();
   count += 1;
   setWeekCount(count);
 
   if(count >= 3 && !getWeekCounted()){
-    setStreak(getStreak()+1);
+    setStreak(getStreak() + 1);
     setWeekCounted(true);
   }
 
+  /* ===============================
+     UI
+  =============================== */
+  weekNumEl.textContent = String(getTotalDays());
   renderStreakUI();
+
   shootConfettiFromUnderButtons();
   if(navigator.vibrate) navigator.vibrate(18);
 
