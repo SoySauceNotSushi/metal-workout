@@ -898,6 +898,7 @@ function renderMetaconHistory(){
   }
 
   const bestTime = Math.min(...metaconHistory.map(h => h.time));
+let prUsed = false;
 
   metaconHistory
     .slice()
