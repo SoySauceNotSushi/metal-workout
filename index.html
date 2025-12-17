@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Jy Workout</title>
 
-<!-- Confetti (same lib you used earlier) -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <style>
@@ -13,28 +12,31 @@
     --brand:#2453f5;
     --ink:#0f172a;
     --sub:#64748b;
-
     --bg:#f8fafc;
     --card:#ffffff;
 
     --shadow-soft:0 18px 48px rgba(15,23,42,0.14);
-    --shadow-subtle:0 10px 24px rgba(15,23,42,0.10);
+    --shadow-subtle:0 10px 24px rgba(15,23,42,0.12);
 
-    --streak-bg:#eef2f7;
+    --streak-bg:#e5e7eb;
     --streak-fill:#f97316;
 
-    /* 8 tag colors (previous style vibe: soft bg + stronger text) */
-    --t-purple-bg:#ede9fe; --t-purple-tx:#7c3aed;
-    --t-orange-bg:#ffedd5; --t-orange-tx:#ea580c;
-    --t-red-bg:#ffe4e6;    --t-red-tx:#e11d48;
-    --t-pink-bg:#fce7f3;   --t-pink-tx:#db2777;
-    --t-blue-bg:#e4ecff;   --t-blue-tx:#2453f5;
-    --t-yellow-bg:#fef9c3; --t-yellow-tx:#ca8a04;
-    --t-teal-bg:#ecfeff;   --t-teal-tx:#0891b2;
-    --t-green-bg:#d9fbe3;  --t-green-tx:#16a34a;
+    /* 8 distinct tag palettes (nice + readable) */
+    --tag-purple-bg:#ede9fe; --tag-purple-tx:#6d28d9;
+    --tag-orange-bg:#ffedd5; --tag-orange-tx:#c2410c;
+    --tag-red-bg:#fee2e2;    --tag-red-tx:#b91c1c;
+    --tag-pink-bg:#fce7f3;   --tag-pink-tx:#be185d;
+    --tag-blue-bg:#e4ecff;   --tag-blue-tx:#2453f5;
+    --tag-yellow-bg:#fef9c3; --tag-yellow-tx:#a16207;
+    --tag-teal-bg:#ccfbf1;   --tag-teal-tx:#0f766e;
+    --tag-green-bg:#d9fbe3;  --tag-green-tx:#16a34a;
   }
 
   *{ box-sizing:border-box; }
+
+  html, body{
+    height:100%;
+  }
 
   body{
     margin:0;
@@ -42,111 +44,173 @@
     color:var(--ink);
     font-family:-apple-system,BlinkMacSystemFont,"SF Pro",Segoe UI,Roboto,sans-serif;
     -webkit-font-smoothing:antialiased;
+
+    /* ✅ lock scrolling */
+    overflow:hidden;
+    overscroll-behavior:none;
+    touch-action:manipulation;
   }
 
   .container{
     max-width:480px;
     margin:0 auto;
     padding:24px;
-    padding-bottom:220px;
+    height:100%;
+    display:flex;
+    flex-direction:column;
     position:relative;
-    min-height:100vh;
   }
 
-  /* TOP HEADER ROW: weather + streak */
-  .top-header{
+  /* TOP STREAK ROW */
+  .top-row{
     display:flex;
     align-items:center;
-    justify-content:space-between;
-    gap:12px;
+    gap:10px;
     margin-bottom:12px;
   }
-
-  .weather{
-    font-size:15px;
-    color:var(--sub);
-    opacity:.95;
-    display:flex;
-    align-items:center;
-    gap:6px;
-    transition:opacity .25s ease, transform .25s ease;
-    min-width:160px;
-  }
-
-  .streak-wrap{
-    display:flex;
-    align-items:center;
-    justify-content:flex-end;
-    gap:10px;
-    flex:1;
-  }
-
   .streak-fire{
     display:flex;
     align-items:center;
     gap:6px;
-    font-size:14px;
     font-weight:700;
     color:var(--streak-fill);
-    white-space:nowrap;
+    font-variant-numeric:tabular-nums;
+    min-width:44px;
   }
-
   .streak-bar{
-    position:relative;
-    width:150px; /* NOT full width */
+    width:100px; /* ✅ requested */
     height:8px;
-    border-radius:999px;
     background:var(--streak-bg);
+    border-radius:999px;
     overflow:hidden;
   }
-
   .streak-bar-fill{
-    position:absolute;
-    inset:0;
+    height:100%;
+    width:0%;
     background:var(--streak-fill);
-    transform-origin:left center;
-    transform:scaleX(0);
-    transition:transform .35s cubic-bezier(.22,.8,.4,1);
-  }
-
-  .streak-count{
-    font-variant-numeric:tabular-nums;
-    min-width:16px;
-  }
-  .streak-count.flip{
-    animation:streakFlip .32s ease-out;
-  }
-  @keyframes streakFlip{
-    0%{ transform:translateY(-60%) rotateX(90deg); opacity:0; }
-    100%{ transform:translateY(0) rotateX(0deg); opacity:1; }
+    transform-origin:left;
+    transition:width .28s ease;
   }
 
   h1{
     font-size:34px;
     font-weight:800;
-    margin:8px 0 6px;
-    letter-spacing:-0.02em;
+    margin:2px 0 6px;
+    letter-spacing:-.3px;
   }
-
-  #subtitle{
-    font-size:17px;
-    font-weight:400;
+  .subtitle{
     color:var(--sub);
-    margin:0 0 18px;
+    font-size:18px;
+    margin-bottom:14px;
   }
 
-  /* AI GRADIENT STAGE — your original style (kept), but DOES NOT cover buttons */
+  /* CENTER AREA (no scroll) */
+  .center{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    min-height:0; /* important for fixed footer */
+  }
+
+  /* WORKOUT CARD */
+  .card{
+    width:100%;
+    max-width:420px;
+    background:var(--card);
+    border-radius:18px;
+    box-shadow:var(--shadow-soft);
+    padding:22px 20px;
+    opacity:0;
+    transform:translateY(18px) scale(.98);
+    transition:opacity .28s ease, transform .32s cubic-bezier(.18,.84,.32,1.12);
+    display:none;
+  }
+  .card.show{
+    display:block;
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+  .card-title{
+    font-size:22px;
+    font-weight:900;
+    margin:0 0 14px;
+    letter-spacing:-.2px;
+  }
+  .line{
+    font-size:18px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:12px 0;
+    flex-wrap:wrap;
+  }
+
+  /* PILLS */
+  .pill{
+    padding:5px 12px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:800;
+    line-height:1;
+    text-transform:lowercase;
+    box-shadow:0 0 0 1px rgba(15,23,42,0.04);
+    user-select:none;
+  }
+
+  /* Tag → color mapping (8 tags) */
+  .tag-push{ background:var(--tag-blue-bg); color:var(--tag-blue-tx); }
+  .tag-pull{ background:var(--tag-green-bg); color:var(--tag-green-tx); }
+  .tag-legs{ background:var(--tag-orange-bg); color:var(--tag-orange-tx); }
+  .tag-abs{ background:var(--tag-teal-bg); color:var(--tag-teal-tx); }
+  .tag-cardio{ background:var(--tag-yellow-bg); color:var(--tag-yellow-tx); }
+  .tag-fullbody{ background:var(--tag-red-bg); color:var(--tag-red-tx); }
+  .tag-shoulders{ background:var(--tag-purple-bg); color:var(--tag-purple-tx); }
+  .tag-upper{ background:var(--tag-pink-bg); color:var(--tag-pink-tx); }
+
+  /* WEEK SUMMARY (centered big engraved number) */
+  .summary{
+    width:100%;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    text-align:center;
+  }
+  .summary.show{ display:flex; }
+
+  .big-num{
+    font-size:140px;
+    font-weight:900;
+    line-height:1;
+    letter-spacing:-3px;
+    color:#e5e7eb;
+    text-shadow:
+      0 2px 0 rgba(255,255,255,0.9),
+      0 -1px 0 rgba(15,23,42,0.05);
+    margin:0;
+    user-select:none;
+  }
+  .summary-text{
+    margin-top:10px;
+    font-size:20px;
+    font-weight:700;
+    color:#94a3b8;
+  }
+
+  /* AI GRADIENT STAGE (does NOT touch buttons) */
   .ai-stage{
     position:absolute;
     left:50%;
-    top:240px;
-    transform:translateX(-50%);
-    width:260px;
-    height:260px;
+    top:54%;
+    transform:translate(-50%,-50%);
+    width:320px;
+    height:320px;
     border-radius:50%;
-    display:none;
     pointer-events:none;
-    z-index:1;
+    display:none;
+    z-index:1; /* behind card, above background */
   }
   .ai-stage::before{
     content:"";
@@ -163,7 +227,6 @@
     background-blend-mode:screen;
     animation:meshBreath 2s ease-in-out infinite, meshDrift 3s ease-in-out infinite;
   }
-  .ai-stage.show{ display:block; }
   .ai-stage.show::before{ opacity:.9; }
 
   @keyframes meshBreath{
@@ -176,151 +239,61 @@
     100%{ transform:translate3d(0,0,0); }
   }
 
-  /* MAIN WORKOUT CARD */
-  #card{
-    position:relative;
-    background:var(--card);
-    border-radius:18px;
-    padding:22px;
-    box-shadow:var(--shadow-soft);
-    display:none;
-    opacity:0;
-    transform:translateY(18px) scale(.97);
-    transition:
-      opacity .32s ease,
-      transform .32s cubic-bezier(.18,.84,.32,1.12);
-    z-index:2;
-  }
-  #card.visible{
-    opacity:1;
-    transform:translateY(0) scale(1);
-  }
-
-  #workoutTitle{
-    font-size:22px;
-    font-weight:800;
-    margin:2px 0 16px;
-  }
-
-  .line{
-    font-size:18px;
-    margin-bottom:12px;
-    display:flex;
-    align-items:center;
-    gap:10px;
-    flex-wrap:wrap;
-  }
-
-  .pill{
-    padding:4px 12px;
-    border-radius:999px;
-    font-size:13px;
-    font-weight:700;
-    white-space:nowrap;
-  }
-
-  /* 8 pills mapped to 8 categories */
-  .pill-push{ background:var(--t-blue-bg);   color:var(--t-blue-tx); }
-  .pill-pull{ background:var(--t-green-bg);  color:var(--t-green-tx); }
-  .pill-upper{background:var(--t-purple-bg); color:var(--t-purple-tx); }
-  .pill-shoulders{background:var(--t-pink-bg); color:var(--t-pink-tx); }
-  .pill-legs{ background:var(--t-orange-bg); color:var(--t-orange-tx); }
-  .pill-abs{  background:var(--t-teal-bg);   color:var(--t-teal-tx); }
-  .pill-cardio{background:var(--t-yellow-bg); color:var(--t-yellow-tx); }
-  .pill-fullbody{background:var(--t-red-bg); color:var(--t-red-tx); }
-
-  /* WEEK SUMMARY SCREEN (engraved number) */
-  #weekSummary{
-    display:none;
-    text-align:center;
-    margin-top:34px;
-    position:relative;
-    z-index:2;
-  }
-
-  .engravedNum{
-    font-size:140px;
-    font-weight:800;
-    line-height:1;
-    letter-spacing:-0.04em;
-    color:rgba(15,23,42,0.07);
-    text-shadow:
-      0 1px 0 rgba(255,255,255,0.9),
-      0 -1px 0 rgba(15,23,42,0.08);
-    margin:24px 0 0;
-    user-select:none;
-  }
-
-  .weekText{
-    margin-top:-8px;
-    font-size:20px;
-    color:var(--sub);
-    font-weight:600;
-  }
-
-  /* FIXED ACTIONS */
-  .fixed-actions{
+  /* FIXED ACTIONS (no shadow on generate button) */
+  .actions{
     position:fixed;
     left:50%;
     bottom:22px;
     transform:translateX(-50%);
     width:calc(100% - 48px);
     max-width:480px;
-    z-index:20; /* always above mesh/confetti */
+    z-index:20; /* above confetti */
   }
 
   .btn{
     width:100%;
-    height:58px;
-    border-radius:30px;
+    height:56px;
+    border-radius:28px;
     border:none;
     font-size:18px;
-    font-weight:600; /* keep sane */
+    font-weight:600; /* keep normal weight */
     cursor:pointer;
   }
-
-  /* Generate button: NO shadow */
   #generateBtn{
     background:var(--brand);
     color:#fff;
-    box-shadow:none;
+    box-shadow:none; /* ✅ remove shadow */
   }
-  #generateBtn:active{ transform:scale(.99); }
-
-  #exBtn{
+  #exerciseBtn{
     margin-top:12px;
     background:#eef2f7;
     color:var(--brand);
     font-weight:700;
   }
-  #exBtn:active{ transform:scale(.99); }
 
-  /* SLIDE TO COMPLETE — sits where the exercise button was (lower) */
-  #slideWrap{
+  /* SLIDER sits where Exercises button was */
+  .slider-wrap{
     margin-top:12px;
     display:none;
   }
-
   .slide-track{
     position:relative;
-    height:58px;
+    height:56px;
     border-radius:999px;
-    background:#eef2f7;
+    background:#e5e7eb;
     overflow:hidden;
     user-select:none;
     touch-action:none;
   }
-
   .slide-fill{
     position:absolute;
     inset:0;
     border-radius:999px;
-    pointer-events:none;
     background:linear-gradient(120deg,#2453f5,#4f8cff);
-    transform-origin:left center;
     transform:scaleX(0);
+    transform-origin:left;
+    transition:transform .12s ease-out;
   }
-
   .slide-label{
     position:absolute;
     inset:0;
@@ -328,453 +301,333 @@
     align-items:center;
     justify-content:center;
     pointer-events:none;
-    font-size:17px;
+    font-size:18px;
     font-weight:700;
-    color:var(--brand);
-    transition:color .12s ease;
+    color:rgba(36,83,245,0.95);
+    transition:color .12s ease-out;
   }
-
-  /* text turns WHITE while sliding (not only completion) */
   .slide-track.filled .slide-label{
-    color:#fff;
+    color:#fff; /* ✅ white when filled (accessibility) */
   }
-
   .slide-knob{
     position:absolute;
     top:50%;
-    left:6px;
-    width:50px;
-    height:50px;
+    left:4px;
+    width:48px;
+    height:48px;
     border-radius:50%;
     background:#fff;
+    transform:translate(0,-50%);
     display:flex;
     align-items:center;
     justify-content:center;
-    box-shadow:0 8px 16px rgba(15,23,42,0.18);
-    transform:translate(0,-50%);
+    box-shadow:0 10px 22px rgba(15,23,42,0.15);
     touch-action:none;
   }
-
-  .slide-knob .arrow{
+  .slide-arrow{
     font-size:20px;
     color:var(--brand);
   }
 
-  /* MODAL — FULL HEIGHT, CONTENT SCROLLS */
-  #modal{
+  /* MODAL (full screen) */
+  .modal{
     position:fixed;
     inset:0;
-    background:rgba(0,0,0,0.35);
+    background:rgba(2,6,23,0.42);
     display:none;
     z-index:60;
   }
-  #modal.show{ display:block; }
+  .modal.show{ display:block; }
 
   .sheet{
     position:absolute;
     inset:0;
     background:#fff;
-    border-radius:18px 18px 0 0;
-    padding:16px 16px 22px;
     display:flex;
     flex-direction:column;
-    gap:12px;
+    padding:16px;
   }
 
-  .sheetHeader{
+  .sheet-top{
     display:flex;
     align-items:center;
     justify-content:space-between;
     gap:10px;
+    padding-bottom:10px;
   }
-  .sheetTitle{
+  .sheet-title{
+    font-weight:900;
     font-size:18px;
-    font-weight:800;
+    letter-spacing:-.2px;
   }
-  .closeBtn{
+  .close{
     border:none;
-    background:#eef2f7;
-    border-radius:10px;
-    padding:10px 12px;
-    font-weight:800;
+    background:#f1f5f9;
+    border-radius:999px;
+    padding:10px 14px;
+    font-weight:900;
     cursor:pointer;
   }
 
   .tabs{
     display:flex;
-    gap:8px;
+    gap:10px;
     flex-wrap:wrap;
+    padding:8px 0 6px;
   }
-
   .tab{
-    padding:8px 12px;
-    border-radius:999px;
-    background:#f1f5f9;
-    font-size:13px;
-    font-weight:800;
     border:none;
     cursor:pointer;
+    padding:10px 14px;
+    border-radius:999px;
+    background:#f1f5f9;
+    font-weight:900;
+    color:#0f172a;
   }
   .tab.active{
     background:#e4ecff;
     color:#1d4ed8;
   }
 
-  .list{
-    flex:1;               /* key: modal height doesn't change */
-    overflow:auto;        /* scroll list */
-    padding-top:2px;
+  /* modal content area fixed height; list scrolls */
+  .sheet-body{
+    flex:1;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
   }
 
-  .row{
+  .add-row{
     display:grid;
-    grid-template-columns: 1fr 90px 44px;
+    grid-template-columns: 1fr 140px;
+    gap:10px;
+    margin-top:10px;
+  }
+  .input{
+    height:52px;           /* ✅ normal size */
+    padding:0 14px;
+    font-size:16px;        /* ✅ readable */
+    border-radius:14px;
+    border:1px solid #e5e7eb;
+    outline:none;
+  }
+  .add-btn{
+    height:52px;
+    border-radius:14px;
+    border:none;
+    background:var(--brand);
+    color:#fff;
+    font-weight:900;
+    cursor:pointer;
+  }
+
+  .list{
+    margin-top:12px;
+    flex:1;
+    min-height:0;
+    overflow:auto; /* ✅ scroll inside modal only */
+    padding-right:2px;
+  }
+
+  .item{
+    display:grid;
+    grid-template-columns: 1fr 120px 44px;
     gap:10px;
     align-items:center;
     margin-bottom:10px;
   }
-
-  .row input{
-    width:100%;
-    padding:12px 12px;
-    border-radius:12px;
-    border:1px solid #e5e7eb;
-    font-size:15px;
-  }
-
-  .trash{
-    width:44px;
-    height:44px;
-    border-radius:12px;
-    border:none;
-    background:#f1f5f9;
-    cursor:pointer;
-    font-size:18px;
-  }
-
-  .addRow{
-    display:flex;
-    gap:10px;
-    margin-top:14px;
-    position:sticky;
-    bottom:0;
-    background:#fff;
-    padding-top:10px;
-  }
-
-  .addRow input{
-    flex:1;
-  }
-
-  .addBtn{
-    width:120px;
-    border:none;
+  .del{
+    width:44px;height:44px;
     border-radius:14px;
-    background:var(--brand);
-    color:#fff;
-    font-weight:800;
+    border:none;
+    background:#fee2e2;
+    color:#b91c1c;
+    font-weight:900;
     cursor:pointer;
   }
 
-  /* subtle separator on scroll */
-  .sheet::before{
-    content:"";
-    position:absolute;
-    top:0; left:0; right:0;
-    height:1px;
-    background:rgba(15,23,42,0.06);
+  /* Small helper */
+  .muted{
+    color:var(--sub);
+    font-size:13px;
+    margin-top:6px;
   }
 </style>
 </head>
 
 <body>
+  <div class="container">
+    <div class="top-row">
+      <div class="streak-fire"><span>🔥</span><span id="streakCount">0</span></div>
+      <div class="streak-bar"><div id="streakFill" class="streak-bar-fill"></div></div>
+    </div>
 
-<div class="container">
+    <h1>Welcome back Jy</h1>
+    <div class="subtitle">Today's mixed workout</div>
 
-  <div class="top-header">
-    <div class="weather" id="weather">Enable location for weather</div>
+    <div class="center">
+      <div id="aiStage" class="ai-stage"></div>
 
-    <div class="streak-wrap">
-      <div class="streak-fire">
-        <span>🔥</span>
-        <span id="streakCount" class="streak-count">0</span>
+      <div id="workoutCard" class="card" aria-live="polite"></div>
+
+      <div id="summary" class="summary">
+        <div id="weekNum" class="big-num">0</div>
+        <div class="summary-text">workouts completed this week</div>
       </div>
-      <div class="streak-bar">
-        <div class="streak-bar-fill" id="streakFill"></div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button id="generateBtn" class="btn">Generate Workout</button>
+
+    <button id="exerciseBtn" class="btn">Exercises</button>
+
+    <div id="sliderWrap" class="slider-wrap">
+      <div id="slideTrack" class="slide-track">
+        <div id="slideFill" class="slide-fill"></div>
+        <div id="slideLabel" class="slide-label">Slide to Complete</div>
+        <div id="slideKnob" class="slide-knob"><span class="slide-arrow">→</span></div>
       </div>
     </div>
   </div>
 
-  <h1>Welcome back Jy</h1>
-  <div id="subtitle">Today's mixed workout</div>
+  <!-- MODAL -->
+  <div id="modal" class="modal" role="dialog" aria-modal="true">
+    <div class="sheet">
+      <div class="sheet-top">
+        <div class="sheet-title">Exercises</div>
+        <button id="closeModal" class="close">Close</button>
+      </div>
 
-  <div id="aiStage" class="ai-stage"></div>
+      <div class="tabs" id="tabs"></div>
 
-  <div id="card">
-    <div id="workoutTitle"></div>
-    <div id="lines"></div>
-  </div>
+      <div class="sheet-body">
+        <div class="add-row">
+          <input id="newName" class="input" type="text" placeholder="Exercise (e.g., Pull-Ups)" />
+          <input id="newReps" class="input" type="number" inputmode="numeric" placeholder="Reps" />
+        </div>
+        <button id="addBtn" class="add-btn" style="margin-top:10px;">Add exercise</button>
+        <div class="muted">Tip: reps are shown for AMRAP. Metabolic Conditioning ignores reps.</div>
 
-  <div id="weekSummary">
-    <div class="engravedNum" id="engravedNum">0</div>
-    <div class="weekText" id="weekText">workouts completed this week</div>
-  </div>
-</div>
-
-<!-- Fixed actions -->
-<div class="fixed-actions">
-  <button id="generateBtn" class="btn">Generate Workout</button>
-  <button id="exBtn" class="btn">Exercises</button>
-
-  <div id="slideWrap">
-    <div id="slideTrack" class="slide-track">
-      <div id="slideFill" class="slide-fill"></div>
-      <div class="slide-label" id="slideLabel">Slide to Complete</div>
-      <div id="slideKnob" class="slide-knob"><span class="arrow">→</span></div>
+        <div id="list" class="list"></div>
+      </div>
     </div>
   </div>
-</div>
-
-<!-- Modal -->
-<div id="modal">
-  <div class="sheet">
-    <div class="sheetHeader">
-      <div class="sheetTitle">Exercises</div>
-      <button class="closeBtn" id="closeModal">Close</button>
-    </div>
-
-    <div class="tabs" id="tabs"></div>
-
-    <div class="list" id="list"></div>
-
-    <div class="addRow">
-      <input id="newName" type="text" placeholder="New exercise name" />
-      <input id="newReps" type="number" inputmode="numeric" placeholder="Reps" />
-      <button class="addBtn" id="addBtn">Add</button>
-    </div>
-  </div>
-</div>
 
 <script>
-/* ===================== STORAGE KEYS ===================== */
+/* ===========================
+   STORAGE KEYS
+=========================== */
 const LS = {
-  streak: "jy_streak",
   weekKey: "jy_weekKey",
-  weekState: "jy_weekState",      // {week, dates:[], counted:boolean}
-  exercises: "jy_exercises"       // object by category
+  weekCount: "jy_weekCount",
+  streak: "jy_streak",
+  weekSummary: "jy_weekSummary",
+  exercises: "jy_exercises",
 };
 
-/* ===================== DATE / WEEK ===================== */
-function todayKey(){
-  const d=new Date();
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-}
-/* ISO-ish week key (stable enough for streak logic) */
-function weekKey(){
-  const d=new Date();
+/* ===========================
+   WEEK KEY + STREAK LOGIC
+   - streak increments when reaching 3 workouts within a week (once)
+   - on week rollover: if previous week <3 -> streak resets to 0
+=========================== */
+function getWeekKey(d=new Date()){
   const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
   const dayNum = date.getUTCDay() || 7;
   date.setUTCDate(date.getUTCDate() + 4 - dayNum);
   const yearStart = new Date(Date.UTC(date.getUTCFullYear(),0,1));
-  const weekNo = Math.ceil((((date - yearStart) / 86400000) + 1)/7);
+  const weekNo = Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
   return `${date.getUTCFullYear()}-W${String(weekNo).padStart(2,"0")}`;
 }
 
-/* ===================== STREAK / WEEK LOGIC ===================== */
+function lsGet(k){ return localStorage.getItem(k); }
+function lsSet(k,v){ localStorage.setItem(k,v); }
+function lsJSONGet(k, fallback){
+  try{
+    const raw = lsGet(k);
+    if(!raw) return fallback;
+    return JSON.parse(raw);
+  }catch{ return fallback; }
+}
+function lsJSONSet(k, obj){ lsSet(k, JSON.stringify(obj)); }
+
 function getStreak(){
-  const n = parseInt(localStorage.getItem(LS.streak) || "0", 10);
-  return Number.isFinite(n) && n > 0 ? n : 0;
+  const n = parseInt(lsGet(LS.streak) || "0", 10);
+  return Number.isFinite(n) && n>0 ? n : 0;
 }
 function setStreak(n){
-  localStorage.setItem(LS.streak, String(Math.max(0, n|0)));
-}
-function loadWeekState(){
-  const raw = localStorage.getItem(LS.weekState);
-  if(!raw) return null;
-  try{ return JSON.parse(raw); }catch{ return null; }
-}
-function saveWeekState(obj){
-  localStorage.setItem(LS.weekState, JSON.stringify(obj));
+  lsSet(LS.streak, String(Math.max(0, n|0)));
 }
 
-/* If week changes:
-   - if last week < 3 workouts -> streak resets to 0
-   - reset weekState for new week
-*/
-function rolloverWeekIfNeeded(){
-  const cur = weekKey();
-  const prev = localStorage.getItem(LS.weekKey);
+function getWeekCount(){
+  const n = parseInt(lsGet(LS.weekCount) || "0", 10);
+  return Number.isFinite(n) && n>=0 ? n : 0;
+}
+function setWeekCount(n){
+  lsSet(LS.weekCount, String(Math.max(0, n|0)));
+}
 
-  let wk = loadWeekState();
-  if(!prev){
-    localStorage.setItem(LS.weekKey, cur);
-    if(!wk || wk.week !== cur){
-      wk = { week: cur, dates: [], counted:false };
-      saveWeekState(wk);
-    }
-    return;
-  }
+function getWeekSummary(){
+  return lsJSONGet(LS.weekSummary, null);
+}
+function setWeekSummary(obj){
+  lsJSONSet(LS.weekSummary, obj);
+}
 
-  if(prev !== cur){
-    // evaluate last week
-    if(wk && wk.week === prev){
-      const done = Array.isArray(wk.dates) ? wk.dates.length : 0;
-      if(done < 3){
+function resetWeekIfNeeded(){
+  const cur = getWeekKey();
+  const prev = lsGet(LS.weekKey);
+  let summary = getWeekSummary();
+  let streak = getStreak();
+
+  if(prev && prev !== cur){
+    // week rolled over -> evaluate last week
+    if(summary && summary.week === prev){
+      if((summary.workouts || 0) < 3){
+        streak = 0; // lose streak
         setStreak(0);
       }
     }
-    // start new week
-    localStorage.setItem(LS.weekKey, cur);
-    wk = { week: cur, dates: [], counted:false };
-    saveWeekState(wk);
+    // new week reset
+    lsSet(LS.weekKey, cur);
+    setWeekCount(0);
+    summary = { week:cur, workouts:0, counted:false };
+    setWeekSummary(summary);
   }else{
-    if(!wk || wk.week !== cur){
-      wk = { week: cur, dates: [], counted:false };
-      saveWeekState(wk);
+    if(!prev) lsSet(LS.weekKey, cur);
+    if(!summary || summary.week !== cur){
+      summary = { week:cur, workouts:getWeekCount(), counted:false };
+      setWeekSummary(summary);
     }
   }
 }
 
-function workoutsThisWeek(){
-  const wk = loadWeekState();
-  if(!wk || wk.week !== weekKey()) return 0;
-  return Array.isArray(wk.dates) ? wk.dates.length : 0;
-}
-
-/* On completion:
-   - add today to dates if not already
-   - if >=3 and not counted -> streak +1 and set counted true
-*/
-function markWorkoutComplete(){
-  const curW = weekKey();
-  let wk = loadWeekState();
-  if(!wk || wk.week !== curW){
-    wk = { week: curW, dates: [], counted:false };
-  }
-  const t = todayKey();
-  if(!wk.dates.includes(t)){
-    wk.dates.push(t);
-  }
-
-  let streak = getStreak();
-  let streakIncreased = false;
-  if(wk.dates.length >= 3 && !wk.counted){
-    streak += 1;
-    wk.counted = true;
-    setStreak(streak);
-    streakIncreased = true;
-  }else{
-    setStreak(streak);
-  }
-
-  saveWeekState(wk);
-  return { done: wk.dates.length, streak, streakIncreased };
-}
-
-/* ===================== UI: STREAK BAR ===================== */
-const streakCountEl = document.getElementById("streakCount");
-const streakFillEl  = document.getElementById("streakFill");
-let lastStreak = getStreak();
-
-function renderStreakUI(opts={}){
-  const done = workoutsThisWeek();
-  const pct = Math.min(done / 3, 1);
-  streakFillEl.style.transform = `scaleX(${pct})`;
-
-  const streak = getStreak();
-  const flip = !!opts.animateFlip && streak > lastStreak;
-  if(flip){
-    streakCountEl.classList.remove("flip");
-    void streakCountEl.offsetWidth;
-    streakCountEl.textContent = streak;
-    streakCountEl.classList.add("flip");
-    setTimeout(()=> streakCountEl.classList.remove("flip"), 320);
-  }else{
-    streakCountEl.textContent = streak;
-  }
-  lastStreak = streak;
-}
-
-/* ===================== WEATHER ===================== */
-const weatherEl = document.getElementById("weather");
-
-function weatherCodeToText(code){
-  const map={
-    0:"Clear sky",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",
-    45:"Fog",48:"Fog",
-    51:"Drizzle",53:"Drizzle",55:"Drizzle",
-    61:"Rain",63:"Rain",65:"Rain",
-    71:"Snow",73:"Snow",75:"Snow",
-    80:"Rain shower",81:"Rain shower",82:"Rain shower",
-    95:"Thunderstorm",96:"Thunderstorm",99:"Thunderstorm"
-  };
-  return map[code] || "Unknown";
-}
-function getWeatherEmoji(cond){
-  const c=cond.toLowerCase();
-  if(c.includes("clear")) return "☀️";
-  if(c.includes("cloud")) return "⛅";
-  if(c.includes("rain")) return "🌧️";
-  if(c.includes("drizzle")) return "🌦️";
-  if(c.includes("thunder")) return "🌩️";
-  if(c.includes("snow")) return "❄️";
-  if(c.includes("fog")||c.includes("mist")) return "🌫️";
-  return "🌡️";
-}
-function updateWeatherUI(){
-  if(!navigator.geolocation){
-    weatherEl.textContent="Location unavailable";
-    return;
-  }
-  weatherEl.textContent="Loading weather…";
-  navigator.geolocation.getCurrentPosition(async pos=>{
-    const lat=pos.coords.latitude;
-    const lon=pos.coords.longitude;
-    try{
-      const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`;
-      const res=await fetch(url);
-      const data=await res.json();
-      const temp=Math.round(data.current_weather.temperature);
-      const cond=weatherCodeToText(data.current_weather.weathercode);
-      const emoji=getWeatherEmoji(cond);
-      let city="Your area";
-      try{
-        const rev=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
-        const r=await rev.json();
-        city=r.address.city||r.address.town||r.address.village||r.address.county||city;
-      }catch{}
-      weatherEl.textContent=`${emoji} ${temp}°C ${city}`;
-    }catch{
-      weatherEl.textContent="Weather unavailable";
-    }
-  },()=>{
-    weatherEl.textContent="Enable location for weather";
-  },{timeout:10000,maximumAge:600000});
-}
-
-/* ===================== EXERCISES DATA (EDITABLE) ===================== */
-const CATS = [
-  { key:"push", label:"Push", pill:"pill-push" },
-  { key:"pull", label:"Pull", pill:"pill-pull" },
-  { key:"upper", label:"Upper", pill:"pill-upper" },
-  { key:"shoulders", label:"Shoulders", pill:"pill-shoulders" },
-  { key:"legs", label:"Legs", pill:"pill-legs" },
-  { key:"abs", label:"Abs", pill:"pill-abs" },
-  { key:"cardio", label:"Cardio", pill:"pill-cardio" },
-  { key:"fullbody", label:"Fullbody", pill:"pill-fullbody" },
+/* ===========================
+   DEFAULT EXERCISES (editable)
+   8 tags: push, pull, legs, abs, cardio, fullbody, shoulders, upper
+=========================== */
+const TAGS = [
+  { key:"pull", label:"Pull", pill:"tag-pull" },
+  { key:"push", label:"Push", pill:"tag-push" },
+  { key:"upper", label:"Upper", pill:"tag-upper" },
+  { key:"shoulders", label:"Shoulders", pill:"tag-shoulders" },
+  { key:"legs", label:"Legs", pill:"tag-legs" },
+  { key:"abs", label:"Abs", pill:"tag-abs" },
+  { key:"fullbody", label:"Fullbody", pill:"tag-fullbody" },
+  { key:"cardio", label:"Cardio", pill:"tag-cardio" },
 ];
 
-const DEFAULT_EXERCISES = {
+const DEFAULT_EX = {
+  pull: [
+    { name:"Pull-Ups", reps:5 },
+    { name:"Chin-Ups", reps:5 },
+    { name:"Australian Chin-Ups", reps:10 },
+  ],
   push: [
     { name:"Push-Ups", reps:10 },
     { name:"Dips", reps:10 },
     { name:"Decline Push-Ups", reps:10 },
     { name:"Diamond Push-Ups", reps:10 },
-  ],
-  pull: [
-    { name:"Pull-Ups", reps:5 },
-    { name:"Chin-Ups", reps:5 },
-    { name:"Australian Chin-Ups", reps:10 },
   ],
   upper: [
     { name:"Muscle-Up", reps:1 },
@@ -792,402 +645,427 @@ const DEFAULT_EXERCISES = {
     { name:"Full Body Raises", reps:20 },
     { name:"Oblique Twists", reps:10 },
   ],
-  cardio: [
-    { name:"Jumping Jacks", reps:20 },
-    { name:"Mountain Climbers", reps:20 },
-  ],
   fullbody: [
     { name:"Burpees", reps:10 },
     { name:"Kettlebell Swings", reps:10 },
   ],
+  cardio: [
+    { name:"Jumping Jacks", reps:20 },
+    { name:"Mountain Climbers", reps:20 },
+  ],
 };
 
 function loadExercises(){
-  const raw = localStorage.getItem(LS.exercises);
-  if(!raw){
-    localStorage.setItem(LS.exercises, JSON.stringify(DEFAULT_EXERCISES));
-    return structuredClone(DEFAULT_EXERCISES);
-  }
-  try{
-    const obj = JSON.parse(raw);
-    // ensure all keys exist
-    const merged = structuredClone(DEFAULT_EXERCISES);
-    for(const k of Object.keys(merged)){
-      if(Array.isArray(obj[k])) merged[k] = obj[k];
-    }
-    localStorage.setItem(LS.exercises, JSON.stringify(merged));
-    return merged;
-  }catch{
-    localStorage.setItem(LS.exercises, JSON.stringify(DEFAULT_EXERCISES));
-    return structuredClone(DEFAULT_EXERCISES);
-  }
+  const saved = lsJSONGet(LS.exercises, null);
+  if(saved && typeof saved === "object") return saved;
+  lsJSONSet(LS.exercises, DEFAULT_EX);
+  return structuredClone(DEFAULT_EX);
+}
+function saveExercises(data){
+  lsJSONSet(LS.exercises, data);
 }
 
-function saveExercises(ex){
-  localStorage.setItem(LS.exercises, JSON.stringify(ex));
+/* ===========================
+   UI REFS
+=========================== */
+const streakCountEl = document.getElementById("streakCount");
+const streakFillEl  = document.getElementById("streakFill");
+
+const aiStageEl     = document.getElementById("aiStage");
+const cardEl        = document.getElementById("workoutCard");
+const summaryEl     = document.getElementById("summary");
+const weekNumEl     = document.getElementById("weekNum");
+
+const generateBtn   = document.getElementById("generateBtn");
+const exerciseBtn   = document.getElementById("exerciseBtn");
+
+const sliderWrap    = document.getElementById("sliderWrap");
+const slideTrack    = document.getElementById("slideTrack");
+const slideFill     = document.getElementById("slideFill");
+const slideKnob     = document.getElementById("slideKnob");
+
+const modal         = document.getElementById("modal");
+const closeModalBtn = document.getElementById("closeModal");
+const tabsEl        = document.getElementById("tabs");
+const listEl        = document.getElementById("list");
+const newNameEl     = document.getElementById("newName");
+const newRepsEl     = document.getElementById("newReps");
+const addBtn        = document.getElementById("addBtn");
+
+/* ===========================
+   STATE
+=========================== */
+let exercises = loadExercises();
+let activeTab = "pull";
+let currentWorkout = null;
+
+/* ===========================
+   RENDER STREAK + SUMMARY
+=========================== */
+function renderTop(){
+  const streak = getStreak();
+  const weekCount = getWeekCount();
+
+  streakCountEl.textContent = streak;
+
+  const pct = Math.min(weekCount/3, 1) * 100;
+  streakFillEl.style.width = `${pct}%`;
+
+  weekNumEl.textContent = weekCount;
 }
 
-/* ===================== WORKOUT GENERATION ===================== */
-const aiStage = document.getElementById("aiStage");
-const cardEl = document.getElementById("card");
-const linesEl = document.getElementById("lines");
-const titleEl = document.getElementById("workoutTitle");
-const subtitleEl = document.getElementById("subtitle");
-
-const generateBtn = document.getElementById("generateBtn");
-const exBtn = document.getElementById("exBtn");
-
-const slideWrap = document.getElementById("slideWrap");
-const slideTrack = document.getElementById("slideTrack");
-const slideFill = document.getElementById("slideFill");
-const slideKnob = document.getElementById("slideKnob");
-
-const weekSummaryEl = document.getElementById("weekSummary");
-const engravedNumEl = document.getElementById("engravedNum");
-const weekTextEl = document.getElementById("weekText");
-
-let currentWorkout = null; // {type, items[]}
-
-/* probabilities for AMRAP categories */
-function shouldInclude(catKey){
-  if(catKey === "pull") return Math.random() < 0.80;
-  if(catKey === "push") return Math.random() < 0.80;
-  // upper + shoulders explicitly 50%
-  if(catKey === "upper") return Math.random() < 0.50;
-  if(catKey === "shoulders") return Math.random() < 0.50;
-  // rest 50%
-  return Math.random() < 0.50;
-}
-
-function rand(arr){
-  return arr[Math.floor(Math.random()*arr.length)];
-}
+/* ===========================
+   WORKOUT GENERATION
+   - 50% chance for shoulders and upper in AMRAP pool (effectively by pool weight)
+   - AMRAP shows 3–4 exercises
+   - MetCon shows ALL categories, shuffled, NO reps shown
+=========================== */
+function randInt(min, max){ return Math.floor(Math.random()*(max-min+1))+min; }
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 function shuffle(arr){
-  const a = arr.slice();
+  const a=[...arr];
   for(let i=a.length-1;i>0;i--){
-    const j = Math.floor(Math.random()*(i+1));
+    const j=Math.floor(Math.random()*(i+1));
     [a[i],a[j]]=[a[j],a[i]];
   }
   return a;
 }
 
-function pickExercise(exByCat, catKey){
-  const list = exByCat[catKey] || [];
-  if(!list.length){
-    return { name: catKey, reps: 10 };
-  }
-  const e = rand(list);
-  return { name: String(e.name || catKey).trim() || catKey, reps: Number(e.reps || 10) };
+/* Weighted chance by tag:
+   - pull: 80%
+   - push: 80%
+   - everything else: 50%
+   NOTE: user also wanted shoulders + upper 50% (fits here)
+*/
+function includeTagChance(tagKey){
+  if(tagKey === "pull") return Math.random() < 0.80;
+  if(tagKey === "push") return Math.random() < 0.80;
+  return Math.random() < 0.50;
 }
 
-/* Build AMRAP: MUST be 3–4 items */
-function buildAMRAP(exByCat){
-  // Step 1: choose categories by probability
-  let chosen = CATS.map(c=>c.key).filter(k=> shouldInclude(k));
+function buildAMRAP(){
+  const tags = TAGS.map(t=>t.key);
 
-  // Step 2: enforce 3–4
-  if(chosen.length < 3){
-    // add random categories until 3
-    const pool = shuffle(CATS.map(c=>c.key));
-    for(const k of pool){
-      if(chosen.includes(k)) continue;
-      chosen.push(k);
-      if(chosen.length >= 3) break;
-    }
-  }
-  if(chosen.length > 4){
-    chosen = shuffle(chosen).slice(0,4);
-  }
-  // If still 2 (extreme), force add
-  while(chosen.length < 3){
-    const k = rand(CATS.map(c=>c.key));
-    if(!chosen.includes(k)) chosen.push(k);
-  }
-  // If 5+, trim
-  if(chosen.length > 4) chosen = chosen.slice(0,4);
+  // decide which categories are included based on chance
+  let included = tags.filter(t => includeTagChance(t));
 
-  // Build items
-  const items = chosen.map(k=>{
-    const meta = CATS.find(c=>c.key===k);
-    const ex = pickExercise(exByCat, k);
-    return {
-      cat: k,
-      pill: meta.pill,
-      label: meta.label.toLowerCase(),
-      name: ex.name,
-      reps: ex.reps
-    };
+  // Ensure we don't end up empty
+  if(included.length === 0){
+    included = ["pull","push"];
+  }
+
+  // pick 3–4 unique exercises total (not per category)
+  const targetCount = randInt(3,4);
+
+  // build candidate pool from included categories
+  let pool = [];
+  included.forEach(tag=>{
+    const list = exercises[tag] || [];
+    list.forEach(ex => pool.push({ tag, ...ex }));
   });
 
-  return { type:"amrap", title:"As Many Rounds As Possible", items };
+  // if pool too small, fall back to all categories
+  if(pool.length < targetCount){
+    pool = [];
+    tags.forEach(tag=>{
+      (exercises[tag]||[]).forEach(ex => pool.push({ tag, ...ex }));
+    });
+  }
+
+  // pick unique by name+tag
+  pool = shuffle(pool);
+  const chosen = [];
+  const seen = new Set();
+  for(const it of pool){
+    const k = `${it.tag}__${it.name}`.toLowerCase();
+    if(seen.has(k)) continue;
+    seen.add(k);
+    chosen.push(it);
+    if(chosen.length >= targetCount) break;
+  }
+
+  return {
+    type: "amrap",
+    title: "As Many Rounds As Possible",
+    items: chosen.map(it => ({
+      name: it.name,
+      reps: Number(it.reps)||0,
+      tags: [it.tag],
+    }))
+  };
 }
 
-/* Build MetCon: ALL 8 categories, shuffled order, NO reps shown */
-function buildMetCon(exByCat){
-  const order = shuffle(CATS.map(c=>c.key));
-  const items = order.map(k=>{
-    const meta = CATS.find(c=>c.key===k);
-    const ex = pickExercise(exByCat, k);
-    return {
-      cat:k,
-      pill: meta.pill,
-      label: meta.label.toLowerCase(),
-      name: ex.name
-      // reps intentionally ignored on render
-    };
+function buildMetCon(){
+  // must include all categories, but order shuffled, and show EXERCISE name (no reps)
+  const order = shuffle(TAGS.map(t=>t.key));
+
+  const items = order.map(tag=>{
+    const list = exercises[tag] || [];
+    const ex = list.length ? pick(list) : { name: tag, reps: 0 };
+    return { name: ex.name, tags: [tag] };
   });
-  return { type:"metcon", title:"Metabolic Conditioning", items };
+
+  return {
+    type: "metcon",
+    title: "Metabolic Conditioning",
+    items
+  };
+}
+
+function buildWorkout(){
+  // 50/50 AMRAP vs MetCon
+  return Math.random() < 0.5 ? buildAMRAP() : buildMetCon();
+}
+
+/* ===========================
+   RENDER WORKOUT CARD
+=========================== */
+function pillClass(tag){
+  return `pill tag-${tag}`;
 }
 
 function renderWorkout(workout){
-  titleEl.textContent = workout.title;
-  linesEl.innerHTML = "";
+  cardEl.innerHTML = "";
+
+  const title = document.createElement("div");
+  title.className = "card-title";
+  title.textContent = workout.title;
+  cardEl.appendChild(title);
 
   workout.items.forEach(it=>{
     const row = document.createElement("div");
     row.className = "line";
 
-    const txt = document.createElement("span");
-    if(workout.type === "amrap"){
-      txt.textContent = `${it.reps} ${it.name}`;
-    }else{
-      txt.textContent = `${it.name}`;
-    }
-
-    const pill = document.createElement("span");
-    pill.className = `pill ${it.pill}`;
-    pill.textContent = it.label;
-
+    const txt = document.createTextNode(
+      workout.type === "amrap"
+        ? `${it.reps} ${it.name}`
+        : `${it.name}`
+    );
     row.appendChild(txt);
-    row.appendChild(pill);
-    linesEl.appendChild(row);
+
+    (it.tags||[]).forEach(tag=>{
+      const p = document.createElement("span");
+      p.className = pillClass(tag);
+      p.textContent = tag;
+      row.appendChild(p);
+    });
+
+    cardEl.appendChild(row);
   });
 
-  cardEl.style.display = "block";
-  cardEl.classList.remove("visible");
-  void cardEl.offsetWidth;
-  cardEl.classList.add("visible");
+  cardEl.classList.add("show");
+  summaryEl.classList.remove("show");
 }
 
-/* View controls */
-function showGenerator(){
-  // hide card + summary
-  cardEl.style.display="none";
-  cardEl.classList.remove("visible");
-  weekSummaryEl.style.display="none";
-
-  // show buttons
-  generateBtn.style.display="block";
-  exBtn.style.display="block";
-  slideWrap.style.display="none";
-
-  subtitleEl.textContent = "Today's mixed workout";
+/* ===========================
+   GENERATION FLOW (mesh gradient)
+   - mesh appears while generating
+   - does NOT cover buttons (it's centered in .center with lower z-index than footer)
+=========================== */
+function showMesh(){
+  aiStageEl.style.display="block";
+  requestAnimationFrame(()=> aiStageEl.classList.add("show"));
+}
+function hideMesh(){
+  aiStageEl.classList.remove("show");
+  setTimeout(()=>{ aiStageEl.style.display="none"; }, 220);
 }
 
-function showWorkoutView(){
-  // hide buttons, show slider (exercise hidden while workout active)
-  generateBtn.style.display="none";
-  exBtn.style.display="none";
-  slideWrap.style.display="block";
-}
-
-function showWeekSummary(doneCount){
-  // hide card
-  cardEl.style.display="none";
-  cardEl.classList.remove("visible");
-
-  weekSummaryEl.style.display="block";
-  engravedNumEl.textContent = String(doneCount);
-  weekTextEl.textContent = doneCount === 1 ? "workout completed this week" : "workouts completed this week";
-
-  // bring buttons back
-  generateBtn.style.display="block";
-  exBtn.style.display="block";
-  slideWrap.style.display="none";
-}
-
-/* Generate flow */
-function handleGenerate(){
-  const exByCat = loadExercises();
-
-  // show mesh
-  aiStage.classList.add("show");
-  aiStage.style.display = "block";
-
-  // hide anything currently
-  weekSummaryEl.style.display="none";
-  cardEl.style.display="none";
-  cardEl.classList.remove("visible");
-
-  // Generate after delay
-  setTimeout(()=>{
-    // choose type 50/50
-    const type = Math.random() < 0.5 ? "amrap" : "metcon";
-    currentWorkout = type === "amrap" ? buildAMRAP(exByCat) : buildMetCon(exByCat);
-
-    aiStage.classList.remove("show");
-    aiStage.style.display="none";
-
-    renderWorkout(currentWorkout);
-    showWorkoutView();
-    resetSlider();
-  }, 850);
-}
-
-/* ===================== SLIDER ===================== */
-let sliding=false;
-let startX=0;
-let currentX=0;
-let maxSlide=0;
-let knobWidth=0;
-let trackWidth=0;
+/* ===========================
+   SLIDER
+=========================== */
+let sliding=false, startX=0, currentX=0, maxSlide=0;
 
 function resetSlider(){
-  const trackRect = slideTrack.getBoundingClientRect();
-  const knobRect  = slideKnob.getBoundingClientRect();
-  trackWidth = trackRect.width || 1;
-  knobWidth  = knobRect.width || 50;
-  maxSlide   = trackWidth - knobWidth - 12;
-
   slideTrack.classList.remove("filled");
-  slideKnob.style.transition = "none";
-  slideFill.style.transition = "none";
-
-  slideKnob.style.transform = "translate(0,-50%)";
-  slideFill.style.transform = "scaleX(0)";
-
+  slideKnob.style.transition="none";
+  slideFill.style.transition="none";
+  slideKnob.style.transform="translate(0,-50%)";
+  slideFill.style.transform="scaleX(0)";
   setTimeout(()=>{
-    slideKnob.style.transition = "transform .2s ease-out";
-    slideFill.style.transition = "transform .2s ease-out";
-  }, 20);
+    slideKnob.style.transition="transform .18s ease-out";
+    slideFill.style.transition="transform .12s ease-out";
+  },10);
 }
 
-slideKnob.addEventListener("pointerdown",e=>{
+slideKnob.addEventListener("pointerdown",(e)=>{
   e.preventDefault();
   sliding=true;
   slideKnob.setPointerCapture(e.pointerId);
+  startX=e.clientX;
+  currentX=0;
 
-  const trackRect = slideTrack.getBoundingClientRect();
-  const knobRect  = slideKnob.getBoundingClientRect();
-  trackWidth = trackRect.width || 1;
-  knobWidth  = knobRect.width || 50;
-  maxSlide   = trackWidth - knobWidth - 12;
+  const trackW = slideTrack.getBoundingClientRect().width;
+  const knobW  = slideKnob.getBoundingClientRect().width;
+  maxSlide = Math.max(0, trackW - knobW - 8);
 
-  startX = e.clientX;
-  currentX = 0;
-
-  slideKnob.style.transition = "none";
-  slideFill.style.transition = "none";
+  slideKnob.style.transition="none";
+  slideFill.style.transition="none";
 });
 
-slideKnob.addEventListener("pointermove",e=>{
+slideKnob.addEventListener("pointermove",(e)=>{
   if(!sliding) return;
   const dx = e.clientX - startX;
-  let x = Math.max(0, Math.min(maxSlide, dx));
+  const x = Math.max(0, Math.min(maxSlide, dx));
   currentX = x;
-
-  const progress = maxSlide === 0 ? 0 : (x / maxSlide);
+  const p = maxSlide===0 ? 0 : x/maxSlide;
 
   slideKnob.style.transform = `translate(${x}px,-50%)`;
-  slideFill.style.transform = `scaleX(${progress})`;
+  slideFill.style.transform = `scaleX(${p})`;
 
-  /* KEY FIX: text turns white DURING slide */
-  if(progress > 0.15){
-    slideTrack.classList.add("filled");
-  }else{
-    slideTrack.classList.remove("filled");
-  }
+  // becomes "filled" pretty early so text turns white while sliding over
+  slideTrack.classList.toggle("filled", p > 0.18);
 });
 
 function endSlide(e){
   if(!sliding) return;
   sliding=false;
-  if(e.pointerId) slideKnob.releasePointerCapture(e.pointerId);
+  try{ slideKnob.releasePointerCapture(e.pointerId); }catch{}
 
-  slideKnob.style.transition = "transform .22s ease-out";
-  slideFill.style.transition = "transform .22s ease-out";
+  const p = maxSlide===0 ? 0 : currentX/maxSlide;
 
-  const progress = maxSlide === 0 ? 0 : (currentX / maxSlide);
+  slideKnob.style.transition="transform .18s ease-out";
+  slideFill.style.transition="transform .12s ease-out";
 
-  if(progress > 0.92){
-    // lock to end
+  if(p > 0.92){
     slideKnob.style.transform = `translate(${maxSlide}px,-50%)`;
     slideFill.style.transform = `scaleX(1)`;
     slideTrack.classList.add("filled");
+
     completeWorkout();
   }else{
-    slideTrack.classList.remove("filled");
-    slideKnob.style.transform = "translate(0,-50%)";
-    slideFill.style.transform = "scaleX(0)";
+    resetSlider();
   }
 }
 slideKnob.addEventListener("pointerup", endSlide);
 slideKnob.addEventListener("pointercancel", endSlide);
 
-/* Completion */
-function completeWorkout(){
-  // confetti behind the buttons (under slider), bursting from below
-  if(window.confetti){
-    confetti({
-      particleCount:140,
-      spread:78,
-      startVelocity:30,
-      gravity:0.95,
-      ticks:220,
-      origin:{ x:0.5, y:1.18 },  // below the button
-      zIndex:5                    // behind fixed actions (z=20)
-    });
+/* ===========================
+   COMPLETE WORKOUT
+   - increments weekCount persistently
+   - updates weekly summary + streak progression
+   - confetti comes from UNDER button (zIndex lower than footer)
+=========================== */
+function updateAfterCompletion(){
+  const curWeek = getWeekKey();
+  let summary = getWeekSummary() || { week:curWeek, workouts:0, counted:false };
+  if(summary.week !== curWeek){
+    summary = { week:curWeek, workouts:0, counted:false };
   }
 
-  const stats = markWorkoutComplete();
-  renderStreakUI({ animateFlip: stats.streakIncreased });
+  let weekCount = getWeekCount() + 1;
+  setWeekCount(weekCount);
 
-  // transition out workout card then show summary
-  cardEl.classList.remove("visible");
-  setTimeout(()=>{
-    showWeekSummary(stats.done);
-    currentWorkout = null;
-    // reset slider for next time
-    resetSlider();
-  }, 260);
+  summary.workouts = weekCount;
+
+  let streak = getStreak();
+  if(weekCount >= 3 && !summary.counted){
+    streak += 1;
+    summary.counted = true;
+    setStreak(streak);
+  }
+  setWeekSummary(summary);
 }
 
-/* ===================== MODAL (FULL HEIGHT) ===================== */
-const modal = document.getElementById("modal");
-const closeModalBtn = document.getElementById("closeModal");
-const tabsEl = document.getElementById("tabs");
-const listEl = document.getElementById("list");
-const newNameEl = document.getElementById("newName");
-const newRepsEl = document.getElementById("newReps");
-const addBtnEl = document.getElementById("addBtn");
+function confettiUnderButton(){
+  if(!window.confetti) return;
 
-let activeTab = "push";
-let EX = loadExercises();
+  // Confetti under the fixed footer:
+  // - use lower zIndex than .actions (which is 20)
+  // - origin slightly below bottom to make it feel like it comes out from under the button
+  confetti({
+    particleCount: 140,
+    spread: 85,
+    startVelocity: 34,
+    origin: { x: 0.5, y: 1.22 },
+    zIndex: 10
+  });
+}
 
+function completeWorkout(){
+  // persist + UI
+  updateAfterCompletion();
+  renderTop();
+
+  // animation + confetti
+  confettiUnderButton();
+
+  // hide workout, show summary, restore buttons
+  setTimeout(()=>{
+    cardEl.classList.remove("show");
+    sliderWrap.style.display="none";
+    exerciseBtn.style.display="block";
+    generateBtn.style.display="block";
+    summaryEl.classList.add("show");
+    currentWorkout = null;
+    resetSlider();
+  }, 220);
+}
+
+/* ===========================
+   BUTTONS
+   - generate -> mesh -> card -> show slider, hide exercises
+   - while workout exists -> slider only
+=========================== */
+generateBtn.addEventListener("click", ()=>{
+  // start generation
+  showMesh();
+
+  // hide card if any
+  cardEl.classList.remove("show");
+
+  generateBtn.disabled = true;
+  generateBtn.textContent = "Generating...";
+
+  // keep buttons safe: mesh is centered and footer is zIndex 20
+  setTimeout(()=>{
+    currentWorkout = buildWorkout();
+    hideMesh();
+    renderWorkout(currentWorkout);
+
+    // lock UI: only slider available
+    generateBtn.style.display="none";
+    exerciseBtn.style.display="none";
+    sliderWrap.style.display="block";
+    resetSlider();
+
+    // restore generate button state (for next time)
+    generateBtn.disabled = false;
+    generateBtn.textContent = "Generate Workout";
+  }, 850);
+});
+
+exerciseBtn.addEventListener("click", ()=>{
+  openModal();
+});
+
+/* ===========================
+   MODAL (full screen)
+   - tabs: push pull legs abs cardio fullbody shoulders upper
+   - add/edit/remove exercises + reps
+=========================== */
 function openModal(){
-  EX = loadExercises();
   modal.classList.add("show");
+  document.body.style.overflow="hidden";
   renderTabs();
   renderList();
-  newNameEl.value="";
-  newRepsEl.value="";
 }
 function closeModal(){
   modal.classList.remove("show");
 }
 closeModalBtn.addEventListener("click", closeModal);
-modal.addEventListener("click",(e)=>{
+modal.addEventListener("click", (e)=>{
   if(e.target === modal) closeModal();
 });
 
 function renderTabs(){
   tabsEl.innerHTML = "";
-  CATS.forEach(c=>{
+  TAGS.forEach(t=>{
     const b = document.createElement("button");
-    b.className = "tab" + (c.key===activeTab ? " active" : "");
-    b.textContent = c.label;
+    b.className = "tab" + (t.key===activeTab ? " active" : "");
+    b.textContent = t.label;
     b.addEventListener("click", ()=>{
-      activeTab = c.key;
+      activeTab = t.key;
       renderTabs();
       renderList();
     });
@@ -1196,78 +1074,87 @@ function renderTabs(){
 }
 
 function renderList(){
-  EX = loadExercises();
   listEl.innerHTML = "";
+  const arr = exercises[activeTab] || [];
 
-  const list = EX[activeTab] || [];
-  list.forEach((item, idx)=>{
+  arr.forEach((ex, idx)=>{
     const row = document.createElement("div");
-    row.className="row";
+    row.className = "item";
 
     const name = document.createElement("input");
-    name.type="text";
-    name.value = item.name || "";
-    name.placeholder="Exercise name";
+    name.className = "input";
+    name.value = ex.name || "";
+    name.placeholder = "Exercise";
     name.addEventListener("input", ()=>{
-      EX[activeTab][idx].name = name.value;
-      saveExercises(EX);
+      exercises[activeTab][idx].name = name.value;
+      saveExercises(exercises);
     });
 
     const reps = document.createElement("input");
-    reps.type="number";
-    reps.inputMode="numeric";
-    reps.value = String(item.reps ?? "");
-    reps.placeholder="Reps";
+    reps.className = "input";
+    reps.type = "number";
+    reps.inputMode = "numeric";
+    reps.value = (ex.reps ?? "");
+    reps.placeholder = "Reps";
     reps.addEventListener("input", ()=>{
-      const v = parseInt(reps.value,10);
-      EX[activeTab][idx].reps = Number.isFinite(v) ? v : 0;
-      saveExercises(EX);
+      exercises[activeTab][idx].reps = parseInt(reps.value||"0",10);
+      saveExercises(exercises);
     });
 
-    const trash = document.createElement("button");
-    trash.className="trash";
-    trash.textContent="🗑️";
-    trash.addEventListener("click", ()=>{
-      EX[activeTab].splice(idx,1);
-      saveExercises(EX);
+    const del = document.createElement("button");
+    del.className = "del";
+    del.textContent = "×";
+    del.addEventListener("click", ()=>{
+      exercises[activeTab].splice(idx,1);
+      saveExercises(exercises);
       renderList();
     });
 
     row.appendChild(name);
     row.appendChild(reps);
-    row.appendChild(trash);
+    row.appendChild(del);
     listEl.appendChild(row);
   });
 }
 
-addBtnEl.addEventListener("click", ()=>{
-  const nm = (newNameEl.value || "").trim();
-  const rp = parseInt(newRepsEl.value,10);
+addBtn.addEventListener("click", ()=>{
+  const name = (newNameEl.value || "").trim();
+  const reps = parseInt(newRepsEl.value || "0", 10);
 
-  if(!nm) return;
+  if(!name) return;
 
-  if(!EX[activeTab]) EX[activeTab]=[];
-  EX[activeTab].push({
-    name:nm,
-    reps:Number.isFinite(rp) ? rp : 10
-  });
+  if(!exercises[activeTab]) exercises[activeTab] = [];
+  exercises[activeTab].push({ name, reps: Number.isFinite(reps) ? reps : 0 });
+  saveExercises(exercises);
 
-  saveExercises(EX);
-  newNameEl.value="";
-  newRepsEl.value="";
+  newNameEl.value = "";
+  newRepsEl.value = "";
+
   renderList();
 });
 
-/* Buttons */
-generateBtn.addEventListener("click", handleGenerate);
-exBtn.addEventListener("click", openModal);
+/* ===========================
+   INIT
+   - week rollover check
+   - show summary centered with persisted weekCount on load
+=========================== */
+function init(){
+  resetWeekIfNeeded();
+  exercises = loadExercises();
 
-/* Boot */
-rolloverWeekIfNeeded();
-renderStreakUI();
-updateWeatherUI();
-showGenerator();
+  // show summary by default
+  renderTop();
+  summaryEl.classList.add("show");
+  cardEl.classList.remove("show");
+
+  // ensure slider hidden, buttons shown
+  sliderWrap.style.display="none";
+  generateBtn.style.display="block";
+  exerciseBtn.style.display="block";
+  resetSlider();
+}
+
+init();
 </script>
-
 </body>
 </html>
