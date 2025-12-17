@@ -27,9 +27,6 @@
     --tag-red-bg:#ffe0e0;    --tag-red-ink:#dc2626;    /* fullbody */
     --tag-yellow-bg:#fef3c7; --tag-yellow-ink:#a16207; /* cardio */
 
-    --streak-fill:#f97316;
-    --streak-bg:#F7F8F9;
-
     --radius:18px;
   }
 
@@ -51,53 +48,6 @@
     height:100vh;
     display:flex;
     flex-direction:column;
-  }
-
-  /* TOP ROW */
-  .top-row{
-    display:flex;
-    align-items:center;
-    justify-content:spaced-between;
-    gap:12px;
-    margin-top:6px;
-    margin-bottom:8px;
-    min-height:22px;
-  }
-  
-  .streak-wrap{
-    display:flex;
-    align-items:center;
-    justify-content:flex-end;
-    gap:10px;
-    min-width:180px;
-  }
-  .streak-fire{
-    display:flex;
-    align-items:center;
-    gap:6px;
-    font-size:14px;
-    font-weight:600;
-    color:var(--streak-fill);
-  }
-  .streak-count{
-    min-width:14px;
-    font-variant-numeric:tabular-nums;
-  }
-  .streak-bar{
-    width:100px;
-    height:8px;
-    border-radius:999px;
-    background:var(--streak-bg);
-    overflow:hidden;
-    position:relative;
-  }
-  .streak-bar-fill{
-    position:absolute;
-    inset:0;
-    background:var(--streak-fill);
-    transform-origin:left center;
-    transform:scaleX(0);
-    transition:transform .35s cubic-bezier(.22,.8,.4,1);
   }
 
   /* CENTER AREA */
@@ -135,12 +85,27 @@
       0 -1px 0 rgba(15,23,42,0.05);
     line-height:0.9;
   }
+
+  /* label row = workouts completed + streak */
   .weekly-count .label{
     margin-top:10px;
     font-size:16px;
     font-weight:400;
     color:rgba(100,116,139,0.65);
     letter-spacing:-0.02em;
+    display:inline-flex;
+    align-items:baseline;
+    gap:8px;
+    flex-wrap:wrap;
+    justify-content:center;
+    max-width:90vw;
+  }
+  .weekly-count .label .dot{
+    opacity:.55;
+  }
+  .weekly-count .label .streak-inline{
+    color:rgba(15,23,42,0.88); /* darker than workouts completed */
+    font-weight:700;
   }
 
   /* WORKOUT CARD */
@@ -489,18 +454,18 @@
     background:#fff;
   }
   .item input{
-  width:100%;
-  min-width:0;
-}
-.item .reps{
-  height:44px;
-  border-radius:12px;
-  border:1px solid rgba(15,23,42,0.10);
-  padding:0 10px;
-  font-size:14px;
-  background:#fff;
-  text-align:center;
-}
+    width:100%;
+    min-width:0;
+  }
+  .item .reps{
+    height:44px;
+    border-radius:12px;
+    border:1px solid rgba(15,23,42,0.10);
+    padding:0 10px;
+    font-size:14px;
+    background:#fff;
+    text-align:center;
+  }
   .trash{
     height:44px;
     width:44px;
@@ -540,21 +505,17 @@
 <canvas id="confettiCanvas"></canvas>
 
 <div class="container">
-  <div class="top-row">
-    <div></div>
-    <div class="streak-wrap">
-      <div class="streak-fire"><span>🔥</span><span id="streakCount" class="streak-count">0</span></div>
-      <div class="streak-bar"><div class="streak-bar-fill" id="streakFill"></div></div>
-    </div>
-  </div>
-
   <div class="center">
     <div class="ai-stage" id="aiStage"></div>
 
     <div class="weekly-center" id="weeklyCenter">
       <div class="weekly-count">
         <div class="num" id="weekNum">0</div>
-        <div class="label" id="weekLabel">workouts completed</div>
+        <div class="label" id="weekLabel">
+          <span id="weekLabelText">workouts completed</span>
+          <span class="dot">·</span>
+          <span class="streak-inline" id="streakInline">0 week streak</span>
+        </div>
       </div>
     </div>
 
@@ -720,12 +681,10 @@ function ensureWeekState(){
 /* =========================================================
    DOM
 ========================================================= */
-const streakCount = qs("#streakCount");
-const streakFill  = qs("#streakFill");
-
 const weeklyCenter = qs("#weeklyCenter");
 const weekNumEl    = qs("#weekNum");
 const weekLabelEl  = qs("#weekLabel");
+const streakInline = qs("#streakInline");
 
 const card      = qs("#card");
 const cardTitle = qs("#cardTitle");
@@ -792,10 +751,8 @@ function setWeekCounted(v){ localStorage.setItem(LS.weekCounted, v ? "1" : "0");
 
 function renderStreakUI(){
   const streak = getStreak();
-  const done = getWeekCount();
-  streakCount.textContent = String(streak);
-  const pct = clamp(done/3, 0, 1);
-  streakFill.style.transform = `scaleX(${pct})`;
+  // inline streak text
+  if(streakInline) streakInline.textContent = `${streak} week streak`;
 }
 
 /* =========================================================
