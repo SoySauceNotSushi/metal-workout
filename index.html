@@ -1145,11 +1145,17 @@ slideKnob.addEventListener("pointercancel", finishSlide);
 ========================================================= */
 function shootConfettiFromUnderButtons(){
   if(!confettiInstance) return;
+
+  // Spawn from the slider (under the knob area)
+  const rect = slideWrap.getBoundingClientRect();
+  const x = (rect.left + rect.width * 0.5) / window.innerWidth;
+  const y = (rect.bottom - 6) / window.innerHeight; // slightly above bottom edge of slider
+
   confettiInstance({
     particleCount:160,
     spread:90,
     startVelocity:35,
-    origin:{ x:0.5, y:0.92 }
+    origin:{ x, y }
   });
 }
 
