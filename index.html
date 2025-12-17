@@ -19,6 +19,7 @@
   --pill-shoulders:#ede9fe;
   --pill-abs:#d1fae5;
   --pill-fullbody:#ffe4e6;
+  --pill-cardio:#e0f2fe;
 
   --shadow:0 12px 32px rgba(15,23,42,.15);
 }
@@ -88,6 +89,7 @@ h1{
 .pill-shoulders{ background:var(--pill-shoulders); color:#7c3aed; }
 .pill-abs{ background:var(--pill-abs); color:#059669; }
 .pill-fullbody{ background:var(--pill-fullbody); color:#e11d48; }
+.pill-cardio{ background:var(--pill-cardio); color:#0284c7; }
 
 #generateBtn{
   position:fixed;
@@ -123,18 +125,21 @@ h1{
 <button id="generateBtn">Generate Workout</button>
 
 <script>
-/* ===================== MOVEMENT POOL ===================== */
+/* ===================== MOVEMENT GROUPS ===================== */
 
-const MOVEMENTS = [
+const GROUPS = [
   {
+    chance: 0.8,
     variants: ["1 Rep Muscle-Up"],
     tags: ["push","pull"]
   },
   {
+    chance: 0.8,
     variants: ["5 Pull-Ups","5 Chin-Ups"],
     tags: ["pull"]
   },
   {
+    chance: 0.8,
     variants: [
       "10 Push-Ups",
       "10 Dips",
@@ -144,6 +149,7 @@ const MOVEMENTS = [
     tags: ["push"]
   },
   {
+    chance: 0.5,
     variants: [
       "10 Dolphin Push-Ups",
       "10 Pike Push-Ups"
@@ -151,6 +157,7 @@ const MOVEMENTS = [
     tags: ["shoulders"]
   },
   {
+    chance: 0.5,
     variants: [
       "15 Jumping Squats",
       "15 Jumping Lunges"
@@ -158,6 +165,7 @@ const MOVEMENTS = [
     tags: ["legs"]
   },
   {
+    chance: 0.5,
     variants: [
       "20 Knee Raises",
       "20 Full Body Raises"
@@ -165,11 +173,20 @@ const MOVEMENTS = [
     tags: ["abs"]
   },
   {
+    chance: 0.5,
     variants: [
       "10 Burpees",
       "10 Kettlebell Swings"
     ],
     tags: ["fullbody"]
+  },
+  {
+    chance: 0.5,
+    variants: [
+      "20 Jumping Jacks",
+      "20 Mountain Climbers"
+    ],
+    tags: ["cardio"]
   }
 ];
 
@@ -179,26 +196,26 @@ function rand(arr){
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function shuffle(arr){
-  return [...arr].sort(() => Math.random() - 0.5);
-}
-
 /* ===================== GENERATOR ===================== */
 
 function generateWorkout(){
   const card = document.getElementById("workoutCard");
   card.innerHTML = "";
 
-  const count = Math.floor(Math.random() * 3) + 5; // 5–7 exercises
-  const picks = shuffle(MOVEMENTS).slice(0, count);
+  const picked = GROUPS.filter(g => Math.random() < g.chance);
 
-  picks.forEach(m => {
+  // Safety: ensure at least 2 exercises
+  while(picked.length < 2){
+    picked.push(GROUPS[Math.floor(Math.random() * GROUPS.length)]);
+  }
+
+  picked.forEach(g => {
     const line = document.createElement("div");
     line.className = "line";
 
-    line.appendChild(document.createTextNode(rand(m.variants)));
+    line.appendChild(document.createTextNode(rand(g.variants)));
 
-    m.tags.forEach(tag => {
+    g.tags.forEach(tag => {
       const pill = document.createElement("span");
       pill.className = `pill pill-${tag}`;
       pill.textContent = tag;
@@ -215,7 +232,9 @@ function generateWorkout(){
 
 /* ===================== INIT ===================== */
 
-document.getElementById("generateBtn").addEventListener("click", generateWorkout);
+document
+  .getElementById("generateBtn")
+  .addEventListener("click", generateWorkout);
 </script>
 
 </body>
