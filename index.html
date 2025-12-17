@@ -6,7 +6,6 @@
 <title>Jy Workout</title>
 
 <style>
-/* ===== BASE ===== */
 :root{
   --brand:#2453f5;
   --ink:#0f172a;
@@ -27,12 +26,51 @@ body{
   max-width:480px;
   margin:0 auto;
   padding:24px;
-  padding-bottom:140px;
+  padding-bottom:150px;
 }
 
 /* ===== HEADER ===== */
 h1{font-size:28px;margin:0 0 6px}
-.subtitle{color:var(--sub);margin-bottom:20px}
+.subtitle{color:var(--sub);margin-bottom:18px}
+
+/* ===== AI GRADIENT ===== */
+.ai-stage{
+  position:absolute;
+  left:50%;
+  top:260px;
+  transform:translateX(-50%);
+  width:260px;
+  height:260px;
+  border-radius:50%;
+  display:none;
+  pointer-events:none;
+}
+.ai-stage::before{
+  content:"";
+  position:absolute;
+  inset:-20%;
+  filter:blur(90px) saturate(160%);
+  opacity:0;
+  background:
+    radial-gradient(22rem 22rem at 30% 36%, #3A7BFF77 0, #0000 50%),
+    radial-gradient(22rem 22rem at 72% 34%, #7DFF5C77 0, #0000 54%),
+    radial-gradient(24rem 20rem at 40% 72%, #FFA43A77 0, #0000 54%),
+    radial-gradient(20rem 20rem at 70% 74%, #9B8FFF99 0, #0000 80%);
+  background-blend-mode:screen;
+  animation:meshBreath 2s ease-in-out infinite, meshDrift 3s ease-in-out infinite;
+  transition:opacity .25s ease;
+}
+.ai-stage.show::before{opacity:.9}
+
+@keyframes meshBreath{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.05)}
+}
+@keyframes meshDrift{
+  0%{transform:translate(0,0)}
+  50%{transform:translate(2%,-1.5%)}
+  100%{transform:translate(0,0)}
+}
 
 /* ===== CARD ===== */
 .card{
@@ -43,21 +81,44 @@ h1{font-size:28px;margin:0 0 6px}
   display:none;
 }
 .card.show{display:block}
-.card-title{font-weight:700;margin-bottom:14px}
+.card-title{
+  font-size:18px;
+  font-weight:700;
+  margin-bottom:14px;
+}
 
 /* ===== LINES ===== */
-.line{margin-bottom:10px;font-size:16px}
+.line{
+  font-size:16px;
+  margin-bottom:10px;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+/* ===== PILLS ===== */
+.pill{
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:600;
+}
+.pill-push{background:#e4ecff;color:#2453f5}
+.pill-pull{background:#dcfce7;color:#16a34a}
+.pill-legs{background:#fff7ed;color:#ea580c}
+.pill-abs{background:#d1fae5;color:#059669}
+.pill-cardio{background:#e0f2fe;color:#0284c7}
+.pill-fullbody{background:#ffe4e6;color:#e11d48}
 
 /* ===== BUTTONS ===== */
 button{
   border:none;
   border-radius:28px;
-  font-size:16px;
   font-weight:600;
 }
 #generateBtn{
   position:fixed;
-  bottom:72px;
+  bottom:70px;
   left:50%;
   transform:translateX(-50%);
   width:calc(100% - 48px);
@@ -65,6 +126,7 @@ button{
   height:52px;
   background:var(--brand);
   color:white;
+  font-size:18px;
 }
 #exerciseBtn{
   position:fixed;
@@ -76,6 +138,7 @@ button{
   height:44px;
   background:#e5e7eb;
   color:#111827;
+  font-size:15px;
 }
 
 /* ===== MODAL ===== */
@@ -98,16 +161,24 @@ button{
 }
 
 /* ===== TABS ===== */
-.tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.tabs{
+  display:flex;
+  gap:8px;
+  margin-bottom:12px;
+  flex-wrap:wrap;
+}
 .tab{
   padding:6px 12px;
   border-radius:999px;
   background:#f1f5f9;
   font-size:14px;
 }
-.tab.active{background:#e0e7ff;color:#1d4ed8}
+.tab.active{
+  background:#e0e7ff;
+  color:#1d4ed8;
+}
 
-/* ===== EXERCISE ROW ===== */
+/* ===== EXERCISE EDIT ===== */
 .exercise{
   display:flex;
   gap:8px;
@@ -146,6 +217,8 @@ button{
 <div class="container">
   <h1>Welcome back Jy</h1>
   <div class="subtitle">Today’s mixed workout</div>
+
+  <div id="aiStage" class="ai-stage"></div>
   <div id="workoutCard" class="card"></div>
 </div>
 
@@ -166,7 +239,7 @@ button{
 </div>
 
 <script>
-/* ===== DEFAULT DATA ===== */
+/* ===== DEFAULT EXERCISES ===== */
 const DEFAULT = {
   push:[{name:"Push-Ups",reps:"10–20"}],
   pull:[{name:"Pull-Ups",reps:"5–10"}],
@@ -176,35 +249,72 @@ const DEFAULT = {
   fullbody:[{name:"Kettlebell Swings",reps:"10–20"}]
 };
 
-const KEYS=Object.keys(DEFAULT);
-let data=JSON.parse(localStorage.getItem("exercises"))||DEFAULT;
-localStorage.setItem("exercises",JSON.stringify(data));
+const KEYS = Object.keys(DEFAULT);
+let data = JSON.parse(localStorage.getItem("exercises")) || DEFAULT;
+localStorage.setItem("exercises", JSON.stringify(data));
 
-/* ===== WORKOUT ===== */
-function generateWorkout(){
-  const card=document.getElementById("workoutCard");
-  card.innerHTML="";
-  const isAMRAP=Math.random()<0.6;
-  card.innerHTML+=`<div class="card-title">${
-    isAMRAP?"As Many Rounds As Possible":"Metabolic Conditioning"
-  }</div>`;
-
-  KEYS.forEach(k=>{
-    const ex=data[k];
-    if(!ex.length) return;
-    const e=ex[Math.floor(Math.random()*ex.length)];
-    card.innerHTML+=`<div class="line">${
-      isAMRAP?`${e.reps} ${e.name}`:e.name
-    }</div>`;
-  });
-  card.classList.add("show");
+function shuffle(arr){
+  return arr.slice().sort(() => Math.random() - 0.5);
 }
 
-/* ===== MODAL ===== */
-let activeTab="push";
-const modal=document.getElementById("modal");
-const tabs=document.getElementById("tabs");
-const list=document.getElementById("exerciseList");
+/* ===== GENERATE WORKOUT ===== */
+function generateWorkout(){
+  const card = document.getElementById("workoutCard");
+  const ai = document.getElementById("aiStage");
+
+  card.classList.remove("show");
+  card.style.display="none";
+
+  ai.style.display="block";
+  ai.classList.add("show");
+
+  setTimeout(()=>{
+    ai.classList.remove("show");
+    ai.style.display="none";
+
+    card.innerHTML="";
+
+    const isAMRAP = Math.random() < 0.6;
+    card.innerHTML += `<div class="card-title">${
+      isAMRAP
+        ? "As Many Rounds As Possible"
+        : "Metabolic Conditioning"
+    }</div>`;
+
+    let keysToUse = isAMRAP
+      ? shuffle(KEYS).slice(0, Math.floor(Math.random()*3)+2)
+      : shuffle(KEYS);
+
+    keysToUse.forEach(k=>{
+      const list = data[k];
+      if(!list.length) return;
+      const ex = list[Math.floor(Math.random()*list.length)];
+      const label = isAMRAP
+        ? `${ex.reps} ${ex.name}`
+        : ex.name;
+
+      const line = document.createElement("div");
+      line.className="line";
+      line.textContent = label;
+
+      const pill = document.createElement("span");
+      pill.className = `pill pill-${k}`;
+      pill.textContent = k;
+      line.appendChild(pill);
+
+      card.appendChild(line);
+    });
+
+    card.style.display="block";
+    card.classList.add("show");
+  },900);
+}
+
+/* ===== MODAL EDITOR ===== */
+let activeTab = KEYS[0];
+const modal = document.getElementById("modal");
+const tabs = document.getElementById("tabs");
+const list = document.getElementById("exerciseList");
 
 function renderTabs(){
   tabs.innerHTML="";
@@ -212,33 +322,33 @@ function renderTabs(){
     const t=document.createElement("div");
     t.className="tab"+(k===activeTab?" active":"");
     t.textContent=k;
-    t.onclick=()=>{activeTab=k;render()};
+    t.onclick=()=>{activeTab=k;renderList()};
     tabs.appendChild(t);
   });
 }
 
-function render(){
+function renderList(){
   renderTabs();
   list.innerHTML="";
   data[activeTab].forEach((e,i)=>{
     const row=document.createElement("div");
     row.className="exercise";
     row.innerHTML=`
-      <input value="${e.name}" onchange="edit('${activeTab}',${i},'name',this.value)"/>
-      <input value="${e.reps}" onchange="edit('${activeTab}',${i},'reps',this.value)"/>
-      <button onclick="del('${activeTab}',${i})">✕</button>`;
+      <input value="${e.name}" onchange="editEx('${activeTab}',${i},'name',this.value)">
+      <input value="${e.reps}" onchange="editEx('${activeTab}',${i},'reps',this.value)">
+      <button onclick="delEx('${activeTab}',${i})">✕</button>`;
     list.appendChild(row);
   });
 }
 
-function edit(cat,i,key,val){
+function editEx(cat,i,key,val){
   data[cat][i][key]=val;
   localStorage.setItem("exercises",JSON.stringify(data));
 }
-function del(cat,i){
+function delEx(cat,i){
   data[cat].splice(i,1);
   localStorage.setItem("exercises",JSON.stringify(data));
-  render();
+  renderList();
 }
 
 document.getElementById("addExercise").onclick=()=>{
@@ -246,16 +356,16 @@ document.getElementById("addExercise").onclick=()=>{
   const r=document.getElementById("newReps");
   if(!n.value) return;
   data[activeTab].push({name:n.value,reps:r.value});
-  n.value="";r.value="";
+  n.value=""; r.value="";
   localStorage.setItem("exercises",JSON.stringify(data));
-  render();
+  renderList();
 };
 
 /* ===== EVENTS ===== */
 document.getElementById("generateBtn").onclick=generateWorkout;
 document.getElementById("exerciseBtn").onclick=()=>{
   modal.classList.add("show");
-  render();
+  renderList();
 };
 modal.onclick=e=>{
   if(e.target===modal) modal.classList.remove("show");
