@@ -1167,18 +1167,20 @@ slideKnob.addEventListener("pointermove",(e)=>{
 
 function finishSlide(e){
   if(!sliding) return;
-  sliding=false;
+  sliding = false;
+
   try{ slideKnob.releasePointerCapture(e.pointerId); }catch{}
 
-  const progress = maxSlide ? (currentX/maxSlide) : 0;
-
-  applyTransitions(true);
+  const progress = maxSlide ? (currentX / maxSlide) : 0;
 
   if(progress > 0.92){
-    setSliderProgressImmediate(maxSlide);
-    completeWorkout();
-  }else{
-    setSliderProgressImmediate(0);
+    applyTransitions(true);
+    requestAnimationFrame(() => {
+      setSliderProgressImmediate(maxSlide);
+      completeWorkout();
+    });
+  } else {
+    snapBack(); // 👈 THIS is the missing piece
   }
 }
 slideKnob.addEventListener("pointerup", finishSlide);
