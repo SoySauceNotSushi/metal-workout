@@ -319,16 +319,18 @@
   .btn.hidden{ display:none; }
 
   /* SLIDER */
-  .slide-wrap{
-    width:100%;
-    height:52px;
-    border-radius:999px;
-    background:#eef2f7;
-    position:relative;
-    overflow:hidden;
-    box-shadow:none;
-    display:none;
-  }
+ .slide-wrap{
+  width:100%;
+  height:52px;
+  border-radius:999px;
+  background:#eef2f7;
+  position:relative;
+  overflow:hidden;
+  box-shadow:none;
+  display:none;
+
+  touch-action: pan-y;
+}
   .slide-wrap.show{ display:block; }
 
   /* FIXED: use WIDTH not transform to avoid lag */
