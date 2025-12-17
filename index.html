@@ -8,18 +8,25 @@
 <style>
 :root{
   --brand:#2453f5;
+  --bg:#f7f8f9;
   --ink:#0f172a;
   --sub:#64748b;
-  --bg:#f7f8f9;
   --card:#ffffff;
 
-  --streak-bg:#e5e7eb;
-  --streak-fill:#f97316;
-
   --shadow:0 12px 32px rgba(15,23,42,.15);
+
+  /* TAG COLORS */
+  --push:#3b82f6;
+  --pull:#22c55e;
+  --upper:#8b5cf6;
+  --shoulders:#ec4899;
+  --legs:#f97316;
+  --abs:#eab308;
+  --cardio:#14b8a6;
+  --fullbody:#ef4444;
 }
 
-*{ box-sizing:border-box; }
+*{box-sizing:border-box}
 body{
   margin:0;
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro",Segoe UI,Roboto,sans-serif;
@@ -29,10 +36,10 @@ body{
 .container{
   max-width:480px;
   margin:0 auto;
-  padding:20px 24px 170px;
+  padding:20px 24px 160px;
 }
 
-/* ===== STREAK ROW ===== */
+/* ===== STREAK ===== */
 .streak-row{
   display:flex;
   align-items:center;
@@ -40,33 +47,26 @@ body{
   margin-bottom:10px;
 }
 .streak-fire{
-  display:flex;
-  align-items:center;
-  gap:6px;
   font-weight:700;
-  color:var(--streak-fill);
-}
-.streak-count{
-  min-width:16px;
-  font-variant-numeric:tabular-nums;
+  color:#f97316;
 }
 .streak-bar{
-  flex:1;
+  width:150px;
   height:8px;
-  background:var(--streak-bg);
+  background:#e5e7eb;
   border-radius:999px;
   overflow:hidden;
 }
-.streak-bar-fill{
+.streak-fill{
   height:100%;
   width:0%;
-  background:var(--streak-fill);
-  transition:width .32s ease;
+  background:#f97316;
+  transition:.3s;
 }
 
 /* ===== HEADER ===== */
-h1{ font-size:28px; margin:6px 0; }
-.subtitle{ color:var(--sub); margin-bottom:18px; }
+h1{font-size:28px;margin:6px 0}
+.subtitle{color:var(--sub);margin-bottom:18px}
 
 /* ===== AI GRADIENT ===== */
 .ai-stage{
@@ -76,37 +76,28 @@ h1{ font-size:28px; margin:6px 0; }
   transform:translateX(-50%);
   width:260px;
   height:260px;
-  border-radius:50%;
   display:none;
-  pointer-events:none;
 }
 .ai-stage::before{
   content:"";
   position:absolute;
   inset:-20%;
-  filter:blur(90px) saturate(160%) contrast(115%);
+  filter:blur(90px);
   opacity:0;
   background:
     radial-gradient(22rem 22rem at 30% 36%, #3A7BFF77 0, #0000 50%),
     radial-gradient(22rem 22rem at 72% 34%, #7DFF5C77 0, #0000 54%),
     radial-gradient(24rem 20rem at 40% 72%, #FFA43A77 0, #0000 54%),
     radial-gradient(20rem 20rem at 70% 74%, #9B8FFF99 0, #0000 80%);
-  background-blend-mode:screen;
-  animation:meshBreath 2s ease-in-out infinite, meshDrift 3s ease-in-out infinite;
-  transition:opacity .25s ease;
+  animation:mesh 2.5s ease-in-out infinite;
 }
-.ai-stage.show::before{ opacity:.9; }
-@keyframes meshBreath{
-  0%,100%{ transform:scale(1); }
-  50%{ transform:scale(1.05); }
-}
-@keyframes meshDrift{
-  0%{ transform:translate(0,0); }
-  50%{ transform:translate(2%,-1.5%); }
-  100%{ transform:translate(0,0); }
+.ai-stage.show::before{opacity:.9}
+@keyframes mesh{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.05)}
 }
 
-/* ===== WORKOUT CARD ===== */
+/* ===== CARD ===== */
 .card{
   background:var(--card);
   border-radius:18px;
@@ -114,9 +105,8 @@ h1{ font-size:28px; margin:6px 0; }
   box-shadow:var(--shadow);
   display:none;
 }
-.card.show{ display:block; }
+.card.show{display:block}
 .card-title{
-  font-size:18px;
   font-weight:700;
   margin-bottom:14px;
 }
@@ -134,16 +124,23 @@ h1{ font-size:28px; margin:6px 0; }
   border-radius:999px;
   font-size:12px;
   font-weight:600;
+  color:white;
 }
-.pill-push{background:#e4ecff;color:#2453f5}
-.pill-pull{background:#dcfce7;color:#16a34a}
-.pill-legs{background:#fff7ed;color:#ea580c}
-.pill-abs{background:#d1fae5;color:#059669}
-.pill-cardio{background:#e0f2fe;color:#0284c7}
-.pill-fullbody{background:#ffe4e6;color:#e11d48}
+.pill-push{background:var(--push)}
+.pill-pull{background:var(--pull)}
+.pill-upper{background:var(--upper)}
+.pill-shoulders{background:var(--shoulders)}
+.pill-legs{background:var(--legs)}
+.pill-abs{background:var(--abs)}
+.pill-cardio{background:var(--cardio)}
+.pill-fullbody{background:var(--fullbody)}
 
-/* ===== FIXED BUTTONS ===== */
-button{ border:none; border-radius:28px; font-weight:600; }
+/* ===== BUTTONS ===== */
+button{
+  border:none;
+  border-radius:28px;
+  font-weight:600;
+}
 #generateBtn{
   position:fixed;
   bottom:70px;
@@ -155,10 +152,7 @@ button{ border:none; border-radius:28px; font-weight:600; }
   background:var(--brand);
   color:white;
   font-size:18px;
-  box-shadow:0 15px 30px rgba(36,83,245,.35);
 }
-#generateBtn:active{ transform:translateX(-50%) scale(.97); }
-
 #exerciseBtn{
   position:fixed;
   bottom:16px;
@@ -168,11 +162,9 @@ button{ border:none; border-radius:28px; font-weight:600; }
   max-width:480px;
   height:44px;
   background:#e5e7eb;
-  color:#111827;
-  font-size:15px;
 }
 
-/* ===== SLIDE TO COMPLETE ===== */
+/* ===== SLIDE ===== */
 .slide-wrap{
   position:fixed;
   bottom:70px;
@@ -183,26 +175,17 @@ button{ border:none; border-radius:28px; font-weight:600; }
   display:none;
 }
 .slide-track{
-  position:relative;
   height:52px;
   border-radius:999px;
   background:#e5e7eb;
-  overflow:hidden;
-  user-select:none;
-  touch-action:none;
-  box-shadow:0 15px 30px rgba(15,23,42,.12);
-}
-.slide-track.filled{
-  background:linear-gradient(135deg,#2453f5,#4f8cff);
+  position:relative;
 }
 .slide-fill{
   position:absolute;
   inset:0;
-  border-radius:999px;
-  background:linear-gradient(120deg,#2453f5,#4f8cff);
+  background:var(--brand);
   transform:scaleX(0);
   transform-origin:left;
-  transition:transform .18s ease-out;
 }
 .slide-label{
   position:absolute;
@@ -210,33 +193,20 @@ button{ border:none; border-radius:28px; font-weight:600; }
   display:flex;
   align-items:center;
   justify-content:center;
-  pointer-events:none;
-  font-size:16px;
   font-weight:600;
 }
-.slide-label span{
-  color:#2453f5;
-  opacity:.9;
-}
-.slide-track.filled .slide-label span{ color:#fff; }
 .slide-knob{
   position:absolute;
   top:4px;
   left:4px;
   width:44px;
   height:44px;
+  background:white;
   border-radius:50%;
-  background:#fff;
   display:flex;
   align-items:center;
   justify-content:center;
-  box-shadow:0 8px 16px rgba(15,23,42,.18);
   touch-action:none;
-  transition:transform .18s ease;
-}
-.slide-knob .arrow{
-  font-size:20px;
-  color:#2453f5;
 }
 
 /* ===== MODAL ===== */
@@ -246,7 +216,7 @@ button{ border:none; border-radius:28px; font-weight:600; }
   background:rgba(0,0,0,.3);
   display:none;
 }
-.modal.show{ display:block; }
+.modal.show{display:block}
 .modal-content{
   position:absolute;
   bottom:0;
@@ -257,66 +227,37 @@ button{ border:none; border-radius:28px; font-weight:600; }
   padding:16px;
   overflow:auto;
 }
-
-/* ===== TABS ===== */
 .tabs{
   display:flex;
   gap:8px;
-  margin-bottom:12px;
   flex-wrap:wrap;
 }
 .tab{
   padding:6px 12px;
   border-radius:999px;
   background:#f1f5f9;
-  font-size:14px;
 }
 .tab.active{
   background:#e0e7ff;
   color:#1d4ed8;
 }
-
-/* ===== EXERCISE EDIT ===== */
 .exercise{
   display:flex;
   gap:8px;
-  margin-bottom:8px;
+  margin:8px 0;
 }
-.exercise input{
-  flex:1;
-  padding:8px 10px;
-  border:1px solid #e5e7eb;
-  border-radius:10px;
-  font-size:14px;
-}
+.exercise input{flex:1;padding:6px}
 .exercise button{
   background:#fee2e2;
   color:#b91c1c;
-  border-radius:10px;
-  padding:8px 10px;
-  font-size:12px;
 }
-
-/* ===== ADD ROW ===== */
 .add-row{
-  margin-top:12px;
   display:flex;
   gap:8px;
+  margin-top:12px;
 }
-.add-row input{
-  flex:1;
-  padding:8px 10px;
-  border:1px solid #e5e7eb;
-  border-radius:10px;
-  font-size:14px;
-}
-.add-row button{
-  background:#dcfce7;
-  color:#166534;
-  border-radius:10px;
-  padding:8px 12px;
-  font-size:13px;
-}
+.add-row input{flex:1;padding:6px}
+.add-row button{background:#dcfce7}
 </style>
 </head>
 
@@ -324,15 +265,9 @@ button{ border:none; border-radius:28px; font-weight:600; }
 
 <div class="container">
 
-  <!-- STREAKS -->
   <div class="streak-row">
-    <div class="streak-fire">
-      <span>🔥</span>
-      <span id="streakCount" class="streak-count">0</span>
-    </div>
-    <div class="streak-bar">
-      <div id="streakBarFill" class="streak-bar-fill"></div>
-    </div>
+    <div class="streak-fire">🔥 <span id="streakCount">0</span></div>
+    <div class="streak-bar"><div id="streakFill" class="streak-fill"></div></div>
   </div>
 
   <h1>Welcome back Jy</h1>
@@ -343,413 +278,208 @@ button{ border:none; border-radius:28px; font-weight:600; }
 </div>
 
 <button id="generateBtn">Generate Workout</button>
+<button id="exerciseBtn">Exercises</button>
 
 <div id="slideWrap" class="slide-wrap">
-  <div id="slideTrack" class="slide-track">
+  <div class="slide-track">
     <div id="slideFill" class="slide-fill"></div>
-    <div class="slide-label"><span>Slide to Complete</span></div>
-    <div id="slideKnob" class="slide-knob"><span class="arrow">→</span></div>
+    <div class="slide-label">Slide to Complete</div>
+    <div id="slideKnob" class="slide-knob">→</div>
   </div>
 </div>
 
-<button id="exerciseBtn">Exercises</button>
-
-<!-- MODAL -->
 <div id="modal" class="modal">
   <div class="modal-content">
     <div class="tabs" id="tabs"></div>
     <div id="exerciseList"></div>
     <div class="add-row">
-      <input id="newName" placeholder="Exercise name"/>
-      <input id="newReps" placeholder="Rep range (used for As Many Rounds As Possible)"/>
+      <input id="newName" placeholder="Exercise"/>
+      <input id="newReps" placeholder="Reps"/>
       <button id="addExercise">Add</button>
     </div>
   </div>
 </div>
 
 <script>
-/* ===================== STORAGE KEYS ===================== */
-const LS = {
-  exercises: "jy_exercises_v1",
-  streak: "jy_streak",
-  weekKey: "jy_week_key",
-  weekWorkouts: "jy_week_workouts",
-  weekCounted: "jy_week_counted"
-};
+const KEYS = ["push","pull","upper","shoulders","legs","abs","cardio","fullbody"];
 
-/* ===================== WEEK HELPERS ===================== */
-function weekKey(){
-  const d = new Date();
-  const jan1 = new Date(d.getFullYear(),0,1);
-  const days = Math.floor((d - jan1) / 86400000);
-  const week = Math.ceil((days + d.getDay() + 1) / 7);
-  return `${d.getFullYear()}-W${week}`;
-}
-
-/* ===================== STREAK STATE ===================== */
-let streak = parseInt(localStorage.getItem(LS.streak) || "0", 10);
-let storedWeekKey = localStorage.getItem(LS.weekKey);
-let weekWorkouts = parseInt(localStorage.getItem(LS.weekWorkouts) || "0", 10);
-let weekCounted = localStorage.getItem(LS.weekCounted) === "1";
-const thisWeek = weekKey();
-
-function rolloverWeekIfNeeded(){
-  if(storedWeekKey && storedWeekKey !== thisWeek){
-    // last week ended → streak survives only if >=3
-    if(weekWorkouts < 3) streak = 0;
-
-    // reset weekly counters for new week
-    weekWorkouts = 0;
-    weekCounted = false;
-  }
-
-  if(!storedWeekKey) storedWeekKey = thisWeek;
-  if(storedWeekKey !== thisWeek) storedWeekKey = thisWeek;
-
-  localStorage.setItem(LS.streak, String(streak));
-  localStorage.setItem(LS.weekKey, storedWeekKey);
-  localStorage.setItem(LS.weekWorkouts, String(weekWorkouts));
-  localStorage.setItem(LS.weekCounted, weekCounted ? "1" : "0");
-}
-
-function updateStreakUI(){
-  document.getElementById("streakCount").textContent = String(streak);
-  const pct = Math.min(weekWorkouts / 3, 1) * 100;
-  document.getElementById("streakBarFill").style.width = pct + "%";
-}
-
-/* call on boot */
-rolloverWeekIfNeeded();
-updateStreakUI();
-
-/* ===================== DEFAULT EXERCISES ===================== */
 const DEFAULT = {
-  push:     [{name:"Push-Ups", reps:"10–20"}, {name:"Dips", reps:"8–15"}, {name:"Diamond Push-Ups", reps:"8–15"}, {name:"Decline Push-Ups", reps:"10–20"}],
-  pull:     [{name:"Pull-Ups", reps:"5–10"}, {name:"Chin-Ups", reps:"5–10"}, {name:"Muscle-Up", reps:"1–3"}],
-  legs:     [{name:"Jumping Squats", reps:"15–25"}, {name:"Jumping Lunges", reps:"15–25"}],
-  abs:      [{name:"Knee Raises", reps:"15–30"}, {name:"Full Body Raises", reps:"10–20"}],
-  cardio:   [{name:"Jumping Jacks", reps:"20–50"}, {name:"Mountain Climbers", reps:"20–60"}],
-  fullbody: [{name:"Burpees", reps:"8–20"}, {name:"Kettlebell Swings", reps:"10–25"}]
+  push:[{name:"Push-Ups",reps:"10"}],
+  pull:[{name:"Pull-Ups",reps:"5"}],
+  upper:[{name:"Muscle-Up",reps:"1"}],
+  shoulders:[{name:"Pike Push-Ups",reps:"10"}],
+  legs:[{name:"Jumping Squats",reps:"15"}],
+  abs:[{name:"Knee Raises",reps:"20"}],
+  cardio:[{name:"Jumping Jacks",reps:"20"}],
+  fullbody:[{name:"Burpees",reps:"10"}]
 };
 
-const KEYS = ["push","pull","legs","abs","cardio","fullbody"];
+let data = JSON.parse(localStorage.getItem("exercises")) || DEFAULT;
+localStorage.setItem("exercises", JSON.stringify(data));
 
-function loadExercises(){
-  const raw = localStorage.getItem(LS.exercises);
-  if(!raw){
-    localStorage.setItem(LS.exercises, JSON.stringify(DEFAULT));
-    return JSON.parse(JSON.stringify(DEFAULT));
-  }
-  try{
-    const obj = JSON.parse(raw);
-    // ensure all keys exist
-    KEYS.forEach(k => { if(!Array.isArray(obj[k])) obj[k] = []; });
-    return obj;
-  }catch{
-    localStorage.setItem(LS.exercises, JSON.stringify(DEFAULT));
-    return JSON.parse(JSON.stringify(DEFAULT));
-  }
+function shuffle(a){return a.slice().sort(()=>Math.random()-0.5)}
+function rand(a){return a[Math.floor(Math.random()*a.length)]}
+
+/* ===== STREAK ===== */
+function weekKey(){
+  const d=new Date();
+  const j=new Date(d.getFullYear(),0,1);
+  return d.getFullYear()+"-W"+Math.ceil((((d-j)/86400000)+j.getDay()+1)/7);
 }
-function saveExercises(obj){
-  localStorage.setItem(LS.exercises, JSON.stringify(obj));
+let streak=+localStorage.getItem("streak")||0;
+let wk=localStorage.getItem("weekKey");
+let count=+localStorage.getItem("weekCount")||0;
+if(wk!==weekKey()){
+  if(count<3) streak=0;
+  count=0;
+  wk=weekKey();
 }
-
-let data = loadExercises();
-
-/* ===================== UTILS ===================== */
-function rand(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-function shuffle(arr){ return arr.slice().sort(() => Math.random() - 0.5); }
-
-/* ===================== WORKOUT STATE ===================== */
-let activeWorkout = null; // {type, items:[{cat, name, reps}]}
-
-/* ===================== RENDER WORKOUT ===================== */
-function renderWorkout(workout){
-  const card = document.getElementById("workoutCard");
-  card.innerHTML = "";
-
-  const title = document.createElement("div");
-  title.className = "card-title";
-  title.textContent = workout.type === "amrap"
-    ? "As Many Rounds As Possible"
-    : "Metabolic Conditioning";
-  card.appendChild(title);
-
-  workout.items.forEach(it => {
-    const row = document.createElement("div");
-    row.className = "line";
-
-    const text = workout.type === "amrap"
-      ? `${it.reps || ""} ${it.name}`.trim()
-      : it.name;
-
-    row.appendChild(document.createTextNode(text));
-
-    const pill = document.createElement("span");
-    pill.className = `pill pill-${it.cat}`;
-    pill.textContent = it.cat;
-    row.appendChild(pill);
-
-    card.appendChild(row);
-  });
-
-  card.classList.add("show");
-  card.style.display = "block";
+localStorage.setItem("streak",streak);
+localStorage.setItem("weekKey",wk);
+localStorage.setItem("weekCount",count);
+function updateStreak(){
+  document.getElementById("streakCount").textContent=streak;
+  document.getElementById("streakFill").style.width=Math.min(count/3*100,100)+"%";
 }
+updateStreak();
 
-/* ===================== GENERATE WORKOUT ===================== */
-function buildWorkout(){
-  const isAMRAP = Math.random() < 0.6;
+/* ===== WORKOUT ===== */
+let active=false;
+function generate(){
+  if(active) return;
+  document.getElementById("exerciseBtn").style.display="none";
+  document.getElementById("generateBtn").style.display="none";
+  document.getElementById("slideWrap").style.display="block";
+  const ai=document.getElementById("aiStage");
+  ai.style.display="block";
+  ai.classList.add("show");
 
-  if(isAMRAP){
-    const cats = shuffle(KEYS).slice(0, Math.floor(Math.random()*3)+2); // 2–4
-    const items = cats.map(cat => {
-      const list = data[cat] || [];
-      const ex = list.length ? rand(list) : {name: cat, reps:""};
-      return {cat, name: ex.name, reps: ex.reps};
-    });
-    return {type:"amrap", items};
-  }else{
-    const cats = shuffle(KEYS); // ALL categories, shuffled order
-    const items = cats.map(cat => {
-      const list = data[cat] || [];
-      const ex = list.length ? rand(list) : {name: cat, reps:""};
-      return {cat, name: ex.name, reps: ex.reps};
-    });
-    return {type:"metcon", items};
-  }
-}
-
-function showGenerating(on){
-  const ai = document.getElementById("aiStage");
-  if(on){
-    ai.style.display = "block";
-    ai.classList.add("show");
-  }else{
+  setTimeout(()=>{
     ai.classList.remove("show");
-    ai.style.display = "none";
-  }
+    ai.style.display="none";
+
+    const card=document.getElementById("workoutCard");
+    card.innerHTML="";
+    const amrap=Math.random()<0.6;
+    card.innerHTML+=`<div class="card-title">${
+      amrap?"As Many Rounds As Possible":"Metabolic Conditioning"
+    }</div>`;
+
+    let cats;
+    if(amrap){
+      cats=shuffle(KEYS).filter(c=>{
+        if(c==="upper"||c==="shoulders") return Math.random()<0.5;
+        return true;
+      }).slice(0,Math.floor(Math.random()*3)+2);
+    }else{
+      cats=shuffle(KEYS);
+    }
+
+    cats.forEach(c=>{
+      const ex=rand(data[c]);
+      const line=document.createElement("div");
+      line.className="line";
+      line.textContent=amrap?`${ex.reps} ${ex.name}`:ex.name;
+      const pill=document.createElement("span");
+      pill.className=`pill pill-${c}`;
+      pill.textContent=c;
+      line.appendChild(pill);
+      card.appendChild(line);
+    });
+
+    card.style.display="block";
+    card.classList.add("show");
+    active=true;
+  },900);
 }
+document.getElementById("generateBtn").onclick=generate;
 
-function showGenerateButton(){
-  document.getElementById("generateBtn").style.display = "block";
-  document.getElementById("slideWrap").style.display = "none";
-}
-function showSlideToComplete(){
-  document.getElementById("generateBtn").style.display = "none";
-  document.getElementById("slideWrap").style.display = "block";
-  resetSlider();
-}
+/* ===== SLIDE ===== */
+let startX=0,curX=0,max=0,sliding=false;
+const knob=document.getElementById("slideKnob");
+const fill=document.getElementById("slideFill");
 
-document.getElementById("generateBtn").addEventListener("click", ()=>{
-  // prevent generating if one is active (must complete first)
-  if(activeWorkout) return;
-
-  showGenerating(true);
-
-  setTimeout(()=>{
-    showGenerating(false);
-
-    activeWorkout = buildWorkout();
-    renderWorkout(activeWorkout);
-    showSlideToComplete();
-  }, 900);
-});
-
-/* ===================== COMPLETE WORKOUT (STREAK UPDATE) ===================== */
-function completeWorkout(){
-  if(!activeWorkout) return;
-
-  // count this completion
-  rolloverWeekIfNeeded(); // ensure week is correct right now
-  weekWorkouts += 1;
-
-  // clamp progress (UI only) but keep real count if you want; we'll cap at 3 for simplicity
-  if(weekWorkouts > 3) weekWorkouts = 3;
-
-  // if reached 3 and not yet counted this week -> +1 streak
-  if(weekWorkouts >= 3 && !weekCounted){
-    streak += 1;
-    weekCounted = true;
-  }
-
-  localStorage.setItem(LS.streak, String(streak));
-  localStorage.setItem(LS.weekKey, thisWeek); // safe
-  localStorage.setItem(LS.weekWorkouts, String(weekWorkouts));
-  localStorage.setItem(LS.weekCounted, weekCounted ? "1" : "0");
-
-  updateStreakUI();
-
-  // reset state to allow new generate
-  activeWorkout = null;
-  showGenerateButton();
-
-  // optional: small haptic
-  if(navigator.vibrate) navigator.vibrate(12);
-}
-
-/* ===================== SLIDE TO COMPLETE LOGIC ===================== */
-const slideTrack = document.getElementById("slideTrack");
-const slideFill  = document.getElementById("slideFill");
-const slideKnob  = document.getElementById("slideKnob");
-
-let sliding=false, startX=0, currentX=0, maxSlide=0;
-
-function resetSlider(){
-  slideTrack.classList.remove("filled");
-  slideKnob.style.transition = "none";
-  slideFill.style.transition = "none";
-  slideKnob.style.transform = "translate(0,0)";
-  slideFill.style.transform = "scaleX(0)";
-
-  // calculate max travel
-  const trackRect = slideTrack.getBoundingClientRect();
-  const knobRect = slideKnob.getBoundingClientRect();
-  maxSlide = (trackRect.width - knobRect.width - 8);
-
-  setTimeout(()=>{
-    slideKnob.style.transition = "transform .2s ease-out";
-    slideFill.style.transition = "transform .2s ease-out";
-  }, 20);
-}
-
-slideKnob.addEventListener("pointerdown",(e)=>{
-  if(!activeWorkout) return;
-  e.preventDefault();
+knob.addEventListener("pointerdown",e=>{
   sliding=true;
-  slideKnob.setPointerCapture(e.pointerId);
-
-  const trackRect = slideTrack.getBoundingClientRect();
-  const knobRect = slideKnob.getBoundingClientRect();
-  maxSlide = (trackRect.width - knobRect.width - 8);
-
-  startX = e.clientX;
-  currentX = 0;
-
-  slideKnob.style.transition = "none";
-  slideFill.style.transition = "none";
+  startX=e.clientX;
+  const r=knob.parentElement.getBoundingClientRect();
+  max=r.width-48;
 });
-
-slideKnob.addEventListener("pointermove",(e)=>{
+knob.addEventListener("pointermove",e=>{
   if(!sliding) return;
-  const dx = e.clientX - startX;
-  const x = Math.max(0, Math.min(maxSlide, dx));
-  currentX = x;
-
-  const progress = maxSlide === 0 ? 0 : (x / maxSlide);
-  slideKnob.style.transform = `translate(${x}px,0)`;
-  slideFill.style.transform = `scaleX(${progress})`;
+  curX=Math.max(0,Math.min(max,e.clientX-startX));
+  knob.style.transform=`translateX(${curX}px)`;
+  fill.style.transform=`scaleX(${curX/max})`;
 });
-
-function endSlide(e){
-  if(!sliding) return;
-  sliding=false;
-
-  try{ slideKnob.releasePointerCapture(e.pointerId); }catch{}
-
-  slideKnob.style.transition = "transform .22s ease-out";
-  slideFill.style.transition = "transform .22s ease-out";
-
-  const progress = maxSlide === 0 ? 0 : (currentX / maxSlide);
-  if(progress > 0.92){
-    slideKnob.style.transform = `translate(${maxSlide}px,0)`;
-    slideFill.style.transform = `scaleX(1)`;
-    slideTrack.classList.add("filled");
-
-    setTimeout(()=> completeWorkout(), 120);
+knob.addEventListener("pointerup",()=>{
+  if(curX/max>0.9){
+    count++;
+    if(count>=3){streak++;count=3}
+    localStorage.setItem("streak",streak);
+    localStorage.setItem("weekCount",count);
+    updateStreak();
+    document.getElementById("workoutCard").style.display="none";
+    document.getElementById("slideWrap").style.display="none";
+    document.getElementById("generateBtn").style.display="block";
+    document.getElementById("exerciseBtn").style.display="block";
+    knob.style.transform="translateX(0)";
+    fill.style.transform="scaleX(0)";
+    active=false;
   }else{
-    slideTrack.classList.remove("filled");
-    slideKnob.style.transform = "translate(0,0)";
-    slideFill.style.transform = "scaleX(0)";
+    knob.style.transform="translateX(0)";
+    fill.style.transform="scaleX(0)";
   }
-}
-slideKnob.addEventListener("pointerup", endSlide);
-slideKnob.addEventListener("pointercancel", endSlide);
+  sliding=false;
+});
 
-/* ===================== EXERCISE MODAL EDITOR ===================== */
-const modal = document.getElementById("modal");
-const tabsEl = document.getElementById("tabs");
-const listEl = document.getElementById("exerciseList");
-let activeTab = "push";
+/* ===== MODAL ===== */
+const modal=document.getElementById("modal");
+const tabs=document.getElementById("tabs");
+const list=document.getElementById("exerciseList");
+let tab=KEYS[0];
 
 function renderTabs(){
-  tabsEl.innerHTML = "";
-  KEYS.forEach(cat=>{
-    const t = document.createElement("div");
-    t.className = "tab" + (cat===activeTab ? " active" : "");
-    t.textContent = cat;
-    t.onclick = ()=>{ activeTab = cat; renderList(); };
-    tabsEl.appendChild(t);
+  tabs.innerHTML="";
+  KEYS.forEach(k=>{
+    const t=document.createElement("div");
+    t.className="tab"+(k===tab?" active":"");
+    t.textContent=k;
+    t.onclick=()=>{tab=k;renderList()};
+    tabs.appendChild(t);
   });
 }
-
 function renderList(){
-  data = loadExercises();
   renderTabs();
-  listEl.innerHTML = "";
-
-  (data[activeTab] || []).forEach((ex, idx)=>{
-    const row = document.createElement("div");
-    row.className = "exercise";
-
-    const name = document.createElement("input");
-    name.value = ex.name || "";
-    name.placeholder = "Exercise name";
-    name.addEventListener("change", ()=>{
-      data[activeTab][idx].name = name.value;
-      saveExercises(data);
-    });
-
-    const reps = document.createElement("input");
-    reps.value = ex.reps || "";
-    reps.placeholder = "Rep range (AMRAP only)";
-    reps.addEventListener("change", ()=>{
-      data[activeTab][idx].reps = reps.value;
-      saveExercises(data);
-    });
-
-    const del = document.createElement("button");
-    del.textContent = "✕";
-    del.onclick = ()=>{
-      data[activeTab].splice(idx,1);
-      saveExercises(data);
-      renderList();
-    };
-
-    row.appendChild(name);
-    row.appendChild(reps);
-    row.appendChild(del);
-    listEl.appendChild(row);
+  list.innerHTML="";
+  data[tab].forEach((e,i)=>{
+    const r=document.createElement("div");
+    r.className="exercise";
+    r.innerHTML=`<input value="${e.name}">
+      <input value="${e.reps}">
+      <button>✕</button>`;
+    r.children[0].onchange=ev=>{e.name=ev.target.value;save()};
+    r.children[1].onchange=ev=>{e.reps=ev.target.value;save()};
+    r.children[2].onclick=()=>{data[tab].splice(i,1);save();renderList()};
+    list.appendChild(r);
   });
 }
-
-document.getElementById("exerciseBtn").addEventListener("click", ()=>{
+function save(){
+  localStorage.setItem("exercises",JSON.stringify(data));
+}
+document.getElementById("exerciseBtn").onclick=()=>{
   modal.classList.add("show");
   renderList();
-});
-modal.addEventListener("click", (e)=>{
-  if(e.target === modal) modal.classList.remove("show");
-});
-
-document.getElementById("addExercise").addEventListener("click", ()=>{
-  const n = document.getElementById("newName");
-  const r = document.getElementById("newReps");
-  const name = (n.value || "").trim();
-  const reps = (r.value || "").trim();
-  if(!name) return;
-
-  data = loadExercises();
-  data[activeTab] = data[activeTab] || [];
-  data[activeTab].push({name, reps});
-  saveExercises(data);
-
-  n.value = "";
-  r.value = "";
+};
+modal.onclick=e=>{if(e.target===modal)modal.classList.remove("show")};
+document.getElementById("addExercise").onclick=()=>{
+  const n=document.getElementById("newName");
+  const r=document.getElementById("newReps");
+  if(!n.value) return;
+  data[tab].push({name:n.value,reps:r.value});
+  save();
+  n.value="";r.value="";
   renderList();
-});
-
-/* ===================== BOOT ===================== */
-showGenerateButton(); // start with generate visible
+};
 </script>
 
 </body>
