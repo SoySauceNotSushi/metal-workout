@@ -1082,29 +1082,34 @@ let sliding=false;
 let startX=0;
 let currentX=0;
 let maxSlide=0;
-let knobWidth=52;
+let knobWidth=42;
 let trackWidth=0;
 
 function resetSlider(){
   const rect = slideWrap.getBoundingClientRect();
-  trackWidth = rect.width || 1;
-  maxSlide = trackWidth - knobWidth - 14;
+
+  trackWidth = rect.width;
+  knobWidth  = slideKnob.getBoundingClientRect().width;
+
+  maxSlide = trackWidth - knobWidth;
+
   currentX = 0;
 
   slideFill.style.width = "0%";
   slideKnob.style.transform = "translate(0,-50%)";
   slideWhite.style.clipPath = "inset(0 100% 0 0)";
 }
-
+  
 function setSliderProgress(px){
-  const x = clamp(px, 0, maxSlide);
+  const x = Math.max(0, Math.min(px, maxSlide));
   currentX = x;
 
-  const progress = maxSlide ? (x / maxSlide) : 0;
-  slideKnob.style.transform = `translate(${x}px,-50%)`;
+  const progress = x / maxSlide;
 
+  slideKnob.style.transform = `translate(${x}px,-50%)`;
   slideFill.style.width = `${progress * 100}%`;
-  slideWhite.style.clipPath = `inset(0 ${100 - progress*100}% 0 0)`;
+
+  slideWhite.style.clipPath = `inset(0 ${100 - progress * 100}% 0 0)`;
 }
 
 slideKnob.addEventListener("pointerdown", (e)=>{
