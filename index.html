@@ -1386,6 +1386,11 @@ function completeWorkout(){
 
   shootConfettiFromUnderButtons();
   // ❌ haptics removed
+  // ✅ Restore focus so clicks work immediately
+requestAnimationFrame(() => {
+  document.activeElement?.blur();
+  window.focus();
+});
 
   showWeeklyCenter();
 }
