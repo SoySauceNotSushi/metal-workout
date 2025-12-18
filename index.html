@@ -78,6 +78,26 @@ body{
   justify-content:center;
   padding-top:18px;
 }
+  .train-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+  padding-bottom:12px;
+  z-index:10;
+}
+
+.train-left{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.train-title{
+  font-size:20px;
+  font-weight:600;
+  letter-spacing:-0.02em;
+}
 
 .weekly-center{
   position:absolute;
@@ -254,7 +274,7 @@ body{
   z-index:10;
 }
 
-  .focus-picker.hidden {
+  .train-header.hidden {
   display: none;
 }
   
@@ -589,33 +609,29 @@ body{
   <canvas id="confettiCanvas"></canvas>
 
   <div class="container">
-    <div class="top-bar">
-      <button class="history-btn" id="historyBtn">History</button>
+    <!-- TRAINING HEADER -->
+<div class="train-header" id="focusPicker">
+  <div class="train-left">
+    <div class="train-title">What would you like to train?</div>
+
+    <div class="focus-bar" role="radiogroup" aria-label="Workout focus">
+      <label class="focus-pill">
+        <input type="radio" name="focus" value="upper" checked />
+        <span>Upper</span>
+      </label>
+      <label class="focus-pill">
+        <input type="radio" name="focus" value="lower" />
+        <span>Lower</span>
+      </label>
+      <label class="focus-pill">
+        <input type="radio" name="focus" value="fullbody" />
+        <span>Fullbody</span>
+      </label>
     </div>
+  </div>
 
-       <!-- ✅ NEW: Focus Radios -->
-  <div
-  class="focus-bar"
-  id="focusPicker"
-  role="radiogroup"
-  aria-label="Workout focus"
->
-  <label class="focus-pill">
-    <input type="radio" name="focus" value="upper" checked />
-    <span>Upper</span>
-  </label>
-
-  <label class="focus-pill">
-    <input type="radio" name="focus" value="lower" />
-    <span>Lower</span>
-  </label>
-
-  <label class="focus-pill">
-    <input type="radio" name="focus" value="fullbody" />
-    <span>Fullbody</span>
-  </label>
+  <button class="history-btn" id="historyBtn">History</button>
 </div>
-    
     <div class="center">
       <div class="ai-stage" id="aiStage"></div>
 
@@ -799,7 +815,7 @@ const addName   = qs("#addName");
 const addReps   = qs("#addReps");
 const addBtn    = qs("#addBtn");
 
-const topBar = qs(".top-bar");
+
 const historyBtn = qs("#historyBtn");
 const historyModal = qs("#historyModal");
 const closeHistoryModal = qs("#closeHistoryModal");
@@ -1128,7 +1144,6 @@ function renderWorkout(workout){
    UI STATES
 ========================================================= */
 function showWeeklyCenter(){
-  topBar.classList.remove("hidden");
   historyBtn.classList.remove("hidden");
   weeklyCenter.classList.remove("hidden");
   
@@ -1150,7 +1165,6 @@ function showWeeklyCenter(){
 
 function showWorkoutState(workout){
   weeklyCenter.classList.add("hidden");
-  topBar.classList.add("hidden");
   historyBtn.classList.add("hidden");
 
   focusPicker.classList.add("hidden");
