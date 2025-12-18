@@ -1119,6 +1119,9 @@ generateBtn.addEventListener("click", ()=>{
   setTimeout(()=>{
     const workout = (Math.random() < 0.55) ? generateAMRAP() : generateMETACON();
     currentWorkout = workout;
+
+    saveJSON(LS.currentWorkout, workout);
+    
     showMesh(false);
     showWorkoutState(workout);
   }, 850);
@@ -1299,7 +1302,7 @@ function shootConfettiFromUnderButtons(){
 }
 
 function completeWorkout(){
-
+localStorage.removeItem(LS.currentWorkout);
   // SAVE METACON ATTEMPT (READ FIRST)
   if (currentWorkout?.type === "Metabolic Conditioning" && timerStart) {
     const timeMs = Date.now() - timerStart;
@@ -1447,7 +1450,15 @@ addBtn.addEventListener("click", ()=>{
 function init(){
   ensureWeekState();
   renderStreakUI();
-  showWeeklyCenter();
+
+  const savedWorkout = loadJSON(LS.currentWorkout, null);
+
+  if (savedWorkout) {
+    currentWorkout = savedWorkout;
+    showWorkoutState(savedWorkout);
+  } else {
+    showWeeklyCenter();
+  }
 }
 init();
 </script>
