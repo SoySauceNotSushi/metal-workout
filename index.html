@@ -1125,7 +1125,7 @@ function showMesh(on){
 generateBtn.addEventListener("click", ()=>{
   showMesh(true);
   setTimeout(()=>{
-    const workout = (Math.random() < 0.55) ? generateAMRAP() : generateMETACON();
+    const workout = (Math.random() < 0.85) ? generateAMRAP() : generateMETACON();
     currentWorkout = workout;
 
     saveJSON(LS.currentWorkout, workout);
