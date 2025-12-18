@@ -1268,7 +1268,7 @@ function finishSlide(e){
 slideKnob.addEventListener("pointerup", finishSlide);
 slideKnob.addEventListener("pointercancel", finishSlide);
 
-  /* =========================================================
+/* =========================================================
    TIMER (METACON ONLY)
 ========================================================= */
 function formatTime(ms){
@@ -1278,21 +1278,81 @@ function formatTime(ms){
   return `${m}:${s}`;
 }
 
-startTimerBtn.addEventListener("click", ()=>{
-  if (timerInterval) return;
+startTimerBtn.addEventListener("click", () => {
+  const timerState = loadJSON(LS.timerState, null);
 
+  // ⏸ PAUSE (currently running)
+  if (timerState?.running && !timerState.paused) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+
+    const elapsed =
+      Date.now() - timerStart + (timerState.elapsed || 0);
+
+    saveJSON(LS.timerState, {
+      start: timerState.start,
+      running: true,
+      paused: true,
+      elapsed
+    });
+
+    // show frozen time
+    startTimerBtn.textContent = formatTime(elapsed);
+    return;
+  }
+
+  // ▶️ RESUME (paused)
+  if (timerState?.paused) {
+    timerStart = Date.now();
+
+    saveJSON(LS.timerState, {
+      start: timerStart,
+      running: true,
+      paused: false,
+      elapsed: timerState.elapsed || 0
+    });
+
+    timerInterval = setInterval(() => {
+      const elapsed =
+        (Date.now() - timerStart) + (timerState.elapsed || 0);
+
+      startTimerBtn.textContent = formatTime(elapsed);
+
+      saveJSON(LS.timerState, {
+        start: timerStart,
+        running: true,
+        paused: false,
+        elapsed
+      });
+    }, 500);
+
+    return;
+  }
+
+  // ▶️ START FROM SCRATCH
   timerStart = Date.now();
 
   saveJSON(LS.timerState, {
     start: timerStart,
-    running: true
+    running: true,
+    paused: false,
+    elapsed: 0
   });
 
   startTimerBtn.textContent = "00:00";
 
-  timerInterval = setInterval(()=>{
+  // 🔥 THIS WAS THE MISSING PART
+  timerInterval = setInterval(() => {
     const elapsed = Date.now() - timerStart;
+
     startTimerBtn.textContent = formatTime(elapsed);
+
+    saveJSON(LS.timerState, {
+      start: timerStart,
+      running: true,
+      paused: false,
+      elapsed
+    });
   }, 500);
 });
 
@@ -1321,17 +1381,21 @@ localStorage.removeItem(LS.currentWorkout);
     saveJSON(LS.metaconHistory, metaconHistory);
   }
 
-  /* RESET METACON TIMER */
-  if (timerInterval) {
-    clearInterval(timerInterval);
-    timerInterval = null;
-  }
-  timerStart = null;
+/* RESET METACON TIMER + CLEAR TIMER STATE */
+if (timerInterval) {
+  clearInterval(timerInterval);
+  timerInterval = null;
+}
 
-  if (startTimerBtn) {
-    startTimerBtn.textContent = "Start Timer";
-    startTimerBtn.classList.add("hidden");
-  }
+timerStart = null;
+
+// clear persisted timer state
+localStorage.removeItem(LS.timerState);
+
+if (startTimerBtn) {
+  startTimerBtn.textContent = "Start Timer";
+  startTimerBtn.classList.add("hidden");
+}
 
   ensureWeekState();
 
@@ -1477,10 +1541,13 @@ function init() {
       startTimerBtn.classList.remove("hidden");
 
       timerInterval = setInterval(() => {
-        const elapsed = Date.now() - timerStart;
+        const elapsed =
+          (Date.now() - timerStart) + (timerState.elapsed || 0);
+
         startTimerBtn.textContent = formatTime(elapsed);
       }, 500);
     }
+
   } else {
     // No saved workout → normal home state
     showWeeklyCenter();
