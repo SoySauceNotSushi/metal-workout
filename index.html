@@ -723,6 +723,7 @@ const LS = {
   lastDone:  "jy_last_workout_date_v1",
   metaconHistory: "jy_metacon_history_v1",
   currentWorkout: "jy_current_workout_v1",
+  timerState: "jy_metacon_timer_v1",
 };
 
 /* =========================================================
@@ -1278,9 +1279,15 @@ function formatTime(ms){
 }
 
 startTimerBtn.addEventListener("click", ()=>{
-  if(timerInterval) return;
+  if (timerInterval) return;
 
   timerStart = Date.now();
+
+  saveJSON(LS.timerState, {
+    start: timerStart,
+    running: true
+  });
+
   startTimerBtn.textContent = "00:00";
 
   timerInterval = setInterval(()=>{
@@ -1288,7 +1295,6 @@ startTimerBtn.addEventListener("click", ()=>{
     startTimerBtn.textContent = formatTime(elapsed);
   }, 500);
 });
-  
 
 /* =========================================================
    COMPLETE WORKOUT
@@ -1447,19 +1453,40 @@ addBtn.addEventListener("click", ()=>{
 /* =========================================================
    INIT
 ========================================================= */
-function init(){
+function init() {
   ensureWeekState();
   renderStreakUI();
 
   const savedWorkout = loadJSON(LS.currentWorkout, null);
 
   if (savedWorkout) {
+    // 1️⃣ Restore workout UI FIRST
     currentWorkout = savedWorkout;
     showWorkoutState(savedWorkout);
+
+    // 2️⃣ Restore timer if it was running
+    const timerState = loadJSON(LS.timerState, null);
+
+    if (
+      timerState &&
+      timerState.running &&
+      savedWorkout.type === "Metabolic Conditioning"
+    ) {
+      timerStart = timerState.start;
+
+      startTimerBtn.classList.remove("hidden");
+
+      timerInterval = setInterval(() => {
+        const elapsed = Date.now() - timerStart;
+        startTimerBtn.textContent = formatTime(elapsed);
+      }, 500);
+    }
   } else {
+    // No saved workout → normal home state
     showWeeklyCenter();
   }
 }
+
 init();
 </script>
 </body>
