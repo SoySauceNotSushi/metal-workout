@@ -910,11 +910,14 @@ let prUsed = false;
       `;
 
       row.querySelector(".history-delete").addEventListener("click", () => {
-        const realIndex = metaconHistory.length - 1 - index;
-        metaconHistory.splice(realIndex, 1);
-        saveJSON(LS.metaconHistory, metaconHistory);
-        renderMetaconHistory();
-      });
+  const ok = confirm("Are you sure you want to delete this Metacon attempt?");
+  if (!ok) return;
+
+  const realIndex = metaconHistory.length - 1 - index;
+  metaconHistory.splice(realIndex, 1);
+  saveJSON(LS.metaconHistory, metaconHistory);
+  renderMetaconHistory();
+});
 
       historyList.appendChild(row);
     });
