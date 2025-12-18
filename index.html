@@ -1400,10 +1400,13 @@ function renderList(){
     del.className = "trash";
     del.textContent = "×";
     del.addEventListener("click", ()=>{
-      library[activeTab].splice(idx,1);
-      saveJSON(LS.library, library);
-      renderList();
-    });
+  const ok = confirm("Are you sure you want to delete this exercise?");
+  if (!ok) return;
+
+  library[activeTab].splice(idx, 1);
+  saveJSON(LS.library, library);
+  renderList();
+});
 
     wrap.appendChild(name);
     wrap.appendChild(reps);
