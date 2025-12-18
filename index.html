@@ -4,14 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Jy Workout</title>
-
-  <!-- ===========================
-    PASTE YOUR CSS HERE (Block 2)
-  ============================ -->
+  
   <style id="appStyles">
-    /* ===========================
-  2) CSS (paste into <style id="appStyles"></style>)
-=========================== */
 :root{
   --bg: #0b1220;
   --panel: rgba(255,255,255,.06);
@@ -691,7 +685,9 @@ body{
   height:100vh;
   pointer-events:none;
   z-index:10;
-}
+  }
+
+    
   </style>
 </head>
 
@@ -857,17 +853,7 @@ body{
   <!-- Confetti library -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-  <!-- ===========================
-    PASTE YOUR JS HERE (Block 3)
-  ============================ -->
   <script id="appScript">
-    /* ===========================
-  3) JS (paste into <script id="appScript"></script>)
-=========================== */
-
-/* =========================================================
-   CONFIG
-========================================================= */
 const METACON_CHANCE = 0.15; // 15% metacon
 const METACON_MIN_LOCK_MS = 0; // kept (no lock)
 const TAGS = ["upper","pull","push","shoulders","legs","abs","fullbody","cardio"];
