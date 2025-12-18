@@ -1281,25 +1281,28 @@ function formatTime(ms){
 startTimerBtn.addEventListener("click", () => {
   const timerState = loadJSON(LS.timerState, null);
 
-  // ⏸ PAUSE (currently running)
-  if (timerState?.running && !timerState.paused) {
-    clearInterval(timerInterval);
-    timerInterval = null;
+// ⏸ PAUSE (freeze time immediately)
+if (timerState?.running && !timerState.paused) {
+  // 1️⃣ Freeze elapsed FIRST
+  const elapsed =
+    Date.now() - timerStart + (timerState.elapsed || 0);
 
-    const elapsed =
-      Date.now() - timerStart + (timerState.elapsed || 0);
+  // 2️⃣ Kill interval immediately
+  clearInterval(timerInterval);
+  timerInterval = null;
 
-    saveJSON(LS.timerState, {
-      start: timerState.start,
-      running: true,
-      paused: true,
-      elapsed
-    });
+  // 3️⃣ Persist frozen state
+  saveJSON(LS.timerState, {
+    start: timerState.start,
+    running: true,
+    paused: true,
+    elapsed
+  });
 
-    // show frozen time
-    startTimerBtn.textContent = formatTime(elapsed);
-    return;
-  }
+  // 4️⃣ Show frozen time (NO recalculation)
+  startTimerBtn.textContent = formatTime(elapsed);
+  return;
+}
 
   // ▶️ RESUME (paused)
   if (timerState?.paused) {
