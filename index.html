@@ -949,32 +949,57 @@ function pillForTag(tagKey){
   const t = TAGS.find(t=>t.key===tagKey);
   return t ? t.pill : "";
 }
-function pickExercise(tagKey){
-  const arr = library[tagKey] || [];
+  
+function pickUniqueExercise(tagKey, usedNames){
+  const arr = (library[tagKey] || []).slice();
   if(!arr.length) return { name:"(Add an exercise)", reps:"" };
+
+  // Try a few times to avoid duplicates
+  for(let i=0; i<12; i++){
+    const ex = rand(arr);
+    const nameKey = (ex.name || "").trim().toLowerCase();
+    if(!nameKey) continue;
+    if(!usedNames.has(nameKey)){
+      usedNames.add(nameKey);
+      return ex;
+    }
+  }
+
+  // Fallback: find the first unused in this category
+  for(const ex of arr){
+    const nameKey = (ex.name || "").trim().toLowerCase();
+    if(nameKey && !usedNames.has(nameKey)){
+      usedNames.add(nameKey);
+      return ex;
+    }
+  }
+
+  // If everything is already used, just return something (won't happen often with 3–4 rows)
   return rand(arr);
 }
-
 /* ✅ NEW: focus-aware AMRAP (3–4 items, can repeat categories) */
 function generateAMRAP_FOCUSED(){
   let pool = [];
 
   if(focus === "upper"){
-    pool = ["pull","push","shoulders","cardio","pull","push"]; // bias repeats
+    pool = ["pull","push","shoulders","cardio","pull","push"];
   }else if(focus === "lower"){
-    pool = ["legs","abs","cardio","legs","cardio"]; // bias legs/cardio
+    pool = ["legs","abs","cardio","legs","cardio"];
   }else{
     pool = ["pull","push","legs","abs","shoulders","cardio","fullbody"];
   }
 
   const count = (Math.random() < 0.55) ? 3 : 4;
-  const chosen = [];
-  while(chosen.length < count){
-    chosen.push(rand(pool));
-  }
 
-  const rows = chosen.map(tag=>{
-    const ex = pickExercise(tag);
+  // categories can repeat
+  const chosenTags = [];
+  while(chosenTags.length < count) chosenTags.push(rand(pool));
+
+  // but exercises cannot repeat
+  const usedNames = new Set();
+
+  const rows = chosenTags.map(tag=>{
+    const ex = pickUniqueExercise(tag, usedNames);
     const reps = (ex.reps||"").trim();
     const text = reps ? `${reps} ${ex.name}` : ex.name;
     return { text, tags:[tag] };
@@ -982,7 +1007,7 @@ function generateAMRAP_FOCUSED(){
 
   return { type:"As Many Rounds As Possible", rows };
 }
-
+  
 /* Metacon unchanged */
 function generateMETACON(){
   return {
