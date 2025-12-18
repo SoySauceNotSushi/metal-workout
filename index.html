@@ -5,682 +5,1744 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Jy Workout</title>
 
-  <!-- 🔽 STEP 2: CSS GOES BETWEEN THESE TAGS -->
-  <style>
-   /* =========================================================
-   RESET + TOKENS
-========================================================= */
+  <!-- ===========================
+    PASTE YOUR CSS HERE (Block 2)
+  ============================ -->
+  <style id="appStyles">
+    /* ===========================
+  2) CSS (paste into <style id="appStyles"></style>)
+=========================== */
 :root{
-  --brand:#2453f5;
-  --brand-soft:#e4ecff;
-  --ink:#0f172a;
-  --ink-soft:#475569;
-  --muted:#94a3b8;
+  --bg: #0b1220;
+  --panel: rgba(255,255,255,.06);
+  --panel2: rgba(255,255,255,.085);
+  --stroke: rgba(255,255,255,.10);
 
-  --bg:#f8fafc;
-  --card:#ffffff;
+  --ink: rgba(255,255,255,.92);
+  --muted: rgba(255,255,255,.62);
+  --muted2: rgba(255,255,255,.46);
 
-  --radius-xl:22px;
-  --radius-lg:16px;
-  --radius-md:12px;
-  --radius-pill:999px;
+  --brand: #6ea8ff;
+  --brand2:#7cf7c7;
+  --hot:#ffb86b;
+  --danger:#ff6b6b;
 
-  --shadow-xs:0 2px 6px rgba(15,23,42,.05);
-  --shadow-sm:0 8px 20px rgba(15,23,42,.08);
-  --shadow-md:0 18px 48px rgba(15,23,42,.12);
+  --shadow: 0 18px 60px rgba(0,0,0,.45);
+  --shadow2: 0 10px 30px rgba(0,0,0,.35);
 
-  --ease:cubic-bezier(.2,.8,.2,1);
+  --r-xl: 26px;
+  --r-lg: 18px;
+  --r-md: 14px;
+  --pill: 999px;
+
+  --ease: cubic-bezier(.2,.8,.2,1);
 }
 
 *{ box-sizing:border-box; }
 html,body{ height:100%; }
-
 body{
   margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro",Inter,Segoe UI,Roboto,sans-serif;
-  background:var(--bg);
-  color:var(--ink);
-  -webkit-font-smoothing:antialiased;
+  font-family: -apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",Inter,Segoe UI,Roboto,sans-serif;
+  color: var(--ink);
+  background: radial-gradient(1100px 800px at 30% -10%, rgba(110,168,255,.18), transparent 55%),
+              radial-gradient(1000px 700px at 70% 0%, rgba(124,247,199,.12), transparent 52%),
+              radial-gradient(900px 650px at 50% 120%, rgba(255,184,107,.10), transparent 50%),
+              var(--bg);
   overflow:hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* =========================================================
-   LAYOUT
-========================================================= */
-.container{
-  max-width:520px;
-  margin:0 auto;
-  padding:18px 18px 0;
-  height:100vh;
-  display:flex;
-  flex-direction:column;
+/* Ambient mesh */
+.bg-mesh{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+}
+.mesh-blob{
+  position:absolute;
+  width:520px;
+  height:520px;
+  border-radius:50%;
+  filter: blur(60px) saturate(140%);
+  opacity:.50;
+  transform: translate3d(0,0,0);
+  animation: drift 10s var(--ease) infinite;
+}
+.mesh-blob.b1{ left:-140px; top:-180px; background: radial-gradient(circle at 30% 30%, rgba(110,168,255,.85), rgba(110,168,255,.00) 60%); }
+.mesh-blob.b2{ right:-160px; top:-120px; background: radial-gradient(circle at 30% 30%, rgba(124,247,199,.70), rgba(124,247,199,.00) 60%); animation-delay: -3s; }
+.mesh-blob.b3{ left:10%; bottom:-240px; width:600px; height:600px; background: radial-gradient(circle at 30% 30%, rgba(255,184,107,.60), rgba(255,184,107,.00) 62%); animation-delay: -6s; }
+@keyframes drift{
+  0%,100%{ transform: translate3d(0,0,0) scale(1); }
+  50%{ transform: translate3d(16px,-10px,0) scale(1.03); }
+}
+.mesh-noise{
+  position:absolute;
+  inset:0;
+  opacity:.10;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
 }
 
-.top-bar{
-  display:flex;
-  justify-content:flex-end;
-  align-items:center;
-  padding-bottom:8px;
-}
-
-.top-bar.hidden{ display:none; }
-
-/* =========================================================
-   HISTORY BUTTON
-========================================================= */
-.history-btn{
-  background:none;
-  border:none;
-  font-size:14px;
-  font-weight:600;
-  color:var(--ink);
-  cursor:pointer;
-  opacity:.75;
-  transition:opacity .2s var(--ease), transform .2s var(--ease);
-}
-.history-btn:hover{
-  opacity:1;
-  transform:translateY(-1px);
-}
-.history-btn.hidden{ display:none; }
-
-/* =========================================================
-   CENTER STAGE
-========================================================= */
-.center{
+/* Top chrome */
+.top-chrome{
   position:relative;
-  flex:1;
+  z-index:2;
+  padding:18px 18px 10px;
   display:flex;
   align-items:flex-start;
-  justify-content:center;
-  padding-top:22px;
+  justify-content:space-between;
+  gap:14px;
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.brand-dot{
+  width:10px; height:10px; border-radius:50%;
+  background: linear-gradient(135deg, var(--brand), var(--brand2));
+  box-shadow: 0 0 0 4px rgba(110,168,255,.12);
+  margin-top:6px;
+}
+.brand-title{
+  font-weight:800;
+  letter-spacing:-.03em;
+  font-size:16px;
+  line-height:1.1;
+}
+.brand-sub{
+  font-size:12px;
+  color: var(--muted2);
+  margin-top:2px;
+}
+.top-actions{
+  display:flex;
+  gap:10px;
+}
+.icon-btn{
+  appearance:none;
+  border:none;
+  cursor:pointer;
+  background: rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.10);
+  border-radius: var(--pill);
+  padding:10px 12px;
+  color: var(--ink);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  box-shadow: var(--shadow2);
+  transition: transform .18s var(--ease), background .18s var(--ease);
+}
+.icon-btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.085); }
+.icon{
+  width:22px; height:22px;
+  display:grid;
+  place-items:center;
+  border-radius:10px;
+  background: rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.08);
+}
+.icon-label{ font-size:13px; font-weight:700; color: rgba(255,255,255,.86); }
+
+/* Main wrap */
+.wrap{
+  position:relative;
+  z-index:1;
+  height: calc(100vh - 74px);
+  max-width:560px;
+  margin:0 auto;
+  padding: 8px 18px 18px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
 }
 
-/* =========================================================
-   WEEKLY COUNT (HERO)
-========================================================= */
-.weekly-center{
+/* Hero */
+.hero{
+  display:grid;
+  place-items:center;
+  gap:12px;
+  padding: 18px 0 6px;
+}
+.hero-card{
+  width:min(520px,100%);
+  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow);
+  padding: 22px 18px;
+  text-align:center;
+  transform: translateY(0);
+  animation: popIn .42s var(--ease) both;
+}
+@keyframes popIn{
+  from{ opacity:0; transform: translateY(14px) scale(.98); }
+  to{ opacity:1; transform: translateY(0) scale(1); }
+}
+.hero-num{
+  font-size: 120px;
+  font-weight: 900;
+  letter-spacing: -.06em;
+  line-height: .9;
+  color: rgba(255,255,255,.14);
+  text-shadow: 0 1px 0 rgba(255,255,255,.08);
+}
+.hero-meta{
+  margin-top: 10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  flex-wrap:wrap;
+  color: var(--muted2);
+  font-size: 14px;
+}
+.hero-streak{
+  color: rgba(255,255,255,.86);
+  font-weight: 700;
+}
+.dot{ opacity:.55; }
+
+.hero-hint{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+.pill-mini{
+  padding:7px 10px;
+  border-radius: var(--pill);
+  font-size:12px;
+  font-weight:700;
+  color: rgba(255,255,255,.82);
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.10);
+}
+
+/* Card */
+.card{
+  width:100%;
+  background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow);
+  padding: 18px;
+  overflow:hidden;
+  opacity:1;
+  transform: translateY(0);
+}
+.card.hidden{ display:none; }
+.card-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+}
+.card-kicker{
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color: rgba(255,255,255,.55);
+}
+.card-title{
+  margin: 6px 0 0;
+  font-size:22px;
+  font-weight:900;
+  letter-spacing:-.03em;
+}
+.card-head-right{ display:flex; align-items:center; gap:10px; }
+.timer-btn{
+  border:none;
+  cursor:pointer;
+  border-radius: var(--pill);
+  padding:10px 12px;
+  font-weight:900;
+  font-size:13px;
+  color: rgba(255,255,255,.92);
+  background: linear-gradient(135deg, rgba(110,168,255,.22), rgba(124,247,199,.14));
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: var(--shadow2);
+  transition: transform .16s var(--ease), filter .16s var(--ease);
+  white-space:nowrap;
+}
+.timer-btn:hover{ transform: translateY(-1px); filter: brightness(1.06); }
+.timer-btn.hidden{ display:none; }
+
+.divider{
+  height:1px;
+  background: rgba(255,255,255,.10);
+  margin: 14px 0;
+}
+
+.rows{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding: 10px 12px;
+  border-radius: var(--r-md);
+  background: rgba(0,0,0,.12);
+  border: 1px solid rgba(255,255,255,.08);
+}
+.row-left{ min-width:0; display:flex; align-items:center; gap:10px; }
+.row-text{
+  font-size:15px;
+  font-weight:700;
+  color: rgba(255,255,255,.88);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  justify-content:flex-end;
+}
+.pill{
+  padding:7px 10px;
+  border-radius: var(--pill);
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.02em;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.12);
+  color: rgba(255,255,255,.85);
+}
+.pill.upper{ background: rgba(155,143,255,.18); border-color: rgba(155,143,255,.26); }
+.pill.pull{ background: rgba(124,247,199,.16); border-color: rgba(124,247,199,.26); }
+.pill.push{ background: rgba(110,168,255,.16); border-color: rgba(110,168,255,.26); }
+.pill.shoulders{ background: rgba(255,153,220,.14); border-color: rgba(255,153,220,.22); }
+.pill.legs{ background: rgba(255,184,107,.16); border-color: rgba(255,184,107,.24); }
+.pill.abs{ background: rgba(125,255,92,.12); border-color: rgba(125,255,92,.18); }
+.pill.fullbody{ background: rgba(255,107,107,.14); border-color: rgba(255,107,107,.20); }
+.pill.cardio{ background: rgba(255,243,199,.14); border-color: rgba(255,243,199,.20); }
+
+.card-foot{
+  margin-top: 14px;
+  display:flex;
+  justify-content:flex-end;
+}
+.ghost-btn{
+  border:none;
+  cursor:pointer;
+  border-radius: var(--pill);
+  padding:10px 12px;
+  font-weight:900;
+  font-size:13px;
+  color: rgba(255,255,255,.90);
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.12);
+  transition: transform .16s var(--ease), background .16s var(--ease);
+}
+.ghost-btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.10); }
+.ghost-btn.hidden{ display:none; }
+
+/* Actions */
+.actions{
+  margin-top:auto;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  padding-bottom: 8px;
+}
+.primary-btn{
+  position:relative;
+  width:100%;
+  border:none;
+  cursor:pointer;
+  padding: 16px 16px;
+  border-radius: var(--r-xl);
+  color: rgba(10,14,20,.96);
+  background: linear-gradient(135deg, rgba(110,168,255,1), rgba(124,247,199,1));
+  box-shadow: 0 22px 70px rgba(110,168,255,.18), 0 18px 60px rgba(0,0,0,.45);
+  overflow:hidden;
+  transition: transform .16s var(--ease), filter .16s var(--ease);
+}
+.primary-btn:hover{ transform: translateY(-1px); filter: brightness(1.03); }
+.btn-glow{
+  position:absolute;
+  inset:-40%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.55), transparent 55%);
+  transform: translate3d(0,0,0);
+  animation: glow 2.4s var(--ease) infinite;
+  opacity:.55;
+}
+@keyframes glow{
+  0%,100%{ transform: translate3d(0,0,0) scale(1); opacity:.50; }
+  50%{ transform: translate3d(8px,-6px,0) scale(1.03); opacity:.28; }
+}
+.btn-text{
+  position:relative;
+  display:block;
+  font-size:18px;
+  font-weight:1000;
+  letter-spacing:-.02em;
+}
+.btn-sub{
+  position:relative;
+  display:block;
+  margin-top:4px;
+  font-size:12px;
+  font-weight:900;
+  opacity:.85;
+}
+
+.slider{
+  position:relative;
+  height:56px;
+  border-radius: var(--pill);
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.12);
+  box-shadow: var(--shadow2);
+  overflow:hidden;
+}
+.slider.hidden{ display:none; }
+.slider-fill{
+  position:absolute;
+  inset:0;
+  width:0%;
+  background: linear-gradient(135deg, rgba(110,168,255,.95), rgba(124,247,199,.85));
+}
+.slider-label{
   position:absolute;
   inset:0;
   display:flex;
   align-items:center;
   justify-content:center;
+  font-weight:1000;
+  letter-spacing:.01em;
+  user-select:none;
   pointer-events:none;
 }
-.weekly-center.hidden{ display:none; }
-
-.weekly-count{
-  text-align:center;
-  transform:translateY(-12px);
-}
-
-.weekly-count .num{
-  font-size:150px;
-  font-weight:900;
-  letter-spacing:-.06em;
-  line-height:.9;
-  color:rgba(15,23,42,.06);
-}
-
-.weekly-count .label{
-  margin-top:10px;
-  font-size:15px;
-  font-weight:400;
-  color:var(--muted);
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-}
-
-.weekly-count .dot{ opacity:.5; }
-.weekly-count .streak-inline{
-  color:var(--ink);
-  font-weight:500;
-}
-
-/* =========================================================
-   WORKOUT CARD
-========================================================= */
-.card{
-  width:100%;
-  background:var(--card);
-  border-radius:var(--radius-xl);
-  box-shadow:var(--shadow-md);
-  padding:22px;
-  opacity:0;
-  transform:translateY(18px) scale(.98);
-  transition:all .35s var(--ease);
-  z-index:3;
-}
-
-.card.visible{
-  opacity:1;
-  transform:translateY(0) scale(1);
-}
-
-.card.hidden{ display:none; }
-
-.card-title{
-  font-size:20px;
-  font-weight:700;
-  letter-spacing:-.03em;
-  margin-bottom:16px;
-}
-
-/* =========================================================
-   WORKOUT ROWS
-========================================================= */
-.row{
+.slider-base{ color: rgba(255,255,255,.85); }
+.slider-white{
+  position:absolute;
+  inset:0;
   display:flex;
-  justify-content:space-between;
   align-items:center;
-  padding:10px 0;
+  justify-content:center;
+  color: rgba(10,14,20,.96);
+  clip-path: inset(0 100% 0 0);
+}
+.slider-knob{
+  position:absolute;
+  left:7px;
+  top:50%;
+  transform: translate3d(0,-50%,0);
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  background: rgba(10,14,20,.92);
+  color: white;
+  display:grid;
+  place-items:center;
+  box-shadow: 0 12px 26px rgba(0,0,0,.42);
+  border: 1px solid rgba(255,255,255,.10);
+  touch-action:none;
+  will-change: transform;
+}
+.slider-knob span{ font-size:18px; font-weight:1000; }
+
+.tiny-row{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  font-size:12px;
+  color: var(--muted2);
+}
+.link-btn{
+  border:none;
+  background:none;
+  color: rgba(255,255,255,.85);
+  cursor:pointer;
+  font-weight:900;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.tiny-dot{ opacity:.55; }
+.tiny-muted{ color: var(--muted2); font-weight:900; }
+
+/* Modals */
+.modal{
+  position:fixed;
+  inset:0;
+  background: rgba(0,0,0,.55);
+  display:none;
+  z-index:50;
+  backdrop-filter: blur(10px);
+}
+.modal.show{ display:block; }
+.sheet{
+  position:absolute;
+  inset: 14px;
+  border-radius: var(--r-xl);
+  overflow:hidden;
+  background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: var(--shadow);
+  display:flex;
+  flex-direction:column;
+}
+.sheet-head{
+  padding: 16px 16px;
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  border-bottom: 1px solid rgba(255,255,255,.10);
+}
+.sheet-title{
+  font-size:18px;
+  font-weight:1000;
+  letter-spacing:-.02em;
+}
+.sheet-sub{
+  margin-top:4px;
+  font-size:12px;
+  color: var(--muted2);
+  font-weight:800;
+}
+.sheet-close{
+  border:none;
+  cursor:pointer;
+  padding:10px 12px;
+  border-radius: var(--pill);
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12);
+  color: rgba(255,255,255,.90);
+  font-weight:1000;
+}
+.sheet-body{
+  padding: 14px 16px 16px;
+  overflow:auto;
+  flex:1;
 }
 
-.row-text{
-  font-size:16px;
-  font-weight:400;
+/* Tabs */
+.tabs{
+  display:flex;
+  gap:10px;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.10);
+  overflow:auto;
+}
+.tab{
+  border:none;
+  cursor:pointer;
+  padding: 10px 12px;
+  border-radius: var(--pill);
+  font-weight:1000;
+  font-size:12px;
+  color: rgba(255,255,255,.80);
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.10);
+  white-space:nowrap;
+}
+.tab.active{
+  background: linear-gradient(135deg, rgba(110,168,255,.18), rgba(124,247,199,.12));
+  border-color: rgba(255,255,255,.14);
+  color: rgba(255,255,255,.92);
+}
+
+/* Inputs/list */
+.add-row{
+  display:grid;
+  grid-template-columns: 1fr 96px 96px;
+  gap:10px;
+  margin-bottom:12px;
+}
+.input{
+  height:46px;
+  border-radius: var(--r-md);
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(0,0,0,.20);
+  color: rgba(255,255,255,.92);
+  padding: 0 12px;
+  font-weight:900;
+  outline:none;
+}
+.input::placeholder{ color: rgba(255,255,255,.40); }
+.input-small{ text-align:center; }
+
+.add-btn{
+  height:46px;
+  border:none;
+  cursor:pointer;
+  border-radius: var(--r-md);
+  background: linear-gradient(135deg, rgba(110,168,255,1), rgba(124,247,199,1));
+  color: rgba(10,14,20,.96);
+  font-weight:1000;
+}
+
+.list{ display:flex; flex-direction:column; gap:10px; }
+.item{
+  display:grid;
+  grid-template-columns: 1fr 86px 44px;
+  gap:10px;
+  align-items:center;
+  padding: 10px;
+  border-radius: var(--r-md);
+  background: rgba(0,0,0,.16);
+  border: 1px solid rgba(255,255,255,.10);
+}
+.item .name, .item .reps{
+  height:42px;
+  border-radius: var(--r-md);
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(0,0,0,.22);
+  color: rgba(255,255,255,.92);
+  padding: 0 10px;
+  font-weight:900;
+  outline:none;
+}
+.item .reps{ text-align:center; padding:0; }
+
+.trash{
+  height:42px;
+  width:44px;
+  border:none;
+  cursor:pointer;
+  border-radius: var(--r-md);
+  background: rgba(255,107,107,.14);
+  border: 1px solid rgba(255,107,107,.22);
+  color: rgba(255,255,255,.92);
+  font-weight:1000;
+  font-size:18px;
+}
+
+/* History rows */
+.history-list{ display:flex; flex-direction:column; gap:10px; }
+.history-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding: 12px 12px;
+  border-radius: var(--r-md);
+  background: rgba(0,0,0,.16);
+  border: 1px solid rgba(255,255,255,.10);
+}
+.h-left{ display:flex; flex-direction:column; gap:3px; }
+.history-time{
+  font-weight:1000;
+  letter-spacing:-.01em;
+}
+.history-date{
+  color: var(--muted2);
+  font-size:12px;
+  font-weight:900;
+}
+.h-right{ display:flex; align-items:center; gap:8px; }
+.pr-badge{
+  padding: 6px 10px;
+  border-radius: var(--pill);
+  font-size:11px;
+  font-weight:1000;
+  background: rgba(124,247,199,.16);
+  border: 1px solid rgba(124,247,199,.24);
+  color: rgba(255,255,255,.92);
+}
+.history-delete{
+  border:none;
+  cursor:pointer;
+  border-radius: 12px;
+  padding: 8px 10px;
+  font-weight:1000;
+  background: rgba(255,107,107,.14);
+  border: 1px solid rgba(255,107,107,.22);
+  color: rgba(255,255,255,.92);
+}
+
+/* Plan rows */
+.plan-list{ display:flex; flex-direction:column; gap:10px; }
+.plan-row{
+  display:grid;
+  grid-template-columns: 96px 1fr;
+  gap:10px;
+  align-items:center;
+  padding: 10px;
+  border-radius: var(--r-md);
+  background: rgba(0,0,0,.16);
+  border: 1px solid rgba(255,255,255,.10);
+}
+.plan-name{
+  font-weight:900;
+  color: rgba(255,255,255,.86);
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
 }
 
-/* =========================================================
-   TAG PILLS
-========================================================= */
-.tags{
-  display:flex;
-  gap:8px;
-}
-
-.pill{
-  padding:6px 12px;
-  border-radius:var(--radius-pill);
-  font-size:13px;
-  font-weight:600;
-  background:var(--brand-soft);
-  color:var(--brand);
-}
-
-/* =========================================================
-   ACTIONS
-========================================================= */
-.actions{
-  position:relative;
-  padding:14px 0 18px;
-  transform:translateY(-1.5rem);
-}
-
-.btn{
-  width:100%;
-  height:52px;
-  border:none;
-  border-radius:var(--radius-pill);
-  font-size:17px;
-  font-weight:600;
-  cursor:pointer;
-  background:var(--brand);
-  color:#fff;
-  box-shadow:var(--shadow-sm);
-  transition:transform .15s var(--ease), box-shadow .15s var(--ease);
-}
-
-.btn:hover{
-  transform:translateY(-1px);
-  box-shadow:var(--shadow-md);
-}
-
-.btn.secondary{
-  margin-top:12px;
-  background:#eef2f7;
-  color:var(--brand);
-  box-shadow:none;
-}
-
-.btn.hidden{ display:none; }
-
-/* =========================================================
-   TIMER BUTTON (TEXT-ONLY)
-========================================================= */
-#startTimerBtn{
-  background:none;
-  box-shadow:none;
-  color:var(--brand);
-  font-weight:600;
-}
-
-/* =========================================================
-   SLIDER
-========================================================= */
-.slide-wrap{
-  margin-top:16px;
-  height:52px;
-  background:#eef2f7;
-  border-radius:var(--radius-pill);
-  position:relative;
-  overflow:hidden;
-  display:none;
-}
-
-.slide-wrap.show{ display:block; }
-
-.slide-fill{
-  position:absolute;
-  inset:0;
-  width:0%;
-  background:linear-gradient(135deg,#2453f5,#4f8cff);
-}
-
-.slide-label{
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:16px;
-  font-weight:600;
-}
-
-.slide-label .base{ color:var(--brand); }
-
-.slide-label .white{
-  position:absolute;
-  inset:0;
-  color:#fff;
-  clip-path:inset(0 100% 0 0);
-}
-
-.slide-knob{
-  position:absolute;
-  left:7px;
-  top:50%;
-  transform:translateY(-50%);
-  width:42px;
-  height:42px;
-  border-radius:50%;
-  background:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  box-shadow:var(--shadow-sm);
-}
-
-/* =========================================================
-   MODALS (APPLE-LIKE)
-========================================================= */
-.modal{
+/* Confetti canvas */
+#confettiCanvas{
   position:fixed;
   inset:0;
-  background:rgba(15,23,42,.4);
-  display:none;
-  z-index:50;
-  backdrop-filter:blur(6px);
-}
-
-.modal.show{ display:block; }
-
-.modal-sheet{
-  position:absolute;
-  inset:0;
-  background:#fff;
-  display:flex;
-  flex-direction:column;
-}
-
-.modal-head{
-  padding:16px 18px;
-  display:flex;
-  justify-content:space-between;
-  border-bottom:1px solid rgba(15,23,42,.06);
-}
-
-.modal-title{
-  font-size:20px;
-  font-weight:800;
-}
-
-.modal-close{
-  border:none;
-  background:#eef2f7;
-  border-radius:10px;
-  padding:8px 14px;
-  font-weight:700;
-  cursor:pointer;
-}
-
-.modal-body{
-  padding:18px;
-  overflow:auto;
-  flex:1;
-}
-
-/* =========================================================
-   HISTORY LIST
-========================================================= */
-.history-row{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:14px;
-  border-radius:var(--radius-md);
-  background:#f8fafc;
-}
-
-.history-time{
-  font-size:16px;
-  font-weight:700;
-}
-
-.history-date{
-  font-size:12px;
-  color:var(--muted);
-}
-
-.pr-badge{
-  font-size:11px;
-  font-weight:700;
-  background:#dcfce7;
-  color:#16a34a;
-  padding:4px 8px;
-  border-radius:var(--radius-pill);
+  width:100vw;
+  height:100vh;
+  pointer-events:none;
+  z-index:10;
 }
   </style>
 </head>
 
 <body>
+  <!-- Ambient mesh -->
+  <div class="bg-mesh" aria-hidden="true">
+    <div class="mesh-blob b1"></div>
+    <div class="mesh-blob b2"></div>
+    <div class="mesh-blob b3"></div>
+    <div class="mesh-noise"></div>
+  </div>
 
-  <!-- 🔽 ALL YOUR HTML MARKUP GOES HERE -->
-  <!-- modals, container, buttons, cards, etc -->
+  <!-- Top chrome -->
+  <header class="top-chrome">
+    <div class="brand">
+      <div class="brand-dot"></div>
+      <div class="brand-title">Jy Workout</div>
+      <div class="brand-sub" id="brandSub">Daily generator</div>
+    </div>
 
-  <!-- 🔽 STEP 3: JS GOES BETWEEN THESE TAGS -->
-  <script>
-    /* =========================================================
-   STORAGE KEYS
+    <div class="top-actions">
+      <button class="icon-btn" id="historyBtn" aria-label="History">
+        <span class="icon">↺</span>
+        <span class="icon-label">History</span>
+      </button>
+      <button class="icon-btn" id="settingsBtn" aria-label="Settings">
+        <span class="icon">⚙</span>
+        <span class="icon-label">Exercises</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- Home hero -->
+    <section class="hero" id="weeklyCenter">
+      <div class="hero-card">
+        <div class="hero-num" id="weekNum">0</div>
+        <div class="hero-meta">
+          <span class="hero-label" id="weekLabelText">workouts completed</span>
+          <span class="dot">·</span>
+          <span class="hero-streak" id="streakInline">0 week streak</span>
+        </div>
+      </div>
+
+      <div class="hero-hint">
+        <span class="pill-mini" id="metaconRatePill">Metacon: 15%</span>
+        <span class="pill-mini">Swipe-to-complete</span>
+        <span class="pill-mini">Timer saves on refresh</span>
+      </div>
+    </section>
+
+    <!-- Workout card -->
+    <section class="card hidden" id="card">
+      <div class="card-head">
+        <div class="card-title-wrap">
+          <div class="card-kicker" id="cardKicker">Today</div>
+          <h2 class="card-title" id="cardTitle">Workout</h2>
+        </div>
+
+        <div class="card-head-right">
+          <button class="timer-btn hidden" id="startTimerBtn" type="button">Start Timer</button>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="rows" id="cardRows"></div>
+
+      <div class="card-foot">
+        <button class="ghost-btn hidden" id="planWorkoutBtn" type="button">Plan Metacon</button>
+      </div>
+    </section>
+
+    <!-- Actions -->
+    <section class="actions" id="actions">
+      <button class="primary-btn" id="generateBtn" type="button">
+        <span class="btn-glow" aria-hidden="true"></span>
+        <span class="btn-text">Generate Workout</span>
+        <span class="btn-sub" id="genSub">Randomized. Clean. Fast.</span>
+      </button>
+
+      <div class="slider hidden" id="slideWrap" aria-label="Slide to complete">
+        <div class="slider-fill" id="slideFill"></div>
+        <div class="slider-label">
+          <div class="slider-base">Slide to Complete</div>
+          <div class="slider-white" id="slideWhite">Slide to Complete</div>
+        </div>
+        <div class="slider-knob" id="slideKnob" role="button" aria-label="Slide knob">
+          <span>→</span>
+        </div>
+      </div>
+
+      <div class="tiny-row">
+        <button class="link-btn" id="resetBtn" type="button">Reset to Home</button>
+        <span class="tiny-dot">·</span>
+        <span class="tiny-muted" id="tinyStatus">Ready</span>
+      </div>
+    </section>
+  </main>
+
+  <!-- Confetti canvas -->
+  <canvas id="confettiCanvas"></canvas>
+
+  <!-- HISTORY MODAL -->
+  <div class="modal" id="historyModal" aria-hidden="true">
+    <div class="sheet">
+      <div class="sheet-head">
+        <div>
+          <div class="sheet-title">Metacon History</div>
+          <div class="sheet-sub" id="historySub">Personal records, attempts, deletions</div>
+        </div>
+        <button class="sheet-close" id="closeHistoryModal" type="button">Done</button>
+      </div>
+
+      <div class="sheet-body">
+        <div class="history-list" id="historyList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXERCISE LIBRARY MODAL -->
+  <div class="modal" id="modal" aria-hidden="true">
+    <div class="sheet">
+      <div class="sheet-head">
+        <div>
+          <div class="sheet-title">Exercises</div>
+          <div class="sheet-sub">Edit your library per tag</div>
+        </div>
+        <button class="sheet-close" id="closeModal" type="button">Done</button>
+      </div>
+
+      <div class="tabs" id="tabs"></div>
+
+      <div class="sheet-body">
+        <div class="add-row">
+          <input class="input" id="addName" placeholder="Exercise name" />
+          <input class="input input-small" id="addReps" placeholder="Reps" inputmode="numeric" />
+          <button class="add-btn" id="addBtn" type="button">Add</button>
+        </div>
+
+        <div class="list" id="list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLAN METACON MODAL -->
+  <div class="modal" id="planModal" aria-hidden="true">
+    <div class="sheet">
+      <div class="sheet-head">
+        <div>
+          <div class="sheet-title">Plan Metacon</div>
+          <div class="sheet-sub">Override reps (keeps the movement name)</div>
+        </div>
+        <button class="sheet-close" id="closePlanModal" type="button">Save</button>
+      </div>
+
+      <div class="sheet-body">
+        <div class="plan-list" id="planBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confetti library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- ===========================
+    PASTE YOUR JS HERE (Block 3)
+  ============================ -->
+  <script id="appScript">
+    /* ===========================
+  3) JS (paste into <script id="appScript"></script>)
+=========================== */
+
+/* =========================================================
+   CONFIG
 ========================================================= */
+const METACON_CHANCE = 0.15; // 15% metacon
+const METACON_MIN_LOCK_MS = 0; // kept (no lock)
+const TAGS = ["upper","pull","push","shoulders","legs","abs","fullbody","cardio"];
+
 const LS = {
-  library: "jy_library_v1",
-  streak: "jy_streak_v1",
-  weekKey: "jy_weekKey_v1",
-  weekCount: "jy_weekCount_v1",
-  weekCounted: "jy_week_counted_v1",
-  totalDays: "jy_total_days_trained_v1",
-  lastDone: "jy_last_workout_date_v1",
-  metaconHistory: "jy_metacon_history_v1",
-  currentWorkout: "jy_current_workout_v1",
-  timerState: "jy_metacon_timer_v1",
+  library:        "jy_library_v2",
+  streak:         "jy_streak_v2",
+  weekKey:        "jy_weekKey_v2",
+  weekCount:      "jy_weekCount_v2",
+  weekCounted:    "jy_week_counted_v2",
+  totalDays:      "jy_total_days_trained_v2",
+  lastDone:       "jy_last_workout_date_v2",
+  metaconHistory: "jy_metacon_history_v2",
+  currentWorkout: "jy_current_workout_v2",
+  timerState:     "jy_metacon_timer_v2",
 };
 
 /* =========================================================
    UTIL
 ========================================================= */
 const qs = s => document.querySelector(s);
-const rand = arr => arr[Math.floor(Math.random() * arr.length)];
+const qsa = s => Array.from(document.querySelectorAll(s));
+const rand = arr => arr[Math.floor(Math.random()*arr.length)];
+const clamp = (n,min,max)=>Math.max(min,Math.min(max,n));
 
-function loadJSON(key, fallback) {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : fallback;
-  } catch {
-    return fallback;
-  }
-}
-function saveJSON(key, val) {
-  localStorage.setItem(key, JSON.stringify(val));
-}
+function pad2(n){ return String(n).padStart(2,"0"); }
 
-function todayKey() {
+function todayKey(){
   const d = new Date();
-  return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+  return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
 }
 
-function isoWeekKey(d = new Date()) {
+function isoWeekKey(d=new Date()){
   const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
   const dayNum = date.getUTCDay() || 7;
   date.setUTCDate(date.getUTCDate() + 4 - dayNum);
-  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(),0,1));
   const weekNo = Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
-  return `${date.getUTCFullYear()}-W${weekNo}`;
+  return `${date.getUTCFullYear()}-W${pad2(weekNo)}`;
 }
 
-function formatTime(ms) {
-  const t = Math.floor(ms / 1000);
-  const m = String(Math.floor(t / 60)).padStart(2, "0");
-  const s = String(t % 60).padStart(2, "0");
+function loadJSON(key, fallback){
+  try{
+    const raw = localStorage.getItem(key);
+    if(!raw) return fallback;
+    return JSON.parse(raw);
+  }catch{ return fallback; }
+}
+function saveJSON(key, val){
+  localStorage.setItem(key, JSON.stringify(val));
+}
+
+function formatTime(ms){
+  const total = Math.floor(ms/1000);
+  const m = pad2(Math.floor(total/60));
+  const s = pad2(total%60);
   return `${m}:${s}`;
 }
-
-function formatDate(d) {
-  return new Date(d).toLocaleDateString(undefined, {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
+function formatDate(dateStr){
+  const d = new Date(dateStr);
+  return d.toLocaleDateString(undefined,{ day:"numeric", month:"short", year:"numeric" });
 }
+
+/* =========================================================
+   DEFAULT LIBRARY
+========================================================= */
+const DEFAULT_LIBRARY = {
+  upper:     [{ name:"Muscle-Ups", reps:"5" }, { name:"Ring Muscle-Ups", reps:"3" }],
+  pull:      [{ name:"Pull-Ups", reps:"10" }, { name:"Chin-Ups", reps:"10" }, { name:"Australian Rows", reps:"15" }],
+  push:      [{ name:"Dips", reps:"12" }, { name:"Push-Ups", reps:"20" }, { name:"Decline Push-Ups", reps:"15" }, { name:"Diamond Push-Ups", reps:"12" }],
+  shoulders: [{ name:"Pike Push-Ups", reps:"12" }, { name:"Dolphin Push-Ups", reps:"12" }],
+  legs:      [{ name:"Jumping Squats", reps:"30" }, { name:"Jumping Lunges", reps:"24" }, { name:"Wall Sit (sec)", reps:"45" }],
+  abs:       [{ name:"Full Body Crunches", reps:"40" }, { name:"Knee Raises", reps:"25" }, { name:"Oblique Twists", reps:"20" }],
+  fullbody:  [{ name:"Burpees", reps:"15" }, { name:"Kettlebell Swings", reps:"25" }],
+  cardio:    [{ name:"Jumping Jacks", reps:"60" }, { name:"Mountain Climbers", reps:"40" }],
+};
 
 /* =========================================================
    DOM
 ========================================================= */
-const generateBtn = qs("#generateBtn");
-const exerciseBtn = qs("#exerciseBtn");
+const weeklyCenter = qs("#weeklyCenter");
+const weekNumEl = qs("#weekNum");
+const streakInline = qs("#streakInline");
+
+const card = qs("#card");
+const cardTitle = qs("#cardTitle");
+const cardRows = qs("#cardRows");
+const planWorkoutBtn = qs("#planWorkoutBtn");
 const startTimerBtn = qs("#startTimerBtn");
+
+const generateBtn = qs("#generateBtn");
+const resetBtn = qs("#resetBtn");
+const tinyStatus = qs("#tinyStatus");
+const metaconRatePill = qs("#metaconRatePill");
+
 const slideWrap = qs("#slideWrap");
 const slideFill = qs("#slideFill");
 const slideKnob = qs("#slideKnob");
 const slideWhite = qs("#slideWhite");
 
-const card = qs("#card");
-const cardTitle = qs("#cardTitle");
-const cardRows = qs("#cardRows");
-
-const weeklyCenter = qs("#weeklyCenter");
-const weekNumEl = qs("#weekNum");
-const streakInline = qs("#streakInline");
-
 const historyBtn = qs("#historyBtn");
+const settingsBtn = qs("#settingsBtn");
+
 const historyModal = qs("#historyModal");
 const closeHistoryModal = qs("#closeHistoryModal");
 const historyList = qs("#historyList");
 
+const modal = qs("#modal");
+const closeModal = qs("#closeModal");
+const tabsEl = qs("#tabs");
+const listEl = qs("#list");
+const addName = qs("#addName");
+const addReps = qs("#addReps");
+const addBtn = qs("#addBtn");
+
+const planModal = qs("#planModal");
+const planBody = qs("#planBody");
+const closePlanModal = qs("#closePlanModal");
+
+/* Confetti */
 const confettiCanvas = qs("#confettiCanvas");
 const confettiFx = window.confetti
-  ? window.confetti.create(confettiCanvas, { resize: true, useWorker: true })
+  ? window.confetti.create(confettiCanvas, { resize:true, useWorker:true })
   : null;
 
+function vibrate(ms){ try{ if(navigator.vibrate) navigator.vibrate(ms); }catch{} }
+
 /* =========================================================
-   DATA
+   STATE
 ========================================================= */
-const TAGS = ["upper","pull","push","shoulders","legs","abs","fullbody","cardio"];
+let library = loadJSON(LS.library, null);
+if(!library){
+  library = structuredClone(DEFAULT_LIBRARY);
+  saveJSON(LS.library, library);
+}
 
-const DEFAULT_LIBRARY = {
-  upper:[{name:"Muscle-Ups",reps:"5"}],
-  pull:[{name:"Pull-Ups",reps:"10"}],
-  push:[{name:"Push-Ups",reps:"20"}],
-  shoulders:[{name:"Pike Push-Ups",reps:"15"}],
-  legs:[{name:"Jump Squats",reps:"25"}],
-  abs:[{name:"Crunches",reps:"40"}],
-  fullbody:[{name:"Burpees",reps:"15"}],
-  cardio:[{name:"Jumping Jacks",reps:"50"}],
-};
-
-let library = loadJSON(LS.library, structuredClone(DEFAULT_LIBRARY));
-saveJSON(LS.library, library);
-
+let metaconHistory = loadJSON(LS.metaconHistory, []);
 let currentWorkout = loadJSON(LS.currentWorkout, null);
+let plannedReps = loadJSON("jy_planned_reps_v2", {}) || {};
+
+/* Timer state */
 let timerInterval = null;
-let timerStart = null;
+let timerBaseMs = 0;      // accumulated elapsed before current run
+let timerRunStart = 0;    // Date.now when resumed/started
+let timerRunning = false; // true when ticking
 
 /* =========================================================
-   STREAK + COUNTS
+   COUNTERS / STREAK
 ========================================================= */
-function getStreak() {
-  return parseInt(localStorage.getItem(LS.streak) || "0", 10);
-}
-function setStreak(n) {
-  localStorage.setItem(LS.streak, String(n));
-}
-function getTotalDays() {
-  return parseInt(localStorage.getItem(LS.totalDays) || "0", 10);
-}
-function setTotalDays(n) {
-  localStorage.setItem(LS.totalDays, String(n));
+function getStreak(){ return parseInt(localStorage.getItem(LS.streak)||"0",10); }
+function setStreak(n){ localStorage.setItem(LS.streak, String(Math.max(0,n|0))); }
+
+function getWeekCount(){ return parseInt(localStorage.getItem(LS.weekCount)||"0",10); }
+function setWeekCount(n){ localStorage.setItem(LS.weekCount, String(Math.max(0,n|0))); }
+
+function getWeekCounted(){ return localStorage.getItem(LS.weekCounted)==="1"; }
+function setWeekCounted(v){ localStorage.setItem(LS.weekCounted, v ? "1":"0"); }
+
+function getTotalDays(){ return parseInt(localStorage.getItem(LS.totalDays)||"0",10); }
+function setTotalDays(n){ localStorage.setItem(LS.totalDays, String(Math.max(0,n|0))); }
+
+function getLastDoneDate(){ return localStorage.getItem(LS.lastDone); }
+function setLastDoneDate(s){ localStorage.setItem(LS.lastDone, s); }
+
+function ensureWeekState(){
+  const current = isoWeekKey();
+  const stored = localStorage.getItem(LS.weekKey);
+  if(!stored){
+    localStorage.setItem(LS.weekKey, current);
+    setWeekCount(0);
+    setWeekCounted(false);
+    return;
+  }
+  if(stored !== current){
+    const lastCount = getWeekCount();
+    if(lastCount < 3) setStreak(0);
+    localStorage.setItem(LS.weekKey, current);
+    setWeekCount(0);
+    setWeekCounted(false);
+  }
 }
 
-function ensureWeek() {
-  const wk = isoWeekKey();
-  if (localStorage.getItem(LS.weekKey) !== wk) {
-    localStorage.setItem(LS.weekKey, wk);
-    localStorage.setItem(LS.weekCount, "0");
-    localStorage.setItem(LS.weekCounted, "0");
-  }
+function renderStreakUI(){
+  streakInline.textContent = `${getStreak()} week streak`;
+  weekNumEl.textContent = String(getTotalDays());
 }
 
 /* =========================================================
    WORKOUT GENERATION
 ========================================================= */
-function generateAMRAP() {
-  const pool = TAGS.filter(() => Math.random() < 0.6);
-  const picked = pool.length >= 3 ? pool.slice(0, 4) : TAGS.slice(0, 3);
+function pickExercise(tag){
+  const arr = library[tag] || [];
+  if(!arr.length) return { name:"(Add exercise)", reps:"" };
+  return rand(arr);
+}
+
+function generateAMRAP(){
+  const candidates = [
+    { tag:"pull", p:0.85 },
+    { tag:"push", p:0.85 },
+    { tag:"legs", p:0.60 },
+    { tag:"abs", p:0.55 },
+    { tag:"shoulders", p:0.50 },
+    { tag:"upper", p:0.45 },
+    { tag:"fullbody", p:0.50 },
+    { tag:"cardio", p:0.50 },
+  ];
+
+  let pool = [];
+  for(const c of candidates) if(Math.random() < c.p) pool.push(c.tag);
+
+  // guarantee 3
+  if(pool.length < 3){
+    const order = ["pull","push","legs","abs","fullbody","cardio","shoulders","upper"];
+    for(const t of order){
+      if(!pool.includes(t)) pool.push(t);
+      if(pool.length>=3) break;
+    }
+  }
+
+  pool = [...new Set(pool)].sort(()=>Math.random()-0.5);
+  const count = (Math.random() < 0.55) ? 3 : 4;
+  const chosen = pool.slice(0,count);
 
   return {
     type: "As Many Rounds As Possible",
-    rows: picked.map(tag => {
-      const ex = rand(library[tag]);
-      return { text: `${ex.reps} ${ex.name}`, tag };
+    rows: chosen.map(tag=>{
+      const ex = pickExercise(tag);
+      const reps = (ex.reps||"").trim();
+      const text = reps ? `${reps} ${ex.name}` : ex.name;
+      return { text, tags:[tag] };
     })
   };
 }
 
-function generateMetacon() {
+function generateMETACON(){
   return {
     type: "Metabolic Conditioning",
     rows: [
-      "50 Pull-Ups",
-      "50 Dips",
-      "100 Jump Squats",
-      "50 Pike Push-Ups",
-      "100 Crunches",
-      "50 Burpees",
-    ].map(t => ({ text: t }))
+      { text:"50 Pull-Ups", tags:["pull"] },
+      { text:"50 Dips", tags:["push"] },
+      { text:"100 Jumping Squats", tags:["legs"] },
+      { text:"50 Pike Push-Ups", tags:["shoulders"] },
+      { text:"50 Push-Ups", tags:["push"] },
+      { text:"100 Full Body Crunches", tags:["abs"] },
+      { text:"50 Kettlebell Swings", tags:["fullbody"] },
+      { text:"50 Australian Rows", tags:["pull"] },
+      { text:"100 Jumping Jacks", tags:["cardio"] },
+      { text:"10 Muscle-Ups", tags:["upper"] },
+    ]
   };
 }
 
 /* =========================================================
-   RENDER
+   UI: RENDER WORKOUT
 ========================================================= */
-function renderWorkout(w) {
-  cardTitle.textContent = w.type;
+function pillSpan(tag){
+  const span = document.createElement("span");
+  span.className = `pill ${tag}`;
+  span.textContent = tag;
+  return span;
+}
+
+function renderWorkout(workout){
+  cardTitle.textContent = workout.type;
   cardRows.innerHTML = "";
-  w.rows.forEach(r => {
-    const div = document.createElement("div");
-    div.className = "row";
-    div.innerHTML = `<div class="row-text">${r.text}</div>`;
-    cardRows.appendChild(div);
+
+  workout.rows.forEach(r=>{
+    const row = document.createElement("div");
+    row.className = "row";
+
+    const left = document.createElement("div");
+    left.className = "row-left";
+
+    const txt = document.createElement("div");
+    txt.className = "row-text";
+    txt.textContent = r.text;
+    txt.dataset.base = r.text;
+
+    left.appendChild(txt);
+
+    const tags = document.createElement("div");
+    tags.className = "tags";
+    (r.tags||[]).forEach(t=> tags.appendChild(pillSpan(t)));
+
+    row.appendChild(left);
+    row.appendChild(tags);
+    cardRows.appendChild(row);
   });
+
   card.classList.remove("hidden");
-  requestAnimationFrame(() => card.classList.add("visible"));
+  weeklyCenter.style.display = "none";
+}
+
+function showHome(){
+  card.classList.add("hidden");
+  weeklyCenter.style.display = "";
+  slideWrap.classList.add("hidden");
+  startTimerBtn.classList.add("hidden");
+  planWorkoutBtn.classList.add("hidden");
+  tinyStatus.textContent = "Ready";
+  currentWorkout = null;
+  saveJSON(LS.currentWorkout, null);
+  // do NOT wipe timer state here — only wipe on complete
+  renderStreakUI();
+}
+
+function showWorkoutState(workout){
+  weeklyCenter.style.display = "none";
+  card.classList.remove("hidden");
+
+  renderWorkout(workout);
+
+  slideWrap.classList.remove("hidden");
+
+  // Metacon-only features
+  if(workout.type === "Metabolic Conditioning"){
+    startTimerBtn.classList.remove("hidden");
+    planWorkoutBtn.classList.remove("hidden");
+  }else{
+    startTimerBtn.classList.add("hidden");
+    planWorkoutBtn.classList.add("hidden");
+  }
+
+  resetSlider();
 }
 
 /* =========================================================
-   TIMER
+   GENERATE
 ========================================================= */
-startTimerBtn.addEventListener("click", () => {
-  if (timerInterval) return;
+metaconRatePill.textContent = `Metacon: ${Math.round(METACON_CHANCE*100)}%`;
 
-  timerStart = Date.now();
-  saveJSON(LS.timerState, { start: timerStart });
+generateBtn.addEventListener("click", ()=>{
+  tinyStatus.textContent = "Generating…";
+  vibrate(8);
 
-  startTimerBtn.textContent = "00:00";
+  // micro “Apple pop” delay
+  setTimeout(()=>{
+    const workout = (Math.random() < METACON_CHANCE) ? generateMETACON() : generateAMRAP();
+    currentWorkout = workout;
+    saveJSON(LS.currentWorkout, workout);
 
-  timerInterval = setInterval(() => {
-    startTimerBtn.textContent = formatTime(Date.now() - timerStart);
-  }, 500);
+    // entering workout resets slider visuals
+    showWorkoutState(workout);
+
+    // when you generate a new workout, timer should be idle unless restored by init
+    if(workout.type !== "Metabolic Conditioning"){
+      stopTimerAndPersist({ clear:true });
+    }else{
+      // keep previous timer state ONLY if it belongs to existing metacon workout (we generated new one)
+      stopTimerAndPersist({ clear:true });
+      setTimerButtonIdle();
+    }
+
+    tinyStatus.textContent = "Workout generated";
+    vibrate(10);
+  }, 420);
+});
+
+resetBtn.addEventListener("click", ()=>{
+  vibrate(6);
+  showHome();
 });
 
 /* =========================================================
-   SLIDER
+   TIMER (Metacon only) — START / PAUSE / RESUME + PERSIST
+   Fixes the “pause jumps 3–5s” issue by saving elapsed BEFORE clearing interval.
 ========================================================= */
-let sliding = false;
-let startX = 0;
+function readTimerState(){
+  return loadJSON(LS.timerState, null);
+}
+function writeTimerState(state){
+  saveJSON(LS.timerState, state);
+}
 
-slideKnob.addEventListener("pointerdown", e => {
-  sliding = true;
-  startX = e.clientX;
-});
+function getElapsedMsNow(){
+  // if running: base + (now - runStart)
+  // if paused: base
+  return timerRunning ? (timerBaseMs + (Date.now() - timerRunStart)) : timerBaseMs;
+}
 
-slideKnob.addEventListener("pointermove", e => {
-  if (!sliding) return;
-  const dx = Math.max(0, e.clientX - startX);
-  slideFill.style.width = `${Math.min(dx / 3, 100)}%`;
-  slideWhite.style.clipPath = `inset(0 ${100 - dx / 3}% 0 0)`;
-});
-
-slideKnob.addEventListener("pointerup", () => {
-  sliding = false;
-  if (parseInt(slideFill.style.width) > 85) {
-    completeWorkout();
-  } else {
-    slideFill.style.width = "0%";
-    slideWhite.style.clipPath = "inset(0 100% 0 0)";
+function setTimerButtonDisplay(ms, mode){
+  // mode: "idle" | "running" | "paused"
+  if(mode === "idle"){
+    startTimerBtn.textContent = "Start Timer";
+    return;
   }
+  // Show time always (your request)
+  const t = formatTime(ms);
+  startTimerBtn.textContent = mode === "paused" ? `⏸ ${t}` : `⏱ ${t}`;
+}
+
+function setTimerButtonIdle(){
+  timerBaseMs = 0;
+  timerRunStart = 0;
+  timerRunning = false;
+  if(timerInterval){ clearInterval(timerInterval); timerInterval = null; }
+  setTimerButtonDisplay(0, "idle");
+}
+
+function startTick(){
+  if(timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(()=>{
+    const ms = getElapsedMsNow();
+    setTimerButtonDisplay(ms, "running");
+    writeTimerState({
+      running:true,
+      baseMs: timerBaseMs,
+      runStart: timerRunStart,
+      updatedAt: Date.now()
+    });
+  }, 250);
+}
+
+function pauseTimer(){
+  // compute exact elapsed NOW, then stop interval
+  const elapsed = getElapsedMsNow();
+  timerBaseMs = elapsed;
+  timerRunning = false;
+
+  if(timerInterval){ clearInterval(timerInterval); timerInterval = null; }
+
+  writeTimerState({
+    running:false,
+    baseMs: timerBaseMs,
+    runStart: 0,
+    updatedAt: Date.now()
+  });
+
+  setTimerButtonDisplay(timerBaseMs, "paused");
+  vibrate(10);
+}
+
+function resumeTimer(){
+  timerRunStart = Date.now();
+  timerRunning = true;
+
+  writeTimerState({
+    running:true,
+    baseMs: timerBaseMs,
+    runStart: timerRunStart,
+    updatedAt: Date.now()
+  });
+
+  setTimerButtonDisplay(getElapsedMsNow(), "running");
+  startTick();
+  vibrate(10);
+}
+
+function startTimerFresh(){
+  timerBaseMs = 0;
+  timerRunStart = Date.now();
+  timerRunning = true;
+
+  writeTimerState({
+    running:true,
+    baseMs: 0,
+    runStart: timerRunStart,
+    updatedAt: Date.now()
+  });
+
+  setTimerButtonDisplay(0, "running");
+  startTick();
+  vibrate(12);
+}
+
+function stopTimerAndPersist({ clear=false } = {}){
+  if(timerInterval){ clearInterval(timerInterval); timerInterval = null; }
+  timerRunning = false;
+  timerRunStart = 0;
+  // leave baseMs if not clear
+  if(clear){
+    timerBaseMs = 0;
+    localStorage.removeItem(LS.timerState);
+    setTimerButtonIdle();
+  }else{
+    writeTimerState({ running:false, baseMs: timerBaseMs, runStart:0, updatedAt: Date.now() });
+    setTimerButtonDisplay(timerBaseMs, timerBaseMs>0 ? "paused" : "idle");
+  }
+}
+
+startTimerBtn.addEventListener("click", ()=>{
+  if(!currentWorkout || currentWorkout.type !== "Metabolic Conditioning") return;
+
+  // state machine
+  if(!timerRunning && timerBaseMs === 0){
+    startTimerFresh();
+    return;
+  }
+  if(timerRunning){
+    pauseTimer();
+    return;
+  }
+  // paused with baseMs > 0
+  resumeTimer();
 });
+
+/* =========================================================
+   PLAN METACON
+========================================================= */
+planWorkoutBtn.addEventListener("click", ()=>{
+  if(!currentWorkout || currentWorkout.type !== "Metabolic Conditioning") return;
+
+  planBody.innerHTML = "";
+  currentWorkout.rows.forEach(r=>{
+    const base = r.text;
+
+    const wrap = document.createElement("div");
+    wrap.className = "plan-row";
+
+    const reps = document.createElement("input");
+    reps.className = "input input-small";
+    reps.placeholder = "Reps";
+    reps.inputMode = "numeric";
+    reps.value = plannedReps[base] || "";
+    reps.addEventListener("input", ()=>{ plannedReps[base] = reps.value; saveJSON("jy_planned_reps_v2", plannedReps); });
+
+    const name = document.createElement("div");
+    name.className = "plan-name";
+    name.textContent = base;
+
+    wrap.appendChild(reps);
+    wrap.appendChild(name);
+    planBody.appendChild(wrap);
+  });
+
+  planModal.classList.add("show");
+});
+
+closePlanModal.addEventListener("click", ()=>{
+  planModal.classList.remove("show");
+  // apply planned reps to card view
+  qsa("#cardRows .row-text").forEach(el=>{
+    const base = el.dataset.base || el.textContent;
+    const r = (plannedReps[base] || "").trim();
+    el.textContent = r ? `${r} ${base}` : base;
+  });
+});
+
+planModal.addEventListener("click",(e)=>{
+  if(e.target === planModal) planModal.classList.remove("show");
+});
+
+/* =========================================================
+   SLIDER (smooth)
+========================================================= */
+let sliding=false;
+let startClientX=0;
+let startOffsetX=0;
+let currentX=0;
+let maxSlide=0;
+let rafPending=false;
+let pendingX=0;
+
+function resetSlider(){
+  const rect = slideWrap.getBoundingClientRect();
+  const knobW = slideKnob.getBoundingClientRect().width;
+  maxSlide = Math.max(0, rect.width - knobW - 14); // padding-ish
+  currentX = 0;
+  slideFill.style.transition = "none";
+  slideWhite.style.transition = "none";
+  slideFill.style.width = "0%";
+  slideWhite.style.clipPath = "inset(0 100% 0 0)";
+  slideKnob.style.transform = "translate3d(0,-50%,0)";
+}
+
+function setSliderImmediate(px){
+  const x = clamp(px, 0, maxSlide);
+  currentX = x;
+  const p = maxSlide ? (x/maxSlide) : 0;
+  slideKnob.style.transform = `translate3d(${x}px,-50%,0)`;
+  slideFill.style.width = `${p*100}%`;
+  slideWhite.style.clipPath = `inset(0 ${100 - p*100}% 0 0)`;
+}
+function setSlider(px){
+  pendingX = px;
+  if(rafPending) return;
+  rafPending = true;
+  requestAnimationFrame(()=>{
+    rafPending = false;
+    setSliderImmediate(pendingX);
+  });
+}
+function snapBack(){
+  slideFill.style.transition = "width .18s ease";
+  slideWhite.style.transition = "clip-path .18s ease";
+  requestAnimationFrame(()=> setSliderImmediate(0));
+}
+
+slideKnob.addEventListener("pointerdown", (e)=>{
+  sliding=true;
+  slideKnob.setPointerCapture(e.pointerId);
+  startClientX = e.clientX;
+  startOffsetX = currentX;
+  slideFill.style.transition = "none";
+  slideWhite.style.transition = "none";
+  vibrate(6);
+});
+
+slideKnob.addEventListener("pointermove",(e)=>{
+  if(!sliding) return;
+  const x = startOffsetX + (e.clientX - startClientX);
+  setSlider(x);
+});
+
+function finishSlide(e){
+  if(!sliding) return;
+  sliding=false;
+  try{ slideKnob.releasePointerCapture(e.pointerId); }catch{}
+  const p = maxSlide ? (currentX/maxSlide) : 0;
+  if(p > 0.92){
+    slideFill.style.transition = "width .18s ease";
+    slideWhite.style.transition = "clip-path .18s ease";
+    requestAnimationFrame(()=>{
+      setSliderImmediate(maxSlide);
+      completeWorkout();
+    });
+  }else{
+    snapBack();
+  }
+}
+slideKnob.addEventListener("pointerup", finishSlide);
+slideKnob.addEventListener("pointercancel", finishSlide);
 
 /* =========================================================
    COMPLETE WORKOUT
 ========================================================= */
-function completeWorkout() {
-  localStorage.removeItem(LS.currentWorkout);
-  if (timerInterval) clearInterval(timerInterval);
+function shootConfetti(){
+  if(!confettiFx) return;
+  confettiFx({ particleCount: 140, spread: 80, startVelocity: 34, scalar: 1.05, origin: { x: 0.5, y: 0.78 } });
+  setTimeout(()=> confettiFx({ particleCount: 80, spread: 70, startVelocity: 28, scalar: .95, origin: { x: 0.55, y: 0.78 } }), 110);
+}
 
-  if (confettiFx) {
-    confettiFx({ particleCount: 180, spread: 90, startVelocity: 40 });
+function completeWorkout(){
+  // Save metacon attempt (if metacon + timer has time)
+  if(currentWorkout?.type === "Metabolic Conditioning"){
+    const elapsed = getElapsedMsNow();
+    if(elapsed > 0){
+      metaconHistory.push({ time: elapsed, date: todayKey() });
+      saveJSON(LS.metaconHistory, metaconHistory);
+    }
   }
 
-  setTotalDays(getTotalDays() + 1);
-  streakInline.textContent = `${getStreak()} week streak`;
-  weekNumEl.textContent = getTotalDays();
+  // Clear timer completely on complete
+  stopTimerAndPersist({ clear:true });
 
-  card.classList.add("hidden");
-  weeklyCenter.classList.remove("hidden");
+  // counters
+  ensureWeekState();
+
+  const today = todayKey();
+  const lastDone = getLastDoneDate();
+  if(lastDone !== today){
+    setTotalDays(getTotalDays()+1);
+    setLastDoneDate(today);
+  }
+
+  let wc = getWeekCount()+1;
+  setWeekCount(wc);
+
+  if(wc >= 3 && !getWeekCounted()){
+    setStreak(getStreak()+1);
+    setWeekCounted(true);
+  }
+
+  shootConfetti();
+  vibrate(18);
+
+  // clear current workout (so refresh returns home)
+  localStorage.removeItem(LS.currentWorkout);
+  currentWorkout = null;
+
+  showHome();
 }
 
 /* =========================================================
    HISTORY
 ========================================================= */
-historyBtn.addEventListener("click", () => {
-  const hist = loadJSON(LS.metaconHistory, []);
-  historyList.innerHTML = hist.length
-    ? hist.map(h =>
-        `<div class="history-row">
-           <div>
-             <div class="history-time">${formatTime(h.time)}</div>
-             <div class="history-date">${formatDate(h.date)}</div>
-           </div>
-         </div>`
-      ).join("")
-    : "<div>No history yet</div>";
+function renderMetaconHistory(){
+  historyList.innerHTML = "";
+
+  if(!metaconHistory.length){
+    historyList.innerHTML = `<div style="color:rgba(255,255,255,.68);font-weight:900">No Metacon attempts yet</div>`;
+    return;
+  }
+
+  const best = Math.min(...metaconHistory.map(h=>h.time));
+  let prUsed = false;
+
+  metaconHistory.slice().reverse().forEach((entry, idxFromEnd)=>{
+    const row = document.createElement("div");
+    row.className = "history-row";
+
+    const left = document.createElement("div");
+    left.className = "h-left";
+    left.innerHTML = `
+      <div class="history-time">${formatTime(entry.time)}</div>
+      <div class="history-date">${formatDate(entry.date)}</div>
+    `;
+
+    const right = document.createElement("div");
+    right.className = "h-right";
+
+    if(entry.time === best && !prUsed){
+      prUsed = true;
+      const pr = document.createElement("span");
+      pr.className = "pr-badge";
+      pr.textContent = "PR";
+      right.appendChild(pr);
+    }
+
+    const del = document.createElement("button");
+    del.className = "history-delete";
+    del.textContent = "Delete";
+    del.addEventListener("click", ()=>{
+      const ok = confirm("Delete this Metacon attempt?");
+      if(!ok) return;
+
+      const realIndex = metaconHistory.length - 1 - idxFromEnd;
+      metaconHistory.splice(realIndex, 1);
+      saveJSON(LS.metaconHistory, metaconHistory);
+      renderMetaconHistory();
+    });
+
+    right.appendChild(del);
+
+    row.appendChild(left);
+    row.appendChild(right);
+    historyList.appendChild(row);
+  });
+}
+
+historyBtn.addEventListener("click", ()=>{
+  renderMetaconHistory();
   historyModal.classList.add("show");
 });
+closeHistoryModal.addEventListener("click", ()=> historyModal.classList.remove("show"));
+historyModal.addEventListener("click",(e)=>{ if(e.target===historyModal) historyModal.classList.remove("show"); });
 
-closeHistoryModal.addEventListener("click", () => {
-  historyModal.classList.remove("show");
+/* =========================================================
+   EXERCISE MODAL
+========================================================= */
+const TAB_ORDER = ["upper","pull","push","shoulders","legs","abs","fullbody","cardio"];
+let activeTab = "push";
+
+function openModal(){
+  modal.classList.add("show");
+  renderTabs();
+  renderList();
+}
+function closeModalFn(){
+  modal.classList.remove("show");
+  saveJSON(LS.library, library);
+}
+
+settingsBtn.addEventListener("click", openModal);
+closeModal.addEventListener("click", closeModalFn);
+modal.addEventListener("click",(e)=>{ if(e.target===modal) closeModalFn(); });
+
+function renderTabs(){
+  tabsEl.innerHTML = "";
+  TAB_ORDER.forEach(k=>{
+    const b = document.createElement("button");
+    b.className = "tab" + (k===activeTab ? " active":"");
+    b.textContent = k;
+    b.addEventListener("click", ()=>{ activeTab = k; renderTabs(); renderList(); });
+    tabsEl.appendChild(b);
+  });
+}
+function renderList(){
+  listEl.innerHTML = "";
+  if(!library[activeTab]) library[activeTab] = [];
+
+  library[activeTab].forEach((item, idx)=>{
+    const wrap = document.createElement("div");
+    wrap.className = "item";
+
+    const name = document.createElement("input");
+    name.className = "name";
+    name.value = item.name || "";
+    name.addEventListener("input", ()=>{
+      library[activeTab][idx].name = name.value;
+      saveJSON(LS.library, library);
+    });
+
+    const reps = document.createElement("input");
+    reps.className = "reps";
+    reps.inputMode = "numeric";
+    reps.value = item.reps || "";
+    reps.addEventListener("input", ()=>{
+      library[activeTab][idx].reps = reps.value;
+      saveJSON(LS.library, library);
+    });
+
+    const del = document.createElement("button");
+    del.className = "trash";
+    del.textContent = "×";
+    del.addEventListener("click", ()=>{
+      const ok = confirm("Delete this exercise?");
+      if(!ok) return;
+      library[activeTab].splice(idx, 1);
+      saveJSON(LS.library, library);
+      renderList();
+    });
+
+    wrap.appendChild(name);
+    wrap.appendChild(reps);
+    wrap.appendChild(del);
+    listEl.appendChild(wrap);
+  });
+}
+
+addBtn.addEventListener("click", ()=>{
+  const n = (addName.value||"").trim();
+  const r = (addReps.value||"").trim();
+  if(!n) return;
+
+  if(!library[activeTab]) library[activeTab]=[];
+  library[activeTab].unshift({ name:n, reps:r });
+
+  addName.value = "";
+  addReps.value = "";
+  saveJSON(LS.library, library);
+  renderList();
 });
 
 /* =========================================================
-   INIT
+   INIT (RESTORE WORKOUT + RESTORE TIMER PERFECTLY)
 ========================================================= */
-function init() {
-  ensureWeek();
-  weekNumEl.textContent = getTotalDays();
-  streakInline.textContent = `${getStreak()} week streak`;
+function restoreTimerIfNeeded(){
+  const state = readTimerState();
+  if(!state) { setTimerButtonIdle(); return; }
 
-  if (currentWorkout) {
-    renderWorkout(currentWorkout);
-    weeklyCenter.classList.add("hidden");
+  // only restore timer if current workout is metacon
+  if(!currentWorkout || currentWorkout.type !== "Metabolic Conditioning"){
+    // keep timer state but do not show ticking (won't be visible anyway). still reset button.
+    setTimerButtonIdle();
+    return;
   }
+
+  timerBaseMs = Number(state.baseMs || 0);
+  const running = !!state.running;
+  const runStart = Number(state.runStart || 0);
+
+  if(running && runStart){
+    timerRunStart = runStart;
+    timerRunning = true;
+
+    // immediate paint
+    setTimerButtonDisplay(getElapsedMsNow(), "running");
+    startTick();
+  }else{
+    timerRunning = false;
+    timerRunStart = 0;
+    setTimerButtonDisplay(timerBaseMs, timerBaseMs>0 ? "paused" : "idle");
+  }
+}
+
+function init(){
+  ensureWeekState();
+  renderStreakUI();
+
+  if(currentWorkout){
+    showWorkoutState(currentWorkout);
+    tinyStatus.textContent = "Restored workout";
+  }else{
+    showHome();
+  }
+
+  restoreTimerIfNeeded();
+
+  // If workout is restored, slider must show
+  if(currentWorkout) slideWrap.classList.remove("hidden");
 }
 
 init();
   </script>
-
 </body>
 </html>
