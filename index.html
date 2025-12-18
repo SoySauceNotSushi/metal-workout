@@ -57,6 +57,10 @@
   padding-bottom:8px;
 }
 
+.top-bar.hidden{
+  display: none;
+}
+  
 .history-btn{
   background:none;
   border:none;
@@ -828,6 +832,7 @@ const addName   = qs("#addName");
 const addReps   = qs("#addReps");
 const addBtn    = qs("#addBtn");
 
+const topBar = qs(".top-bar");
 const historyBtn = qs("#historyBtn");
 const historyModal = qs("#historyModal");
 const closeHistoryModal = qs("#closeHistoryModal");
@@ -1057,6 +1062,7 @@ function renderWorkout(workout){
    UI STATES
 ========================================================= */
 function showWeeklyCenter(){
+  topBar.classList.remove("hidden");
   historyBtn.classList.remove("hidden");
   weeklyCenter.classList.remove("hidden");
   card.classList.remove("visible");
@@ -1076,6 +1082,7 @@ function showWeeklyCenter(){
 
 function showWorkoutState(workout){
   weeklyCenter.classList.add("hidden");
+  topBar.classList.add("hidden");
   historyBtn.classList.add("hidden");
   renderWorkout(workout);
 
