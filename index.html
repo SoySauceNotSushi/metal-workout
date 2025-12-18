@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Jy Workout</title>
 
-  <!-- ============================= -->
-  <!-- CSS WILL GO HERE (STEP 2) -->
-  /* =========================================================
+  <!-- 🔽 STEP 2: CSS GOES BETWEEN THESE TAGS -->
+  <style>
+   /* =========================================================
    RESET + TOKENS
 ========================================================= */
 :root{
@@ -384,114 +384,17 @@ body{
   padding:4px 8px;
   border-radius:var(--radius-pill);
 }
-  <!-- ============================= -->
-
+  </style>
 </head>
 
 <body>
 
-  <!-- HISTORY MODAL -->
-  <div class="modal" id="historyModal">
-    <div class="modal-sheet">
-      <div class="modal-head">
-        <div class="modal-title">Metacon History</div>
-        <button class="modal-close" id="closeHistoryModal">Done</button>
-      </div>
-      <div class="modal-body">
-        <div class="history-list" id="historyList"></div>
-      </div>
-    </div>
-  </div>
+  <!-- 🔽 ALL YOUR HTML MARKUP GOES HERE -->
+  <!-- modals, container, buttons, cards, etc -->
 
-  <canvas id="confettiCanvas"></canvas>
-
-  <div class="container">
-
-    <!-- APP HEADER -->
-    <div class="top-bar">
-      <button class="history-btn" id="historyBtn">History</button>
-    </div>
-
-    <!-- MAIN STAGE -->
-    <div class="center">
-
-      <div class="ai-stage" id="aiStage"></div>
-
-      <!-- WEEKLY STATS -->
-      <div class="weekly-center" id="weeklyCenter">
-        <div class="weekly-count">
-          <div class="num" id="weekNum">0</div>
-          <div class="label" id="weekLabel">
-            <span id="weekLabelText">workouts completed</span>
-            <span class="dot">·</span>
-            <span class="streak-inline" id="streakInline">0 week streak</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- WORKOUT CARD -->
-      <div class="card hidden" id="card">
-        <div class="card-title" id="cardTitle"></div>
-        <div id="cardRows"></div>
-        <button class="plan-btn hidden" id="planWorkoutBtn">Plan Workout</button>
-      </div>
-
-    </div>
-
-    <!-- ACTION AREA -->
-    <div class="actions">
-      <button class="btn" id="generateBtn">Generate Workout</button>
-      <button class="btn secondary" id="exerciseBtn">Exercises</button>
-
-      <button class="btn secondary hidden" id="startTimerBtn">Start Timer</button>
-
-      <div class="slide-wrap" id="slideWrap">
-        <div class="slide-fill" id="slideFill"></div>
-        <div class="slide-label">
-          <div class="base">Slide to Complete</div>
-          <div class="white" id="slideWhite">Slide to Complete</div>
-        </div>
-        <div class="slide-knob" id="slideKnob"><span>→</span></div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- EXERCISE LIBRARY MODAL -->
-  <div class="modal" id="modal">
-    <div class="modal-sheet">
-      <div class="modal-head">
-        <div class="modal-title">Exercises</div>
-        <button class="modal-close" id="closeModal">Done</button>
-      </div>
-      <div class="tabs" id="tabs"></div>
-      <div class="modal-body">
-        <div class="add-row">
-          <input id="addName" placeholder="Exercise name" />
-          <input id="addReps" placeholder="Reps" />
-        </div>
-        <button id="addBtn">Add Exercise</button>
-        <div id="list"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PLAN WORKOUT MODAL -->
-  <div class="modal" id="planModal">
-    <div class="modal-sheet">
-      <div class="modal-head">
-        <div class="modal-title">Plan Workout</div>
-        <button class="modal-close" id="closePlanModal">Save</button>
-      </div>
-      <div class="modal-body">
-        <div class="plan-list" id="planBody"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ============================= -->
-  <!-- JS WILL GO HERE (STEP 3) -->
-  /* =========================================================
+  <!-- 🔽 STEP 3: JS GOES BETWEEN THESE TAGS -->
+  <script>
+    /* =========================================================
    STORAGE KEYS
 ========================================================= */
 const LS = {
@@ -777,7 +680,7 @@ function init() {
 }
 
 init();
-  <!-- ============================= -->
+  </script>
 
 </body>
 </html>
