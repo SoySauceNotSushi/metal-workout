@@ -733,6 +733,14 @@ const LS = {
 const qs    = s => document.querySelector(s);
 const rand  = arr => arr[Math.floor(Math.random()*arr.length)];
 
+function hardResetPointerState() {
+  // iOS WebKit gesture reset
+  document.body.style.pointerEvents = "none";
+  requestAnimationFrame(() => {
+    document.body.style.pointerEvents = "";
+  });
+}
+
 function isoWeekKey(d=new Date()){
   const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
   const dayNum = date.getUTCDay() || 7;
@@ -1321,6 +1329,8 @@ function finishSlide(e){
 }
 slideKnob.addEventListener("pointerup", finishSlide);
 slideKnob.addEventListener("pointercancel", finishSlide);
+window.addEventListener("pointerup", finishSlide, { passive: true });
+window.addEventListener("pointercancel", finishSlide, { passive: true });
 
 /* =========================================================
    TIMER (unchanged)
@@ -1386,13 +1396,11 @@ function completeWorkout(){
 
   shootConfettiFromUnderButtons();
   // ❌ haptics removed
-  // ✅ Restore focus so clicks work immediately
-requestAnimationFrame(() => {
-  document.activeElement?.blur();
-  window.focus();
-});
 
   showWeeklyCenter();
+
+  // iOS: sometimes pointer state gets “stuck” after pointercapture/slide
+hardResetPointerState();
 }
 
 /* =========================================================
