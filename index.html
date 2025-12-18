@@ -980,32 +980,68 @@ function pickUniqueExercise(tagKey, usedNames){
 /* ✅ NEW: focus-aware AMRAP (3–4 items, can repeat categories) */
 function generateAMRAP_FOCUSED(){
   let pool = [];
+  let mustInclude = [];
 
   if(focus === "upper"){
-    pool = ["pull","push","shoulders","cardio","pull","push"];
-  }else if(focus === "lower"){
-    pool = ["legs","abs","cardio","legs","cardio"];
-  }else{
+    pool = ["pull","push","shoulders","cardio"];
+    mustInclude = ["pull","cardio"];
+  } 
+  else if(focus === "lower"){
+    pool = ["legs","abs","cardio"];
+    mustInclude = ["cardio","abs"];
+  } 
+  else {
     pool = ["pull","push","legs","abs","shoulders","cardio","fullbody"];
+    mustInclude = [];
   }
 
-  const count = (Math.random() < 0.55) ? 3 : 4;
+  const count = Math.random() < 0.55 ? 3 : 4;
+  const picked = [];
+  const counts = {};
 
-  // categories can repeat
-  const chosenTags = [];
-  while(chosenTags.length < count) chosenTags.push(rand(pool));
+  function canPick(tag){
+    return (counts[tag] || 0) < 2;
+  }
 
-  // but exercises cannot repeat
-  const usedNames = new Set();
+  // 1️⃣ Force at least one required category (if defined)
+  if(mustInclude.length){
+    const forced = rand(mustInclude);
+    picked.push(forced);
+    counts[forced] = 1;
+  }
 
-  const rows = chosenTags.map(tag=>{
-    const ex = pickUniqueExercise(tag, usedNames);
-    const reps = (ex.reps||"").trim();
+  // 2️⃣ Fill remaining slots safely
+  while(picked.length < count){
+    const tag = rand(pool);
+    if(!canPick(tag)) continue;
+    picked.push(tag);
+    counts[tag] = (counts[tag] || 0) + 1;
+  }
+
+  // 3️⃣ Map to exercises (no duplicate exercises)
+  const usedExercises = new Set();
+
+  const rows = picked.map(tag=>{
+    const options = (library[tag] || []).filter(
+      ex => !usedExercises.has(ex.name)
+    );
+
+    const ex = options.length
+      ? rand(options)
+      : pickExercise(tag);
+
+    usedExercises.add(ex.name);
+
+    const reps = (ex.reps || "").trim();
     const text = reps ? `${reps} ${ex.name}` : ex.name;
+
     return { text, tags:[tag] };
   });
 
-  return { type:"As Many Rounds As Possible", rows };
+  return {
+    type: "As Many Rounds As Possible",
+    rows
+  };
 }
   
 /* Metacon unchanged */
