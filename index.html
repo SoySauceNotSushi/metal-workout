@@ -1057,6 +1057,7 @@ function renderWorkout(workout){
    UI STATES
 ========================================================= */
 function showWeeklyCenter(){
+  historyBtn.classList.remove("hidden");
   weeklyCenter.classList.remove("hidden");
   card.classList.remove("visible");
   setTimeout(()=> card.classList.add("hidden"), 160);
@@ -1075,6 +1076,7 @@ function showWeeklyCenter(){
 
 function showWorkoutState(workout){
   weeklyCenter.classList.add("hidden");
+  historyBtn.classList.add("hidden");
   renderWorkout(workout);
 
   generateBtn.classList.add("hidden");
