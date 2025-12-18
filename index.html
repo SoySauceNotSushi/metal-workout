@@ -712,7 +712,7 @@ const LS = {
   weekCount: "jy_weekCount_v1",
   weekCounted:"jy_week_counted_v1",
   totalDays: "jy_total_days_trained_v1",
-  lastDone:  "jy_last_workout_date_v1"
+  lastDone:  "jy_last_workout_date_v1",
   metaconHistory: "jy_metacon_history_v1",
 };
 
@@ -878,15 +878,6 @@ let timerInterval = null;
 let timerStart = null;
 
 let metaconHistory = loadJSON(LS.metaconHistory, []);
-
-function formatDate(dateStr){
-  const d = new Date(dateStr);
-  return d.toLocaleDateString(undefined, {
-    day: "numeric",
-    month: "short",
-    year: "numeric"
-  });
-}
 
 function renderMetaconHistory(){
   historyList.innerHTML = "";
