@@ -253,6 +253,11 @@ body{
   padding:10px 0 2px;
   z-index:10;
 }
+
+  .focus-picker.hidden {
+  display: none;
+}
+  
 .focus-pill{
   position:relative;
   display:inline-flex;
@@ -761,7 +766,7 @@ const cardRows  = qs("#cardRows");
 const planWorkoutBtn = qs("#planWorkoutBtn");
 
 const aiStage   = qs("#aiStage");
-
+const focusPicker = qs("#focusPicker");
 const generateBtn = qs("#generateBtn");
 const exerciseBtn = qs("#exerciseBtn");
 const startTimerBtn = qs("#startTimerBtn");
@@ -1111,6 +1116,9 @@ function showWeeklyCenter(){
   topBar.classList.remove("hidden");
   historyBtn.classList.remove("hidden");
   weeklyCenter.classList.remove("hidden");
+  
+  focusPicker.classList.remove("hidden");
+  
   card.classList.remove("visible");
   setTimeout(()=> card.classList.add("hidden"), 160);
 
@@ -1129,6 +1137,9 @@ function showWorkoutState(workout){
   weeklyCenter.classList.add("hidden");
   topBar.classList.add("hidden");
   historyBtn.classList.add("hidden");
+
+  focusPicker.classList.add("hidden");
+
   renderWorkout(workout);
 
   generateBtn.classList.add("hidden");
