@@ -1,1536 +1,240 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Jy Workout</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Daily Mass | Ordo</title>
+    <style>
+        /* --- SLEEK REVOLUT-STYLE UI --- */
+        :root {
+            --bg-app: #F2F2F7;
+            --bg-card: #FFFFFF;
+            --text-primary: #1C1C1E;
+            --text-secondary: #8E8E93;
+            --accent: #007AFF;
+            --divider: #E5E5EA;
+            --radius: 22px;
+            --shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
 
-<style>
-:root{
-  --brand:#2453f5;
-  --ink:#0f172a;
-  --sub:#64748b;
+        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
 
-  --bgTop:#ffffff;
-  --bgBottom:#ffffff;
+        body {
+            margin: 0;
+            background-color: var(--bg-app);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-primary);
+            padding-bottom: 80px;
+        }
 
-  --card:#ffffff;
-  --shadow-soft:0 18px 48px rgba(15,23,42,0.12);
+        /* HEADER */
+        header {
+            position: sticky;
+            top: 0;
+            background: rgba(242, 242, 247, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 16px 24px;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
 
-  --tag-purple-bg:#ede9fe; --tag-purple-ink:#6d28d9;
-  --tag-green-bg:#dcfce7;  --tag-green-ink:#16a34a;
-  --tag-blue-bg:#e4ecff;   --tag-blue-ink:#2453f5;
-  --tag-pink-bg:#ffe4f1;   --tag-pink-ink:#be185d;
-  --tag-orange-bg:#ffe6bf; --tag-orange-ink:#b45309;
-  --tag-teal-bg:#d1fae5;   --tag-teal-ink:#0f766e;
-  --tag-red-bg:#ffe0e0;    --tag-red-ink:#dc2626;
-  --tag-yellow-bg:#fef3c7; --tag-yellow-ink:#a16207;
+        h1 { font-size: 28px; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
 
-  --radius:18px;
-}
+        #date-badge {
+            font-size: 13px; font-weight: 700; color: var(--accent);
+            background: rgba(0, 122, 255, 0.1); padding: 6px 14px;
+            border-radius: 100px; text-transform: uppercase;
+        }
 
-*{ box-sizing:border-box; }
-html,body{ height:100%; }
+        /* CONTAINER */
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
 
-body{
-  margin:0;
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro",Segoe UI,Roboto,sans-serif;
-  color:var(--ink);
-  -webkit-font-smoothing:antialiased;
-  background:linear-gradient(180deg,var(--bgTop),var(--bgBottom));
-  overflow:hidden;
-}
+        /* SECTIONS */
+        .section-title {
+            font-size: 13px; font-weight: 600; color: var(--text-secondary);
+            text-transform: uppercase; letter-spacing: 0.5px;
+            margin: 30px 0 10px 10px;
+        }
 
-.container{
-  max-width:520px;
-  margin:0 auto;
-  padding:18px 18px 0;
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-}
+        /* CARDS */
+        .card {
+            background: var(--bg-card); border-radius: var(--radius);
+            box-shadow: var(--shadow); overflow: hidden; margin-bottom: 16px;
+        }
 
-.top-bar{
-  display:flex;
-  justify-content:flex-end;
-  align-items:center;
-  padding-bottom:8px;
-}
-.top-bar.hidden{ display:none; }
+        .row {
+            padding: 22px 20px;
+            border-bottom: 1px solid var(--divider);
+            display: flex; flex-direction: column; gap: 6px;
+        }
+        .row:last-child { border-bottom: none; }
 
-.history-btn{
-  background:none;
-  border:none;
-  color:var(--ink);
-  font-size:14px;
-  font-weight:600;
-  cursor:pointer;
-}
-.history-btn.hidden{ display:none; }
+        /* TYPOGRAPHY */
+        .speaker {
+            font-size: 11px; font-weight: 800; color: var(--accent);
+            text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.5px;
+        }
+        .pt { font-size: 17px; font-weight: 600; line-height: 1.5; color: var(--text-primary); margin-bottom: 2px;}
+        .en { font-size: 15px; font-weight: 400; line-height: 1.5; color: var(--text-secondary); font-style: italic;}
 
-.center{
-  position:relative;
-  flex:1;
-  display:flex;
-  align-items:flex-start;
-  justify-content:center;
-  padding-top:18px;
-}
-  .train-header{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:16px;
-  padding-bottom:12px;
-  z-index:10;
-}
+        /* LOADING & ERROR STATES */
+        .loading { text-align: center; padding: 40px; color: var(--text-secondary); font-size: 14px; }
+        .error { color: #FF3B30; text-align: center; padding: 20px; font-size: 14px; }
 
-.train-left{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-}
+        /* ANIMATION */
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; opacity: 0; transform: translateY(10px); }
+        @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
 
-.train-title{
-  font-size:20px;
-  font-weight:600;
-  letter-spacing:-0.02em;
-}
-
-.weekly-center{
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  pointer-events:none;
-}
-.weekly-center.hidden{ display:none; }
-
-.weekly-count{
-  text-align:center;
-  transform:translateY(-10px);
-  opacity:.95;
-}
-.weekly-count .num{
-  font-size:150px;
-  font-weight:900;
-  letter-spacing:-0.05em;
-  color:rgba(15,23,42,0.08);
-  text-shadow:
-    0 1px 0 rgba(255,255,255,0.8),
-    0 -1px 0 rgba(15,23,42,0.05);
-  line-height:0.9;
-}
-.weekly-count .label{
-  margin-top:10px;
-  font-size:16px;
-  font-weight:400;
-  color:rgba(100,116,139,0.65);
-  letter-spacing:-0.02em;
-  display:inline-flex;
-  align-items:baseline;
-  gap:8px;
-  flex-wrap:wrap;
-  justify-content:center;
-  max-width:90vw;
-}
-.weekly-count .label .dot{ opacity:.55; }
-.weekly-count .label .streak-inline{
-  color:rgba(15,23,42,0.88);
-  font-weight:500;
-}
-
-.card{
-  width:min(460px, 100%);
-  background:var(--card);
-  border-radius:22px;
-  box-shadow:var(--shadow-soft);
-  padding:22px 22px;
-  opacity:0;
-  transform:translateY(18px) scale(.98);
-  transition:opacity .28s ease, transform .28s cubic-bezier(.18,.84,.32,1.12);
-  position:relative;
-  z-index:3;
-}
-.card.visible{ opacity:1; transform:translateY(0) scale(1); }
-.card.hidden{ display:none; }
-
-.card-title{
-  font-size:20px;
-  font-weight:600;
-  margin:0 0 18px;
-  letter-spacing:-0.03em;
-}
-
-.row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  padding:10px 0;
-  border-bottom:0px solid rgba(15,23,42,0.04);
-}
-.row:last-child{ border-bottom:none; }
-
-.row-left{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  min-width:0;
-}
-.row-text{
-  font-size:16px;
-  font-weight:400;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-.tags{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  justify-content:flex-end;
-}
-.pill{
-  padding:6px 12px;
-  border-radius:999px;
-  font-size:14px;
-  font-weight:500;
-  line-height:1;
-  white-space:nowrap;
-}
-
-.pill-upper{ background:var(--tag-purple-bg); color:var(--tag-purple-ink); }
-.pill-pull{ background:var(--tag-green-bg); color:var(--tag-green-ink); }
-.pill-push{ background:var(--tag-blue-bg); color:var(--tag-blue-ink); }
-.pill-shoulders{ background:var(--tag-pink-bg); color:var(--tag-pink-ink); }
-.pill-legs{ background:var(--tag-orange-bg); color:var(--tag-orange-ink); }
-.pill-abs{ background:var(--tag-teal-bg); color:var(--tag-teal-ink); }
-.pill-fullbody{ background:var(--tag-red-bg); color:var(--tag-red-ink); }
-.pill-cardio{ background:var(--tag-yellow-bg); color:var(--tag-yellow-ink); }
-
-.plan-btn{
-  margin-top:14px;
-  width:100%;
-  background:none;
-  border:none;
-  color:var(--brand);
-  font-size:14px;
-  font-weight:600;
-  cursor:pointer;
-  padding:6px 0;
-}
-.plan-btn.hidden{ display:none; }
-
-/* ✅ Mesh gradient */
-.ai-stage{
-  position:absolute;
-  left:50%;
-  top:38%;
-  transform:translate(-50%,-50%);
-  width:260px;
-  height:260px;
-  border-radius:50%;
-  pointer-events:none;
-  display:none;
-  z-index:1;
-  overflow:visible;
-}
-.ai-stage::before{
-  content:"";
-  position:absolute;
-  inset:-20% -15% -25% -15%;
-  filter:blur(84px) saturate(160%) contrast(115%);
-  opacity:0;
-  transition:opacity .25s ease;
-  background:
-    radial-gradient(22rem 22rem at 30% 36%, #3A7BFF77 0, #0000 50%),
-    radial-gradient(22rem 22rem at 72% 34%, #7DFF5C77 0, #0000 54%),
-    radial-gradient(24rem 20rem at 40% 72%, #FFA43A77 0, #0000 54%),
-    radial-gradient(20rem 20rem at 70% 74%, #9B8FFF99 0, #0000 80%);
-  background-blend-mode:screen;
-  animation:meshBreath 2s ease-in-out infinite, meshDrift 3s ease-in-out infinite;
-}
-.ai-stage.show::before{ opacity:.9; }
-@keyframes meshBreath{
-  0%,100%{ transform:scale(1); opacity:.65 }
-  50%{ transform:scale(1.04); opacity:.35 }
-}
-@keyframes meshDrift{
-  0%{ transform:translate3d(0,0,0); }
-  50%{ transform:translate3d(2%,-1.5%,0); }
-  100%{ transform:translate3d(0,0,0); }
-}
-
-/* ✅ NEW: Focus radios styling */
-.focus-bar{
-  display:flex;
-  gap:10px;
-  justify-content:flex-start;
-  padding:10px 0 2px;
-  z-index:10;
-}
-
-  .train-header.hidden {
-  display: none;
-}
-  
-.focus-pill{
-  position:relative;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  padding:10px 14px;
-  border-radius:999px;
-  background:#eef2f7;
-  color:#0f172a;
-  font-size:14px;
-  font-weight:600;
-  cursor:pointer;
-  user-select:none;
-}
-.focus-pill input{
-  position:absolute;
-  opacity:0;
-  pointer-events:none;
-}
-.focus-pill span{
-  opacity:.75;
-}
-.focus-pill input:checked + span{
-  opacity:1;
-  color:var(--brand);
-}
-
-/* Actions */
-.actions{
-  position:relative;
-  padding:12px 0 18px;
-  z-index:10;
-  transform: translateY(-1.5rem);
-}
-.btn{
-  width:100%;
-  height:52px;
-  border:none;
-  border-radius:999px;
-  font-size:18px;
-  font-weight:600;
-  cursor:pointer;
-  background:var(--brand);
-  color:white;
-  box-shadow:none;
-}
-.btn.secondary{
-  margin-top:12px;
-  background:#eef2f7;
-  color:var(--brand);
-  font-weight:600;
-}
-.btn:active{ transform:scale(.99); }
-.btn.hidden{ display:none; }
-
-#startTimerBtn{
-  background:none;
-  box-shadow:none;
-  border:none;
-  color:var(--brand);
-}
-
-/* Slider */
-.slide-wrap{
-  width:100%;
-  height:52px;
-  margin-top:16px;
-  border-radius:999px;
-  background:#eef2f7;
-  position:relative;
-  overflow:hidden;
-  box-shadow:none;
-  display:none;
-  touch-action: pan-y;
-}
-.slide-wrap.show{ display:block; }
-.slide-fill{
-  position:absolute;
-  inset:0;
-  width:0%;
-  background:linear-gradient(135deg,#2453f5,#4f8cff);
-  transition:none;
-  will-change: width;
-}
-.slide-label{
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:18px;
-  font-weight:600;
-  letter-spacing:.2px;
-  user-select:none;
-  pointer-events:none;
-}
-.slide-label .base{ color:#2453f5; }
-.slide-label .white{
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#fff;
-  clip-path:inset(0 100% 0 0);
-  transition:none;
-  will-change: clip-path;
-}
-.slide-knob{
-  position:absolute;
-  left:7px;
-  top:50%;
-  transform:translate3d(0,-50%,0);
-  width:42px;
-  height:42px;
-  border-radius:50%;
-  background:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  box-shadow:0 10px 22px rgba(15,23,42,0.14);
-  touch-action:none;
-  will-change: transform;
-}
-.slide-knob span{
-  font-size:18px;
-  color:var(--brand);
-  font-weight:600;
-}
-
-/* Confetti canvas */
-#confettiCanvas{
-  position:fixed;
-  left:0; top:0;
-  width:100vw;
-  height:100vh;
-  pointer-events:none;
-  z-index:2;
-}
-
-/* Modals, history, exercise editor */
-.history-list{ display:flex; flex-direction:column; gap:12px; }
-.history-row{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:12px 14px;
-  border-radius:12px;
-  background:#f8fafc;
-}
-.history-left{ display:flex; flex-direction:column; }
-.history-time{ font-size:16px; font-weight:700; }
-.history-date{ font-size:12px; color:#64748b; }
-.history-right{ display:flex; align-items:center; gap:8px; }
-.pr-badge{
-  font-size:11px; font-weight:700;
-  background:#dcfce7; color:#16a34a;
-  padding:4px 8px; border-radius:999px;
-}
-.history-delete{
-  border:none;
-  background:#ffe0e0;
-  color:#dc2626;
-  border-radius:8px;
-  padding:6px 10px;
-  font-size:12px;
-  font-weight:700;
-  cursor:pointer;
-}
-
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(15,23,42,0.35);
-  display:none;
-  z-index:50;
-}
-.modal.show{ display:block; }
-.modal-sheet{
-  position:absolute;
-  inset:0;
-  background:#fff;
-  border-radius:0;
-  display:flex;
-  flex-direction:column;
-}
-.modal-head{
-  padding:16px 18px 10px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  border-bottom:1px solid rgba(15,23,42,0.06);
-}
-.modal-title{ font-size:20px; font-weight:800; }
-.modal-close{
-  border:none;
-  background:#eef2f7;
-  color:var(--ink);
-  border-radius:10px;
-  height:38px;
-  padding:0 14px;
-  font-weight:700;
-  cursor:pointer;
-}
-.tabs{
-  display:flex;
-  gap:10px;
-  padding:10px 18px;
-  border-bottom:1px solid rgba(15,23,42,0.06);
-  overflow-x:auto;
-  -webkit-overflow-scrolling:touch;
-}
-.tab{
-  border:none;
-  background:#eef2f7;
-  color:#0f172a;
-  padding:10px 14px;
-  border-radius:999px;
-  font-weight:500;
-  font-size:14px;
-  white-space:nowrap;
-  cursor:pointer;
-}
-.tab.active{ background:#e4ecff; color:var(--brand); }
-.modal-body{ padding:14px 18px 18px; overflow:auto; flex:1; }
-
-.add-row{ display:grid; grid-template-columns:1fr 44px; gap:12px; }
-#addReps{ width:60px; min-width:44px; max-width:44px; padding:0; text-align:center; }
-#addName{ min-width:0; }
-
-.input{
-  height:48px;
-  border-radius:12px;
-  border:1px solid rgba(15,23,42,0.12);
-  padding:0 14px;
-  font-size:16px;
-}
-.add-btn{
-  width:100%;
-  height:48px;
-  margin-top:16px;
-  margin-bottom:16px;
-  border-radius:999px;
-  border:none;
-  background:var(--brand);
-  color:#fff;
-  font-weight:600;
-  font-size:18px;
-  cursor:pointer;
-}
-
-.list{ display:flex; flex-direction:column; gap:10px; }
-.item{
-  display:grid;
-  grid-template-columns:1fr 44px 44px;
-  gap:16px;
-  align-items:center;
-  padding:0px;
-  border-radius:14px;
-  background:#ffffff;
-}
-.item .name{
-  height:44px;
-  border-radius:12px;
-  border:1px solid rgba(15,23,42,0.10);
-  padding:0 12px;
-  font-size:16px;
-  background:#fff;
-}
-.item .reps{
-  height:44px;
-  width:44px;
-  padding:0;
-  border-radius:12px;
-  border:1px solid rgba(15,23,42,0.10);
-  font-size:14px;
-  background:#fff;
-  text-align:center;
-}
-.trash{
-  height:44px;
-  width:44px;
-  border:none;
-  border-radius:12px;
-  background:#ffe0e0;
-  color:#dc2626;
-  font-weight:900;
-  font-size:18px;
-  cursor:pointer;
-}
-
-/* Plan modal */
-.plan-list{ display:flex; flex-direction:column; gap:12px; }
-.plan-row{
-  display:grid;
-  grid-template-columns: 86px 1fr;
-  gap:12px;
-  align-items:center;
-}
-.plan-name{
-  font-size:16px;
-  font-weight:400;
-  color:var(--ink);
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-</style>
+        /* HIDE SCROLLBAR */
+        ::-webkit-scrollbar { display: none; }
+    </style>
 </head>
-
 <body>
-  <!-- HISTORY MODAL -->
-  <div class="modal" id="historyModal">
-    <div class="modal-sheet">
-      <div class="modal-head">
-        <div class="modal-title">Metacon History</div>
-        <button class="modal-close" id="closeHistoryModal">Done</button>
-      </div>
 
-      <div class="modal-body">
-        <div class="history-list" id="historyList">
-          <!-- rows injected here -->
+    <header>
+        <h1>Daily Mass</h1>
+        <div id="date-badge">Today</div>
+    </header>
+
+    <div class="container">
+
+        <div class="section-title">Introductory Rites</div>
+        <div class="card">
+            <div class="row">
+                <div class="speaker">Priest</div>
+                <div class="pt">Em nome do Pai, e do Filho, e do Espírito Santo.</div>
+                <div class="en">In the name of the Father, and of the Son, and of the Holy Spirit.</div>
+            </div>
+            <div class="row">
+                <div class="speaker">All</div>
+                <div class="pt">Amém.</div>
+                <div class="en">Amen.</div>
+            </div>
+            <div class="row">
+                <div class="speaker">Kyrie</div>
+                <div class="pt">Senhor, tende piedade de nós.</div>
+                <div class="en">Lord, have mercy.</div>
+            </div>
         </div>
-      </div>
-    </div>
-  </div>
 
-  <canvas id="confettiCanvas"></canvas>
-
-  <div class="container">
-    <!-- TRAINING HEADER -->
-<div class="train-header" id="focusPicker">
-  <div class="train-left">
-    <div class="train-title">What would you like to train?</div>
-
-    <div class="focus-bar" role="radiogroup" aria-label="Workout focus">
-      <label class="focus-pill">
-        <input type="radio" name="focus" value="upper" checked />
-        <span>Upper</span>
-      </label>
-      <label class="focus-pill">
-        <input type="radio" name="focus" value="lower" />
-        <span>Lower</span>
-      </label>
-      <label class="focus-pill">
-        <input type="radio" name="focus" value="fullbody" />
-        <span>Fullbody</span>
-      </label>
-    </div>
-  </div>
-
-  <button class="history-btn" id="historyBtn">History</button>
-</div>
-    <div class="center">
-      <div class="ai-stage" id="aiStage"></div>
-
-      <div class="weekly-center" id="weeklyCenter">
-        <div class="weekly-count">
-          <div class="num" id="weekNum">0</div>
-          <div class="label" id="weekLabel">
-            <span id="weekLabelText">workouts completed</span>
-            <span class="dot">·</span>
-            <span class="streak-inline" id="streakInline">0 week streak</span>
-          </div>
+        <div class="section-title">Liturgy of the Word (Live)</div>
+        
+        <div class="card" id="dynamic-content">
+            <div class="loading">Connecting to Liturgical Calendar...</div>
         </div>
-      </div>
 
-      <div class="card hidden" id="card">
-        <div class="card-title" id="cardTitle"></div>
-        <div id="cardRows"></div>
-        <button class="plan-btn hidden" id="planWorkoutBtn">Plan Workout</button>
-      </div>
-    </div>
-
-    <div class="actions">
-      <button class="btn" id="generateBtn">Generate Upper</button>
-      <button class="btn secondary" id="exerciseBtn">Exercises</button>
-
-      <button class="btn secondary hidden" id="startTimerBtn">Start Timer</button>
-
-      <div class="slide-wrap" id="slideWrap" aria-label="Slide to Complete">
-        <div class="slide-fill" id="slideFill"></div>
-        <div class="slide-label">
-          <div class="base">Slide to Complete</div>
-          <div class="white" id="slideWhite">Slide to Complete</div>
+        <div class="section-title">Liturgy of the Eucharist</div>
+        <div class="card">
+            <div class="row">
+                <div class="speaker">Sanctus</div>
+                <div class="pt">Santo, Santo, Santo, Senhor Deus do universo.</div>
+                <div class="en">Holy, Holy, Holy Lord God of hosts.</div>
+            </div>
+            <div class="row">
+                <div class="speaker">Agnus Dei</div>
+                <div class="pt">Cordeiro de Deus, que tirais o pecado do mundo...</div>
+                <div class="en">Lamb of God, you take away the sins of the world...</div>
+            </div>
         </div>
-        <div class="slide-knob" id="slideKnob"><span>→</span></div>
-      </div>
+
     </div>
-  </div>
 
-  <!-- EXERCISE LIBRARY MODAL -->
-  <div class="modal" id="modal">
-    <div class="modal-sheet">
-      <div class="modal-head">
-        <div class="modal-title">Exercises</div>
-        <button class="modal-close" id="closeModal">Done</button>
-      </div>
-      <div class="tabs" id="tabs"></div>
-      <div class="modal-body">
-        <div class="add-row">
-          <input class="input" id="addName" placeholder="Exercise name" />
-          <input class="input" id="addReps" placeholder="Reps" />
-        </div>
-        <button class="add-btn" id="addBtn">Add Exercise</button>
-        <div style="height:12px"></div>
-        <div class="list" id="list"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PLAN MODAL -->
-  <div class="modal" id="planModal">
-    <div class="modal-sheet">
-      <div class="modal-head">
-        <div class="modal-title">Plan Workout</div>
-        <button class="modal-close" id="closePlanModal">Save</button>
-      </div>
-      <div class="modal-body">
-        <div class="plan-list" id="planBody"></div>
-      </div>
-    </div>
-  </div>
-
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-<script>
-/* =========================================================
-   CONFIG
-========================================================= */
-const TAGS = [
-  { key:"upper",     label:"upper",     pill:"pill-upper" },
-  { key:"pull",      label:"pull",      pill:"pill-pull" },
-  { key:"push",      label:"push",      pill:"pill-push" },
-  { key:"shoulders", label:"shoulders", pill:"pill-shoulders" },
-  { key:"legs",      label:"legs",      pill:"pill-legs" },
-  { key:"abs",       label:"abs",       pill:"pill-abs" },
-  { key:"fullbody",  label:"fullbody",  pill:"pill-fullbody" },
-  { key:"cardio",    label:"cardio",    pill:"pill-cardio" },
-];
-
-const DEFAULT_LIBRARY = {
-  upper: [ { name:"Muscle-Up", reps:"1" } ],
-  pull:  [ { name:"Pull-Ups", reps:"5" }, { name:"Chin-Ups", reps:"5" }, { name:"Australian Chin-Ups", reps:"10" } ],
-  push:  [ { name:"Push-Ups", reps:"10" }, { name:"Dips", reps:"10" }, { name:"Decline Push-Ups", reps:"10" }, { name:"Diamond Push-Ups", reps:"10" } ],
-  shoulders:[ { name:"Dolphin Push-Ups", reps:"10" }, { name:"Pike Push-Ups", reps:"10" } ],
-  legs:  [ { name:"Jumping Squats", reps:"15" }, { name:"Jumping Lunges", reps:"15" } ],
-  abs:   [ { name:"Knee Raises", reps:"20" }, { name:"Full Body Raises", reps:"20" }, { name:"Oblique Twists", reps:"10" } ],
-  fullbody:[ { name:"Burpees", reps:"10" }, { name:"Kettlebell Swings", reps:"10" } ],
-  cardio:[ { name:"Jumping Jacks", reps:"20" }, { name:"Mountain Climbers", reps:"20" } ],
-};
-
-const LS = {
-  library:   "jy_library_v1",
-  streak:    "jy_streak_v1",
-  weekKey:   "jy_weekKey_v1",
-  weekCount: "jy_weekCount_v1",
-  weekCounted:"jy_week_counted_v1",
-  totalDays: "jy_total_days_trained_v1",
-  lastDone:  "jy_last_workout_date_v1",
-  metaconHistory: "jy_metacon_history_v1",
-  currentWorkout: "jy_current_workout_v1",
-  timerState: "jy_metacon_timer_v1",
-};
-
-/* =========================================================
-   UTIL
-========================================================= */
-const qs    = s => document.querySelector(s);
-const rand  = arr => arr[Math.floor(Math.random()*arr.length)];
-
-function hardResetPointerState() {
-  // iOS WebKit gesture reset
-  document.body.style.pointerEvents = "none";
-  requestAnimationFrame(() => {
-    document.body.style.pointerEvents = "";
-  });
-}
-
-function isoWeekKey(d=new Date()){
-  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-  const dayNum = date.getUTCDay() || 7;
-  date.setUTCDate(date.getUTCDate() + 4 - dayNum);
-  const yearStart = new Date(Date.UTC(date.getUTCFullYear(),0,1));
-  const weekNo = Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
-  return `${date.getUTCFullYear()}-W${String(weekNo).padStart(2,"0")}`;
-}
-function todayKey(){
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-}
-function formatDate(dateStr){
-  const d = new Date(dateStr);
-  return d.toLocaleDateString(undefined, { day:"numeric", month:"short", year:"numeric" });
-}
-function loadJSON(key, fallback){
-  try{
-    const raw = localStorage.getItem(key);
-    if(!raw) return fallback;
-    return JSON.parse(raw);
-  }catch{ return fallback; }
-}
-function saveJSON(key, val){
-  localStorage.setItem(key, JSON.stringify(val));
-}
-
-/* =========================================================
-   DOM
-========================================================= */
-const weeklyCenter = qs("#weeklyCenter");
-const weekNumEl    = qs("#weekNum");
-const streakInline = qs("#streakInline");
-
-const card      = qs("#card");
-const cardTitle = qs("#cardTitle");
-const cardRows  = qs("#cardRows");
-const planWorkoutBtn = qs("#planWorkoutBtn");
-
-const aiStage   = qs("#aiStage");
-const focusPicker = qs("#focusPicker");
-const generateBtn = qs("#generateBtn");
-const exerciseBtn = qs("#exerciseBtn");
-const startTimerBtn = qs("#startTimerBtn");
-
-const slideWrap  = qs("#slideWrap");
-const slideFill  = qs("#slideFill");
-const slideKnob  = qs("#slideKnob");
-const slideWhite = qs("#slideWhite");
-
-const modal     = qs("#modal");
-const closeModal= qs("#closeModal");
-const tabsEl    = qs("#tabs");
-const listEl    = qs("#list");
-const addName   = qs("#addName");
-const addReps   = qs("#addReps");
-const addBtn    = qs("#addBtn");
-
-
-const historyBtn = qs("#historyBtn");
-const historyModal = qs("#historyModal");
-const closeHistoryModal = qs("#closeHistoryModal");
-const historyList = qs("#historyList");
-
-const planModal = qs("#planModal");
-const planBody  = qs("#planBody");
-const closePlanModal = qs("#closePlanModal");
-
-const confettiCanvas = qs("#confettiCanvas");
-const confettiInstance = window.confetti
-  ? window.confetti.create(confettiCanvas, { resize:true, useWorker:true })
-  : null;
-
-/* =========================================================
-   SAFE CANVAS SIZE
-========================================================= */
-function sizeConfettiCanvas(){
-  const dpr = Math.max(1, window.devicePixelRatio || 1);
-  confettiCanvas.width  = Math.floor(window.innerWidth  * dpr);
-  confettiCanvas.height = Math.floor(window.innerHeight * dpr);
-  confettiCanvas.style.width  = "100vw";
-  confettiCanvas.style.height = "100vh";
-}
-window.addEventListener("resize", sizeConfettiCanvas, { passive:true });
-sizeConfettiCanvas();
-
-/* =========================================================
-   STATE
-========================================================= */
-let library = loadJSON(LS.library, null);
-if(!library){
-  library = structuredClone(DEFAULT_LIBRARY);
-  saveJSON(LS.library, library);
-}
-
-let currentWorkout = null;
-let plannedReps = {};
-let timerInterval = null;
-let timerStart = null;
-
-let metaconHistory = loadJSON(LS.metaconHistory, []);
-
-/* =========================================================
-   NEW: Focus selection
-========================================================= */
-let focus = "upper"; // default
-
-function setGenerateLabel(){
-  const label =
-    focus === "upper" ? "Generate Upper" :
-    focus === "lower" ? "Generate Lower" :
-    "Generate Fullbody";
-  generateBtn.textContent = label;
-}
-
-document.querySelectorAll('input[name="focus"]').forEach(r=>{
-  r.addEventListener("change", ()=>{
-    focus = r.value;
-    setGenerateLabel();
-  });
-});
-
-setGenerateLabel();
-
-/* =========================================================
-   HISTORY MODAL
-========================================================= */
-historyBtn.addEventListener("click", ()=>{
-  renderMetaconHistory();
-  historyModal.classList.add("show");
-});
-closeHistoryModal.addEventListener("click", ()=> historyModal.classList.remove("show"));
-historyModal.addEventListener("click",(e)=>{
-  if(e.target === historyModal) historyModal.classList.remove("show");
-});
-
-function formatTime(ms){
-  const total = Math.floor(ms / 1000);
-  const m = String(Math.floor(total / 60)).padStart(2,"0");
-  const s = String(total % 60).padStart(2,"0");
-  return `${m}:${s}`;
-}
-
-function renderMetaconHistory(){
-  historyList.innerHTML = "";
-  if (!metaconHistory.length) {
-    historyList.innerHTML = `<div style="color:#64748b;font-size:14px">No Metacon attempts yet</div>`;
-    return;
-  }
-  const bestTime = Math.min(...metaconHistory.map(h => h.time));
-  let prUsed = false;
-
-  metaconHistory.slice().reverse().forEach((entry, index) => {
-    const row = document.createElement("div");
-    row.className = "history-row";
-
-    row.innerHTML = `
-      <div class="history-left">
-        <div class="history-time">${formatTime(entry.time)}</div>
-        <div class="history-date">${formatDate(entry.date)}</div>
-      </div>
-      <div class="history-right">
-        ${entry.time === bestTime && !prUsed ? (prUsed = true, '<span class="pr-badge">PR</span>') : ""}
-        <button class="history-delete">×</button>
-      </div>
-    `;
-
-    row.querySelector(".history-delete").addEventListener("click", () => {
-      const ok = confirm("Are you sure you want to delete this Metacon attempt?");
-      if (!ok) return;
-      const realIndex = metaconHistory.length - 1 - index;
-      metaconHistory.splice(realIndex, 1);
-      saveJSON(LS.metaconHistory, metaconHistory);
-      renderMetaconHistory();
-    });
-
-    historyList.appendChild(row);
-  });
-}
-
-/* =========================================================
-   COUNTERS / STREAK
-========================================================= */
-function getStreak(){ return parseInt(localStorage.getItem(LS.streak)||"0",10); }
-function setStreak(n){ localStorage.setItem(LS.streak, String(Math.max(0, n|0))); }
-function getWeekCount(){ return parseInt(localStorage.getItem(LS.weekCount)||"0",10); }
-function setWeekCount(n){ localStorage.setItem(LS.weekCount, String(Math.max(0, n|0))); }
-function getWeekCounted(){ return localStorage.getItem(LS.weekCounted)==="1"; }
-function setWeekCounted(v){ localStorage.setItem(LS.weekCounted, v ? "1" : "0"); }
-
-function getTotalDays(){ return parseInt(localStorage.getItem(LS.totalDays) || "0", 10); }
-function setTotalDays(n){ localStorage.setItem(LS.totalDays, String(Math.max(0, n|0))); }
-function getLastDoneDate(){ return localStorage.getItem(LS.lastDone); }
-function setLastDoneDate(dateStr){ localStorage.setItem(LS.lastDone, dateStr); }
-
-function ensureWeekState(){
-  const current = isoWeekKey();
-  const storedWeek = localStorage.getItem(LS.weekKey);
-
-  if(!storedWeek){
-    localStorage.setItem(LS.weekKey, current);
-    localStorage.setItem(LS.weekCount, "0");
-    localStorage.setItem(LS.weekCounted, "0");
-    return;
-  }
-
-  if(storedWeek !== current){
-    const lastCount = parseInt(localStorage.getItem(LS.weekCount)||"0",10);
-    if(lastCount < 3){
-      localStorage.setItem(LS.streak, "0");
-    }
-    localStorage.setItem(LS.weekKey, current);
-    localStorage.setItem(LS.weekCount, "0");
-    localStorage.setItem(LS.weekCounted, "0");
-  }
-}
-
-function renderStreakUI(){
-  if(streakInline) streakInline.textContent = `${getStreak()} week streak`;
-}
-
-/* =========================================================
-   WORKOUT GEN
-========================================================= */
-function pillForTag(tagKey){
-  const t = TAGS.find(t=>t.key===tagKey);
-  return t ? t.pill : "";
-}
-  
-function pickUniqueExercise(tagKey, usedNames){
-  const arr = (library[tagKey] || []).slice();
-  if(!arr.length) return { name:"(Add an exercise)", reps:"" };
-
-  // Try a few times to avoid duplicates
-  for(let i=0; i<12; i++){
-    const ex = rand(arr);
-    const nameKey = (ex.name || "").trim().toLowerCase();
-    if(!nameKey) continue;
-    if(!usedNames.has(nameKey)){
-      usedNames.add(nameKey);
-      return ex;
-    }
-  }
-
-  // Fallback: find the first unused in this category
-  for(const ex of arr){
-    const nameKey = (ex.name || "").trim().toLowerCase();
-    if(nameKey && !usedNames.has(nameKey)){
-      usedNames.add(nameKey);
-      return ex;
-    }
-  }
-
-  // If everything is already used, just return something (won't happen often with 3–4 rows)
-  return rand(arr);
-}
-/* ✅ NEW: focus-aware AMRAP (3–4 items, can repeat categories) */
-function generateAMRAP_FOCUSED(){
-  let pool = [];
-  let mustInclude = [];
-
-  if(focus === "upper"){
-    pool = ["pull","push","shoulders","cardio"];
-    mustInclude = ["pull","cardio"];
-  } 
-  else if(focus === "lower"){
-    pool = ["legs","abs","cardio"];
-    mustInclude = ["cardio","abs"];
-  } 
-  else {
-    pool = ["pull","push","legs","abs","shoulders","cardio","fullbody"];
-    mustInclude = [];
-  }
-
-  const count = Math.random() < 0.55 ? 3 : 4;
-  const picked = [];
-  const counts = {};
-
-  function canPick(tag){
-    return (counts[tag] || 0) < 2;
-  }
-
-  // 1️⃣ Force at least one required category (if defined)
-  if(mustInclude.length){
-    const forced = rand(mustInclude);
-    picked.push(forced);
-    counts[forced] = 1;
-  }
-
-  // 2️⃣ Fill remaining slots safely
-  while(picked.length < count){
-    const tag = rand(pool);
-    if(!canPick(tag)) continue;
-    picked.push(tag);
-    counts[tag] = (counts[tag] || 0) + 1;
-  }
-
-  // 3️⃣ Map to exercises (no duplicate exercises)
-  const usedExercises = new Set();
-
-  const rows = picked.map(tag=>{
-    const options = (library[tag] || []).filter(
-      ex => !usedExercises.has(ex.name)
-    );
-
-    const ex = options.length
-      ? rand(options)
-      : pickExercise(tag);
-
-    usedExercises.add(ex.name);
-
-    const reps = (ex.reps || "").trim();
-    const text = reps ? `${reps} ${ex.name}` : ex.name;
-
-    return { text, tags:[tag] };
-  });
-
-  return {
-    type: "As Many Rounds As Possible",
-    rows
-  };
-}
-  
-/* Metacon unchanged */
-function generateMETACON(){
-  return {
-    type: "Metabolic Conditioning",
-    rows: [
-      { text: "50 Pull-Ups", tags:["pull"] },
-      { text: "50 Dips", tags:["push"] },
-      { text: "100 Jumping Squats", tags:["legs"] },
-      { text: "50 Pike Push-Ups", tags:["shoulders"] },
-      { text: "50 Push-Ups", tags:["push"] },
-      { text: "100 Full Body Crunches", tags:["abs"] },
-      { text: "50 Kettlebell Swings", tags:["fullbody"] },
-      { text: "50 Australian Rows", tags:["pull"] },
-      { text: "100 Jumping Jacks", tags:["cardio"] },
-      { text: "10 Muscle-Ups", tags:["upper"] }
-    ]
-  };
-}
-
-function showPlanButton(){
-  planWorkoutBtn.classList.add("hidden");
-}
-
-function renderWorkout(workout){
-  cardTitle.textContent = workout.type;
-  cardRows.innerHTML = "";
-
-  workout.rows.forEach(r=>{
-    const row = document.createElement("div");
-    row.className = "row";
-
-    const left = document.createElement("div");
-    left.className = "row-left";
-
-    const txt = document.createElement("div");
-    txt.className = "row-text";
-    txt.textContent = r.text;
-    txt.dataset.base = r.text;
-
-    left.appendChild(txt);
-
-    const tags = document.createElement("div");
-    tags.className = "tags";
-    r.tags.forEach(tag=>{
-      const pill = document.createElement("span");
-      pill.className = `pill ${pillForTag(tag)}`;
-      pill.textContent = tag;
-      tags.appendChild(pill);
-    });
-
-    row.appendChild(left);
-    row.appendChild(tags);
-    cardRows.appendChild(row);
-  });
-
-  card.classList.remove("hidden");
-  requestAnimationFrame(()=> card.classList.add("visible"));
-  showPlanButton(workout);
-}
-
-/* =========================================================
-   UI STATES
-========================================================= */
-function showWeeklyCenter(){
-  historyBtn.classList.remove("hidden");
-  weeklyCenter.classList.remove("hidden");
-  
-  focusPicker.classList.remove("hidden");
-  
-  card.classList.remove("visible");
-  setTimeout(()=> card.classList.add("hidden"), 160);
-
-  generateBtn.classList.remove("hidden");
-  exerciseBtn.classList.remove("hidden");
-  slideWrap.classList.remove("show");
-
-  currentWorkout = null;
-  plannedReps = {};
-  showPlanButton(null);
-
-  weekNumEl.textContent = String(getTotalDays());
-}
-
-function showWorkoutState(workout){
-  weeklyCenter.classList.add("hidden");
-  historyBtn.classList.add("hidden");
-
-  focusPicker.classList.add("hidden");
-
-  renderWorkout(workout);
-
-  generateBtn.classList.add("hidden");
-  exerciseBtn.classList.add("hidden");
-  slideWrap.classList.add("show");
-
-  if(workout.type === "Metabolic Conditioning"){
-    startTimerBtn.classList.remove("hidden");
-  }else{
-    startTimerBtn.classList.add("hidden");
-  }
-
-  plannedReps = {};
-  resetSlider();
-}
-
-/* =========================================================
-   MESH
-========================================================= */
-function showMesh(on){
-  if(on){
-    aiStage.style.display = "block";
-    requestAnimationFrame(()=> aiStage.classList.add("show"));
-  }else{
-    aiStage.classList.remove("show");
-    setTimeout(()=>{ aiStage.style.display="none"; }, 220);
-  }
-}
-
-/* Generate click: SAME metacon odds, now focus-aware AMRAP */
-generateBtn.addEventListener("click", ()=>{
-  showMesh(true);
-  setTimeout(()=>{
-    const workout = (Math.random() < 0.15) ? generateMETACON() : generateAMRAP_FOCUSED();
-    currentWorkout = workout;
-    saveJSON(LS.currentWorkout, workout);
-    showMesh(false);
-    showWorkoutState(workout);
-  }, 850);
-});
-
-/* =========================================================
-   PLAN WORKOUT (unchanged)
-========================================================= */
-planWorkoutBtn.addEventListener("click", ()=>{
-  if(!currentWorkout || currentWorkout.type !== "Metabolic Conditioning") return;
-
-  planBody.innerHTML = "";
-
-  currentWorkout.rows.forEach(r=>{
-    const base = r.text;
-
-    const wrap = document.createElement("div");
-    wrap.className = "plan-row";
-
-    const reps = document.createElement("input");
-    reps.className = "input";
-    reps.placeholder = "Reps";
-    reps.inputMode = "numeric";
-    reps.value = plannedReps[base] || "";
-    reps.addEventListener("input", ()=>{ plannedReps[base] = reps.value; });
-
-    const name = document.createElement("div");
-    name.className = "plan-name";
-    name.textContent = base;
-
-    wrap.appendChild(reps);
-    wrap.appendChild(name);
-    planBody.appendChild(wrap);
-  });
-
-  planModal.classList.add("show");
-});
-closePlanModal.addEventListener("click", ()=>{
-  planModal.classList.remove("show");
-  [...cardRows.querySelectorAll(".row-text")].forEach(el=>{
-    const base = el.dataset.base || el.textContent;
-    const r = (plannedReps[base] || "").trim();
-    el.textContent = r ? `${r} ${base}` : base;
-  });
-});
-planModal.addEventListener("click",(e)=>{
-  if(e.target === planModal) planModal.classList.remove("show");
-});
-
-/* =========================================================
-   SLIDER (no lag) — unchanged
-========================================================= */
-let sliding=false;
-let startClientX=0;
-let startOffsetX=0;
-let currentX=0;
-let maxSlide=0;
-let rafPending=false;
-let pendingX=0;
-
-function applyTransitions(on){
-  if(on){
-    slideFill.style.transition = "width .18s ease";
-    slideWhite.style.transition = "clip-path .18s ease";
-  }else{
-    slideFill.style.transition = "none";
-    slideWhite.style.transition = "none";
-  }
-}
-
-function resetSlider(){
-  const rect = slideWrap.getBoundingClientRect();
-  const trackWidth = rect.width;
-  const knobWidth  = slideKnob.getBoundingClientRect().width;
-  maxSlide = Math.max(0, trackWidth - knobWidth);
-  currentX = 0;
-
-  applyTransitions(false);
-  slideFill.style.width = "0%";
-  slideKnob.style.transform = "translate3d(0px,-50%,0)";
-  slideWhite.style.clipPath = "inset(0 100% 0 0)";
-}
-
-function setSliderProgressImmediate(px){
-  const x = Math.max(0, Math.min(px, maxSlide));
-  currentX = x;
-  const progress = maxSlide ? (x / maxSlide) : 0;
-
-  slideKnob.style.transform = `translate3d(${x}px,-50%,0)`;
-  slideFill.style.width = `${progress * 100}%`;
-  slideWhite.style.clipPath = `inset(0 ${100 - progress * 100}% 0 0)`;
-}
-
-function setSliderProgress(px){
-  pendingX = px;
-  if(rafPending) return;
-  rafPending = true;
-  requestAnimationFrame(()=>{
-    rafPending = false;
-    setSliderProgressImmediate(pendingX);
-  });
-}
-
-function snapBack(){
-  applyTransitions(true);
-  requestAnimationFrame(()=> setSliderProgressImmediate(0));
-}
-
-slideKnob.addEventListener("pointerdown", (e)=>{
-  sliding=true;
-  slideKnob.setPointerCapture(e.pointerId);
-  applyTransitions(false);
-  startClientX = e.clientX;
-  startOffsetX = currentX;
-  // ❌ haptics removed
-});
-slideKnob.addEventListener("pointermove",(e)=>{
-  if(!sliding) return;
-  const x = startOffsetX + (e.clientX - startClientX);
-  setSliderProgress(x);
-});
-function finishSlide(e){
-  if(!sliding) return;
-  sliding=false;
-  try{ slideKnob.releasePointerCapture(e.pointerId); }catch{}
-  const progress = maxSlide ? (currentX / maxSlide) : 0;
-  if(progress > 0.92){
-    applyTransitions(true);
-    requestAnimationFrame(()=>{
-      setSliderProgressImmediate(maxSlide);
-      completeWorkout();
-    });
-  } else {
-    snapBack();
-  }
-}
-slideKnob.addEventListener("pointerup", finishSlide);
-slideKnob.addEventListener("pointercancel", finishSlide);
-window.addEventListener("pointerup", finishSlide, { passive: true });
-window.addEventListener("pointercancel", finishSlide, { passive: true });
-
-/* =========================================================
-   TIMER (unchanged)
-========================================================= */
-startTimerBtn.addEventListener("click", ()=>{
-  if (timerInterval) return;
-  timerStart = Date.now();
-  saveJSON(LS.timerState, { start: timerStart, running: true });
-  startTimerBtn.textContent = "00:00";
-  timerInterval = setInterval(()=>{
-    const elapsed = Date.now() - timerStart;
-    startTimerBtn.textContent = formatTime(elapsed);
-  }, 500);
-});
-
-/* =========================================================
-   COMPLETE WORKOUT (confetti kept, haptics removed)
-========================================================= */
-function shootConfettiFromUnderButtons(){
-  if(!confettiInstance) return;
-  const rect = slideWrap.getBoundingClientRect();
-  const x = (rect.left + rect.width * 0.5) / window.innerWidth;
-  const y = (rect.bottom - 6) / window.innerHeight;
-  confettiInstance({ particleCount:160, spread:90, startVelocity:35, origin:{ x, y } });
-}
-
-function completeWorkout(){
-  localStorage.removeItem(LS.currentWorkout);
-
-  if (currentWorkout?.type === "Metabolic Conditioning" && timerStart) {
-    const timeMs = Date.now() - timerStart;
-    metaconHistory.push({ time: timeMs, date: todayKey() });
-    saveJSON(LS.metaconHistory, metaconHistory);
-  }
-
-  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-  timerStart = null;
-  if (startTimerBtn) {
-    startTimerBtn.textContent = "Start Timer";
-    startTimerBtn.classList.add("hidden");
-  }
-
-  ensureWeekState();
-
-  const today = todayKey();
-  const lastDone = getLastDoneDate();
-  if(lastDone !== today){
-    setTotalDays(getTotalDays() + 1);
-    setLastDoneDate(today);
-  }
-
-  let count = getWeekCount();
-  count += 1;
-  setWeekCount(count);
-
-  if(count >= 3 && !getWeekCounted()){
-    setStreak(getStreak() + 1);
-    setWeekCounted(true);
-  }
-
-  weekNumEl.textContent = String(getTotalDays());
-  renderStreakUI();
-
-  shootConfettiFromUnderButtons();
-  // ❌ haptics removed
-
-  showWeeklyCenter();
-
-  // iOS: sometimes pointer state gets “stuck” after pointercapture/slide
-hardResetPointerState();
-}
-
-/* =========================================================
-   EXERCISE MODAL (unchanged)
-========================================================= */
-const TAB_ORDER = ["upper","pull","push","shoulders","legs","abs","fullbody","cardio"];
-let activeTab = "push";
-
-function openModal(){
-  modal.classList.add("show");
-  renderTabs();
-  renderList();
-}
-function closeModalFn(){
-  modal.classList.remove("show");
-  saveJSON(LS.library, library);
-}
-exerciseBtn.addEventListener("click", openModal);
-closeModal.addEventListener("click", closeModalFn);
-modal.addEventListener("click",(e)=>{ if(e.target === modal) closeModalFn(); });
-
-function renderTabs(){
-  tabsEl.innerHTML = "";
-  TAB_ORDER.forEach(k=>{
-    const b = document.createElement("button");
-    b.className = "tab" + (k===activeTab ? " active":"");
-    b.textContent = k;
-    b.addEventListener("click", ()=>{ activeTab = k; renderTabs(); renderList(); });
-    tabsEl.appendChild(b);
-  });
-}
-
-function renderList(){
-  listEl.innerHTML = "";
-  const arr = library[activeTab] || [];
-  if(!library[activeTab]) library[activeTab]=[];
-
-  arr.forEach((item, idx)=>{
-    const wrap = document.createElement("div");
-    wrap.className = "item";
-
-    const name = document.createElement("input");
-    name.className = "name";
-    name.value = item.name || "";
-    name.addEventListener("input", ()=>{
-      library[activeTab][idx].name = name.value;
-      saveJSON(LS.library, library);
-    });
-
-    const reps = document.createElement("input");
-    reps.className = "reps";
-    reps.placeholder = "Reps (AMRAP)";
-    reps.value = item.reps || "";
-    reps.addEventListener("input", ()=>{
-      library[activeTab][idx].reps = reps.value;
-      saveJSON(LS.library, library);
-    });
-
-    const del = document.createElement("button");
-    del.className = "trash";
-    del.textContent = "×";
-    del.addEventListener("click", ()=>{
-      const ok = confirm("Are you sure you want to delete this exercise?");
-      if (!ok) return;
-      library[activeTab].splice(idx, 1);
-      saveJSON(LS.library, library);
-      renderList();
-    });
-
-    wrap.appendChild(name);
-    wrap.appendChild(reps);
-    wrap.appendChild(del);
-    listEl.appendChild(wrap);
-  });
-}
-
-addBtn.addEventListener("click", ()=>{
-  const n = (addName.value||"").trim();
-  const r = (addReps.value||"").trim();
-  if(!n) return;
-  if(!library[activeTab]) library[activeTab]=[];
-  library[activeTab].unshift({ name:n, reps:r });
-  addName.value="";
-  addReps.value="";
-  saveJSON(LS.library, library);
-  renderList();
-});
-
-/* =========================================================
-   INIT
-========================================================= */
-function init() {
-  ensureWeekState();
-  renderStreakUI();
-
-  const savedWorkout = loadJSON(LS.currentWorkout, null);
-
-  if (savedWorkout) {
-    currentWorkout = savedWorkout;
-    showWorkoutState(savedWorkout);
-
-    const timerState = loadJSON(LS.timerState, null);
-    if (timerState && timerState.running && savedWorkout.type === "Metabolic Conditioning") {
-      timerStart = timerState.start;
-      startTimerBtn.classList.remove("hidden");
-      timerInterval = setInterval(() => {
-        const elapsed = Date.now() - timerStart;
-        startTimerBtn.textContent = formatTime(elapsed);
-      }, 500);
-    }
-  } else {
-    showWeeklyCenter();
-  }
-}
-
-init();
-</script>
+    <script>
+        // 1. SETUP DATE
+        const today = new Date();
+        const dateOptions = { day: 'numeric', month: 'short' };
+        document.getElementById('date-badge').innerText = today.toLocaleDateString('en-GB', dateOptions);
+
+        // Format Date for API (YYYY-MM-DD)
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const apiDate = `${yyyy}-${mm}-${dd}`;
+
+        // 2. API CONFIGURATION (Evangelizo)
+        const apiBase = "https://publication.evangelizo.ws";
+        
+        // We fetch two languages separately
+        const urlPT = `${apiBase}/PT/days/${apiDate}/readings`;
+        const urlEN = `${apiBase}/US/days/${apiDate}/readings`; // Using US English
+
+        // 3. FETCH AND COMBINE
+        async function getReadings() {
+            const container = document.getElementById('dynamic-content');
+
+            try {
+                // Fetch both languages at the same time
+                const [resPT, resEN] = await Promise.all([
+                    fetch(urlPT),
+                    fetch(urlEN)
+                ]);
+
+                if (!resPT.ok || !resEN.ok) throw new Error("Connection failed");
+
+                const dataPT = await resPT.json();
+                const dataEN = await resEN.json();
+
+                // 4. FIND THE GOSPEL & FIRST READING
+                // The API returns a list (data.data). We need to find the one where type === "Gospel"
+                
+                const getGospel = (list) => list.data.find(r => r.type === "gospel");
+                const getReading1 = (list) => list.data.find(r => r.type === "reading");
+
+                const gospelPT = getGospel(dataPT);
+                const gospelEN = getGospel(dataEN);
+                
+                const read1PT = getReading1(dataPT);
+                const read1EN = getReading1(dataEN);
+
+                // 5. RENDER TO SCREEN
+                container.innerHTML = ''; // Clear loading message
+
+                // First Reading Block
+                if (read1PT && read1EN) {
+                    container.innerHTML += `
+                        <div class="row fade-in">
+                            <div class="speaker">First Reading</div>
+                            <div class="pt">${cleanText(read1PT.text)}</div>
+                            <div class="en">${cleanText(read1EN.text)}</div>
+                        </div>
+                    `;
+                }
+
+                // Gospel Block
+                if (gospelPT && gospelEN) {
+                    container.innerHTML += `
+                        <div class="row fade-in" style="animation-delay:0.1s">
+                            <div class="speaker">The Gospel &middot; ${gospelEN.book.title}</div>
+                            <div class="pt">${cleanText(gospelPT.text)}</div>
+                            <div class="en">${cleanText(gospelEN.text)}</div>
+                        </div>
+                    `;
+                }
+
+            } catch (error) {
+                console.error(error);
+                container.innerHTML = `
+                    <div class="error">
+                        Could not load today's readings.<br>
+                        Check your internet connection.
+                    </div>
+                `;
+            }
+        }
+
+        // Helper: Remove weird line breaks or HTML tags from API text if needed
+        function cleanText(text) {
+            // Sometimes APIs return raw line breaks, we want to preserve paragraphs but keep it clean
+            return text.replace(/\n/g, '<br><br>');
+        }
+
+        // Run logic
+        getReadings();
+
+    </script>
 </body>
 </html>
