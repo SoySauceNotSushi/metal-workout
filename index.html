@@ -3,107 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Daily Mass | Ordo</title>
+    <title>Mass | Daily Ordo</title>
     <style>
-        /* --- SLEEK REVOLUT-STYLE UI --- */
+        /* --- REVOLUT / APPLE STYLE SYSTEM --- */
         :root {
-            --bg-app: #F2F2F7;
+            --bg-body: #F2F2F7;       /* iOS System Gray 6 */
             --bg-card: #FFFFFF;
-            --text-primary: #1C1C1E;
-            --text-secondary: #8E8E93;
-            --accent: #007AFF;
-            --divider: #E5E5EA;
-            --radius: 22px;
-            --shadow: 0 4px 20px rgba(0,0,0,0.05);
+            --text-main: #000000;
+            --text-sub: #8E8E93;      /* iOS System Gray */
+            --accent: #007AFF;        /* iOS Blue */
+            --divider: #E5E5EA;       /* iOS Separator */
+            --radius: 20px;
+            --shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
 
-        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
-
         body {
-            margin: 0;
-            background-color: var(--bg-app);
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            color: var(--text-primary);
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
             padding-bottom: 80px;
+            -webkit-font-smoothing: antialiased;
         }
 
         /* HEADER */
         header {
-            position: sticky;
-            top: 0;
-            background: rgba(242, 242, 247, 0.9);
+            background-color: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            padding: 16px 24px;
+            position: sticky;
+            top: 0;
             z-index: 1000;
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
         }
 
-        h1 { font-size: 28px; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
+        h1 {
+            font-size: 24px;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
 
         #date-badge {
-            font-size: 13px; font-weight: 700; color: var(--accent);
-            background: rgba(0, 122, 255, 0.1); padding: 6px 14px;
-            border-radius: 100px; text-transform: uppercase;
+            background-color: rgba(0, 122, 255, 0.1);
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
         }
 
-        /* CONTAINER */
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        /* MAIN LAYOUT */
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 24px 16px;
+        }
 
-        /* SECTIONS */
-        .section-title {
-            font-size: 13px; font-weight: 600; color: var(--text-secondary);
-            text-transform: uppercase; letter-spacing: 0.5px;
-            margin: 30px 0 10px 10px;
+        /* SECTION TITLES */
+        .section-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-sub);
+            text-transform: uppercase;
+            margin: 24px 0 10px 12px;
+            letter-spacing: 0.5px;
         }
 
         /* CARDS */
         .card {
-            background: var(--bg-card); border-radius: var(--radius);
-            box-shadow: var(--shadow); overflow: hidden; margin-bottom: 16px;
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden; /* Clips children to rounded corners */
         }
 
         .row {
-            padding: 22px 20px;
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
             border-bottom: 1px solid var(--divider);
-            display: flex; flex-direction: column; gap: 6px;
+            transition: background 0.2s;
         }
-        .row:last-child { border-bottom: none; }
 
-        /* TYPOGRAPHY */
+        .row:last-child {
+            border-bottom: none;
+        }
+
+        /* TEXT STYLES */
         .speaker {
-            font-size: 11px; font-weight: 800; color: var(--accent);
-            text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.5px;
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
         }
-        .pt { font-size: 17px; font-weight: 600; line-height: 1.5; color: var(--text-primary); margin-bottom: 2px;}
-        .en { font-size: 15px; font-weight: 400; line-height: 1.5; color: var(--text-secondary); font-style: italic;}
 
-        /* LOADING & ERROR STATES */
-        .loading { text-align: center; padding: 40px; color: var(--text-secondary); font-size: 14px; }
-        .error { color: #FF3B30; text-align: center; padding: 20px; font-size: 14px; }
+        .pt {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-main);
+            line-height: 1.4;
+        }
+
+        .en {
+            font-size: 15px;
+            font-weight: 400;
+            color: var(--text-sub);
+            line-height: 1.4;
+        }
+
+        /* STATE INDICATORS */
+        .status-msg {
+            padding: 30px;
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-sub);
+        }
 
         /* ANIMATION */
-        .fade-in { animation: fadeIn 0.5s ease-out forwards; opacity: 0; transform: translateY(10px); }
-        @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate {
+            animation: slideUp 0.5s ease-out forwards;
+        }
 
-        /* HIDE SCROLLBAR */
-        ::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
 
     <header>
         <h1>Daily Mass</h1>
-        <div id="date-badge">Today</div>
+        <div id="date-badge">Loading...</div>
     </header>
 
     <div class="container">
 
-        <div class="section-title">Introductory Rites</div>
-        <div class="card">
+        <div class="section-label">Introductory Rites</div>
+        <div class="card animate">
             <div class="row">
                 <div class="speaker">Priest</div>
                 <div class="pt">Em nome do Pai, e do Filho, e do Espírito Santo.</div>
@@ -121,14 +168,13 @@
             </div>
         </div>
 
-        <div class="section-title">Liturgy of the Word (Live)</div>
-        
-        <div class="card" id="dynamic-content">
-            <div class="loading">Connecting to Liturgical Calendar...</div>
+        <div class="section-label">Liturgy of the Word (Today)</div>
+        <div class="card animate" id="dynamic-card" style="min-height: 100px;">
+            <div class="status-msg">Loading readings...</div>
         </div>
 
-        <div class="section-title">Liturgy of the Eucharist</div>
-        <div class="card">
+        <div class="section-label">Liturgy of the Eucharist</div>
+        <div class="card animate">
             <div class="row">
                 <div class="speaker">Sanctus</div>
                 <div class="pt">Santo, Santo, Santo, Senhor Deus do universo.</div>
@@ -144,96 +190,126 @@
     </div>
 
     <script>
-        // 1. SETUP DATE
-        const today = new Date();
-        const dateOptions = { day: 'numeric', month: 'short' };
-        document.getElementById('date-badge').innerText = today.toLocaleDateString('en-GB', dateOptions);
+        // --- 1. SET DATE ---
+        const now = new Date();
+        const displayOpts = { weekday: 'short', day: 'numeric', month: 'short' };
+        document.getElementById('date-badge').innerText = now.toLocaleDateString('en-GB', displayOpts);
 
-        // Format Date for API (YYYY-MM-DD)
-        const yyyy = today.getFullYear();
-        const mm = String(today.getMonth() + 1).padStart(2, '0');
-        const dd = String(today.getDate()).padStart(2, '0');
-        const apiDate = `${yyyy}-${mm}-${dd}`;
+        // Format for API (YYYY-MM-DD)
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const dateString = `${year}-${month}-${day}`;
 
-        // 2. API CONFIGURATION (Evangelizo)
-        const apiBase = "https://publication.evangelizo.ws";
-        
-        // We fetch two languages separately
-        const urlPT = `${apiBase}/PT/days/${apiDate}/readings`;
-        const urlEN = `${apiBase}/US/days/${apiDate}/readings`; // Using US English
+        // --- 2. OFFLINE BACKUP DATA (Safety Net) ---
+        // If the API fails, we use this data so the app doesn't look broken.
+        const backupData = {
+            // Dec 19 (Friday)
+            "2025-12-19": {
+                r1_pt: "Jz 13, 2-7. 24-25a: O anjo do Senhor apareceu à mulher...",
+                r1_en: "Judges 13:2-7, 24-25a: The angel of the Lord appeared to the woman...",
+                gos_pt: "Lc 1, 5-25: Zacarias e Isabel...",
+                gos_en: "Luke 1:5-25: Zechariah and Elizabeth..."
+            },
+            // Dec 20 (Saturday)
+            "2025-12-20": {
+                r1_pt: "Is 7, 10-14: Eis que a virgem conceberá...",
+                r1_en: "Isaiah 7:10-14: The virgin shall conceive...",
+                gos_pt: "Lc 1, 26-38: Alegra-te, cheia de graça...",
+                gos_en: "Luke 1:26-38: Hail, full of grace..."
+            }
+        };
 
-        // 3. FETCH AND COMBINE
-        async function getReadings() {
-            const container = document.getElementById('dynamic-content');
+        // --- 3. FETCH FUNCTION ---
+        async function fetchReadings() {
+            const container = document.getElementById('dynamic-card');
+            
+            // We use 'corsproxy.io' which is very robust for bypassing blocks
+            const proxy = "https://corsproxy.io/?";
+            const baseUrl = "https://publication.evangelizo.ws";
+            
+            const urlPT = `${proxy}${encodeURIComponent(`${baseUrl}/PT/days/${dateString}/readings`)}`;
+            const urlEN = `${proxy}${encodeURIComponent(`${baseUrl}/US/days/${dateString}/readings`)}`;
 
             try {
-                // Fetch both languages at the same time
+                // Try to get data from internet
                 const [resPT, resEN] = await Promise.all([
                     fetch(urlPT),
                     fetch(urlEN)
                 ]);
 
-                if (!resPT.ok || !resEN.ok) throw new Error("Connection failed");
+                if (!resPT.ok || !resEN.ok) throw new Error("Network Error");
 
-                const dataPT = await resPT.json();
-                const dataEN = await resEN.json();
+                const jsonPT = await resPT.json();
+                const jsonEN = await resEN.json();
 
-                // 4. FIND THE GOSPEL & FIRST READING
-                // The API returns a list (data.data). We need to find the one where type === "Gospel"
+                // Extract data
+                const getGospel = (d) => d.data.find(r => r.type === 'gospel');
+                const getReading = (d) => d.data.find(r => r.type === 'reading');
+
+                renderContent(
+                    clean(getReading(jsonPT)?.text),
+                    clean(getReading(jsonEN)?.text),
+                    clean(getGospel(jsonPT)?.text),
+                    clean(getGospel(jsonEN)?.text),
+                    getGospel(jsonEN)?.book?.title // Gospel Title
+                );
+
+            } catch (err) {
+                console.log("Online fetch failed, switching to backup:", err);
+                // If internet fails, load Backup Data
+                const todayBackup = backupData[dateString];
                 
-                const getGospel = (list) => list.data.find(r => r.type === "gospel");
-                const getReading1 = (list) => list.data.find(r => r.type === "reading");
-
-                const gospelPT = getGospel(dataPT);
-                const gospelEN = getGospel(dataEN);
-                
-                const read1PT = getReading1(dataPT);
-                const read1EN = getReading1(dataEN);
-
-                // 5. RENDER TO SCREEN
-                container.innerHTML = ''; // Clear loading message
-
-                // First Reading Block
-                if (read1PT && read1EN) {
-                    container.innerHTML += `
-                        <div class="row fade-in">
-                            <div class="speaker">First Reading</div>
-                            <div class="pt">${cleanText(read1PT.text)}</div>
-                            <div class="en">${cleanText(read1EN.text)}</div>
-                        </div>
-                    `;
+                if (todayBackup) {
+                    renderContent(
+                        todayBackup.r1_pt,
+                        todayBackup.r1_en,
+                        todayBackup.gos_pt,
+                        todayBackup.gos_en,
+                        "Gospel (Offline Mode)"
+                    );
+                } else {
+                    container.innerHTML = `<div class="status-msg" style="color:red">Unable to load readings.<br>Check internet connection.</div>`;
                 }
+            }
+        }
 
-                // Gospel Block
-                if (gospelPT && gospelEN) {
-                    container.innerHTML += `
-                        <div class="row fade-in" style="animation-delay:0.1s">
-                            <div class="speaker">The Gospel &middot; ${gospelEN.book.title}</div>
-                            <div class="pt">${cleanText(gospelPT.text)}</div>
-                            <div class="en">${cleanText(gospelEN.text)}</div>
-                        </div>
-                    `;
-                }
+        // --- 4. RENDER HELPER ---
+        function renderContent(r1_pt, r1_en, gos_pt, gos_en, gos_title) {
+            const container = document.getElementById('dynamic-card');
+            container.innerHTML = ''; // Clear loading
 
-            } catch (error) {
-                console.error(error);
-                container.innerHTML = `
-                    <div class="error">
-                        Could not load today's readings.<br>
-                        Check your internet connection.
+            // First Reading
+            if (r1_pt) {
+                container.innerHTML += `
+                    <div class="row">
+                        <div class="speaker">First Reading</div>
+                        <div class="pt">${r1_pt}</div>
+                        <div class="en">${r1_en || '...'}</div>
+                    </div>
+                `;
+            }
+
+            // Gospel
+            if (gos_pt) {
+                container.innerHTML += `
+                    <div class="row">
+                        <div class="speaker">The Gospel &middot; ${gos_title || 'Holy Gospel'}</div>
+                        <div class="pt">${gos_pt}</div>
+                        <div class="en">${gos_en || '...'}</div>
                     </div>
                 `;
             }
         }
 
-        // Helper: Remove weird line breaks or HTML tags from API text if needed
-        function cleanText(text) {
-            // Sometimes APIs return raw line breaks, we want to preserve paragraphs but keep it clean
+        // Helper to clean API text
+        function clean(text) {
+            if (!text) return "";
             return text.replace(/\n/g, '<br><br>');
         }
 
-        // Run logic
-        getReadings();
+        // Start
+        fetchReadings();
 
     </script>
 </body>
