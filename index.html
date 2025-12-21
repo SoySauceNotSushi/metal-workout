@@ -22,6 +22,7 @@
   /* UI System Colors */
   --btn-secondary-bg: #f7f8f9;
   --btn-disabled-text: #cbd5e1;
+  --separator: rgba(15, 23, 42, 0.08);
 }
 
 *{ box-sizing:border-box; }
@@ -570,7 +571,6 @@ body{
 #addMin, #addMax { width: 100%; padding: 0; text-align: center; }
 #addName { min-width: 0; }
 
-/* Styles for the separator dash */
 .dash-sep {
   text-align: center;
   font-weight: 700;
@@ -586,39 +586,72 @@ body{
 
 .add-btn {
   margin-top: 0;
-  margin-bottom: 16px;
+  margin-bottom: 8px; /* Reduced to make room for edit bar */
 }
 
-.list{ display:flex; flex-direction:column; gap:10px; }
+/* LIST HEADER ACTIONS */
+.list-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 0 8px;
+}
+.edit-list-btn {
+  background: none;
+  border: none;
+  color: var(--brand);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
 
-/* UPDATED LIST ITEM GRID */
+.list{ display:flex; flex-direction:column; gap:0px; /* Gap 0 for separators */ }
+
+/* CLEAN LIST ITEM STYLING (No Box, No Padding) */
 .item {
   display: grid;
-  grid-template-columns: 1fr 60px 10px 60px 44px 44px; /* Name | Min | - | Max | Eye | Trash */
-  gap: 12px;
+  grid-template-columns: 1fr 60px 10px 60px 44px 0px; /* Name | Min | - | Max | Eye | Trash(Hidden) */
+  gap: 8px; /* Tighter gap */
   align-items: center; 
-  padding: 0px; 
-  border-radius: 14px; 
-  background: #ffffff;
+  padding: 12px 0; /* Vertical Padding only */
+  background: transparent;
+  border-bottom: 1px solid var(--separator);
+  transition: all 0.3s ease;
+}
+.item:last-child { border-bottom: none; }
+
+/* Editing Mode Grid Change */
+.list.editing .item {
+  grid-template-columns: 1fr 60px 10px 60px 44px 44px; /* Trash Visible */
 }
 
+/* Transparent Inputs inside list */
 .item .name, .item .reps {
-  height:44px; border-radius:12px; border:1px solid rgba(15,23,42,0.10);
-  padding:0 12px; font-size:16px; background:#fff; min-width: 0; position: relative; z-index: 1;
+  height: 36px; 
+  border-radius: 0; 
+  border: none;
+  padding: 0; 
+  font-size: 16px; 
+  background: transparent; 
+  min-width: 0; 
+  position: relative; 
+  z-index: 1;
 }
-.item .reps { width: 100%; padding: 0; text-align: center; font-size: 14px; }
+.item .reps { width: 100%; text-align: center; font-size: 15px; color: var(--sub); }
 
-.trash{
-  height:44px; width:44px; border:none; border-radius:12px; background:#ffe0e0;
-  color:#dc2626; font-weight:900; font-size:18px; cursor:pointer; z-index: 10;
+.trash {
+  height:36px; width:36px; border:none; border-radius:8px; background:#ffe0e0;
+  color:#dc2626; font-weight:900; font-size:16px; cursor:pointer; z-index: 10;
   position: relative; touch-action: manipulation;
+  display: none; /* Hidden by default */
 }
+.list.editing .trash { display: flex; align-items: center; justify-content: center; }
+
 .visibility-btn {
-  height:44px; width:44px; border:none; border-radius:12px; background:#eef2f7;
-  color:#64748b; font-size:18px; display:flex; align-items:center;
+  height:36px; width:36px; border:none; border-radius:8px; background: transparent;
+  color:#94a3b8; font-size:18px; display:flex; align-items:center;
   justify-content:center; cursor:pointer; touch-action: manipulation;
 }
-.item.hidden-exercise .name, .item.hidden-exercise .reps { opacity: 0.5; background: #f8fafc; }
+.item.hidden-exercise .name, .item.hidden-exercise .reps { opacity: 0.4; }
 
 /* Plan modal */
 .plan-list{ display:flex; flex-direction:column; gap:12px; }
@@ -1046,7 +1079,11 @@ body{
                     </div>
                 </div>
                 <button class="add-btn" id="addBtn">Add Exercise</button>
-                <div style="height:12px"></div>
+                
+                <div class="list-actions">
+                    <button id="editListBtn" class="edit-list-btn">Edit</button>
+                </div>
+                
                 <div class="list" id="list"></div>
             </div>
         </div>
@@ -1219,6 +1256,8 @@ body{
       const addMin    = qs("#addMin");
       const addMax    = qs("#addMax");
       const addBtn    = qs("#addBtn");
+      
+      const editListBtn = qs("#editListBtn");
 
       const historyBtn = qs("#historyBtn");
       const historyModal = qs("#historyModal");
@@ -2338,8 +2377,34 @@ body{
       ========================================================= */
       const TAB_ORDER = ["push","pull","legs","shoulders","abs","cardio"];
       let activeTab = "push";
-      function openModal(){ modal.classList.add("show"); renderTabs(); renderList(); }
-      function closeModalFn(){ modal.classList.remove("show"); saveJSON(LS.library, library); }
+      let isEditing = false; // State for Edit Mode
+
+      function openModal(){ 
+          modal.classList.add("show"); 
+          renderTabs(); 
+          renderList(); 
+      }
+      function closeModalFn(){ 
+          modal.classList.remove("show"); 
+          // Reset edit state on close
+          isEditing = false;
+          listEl.classList.remove("editing");
+          editListBtn.textContent = "Edit";
+          saveJSON(LS.library, library); 
+      }
+      
+      // Edit Toggle Logic
+      editListBtn.addEventListener("click", () => {
+          isEditing = !isEditing;
+          if (isEditing) {
+              listEl.classList.add("editing");
+              editListBtn.textContent = "Done";
+          } else {
+              listEl.classList.remove("editing");
+              editListBtn.textContent = "Edit";
+          }
+      });
+
       exerciseBtn.addEventListener("click", openModal);
       closeModal.addEventListener("click", closeModalFn);
       modal.addEventListener("click",(e)=>{ if(e.target === modal) closeModalFn(); });
@@ -2357,6 +2422,11 @@ body{
         listEl.innerHTML = "";
         const arr = library[activeTab] || [];
         if(!library[activeTab]) library[activeTab]=[];
+        
+        // Ensure list respects current editing state
+        if (isEditing) listEl.classList.add("editing");
+        else listEl.classList.remove("editing");
+
         arr.forEach((item, idx)=>{
           const wrap = document.createElement("div");
           if(item.hidden) wrap.classList.add("hidden-exercise");
@@ -2368,14 +2438,12 @@ body{
           const minInput = document.createElement("input"); 
           minInput.className = "reps"; 
           minInput.placeholder = "Min";
-          minInput.value = item.minReps || item.reps || ""; // Fallback
+          minInput.value = item.minReps || item.reps || ""; 
           
           minInput.addEventListener("change", ()=>{ 
               const val = minInput.value.trim();
-              // If only Min is present, store it as generic reps or MinReps? 
-              // New logic: Store as Min. If Max is empty, generator uses Min.
               library[activeTab][idx].minReps = val;
-              delete library[activeTab][idx].reps; // Migrate to new structure
+              delete library[activeTab][idx].reps;
               saveJSON(LS.library, library); 
           });
 
@@ -2438,7 +2506,6 @@ body{
         if(!library[activeTab]) library[activeTab]=[];
         
         let newEx = { name: n, hidden: false };
-        // New structure: always use minReps/maxReps
         newEx.minReps = min;
         if(max) newEx.maxReps = max;
         
