@@ -201,10 +201,9 @@ body{
   border-bottom:0px solid rgba(15,23,42,0.04);
 }
 .row:last-child{ border-bottom:none; }
-.row-left{ display:flex; align-items:center; gap:10px; min-width:0; flex: 1; } /* Added flex:1 */
+.row-left{ display:flex; align-items:center; gap:10px; min-width:0; flex: 1; } 
 .row-text{ font-size:16px; font-weight:400; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width: 100%; }
 
-/* NEW TAG STYLE (Text based, no box) */
 .row-tag {
   color: #94a3b8;
   font-weight: 500;
@@ -461,7 +460,7 @@ body{
 #confettiCanvas{ position:fixed; left:0; top:0; width:100vw; height:100vh; pointer-events:none; z-index:2000; transition: z-index 0s; }
 
 /* =========================================================
-   UPDATED MODAL SYSTEM
+   UPDATED MODAL SYSTEM (Smooth Transitions)
 ========================================================= */
 
 /* Base Modal (The Dimmer) */
@@ -560,12 +559,25 @@ body{
 .tab.active{ background:#e4ecff; color:var(--brand); }
 .modal-body{ padding:14px 18px 18px; overflow:auto; flex:1; }
 
-.add-row{
-  display:grid; grid-template-columns:1fr 44px 44px; gap:12px;
+/* UPDATED EXERCISE ROW GRID WITH DASH */
+.add-row {
+  display: grid;
+  grid-template-columns: 1fr 60px 10px 60px; /* Name | Min | - | Max */
+  gap: 12px;
   margin-bottom: 16px;
+  align-items: center;
 }
-#addReps{ width:60px; min-width:44px; max-width:44px; padding:0; text-align:center; }
-#addName{ min-width:0; }
+#addMin, #addMax { width: 100%; padding: 0; text-align: center; }
+#addName { min-width: 0; }
+
+/* Styles for the separator dash */
+.dash-sep {
+  text-align: center;
+  font-weight: 700;
+  color: #cbd5e1;
+  font-size: 18px;
+  user-select: none;
+}
 
 .input{
   height:48px; border-radius:12px; border:1px solid rgba(15,23,42,0.12);
@@ -578,15 +590,24 @@ body{
 }
 
 .list{ display:flex; flex-direction:column; gap:10px; }
-.item{
-  display:grid; grid-template-columns:1fr 64px 44px 44px; gap:16px;
-  align-items:center; padding:0px; border-radius:14px; background:#ffffff;
+
+/* UPDATED LIST ITEM GRID */
+.item {
+  display: grid;
+  grid-template-columns: 1fr 60px 10px 60px 44px 44px; /* Name | Min | - | Max | Eye | Trash */
+  gap: 12px;
+  align-items: center; 
+  padding: 0px; 
+  border-radius: 14px; 
+  background: #ffffff;
 }
+
 .item .name, .item .reps {
   height:44px; border-radius:12px; border:1px solid rgba(15,23,42,0.10);
   padding:0 12px; font-size:16px; background:#fff; min-width: 0; position: relative; z-index: 1;
 }
-.item .reps{ width:64px; padding:0; text-align:center; font-size:14px; }
+.item .reps { width: 100%; padding: 0; text-align: center; font-size: 14px; }
+
 .trash{
   height:44px; width:44px; border:none; border-radius:12px; background:#ffe0e0;
   color:#dc2626; font-weight:900; font-size:18px; cursor:pointer; z-index: 10;
@@ -1018,8 +1039,11 @@ body{
             <div class="modal-body">
                 <div class="add-row">
                     <input class="input" id="addName" placeholder="Exercise name" />
-                    <input class="input" id="addMin" placeholder="Min" type="number" />
-                    <input class="input" id="addMax" placeholder="Max" type="number" />
+                    <div class="rep-group" style="display:contents;">
+                        <input class="input" id="addMin" placeholder="Min" type="number" />
+                        <div class="dash-sep">-</div>
+                        <input class="input" id="addMax" placeholder="Max" type="number" />
+                    </div>
                 </div>
                 <button class="add-btn" id="addBtn">Add Exercise</button>
                 <div style="height:12px"></div>
@@ -1615,6 +1639,7 @@ body{
           if (audioCtx.state === 'suspended') audioCtx.resume();
       }
 
+      // --- BOXING BELL (DING DING DING) ---
       function playBoxingBell() {
           try {
               if(!audioCtx) initAudio();
@@ -2340,26 +2365,36 @@ body{
           const name = document.createElement("input"); name.className = "name"; name.value = item.name || "";
           name.addEventListener("input", ()=>{ library[activeTab][idx].name = name.value; saveJSON(LS.library, library); });
           
-          const repsInput = document.createElement("input"); 
-          repsInput.className = "reps"; 
-          let valStr = "";
-          if (item.minReps && item.maxReps) valStr = `${item.minReps}-${item.maxReps}`;
-          else valStr = item.reps || "";
-          repsInput.value = valStr;
-          repsInput.placeholder = "5-10";
+          const minInput = document.createElement("input"); 
+          minInput.className = "reps"; 
+          minInput.placeholder = "Min";
+          minInput.value = item.minReps || item.reps || ""; // Fallback
           
-          repsInput.addEventListener("change", ()=>{ 
-              const val = repsInput.value.trim();
-              if (val.includes("-")) {
-                  const [min, max] = val.split("-");
-                  library[activeTab][idx].minReps = min;
-                  library[activeTab][idx].maxReps = max;
-                  delete library[activeTab][idx].reps;
-              } else {
-                  library[activeTab][idx].reps = val;
-                  delete library[activeTab][idx].minReps;
-                  delete library[activeTab][idx].maxReps;
-              }
+          minInput.addEventListener("change", ()=>{ 
+              const val = minInput.value.trim();
+              // If only Min is present, store it as generic reps or MinReps? 
+              // New logic: Store as Min. If Max is empty, generator uses Min.
+              library[activeTab][idx].minReps = val;
+              delete library[activeTab][idx].reps; // Migrate to new structure
+              saveJSON(LS.library, library); 
+          });
+
+          const dash = document.createElement("span");
+          dash.className = "dash-sep";
+          dash.textContent = "-";
+          dash.style.fontSize = "18px";
+          dash.style.fontWeight = "700";
+          dash.style.color = "#cbd5e1";
+          dash.style.textAlign = "center";
+
+          const maxInput = document.createElement("input"); 
+          maxInput.className = "reps"; 
+          maxInput.placeholder = "Max";
+          maxInput.value = item.maxReps || "";
+          
+          maxInput.addEventListener("change", ()=>{ 
+              const val = maxInput.value.trim();
+              library[activeTab][idx].maxReps = val;
               saveJSON(LS.library, library); 
           });
           
@@ -2373,7 +2408,12 @@ body{
             triggerCustomConfirm("Delete this exercise?", () => { library[activeTab].splice(idx, 1); saveJSON(LS.library, library); updateExerciseButtonLabel(); renderList(); });
           });
 
-          wrap.appendChild(name); wrap.appendChild(repsInput); wrap.appendChild(eyeBtn); wrap.appendChild(del);
+          wrap.appendChild(name); 
+          wrap.appendChild(minInput); 
+          wrap.appendChild(dash); 
+          wrap.appendChild(maxInput); 
+          wrap.appendChild(eyeBtn); 
+          wrap.appendChild(del);
           listEl.appendChild(wrap);
         });
       }
@@ -2398,12 +2438,9 @@ body{
         if(!library[activeTab]) library[activeTab]=[];
         
         let newEx = { name: n, hidden: false };
-        if (max) {
-            newEx.minReps = min;
-            newEx.maxReps = max;
-        } else {
-            newEx.reps = min;
-        }
+        // New structure: always use minReps/maxReps
+        newEx.minReps = min;
+        if(max) newEx.maxReps = max;
         
         library[activeTab].unshift(newEx);
        
