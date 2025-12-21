@@ -22,7 +22,7 @@
   /* UI System Colors */
   --btn-secondary-bg: #f7f8f9;
   --btn-disabled-text: #cbd5e1;
-  --separator: rgba(15, 23, 42, 0.08);
+  --separator: #e2e8f0;
 }
 
 *{ box-sizing:border-box; }
@@ -461,7 +461,7 @@ body{
 #confettiCanvas{ position:fixed; left:0; top:0; width:100vw; height:100vh; pointer-events:none; z-index:2000; transition: z-index 0s; }
 
 /* =========================================================
-   UPDATED MODAL SYSTEM (Smooth Transitions)
+   UPDATED MODAL SYSTEM
 ========================================================= */
 
 /* Base Modal (The Dimmer) */
@@ -495,8 +495,11 @@ body{
 #modal .modal-sheet {
   inset: 0;
   top: 30px;
+  bottom: 0; /* Full height to allow sticky footer */
   border-radius: 24px 24px 0 0;
   transform: translateY(100%);
+  display: flex;
+  flex-direction: column;
 }
 #modal.show .modal-sheet { transform: translateY(0); }
 
@@ -515,6 +518,7 @@ body{
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid rgba(15,23,42,0.06);
+  flex-shrink: 0; /* Don't shrink */
 }
 
 /* Specialized History Header Grid */
@@ -552,15 +556,30 @@ body{
 .tabs{
   display:flex; gap:10px; padding:10px 18px; border-bottom:1px solid rgba(15,23,42,0.06);
   overflow-x:auto; -webkit-overflow-scrolling:touch;
+  flex-shrink: 0;
 }
 .tab{
   border:none; background:#eef2f7; color:#0f172a; padding:10px 14px;
   border-radius:999px; font-weight:500; font-size:14px; white-space:nowrap; cursor:pointer;
 }
 .tab.active{ background:#e4ecff; color:var(--brand); }
-.modal-body{ padding:14px 18px 18px; overflow:auto; flex:1; }
 
-/* UPDATED EXERCISE ROW GRID WITH DASH */
+.modal-body{ 
+  padding:14px 18px 18px; 
+  overflow-y:auto; 
+  flex:1; /* Takes remaining space */
+  padding-bottom: 100px; /* Space for footer */
+}
+
+/* NEW MODAL FOOTER (Sticky Bottom) */
+.modal-footer {
+  padding: 16px 18px 34px;
+  border-top: 1px solid rgba(15,23,42,0.06);
+  background: #fff;
+  flex-shrink: 0;
+  z-index: 20;
+}
+
 .add-row {
   display: grid;
   grid-template-columns: 1fr 60px 10px 60px; /* Name | Min | - | Max */
@@ -586,7 +605,7 @@ body{
 
 .add-btn {
   margin-top: 0;
-  margin-bottom: 8px; /* Reduced to make room for edit bar */
+  margin-bottom: 8px; /* Reduced */
 }
 
 /* LIST HEADER ACTIONS */
@@ -602,6 +621,7 @@ body{
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
+  padding: 4px 8px;
 }
 
 .list{ display:flex; flex-direction:column; gap:0px; /* Gap 0 for separators */ }
@@ -748,6 +768,17 @@ body{
   transition: transform 0.1s;
 }
 .confirm-btn.cancel:active { transform: scale(0.98); }
+
+/* Primary Blue (Back Button) */
+.confirm-btn.primary {
+    width: 100%; height: 52px;
+    background: var(--brand); color: white;
+    border: none; border-radius: 999px;
+    font-size: 17px; font-weight: 700; cursor: pointer;
+    transition: transform 0.1s;
+}
+.confirm-btn.primary:active { transform: scale(0.98); }
+
 
 /* --- PB / ACTION SHEET OVERLAY --- */
 .pb-overlay {
@@ -947,6 +978,19 @@ body{
         </div>
     </div>
     
+    <div class="confirm-overlay" id="unsavedOverlay">
+        <div class="confirm-box">
+            <div class="confirm-content">
+                <div class="confirm-title">Unsaved Changes</div>
+                <div class="confirm-text">You have changes that haven't been saved. Would you like to save them?</div>
+            </div>
+            <div class="confirm-actions">
+                <button class="confirm-btn primary" id="unsavedYes">Yes, Save Changes</button>
+                <button class="confirm-btn cancel" id="unsavedNo">No, Discard</button>
+            </div>
+        </div>
+    </div>
+    
     <div class="pb-overlay" id="planSheetOverlay">
         <div class="pb-card wizard-sheet">
             <div class="wizard-head">
@@ -1066,7 +1110,6 @@ body{
         <div class="modal-sheet">
             <div class="modal-head">
                 <div class="modal-title">Exercises</div>
-                <button class="modal-close" id="closeModal">Done</button>
             </div>
             <div class="tabs" id="tabs"></div>
             <div class="modal-body">
@@ -1085,6 +1128,9 @@ body{
                 </div>
                 
                 <div class="list" id="list"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" id="modalBackBtn">Back</button>
             </div>
         </div>
     </div>
@@ -1217,6 +1263,29 @@ body{
         confirmOverlay.classList.remove("show");
         confirmCallback = null;
       });
+      
+      // UNSAVED CONFIRMATION
+      const unsavedOverlay = qs("#unsavedOverlay");
+      const unsavedYes = qs("#unsavedYes");
+      const unsavedNo = qs("#unsavedNo");
+      
+      function showUnsavedConfirm() {
+          unsavedOverlay.classList.add("show");
+      }
+      
+      unsavedYes.addEventListener("click", () => {
+          // Save
+          library = JSON.parse(JSON.stringify(tempLibrary));
+          saveJSON(LS.library, library);
+          unsavedOverlay.classList.remove("show");
+          closeModalFn(true); // true = force close
+      });
+      
+      unsavedNo.addEventListener("click", () => {
+          // Discard
+          unsavedOverlay.classList.remove("show");
+          closeModalFn(true); // true = force close
+      });
 
       /* =========================================================
          DOM ELEMENTS
@@ -1249,7 +1318,9 @@ body{
       const slideWhite = qs("#slideWhite");
 
       const modal     = qs("#modal");
-      const closeModal= qs("#closeModal");
+      // const closeModal= qs("#closeModal"); // Removed standard close button
+      const modalBackBtn = qs("#modalBackBtn"); // New Back Button
+      
       const tabsEl    = qs("#tabs");
       const listEl    = qs("#list");
       const addName   = qs("#addName");
@@ -1975,440 +2046,66 @@ body{
       });
 
       /* =========================================================
-         COUNTERS & UI
-      ========================================================= */
-      function getStreak(){ return parseInt(localStorage.getItem(LS.streak)||"0",10); }
-      function setStreak(n){ localStorage.setItem(LS.streak, String(Math.max(0, n|0))); }
-      function getWeekCount(){ return parseInt(localStorage.getItem(LS.weekCount)||"0",10); }
-      function setWeekCount(n){ localStorage.setItem(LS.weekCount, String(Math.max(0, n|0))); }
-      function getWeekCounted(){ return localStorage.getItem(LS.weekCounted)==="1"; }
-      function setWeekCounted(v){ localStorage.setItem(LS.weekCounted, v ? "1" : "0"); }
-      function getTotalDays(){ return metaconHistory.length + workoutHistory.length; }
-
-      function ensureWeekState(){
-        const current = isoWeekKey();
-        const storedWeek = localStorage.getItem(LS.weekKey);
-        if(!storedWeek){
-          localStorage.setItem(LS.weekKey, current);
-          localStorage.setItem(LS.weekCount, "0");
-          localStorage.setItem(LS.weekCounted, "0");
-          return;
-        }
-        if(storedWeek !== current){
-          const lastCount = parseInt(localStorage.getItem(LS.weekCount)||"0",10);
-          if(lastCount < 3) localStorage.setItem(LS.streak, "0");
-          localStorage.setItem(LS.weekKey, current);
-          localStorage.setItem(LS.weekCount, "0");
-          localStorage.setItem(LS.weekCounted, "0");
-        }
-      }
-
-      function renderStreakUI(){
-        if (getTotalDays() === 0) setStreak(0);
-        if(streakInline) streakInline.textContent = `${getStreak()} week streak`;
-      }
-      function renderInitialCounter(valStr) {
-        weekNumWrap.innerHTML = "";
-        valStr.split("").forEach(char => {
-          const d = document.createElement("div"); d.className = "ticker-digit";
-          d.innerHTML = `<div class="ticker-track" style="transform: translateY(0%)"><div class="ticker-num">${char}</div></div>`;
-          weekNumWrap.appendChild(d);
-        });
-      }
-      function animateCounter(oldVal, newVal) {
-        if (oldVal.length !== newVal.length) { renderInitialCounter(newVal); return; }
-        weekNumWrap.innerHTML = "";
-        const oldChars = oldVal.split(""); const newChars = newVal.split("");
-        oldChars.forEach((oldChar, i) => {
-          const newChar = newChars[i];
-          const digitDiv = document.createElement("div"); digitDiv.className = "ticker-digit";
-          if (oldChar === newChar) {
-             digitDiv.innerHTML = `<div class="ticker-track" style="transform: translateY(0%)"><div class="ticker-num">${newChar}</div></div>`;
-          } else {
-             digitDiv.innerHTML = `<div class="ticker-track" style="transform: translateY(-50%)"><div class="ticker-num">${newChar}</div><div class="ticker-num">${oldChar}</div></div>`;
-             requestAnimationFrame(() => { requestAnimationFrame(() => { digitDiv.querySelector(".ticker-track").style.transform = "translateY(0%)"; }); });
-          }
-          weekNumWrap.appendChild(digitDiv);
-        });
-      }
-      function updateCounterUI(oldVal, newVal, animate) {
-        if (animate) animateCounter(oldVal, newVal); else renderInitialCounter(newVal);
-      }
-
-      function showPlanButton(){ planWorkoutBtn.classList.add("hidden"); }
-
-      function renderWorkout(workout){
-        cardTitle.textContent = workout.type;
-        cardRows.innerHTML = "";
-        workout.rows.forEach(r=>{
-          const row = document.createElement("div"); row.className = "row";
-          
-          const left = document.createElement("div"); left.className = "row-left";
-          
-          // NEW RENDER LOGIC: Text + Dash + Tag
-          const txt = document.createElement("div"); txt.className = "row-text";
-          
-          // Get the tag name
-          const tagName = r.tags.length > 0 ? r.tags[0] : "";
-          // Capitalize
-          const prettyTag = tagName ? (tagName.charAt(0).toUpperCase() + tagName.slice(1)) : "";
-          
-          // Create inner HTML for the text line
-          // e.g. "10 Pull-Ups <span class='row-tag'>— Pull</span>"
-          let htmlContent = r.text;
-          if (prettyTag) {
-              htmlContent += `<span class="row-tag"> — ${prettyTag}</span>`;
-          }
-          txt.innerHTML = htmlContent; 
-          
-          left.appendChild(txt);
-          row.appendChild(left);
-          
-          // Removed the separate tags div creation
-          
-          cardRows.appendChild(row);
-        });
-        card.classList.remove("hidden");
-        requestAnimationFrame(()=> card.classList.add("visible"));
-        showPlanButton(workout);
-      }
-
-      function showWeeklyCenter(){
-        historyBtn.classList.remove("hidden");
-        weeklyCenter.classList.remove("hidden"); weeklyCenter.style.opacity = '0';
-        focusPicker.classList.remove("hidden");
-        card.classList.remove("visible"); card.classList.add("hidden");
-        slideWrap.classList.remove("show"); slideWrap.style.opacity = ''; slideWrap.style.pointerEvents = '';
-        planTriggerBtn.classList.remove("hidden");
-        exerciseBtn.classList.remove("hidden");
-        currentWorkout = null; plannedReps = {}; showPlanButton(null);
-        
-        roundCounterControl.classList.remove("visible");
-        
-        if(restTimerInterval) clearInterval(restTimerInterval);
-        isResting = false; restTimeLeft = 20;
-        resetMetaconUI();
-        
-        requestAnimationFrame(() => { weeklyCenter.style.opacity = '1'; actionsArea.classList.remove("faded"); });
-      }
-
-      function showWorkoutState(workout){
-        weeklyCenter.classList.add("hidden");
-        historyBtn.classList.add("hidden");
-        focusPicker.classList.add("hidden");
-        renderWorkout(workout);
-        planTriggerBtn.classList.add("hidden");
-        exerciseBtn.classList.add("hidden");
-        slideWrap.classList.add("show"); slideWrap.style.opacity = '1';
-        
-        // Show Timer Wrapper
-        cardTimerWrap.classList.remove("hidden");
-        
-        if(workout.type === "Metabolic Conditioning") {
-            // Metacon Setup
-            roundCounterControl.classList.remove("visible"); 
-            
-            // Check state
-            if (metaconState.running || metaconState.accumulated > 0) {
-                if(metaconState.running) {
-                    cardTimer.classList.add("active");
-                    metaconTimerInterval = setInterval(updateMetaconDisplay, 100);
-                } else {
-                    cardTimer.classList.add("paused");
-                }
-                updateMetaconDisplay();
-            } else {
-                cardTimer.textContent = "Start Workout";
-            }
-            
-        } else {
-            // AMRAP Setup
-            currentRounds = workout.roundsDone || 0;
-            updateRoundBtn();
-            roundCounterControl.classList.add("visible");
-            
-            if (workout.timerActivated) {
-                roundCounterControl.classList.remove("disabled-state");
-                roundMinus.disabled = false;
-                roundPlus.disabled = false;
-            } else {
-                roundCounterControl.classList.add("disabled-state");
-                roundMinus.disabled = true;
-                roundPlus.disabled = true;
-            }
-            
-            // Check for saved time
-            restTimeLeft = (workout.timeLeft !== undefined) ? workout.timeLeft : (workout.duration || 300);
-            
-            // Initial Text
-            if (restTimeLeft === (workout.duration || 300) && !workout.timerActivated) {
-                cardTimer.textContent = getStartText();
-            } else {
-                // If loaded in a "paused" state (implied by reload)
-                cardTimer.textContent = "Resume (" + formatTimerTime(restTimeLeft) + ")";
-                cardTimer.classList.add("paused"); 
-                // Note: user must click resume to start tick again
-            }
-        }
-        
-        plannedReps = {}; resetSlider();
-      }
-
-      function showMesh(on){
-        if(on){ aiStage.style.display = "block"; requestAnimationFrame(()=> aiStage.classList.add("show")); }
-        else{ aiStage.classList.remove("show"); setTimeout(()=>{ aiStage.style.display="none"; }, 250); }
-      }
-
-      let sliding = false, startClientX = 0, currentWidth = 52, rafPending = false, pendingWidth = 52;
-      function applyTransitions(on){
-        if(on){ slideKnob.style.transition = "width .2s ease-out, transform .2s ease-out"; slideWhite.style.transition = "clip-path .2s ease-out"; }
-        else { slideKnob.style.transition = "none"; slideWhite.style.transition = "none"; }
-      }
-      function resetSlider(){
-        currentWidth = 52; applyTransitions(false);
-        requestAnimationFrame(()=>{ slideKnob.style.width = "52px"; slideWhite.style.clipPath = "inset(0 100% 0 0)"; });
-      }
-      function setSliderProgressImmediate(width){
-        const containerWidth = slideWrap.getBoundingClientRect().width;
-        const w = Math.max(52, Math.min(width, containerWidth));
-        currentWidth = w; slideKnob.style.width = `${w}px`;
-        const pct = (w / containerWidth) * 100; slideWhite.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
-      }
-      function setSliderProgress(px){
-        pendingWidth = px; if(rafPending) return; rafPending = true;
-        requestAnimationFrame(()=>{ rafPending = false; setSliderProgressImmediate(pendingWidth); });
-      }
-      function snapBack(){ applyTransitions(true); requestAnimationFrame(()=> setSliderProgressImmediate(52)); }
-
-      slideKnob.addEventListener("pointerdown", (e)=>{
-        sliding = true; slideKnob.setPointerCapture(e.pointerId); applyTransitions(false);
-        startClientX = e.clientX; if (navigator.vibrate) navigator.vibrate(10);
-      });
-      slideKnob.addEventListener("pointermove", (e)=>{
-        if(!sliding) return; const delta = e.clientX - startClientX; if (delta < 0) return;
-        setSliderProgress(52 + delta);
-      });
-      function finishSlide(e){
-        if(!sliding) return; sliding = false; try{ slideKnob.releasePointerCapture(e.pointerId); }catch{}
-        const containerWidth = slideWrap.getBoundingClientRect().width;
-        
-        if(currentWidth > containerWidth * 0.92){
-          applyTransitions(true);
-          
-          // 1. METACON LOGIC
-          if (currentWorkout?.type === "Metabolic Conditioning") {
-             // If never started (0 time accumulated and not running)
-             if (!metaconState.running && metaconState.accumulated === 0) {
-                 requestAnimationFrame(()=> setSliderProgressImmediate(52));
-                 snapBack();
-                 triggerCustomConfirm(
-                     "You haven't started the timer. Quit?",
-                     () => { discardWorkout(); },
-                     "Quit Workout", true
-                 );
-                 return;
-             }
-             // Otherwise, fall through to complete
-          }
-          
-          // 2. AMRAP LOGIC
-          else {
-             // If never started OR Time still remaining
-             if (!currentWorkout.timerActivated || restTimeLeft > 0) {
-                 requestAnimationFrame(()=> setSliderProgressImmediate(52));
-                 snapBack();
-
-                 if(isResting) {
-                     if(restTimerInterval) clearInterval(restTimerInterval);
-                     isResting = false; 
-                     cardTimer.classList.add("paused");
-                     cardTimer.textContent = "Resume (" + formatTimerTime(restTimeLeft) + ")";
-                 }
-
-                 triggerCustomConfirm(
-                     "Workout not finished. Quit?",
-                     () => { discardWorkout(); },
-                     "Quit Workout", true
-                 );
-                 return;
-             }
-          }
-          
-          requestAnimationFrame(()=>{ setSliderProgressImmediate(containerWidth); completeWorkout(); });
-        } else snapBack();
-      }
-      slideKnob.addEventListener("pointerup", finishSlide); slideKnob.addEventListener("pointercancel", finishSlide);
-      window.addEventListener("pointerup", finishSlide, { passive: true }); window.addEventListener("pointercancel", finishSlide, { passive: true });
-
-      function shootConfetti(isPB = false){
-        if(!confettiInstance) return;
-        if (isPB) confettiInstance({ particleCount: 200, spread: 120, origin: { x: 0.5, y: 1 }, startVelocity: 60, colors: ['#FFD700', '#FFA500', '#FFFFFF'], zIndex: 300 });
-        else {
-          const rect = slideWrap.getBoundingClientRect();
-          const x = (rect.left + rect.width * 0.5) / window.innerWidth;
-          const y = (rect.bottom - 6) / window.innerHeight;
-          confettiInstance({ particleCount:160, spread:90, startVelocity:35, origin:{ x, y }, zIndex: 2 });
-        }
-      }
-
-      function triggerHomeTransition(oldVal, newVal) {
-        card.style.opacity = '0'; card.style.transform = 'translateY(20px) scale(0.95)';
-        actionsArea.classList.add("faded");
-        if (document.activeElement) document.activeElement.blur();
-        setTimeout(() => {
-          card.style.opacity = ''; card.style.transform = ''; slideWrap.style.opacity = '';
-          showWeeklyCenter();
-          if (oldVal && newVal) updateCounterUI(oldVal, newVal, true);
-          hardResetPointerState();
-        }, 400);
-      }
-
-      function discardWorkout() {
-          localStorage.removeItem(LS.currentWorkout);
-          if(restTimerInterval) clearInterval(restTimerInterval);
-          stopMetaconTimer(); // Clean up state
-          triggerHomeTransition();
-      }
-
-      function completeWorkout(){
-        localStorage.removeItem(LS.currentWorkout);
-        let isPBRun = false; slideWrap.style.opacity = '0'; slideWrap.style.pointerEvents = 'none';
-        const oldTotal = String(getTotalDays());
-
-        // Handle METACON Completion
-        if (currentWorkout?.type === "Metabolic Conditioning") {
-          // Calculate final accurate time
-          const finalTimeMs = stopMetaconTimer(); 
-          
-          const previousTimes = metaconHistory.map(h => h.time);
-          const bestPrevious = previousTimes.length ? Math.min(...previousTimes) : Infinity;
-          
-          metaconHistory.push({ time: finalTimeMs, date: todayKey() });
-          saveJSON(LS.metaconHistory, metaconHistory);
-          
-          if (previousTimes.length > 0 && finalTimeMs < bestPrevious) {
-            isPBRun = true; pbTimeDisplay.textContent = formatTime(finalTimeMs);
-            pbPrevDisplay.textContent = `Previous Best: ${formatTime(bestPrevious)}`;
-            pbCardRows.innerHTML = document.getElementById("cardRows").innerHTML;
-            pbCloseBtn.classList.add('hidden-state'); pbOverlay.classList.add('show');
-            shootConfetti(true); setTimeout(() => { pbCloseBtn.classList.remove('hidden-state'); }, 2500);
-          } else shootConfetti(false);
-          
-        } else {
-          // Handle AMRAP Completion
-          if(restTimerInterval) clearInterval(restTimerInterval);
-          resetAmrapUI();
-          
-          const title = currentWorkout.type;
-          const rounds = currentWorkout.roundsDone || 0;
-          
-          // Generate Summary
-          summaryRounds.textContent = rounds + " Rounds";
-          summaryCardRows.innerHTML = "";
-          
-          currentWorkout.rows.forEach(r => {
-             const row = document.createElement("div"); row.className = "row";
-             
-             // TEXT + DASH TAG
-             const left = document.createElement("div"); left.className = "row-left";
-             const txt = document.createElement("div"); txt.className = "row-text";
-             
-             const tagName = r.tags.length > 0 ? r.tags[0] : "";
-             const prettyTag = tagName ? (tagName.charAt(0).toUpperCase() + tagName.slice(1)) : "";
-             
-             // Calculate Total Reps
-             let displayText = r.text;
-             const parts = r.text.match(/^(\d+)\s+(.*)$/);
-             if(parts) {
-                 const repsPerRound = parseInt(parts[1], 10);
-                 const name = parts[2];
-                 const totalReps = repsPerRound * rounds;
-                 displayText = `${totalReps} ${name}`;
-             }
-             
-             let htmlContent = displayText;
-             if (prettyTag) {
-                 htmlContent += `<span class="row-tag"> — ${prettyTag}</span>`;
-             }
-             txt.innerHTML = htmlContent; 
-             
-             left.appendChild(txt);
-             row.appendChild(left);
-             
-             // ANIMATION CLASS
-             row.className += " result-row";
-             row.style.animationDelay = (summaryCardRows.children.length * 0.15) + "s";
-
-             summaryCardRows.appendChild(row);
-          });
-          
-          workoutHistory.push({ type: title, date: todayKey(), rounds: rounds });
-          saveJSON(LS.workoutHistory, workoutHistory);
-          
-          summaryOverlay.classList.add("show");
-          shootConfetti(false);
-        }
-        
-        playCelebrationSound();
-
-        const newTotal = String(getTotalDays());
-        roundCounterControl.classList.remove("visible");
-
-        ensureWeekState();
-        let count = getWeekCount() + 1; setWeekCount(count);
-        if(count >= 3 && !getWeekCounted()){ setStreak(getStreak() + 1); setWeekCounted(true); }
-        renderStreakUI();
-
-        if (!isPBRun && currentWorkout?.type === "Metabolic Conditioning") {
-           setTimeout(() => { triggerHomeTransition(oldTotal, newTotal); }, 1200);
-        } else if (!isPBRun) {
-           updateCounterUI(oldTotal, newTotal, false);
-        }
-      }
-
-      pbCloseBtn.onclick = () => {
-         pbOverlay.classList.remove("show");
-         setTimeout(() => pbCloseBtn.classList.add('hidden-state'), 300);
-         triggerHomeTransition(String(getTotalDays()), String(getTotalDays()));
-      };
-
-      /* =========================================================
-         EXERCISE MODAL
+         EXERCISE MODAL (EDIT & MANUAL SAVE)
       ========================================================= */
       const TAB_ORDER = ["push","pull","legs","shoulders","abs","cardio"];
       let activeTab = "push";
-      let isEditing = false; // State for Edit Mode
+      let isEditing = false;
+      let tempLibrary = null;
+      let isDirty = false;
 
       function openModal(){ 
-          modal.classList.add("show"); 
+          modal.classList.add("show");
+          // DEEP CLONE to temp
+          tempLibrary = JSON.parse(JSON.stringify(library));
+          isDirty = false;
           renderTabs(); 
           renderList(); 
       }
-      function closeModalFn(){ 
+      
+      // Close function now handles checking dirty state
+      function closeModalFn(force = false){ 
+          if (!force && isDirty) {
+              showUnsavedConfirm();
+              return;
+          }
+          
           modal.classList.remove("show"); 
           // Reset edit state on close
           isEditing = false;
           listEl.classList.remove("editing");
           editListBtn.textContent = "Edit";
-          saveJSON(LS.library, library); 
+          // Discard temp changes (next open re-clones from LS)
+          tempLibrary = null; 
+          isDirty = false;
       }
       
-      // Edit Toggle Logic
+      // Toggle Edit Mode Logic
       editListBtn.addEventListener("click", () => {
-          isEditing = !isEditing;
           if (isEditing) {
-              listEl.classList.add("editing");
-              editListBtn.textContent = "Done";
-          } else {
+              // "Save" Clicked -> Commit changes
+              library = JSON.parse(JSON.stringify(tempLibrary)); // Commit temp to main
+              saveJSON(LS.library, library);
+              isDirty = false;
+              
+              isEditing = false;
               listEl.classList.remove("editing");
               editListBtn.textContent = "Edit";
+          } else {
+              // "Edit" Clicked -> Enter mode
+              isEditing = true;
+              listEl.classList.add("editing");
+              editListBtn.textContent = "Save";
           }
+      });
+      
+      modalBackBtn.addEventListener("click", () => {
+          closeModalFn();
       });
 
       exerciseBtn.addEventListener("click", openModal);
-      closeModal.addEventListener("click", closeModalFn);
-      modal.addEventListener("click",(e)=>{ if(e.target === modal) closeModalFn(); });
-
+      // modal.addEventListener("click",(e)=>{ if(e.target === modal) closeModalFn(); }); // Optional: Click outside closes? Better disable for dirty check.
+      
       function renderTabs(){
         tabsEl.innerHTML = "";
         TAB_ORDER.forEach(k=>{
@@ -2420,10 +2117,10 @@ body{
 
       function renderList(){
         listEl.innerHTML = "";
-        const arr = library[activeTab] || [];
-        if(!library[activeTab]) library[activeTab]=[];
+        // Use TEMP library for rendering
+        const arr = tempLibrary[activeTab] || [];
+        if(!tempLibrary[activeTab]) tempLibrary[activeTab]=[];
         
-        // Ensure list respects current editing state
         if (isEditing) listEl.classList.add("editing");
         else listEl.classList.remove("editing");
 
@@ -2433,7 +2130,10 @@ body{
           wrap.className = "item " + (item.hidden ? "hidden-exercise" : "");
           
           const name = document.createElement("input"); name.className = "name"; name.value = item.name || "";
-          name.addEventListener("input", ()=>{ library[activeTab][idx].name = name.value; saveJSON(LS.library, library); });
+          name.addEventListener("input", ()=>{ 
+              tempLibrary[activeTab][idx].name = name.value; 
+              isDirty = true; 
+          });
           
           const minInput = document.createElement("input"); 
           minInput.className = "reps"; 
@@ -2442,9 +2142,9 @@ body{
           
           minInput.addEventListener("change", ()=>{ 
               const val = minInput.value.trim();
-              library[activeTab][idx].minReps = val;
-              delete library[activeTab][idx].reps;
-              saveJSON(LS.library, library); 
+              tempLibrary[activeTab][idx].minReps = val;
+              delete tempLibrary[activeTab][idx].reps;
+              isDirty = true;
           });
 
           const dash = document.createElement("span");
@@ -2462,18 +2162,28 @@ body{
           
           maxInput.addEventListener("change", ()=>{ 
               const val = maxInput.value.trim();
-              library[activeTab][idx].maxReps = val;
-              saveJSON(LS.library, library); 
+              tempLibrary[activeTab][idx].maxReps = val;
+              isDirty = true;
           });
           
           const eyeBtn = document.createElement("button"); eyeBtn.className = "visibility-btn";
           eyeBtn.innerHTML = item.hidden ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>` : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
-          eyeBtn.addEventListener("click", (e) => { e.stopPropagation(); item.hidden = !item.hidden; saveJSON(LS.library, library); updateExerciseButtonLabel(); renderList(); });
+          eyeBtn.addEventListener("click", (e) => { 
+              e.stopPropagation(); 
+              item.hidden = !item.hidden; 
+              // Update temp, dirty, re-render
+              tempLibrary[activeTab][idx].hidden = item.hidden;
+              isDirty = true;
+              renderList(); 
+          });
 
           const del = document.createElement("button"); del.className = "trash"; del.textContent = "×";
           del.addEventListener("click", (e)=>{
             e.stopPropagation(); e.preventDefault();
-            triggerCustomConfirm("Delete this exercise?", () => { library[activeTab].splice(idx, 1); saveJSON(LS.library, library); updateExerciseButtonLabel(); renderList(); });
+            // Delete from temp immediately
+            tempLibrary[activeTab].splice(idx, 1);
+            isDirty = true;
+            renderList();
           });
 
           wrap.appendChild(name); 
@@ -2503,20 +2213,21 @@ body{
         
         if(!n || !min) return;
         
-        if(!library[activeTab]) library[activeTab]=[];
+        if(!tempLibrary[activeTab]) tempLibrary[activeTab]=[];
         
         let newEx = { name: n, hidden: false };
         newEx.minReps = min;
         if(max) newEx.maxReps = max;
         
-        library[activeTab].unshift(newEx);
+        tempLibrary[activeTab].unshift(newEx);
+        isDirty = true;
        
         addName.value="";
         addMin.value="";
         addMax.value="";
         addBtn.disabled = true;
 
-        saveJSON(LS.library, library); updateExerciseButtonLabel(); renderList();
+        renderList();
       });
 
       function init() {
