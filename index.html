@@ -120,9 +120,9 @@ body{
   letter-spacing:-0.05em;
   color:rgba(15,23,42,0.08);
   text-shadow: 0 1px 0 rgba(255,255,255,0.8), 0 -1px 0 rgba(15,23,42,0.05);
-  line-height: 0.9;
-  /* FIXED: Increased height so bottom isn't cut off */
-  height: 160px; 
+  line-height: 1; /* Changed to 1 to avoid squash */
+  /* FIXED: Increased height to 180px */
+  height: 180px; 
   overflow: hidden;
 }
 
@@ -133,10 +133,11 @@ body{
   transition: transform 0.8s cubic-bezier(0.18, 0.89, 0.32, 1.15);
   will-change: transform;
 }
-.ticker-num { height: 160px; display: flex; align-items: center; justify-content: center; } /* Matched height */
+/* Height matches wrap to keep alignment */
+.ticker-num { height: 180px; display: flex; align-items: center; justify-content: center; } 
 
 .weekly-count .label{
-  margin-top:0px; /* Reduced since number is bigger */
+  margin-top:-10px; /* Pull label up */
   font-size:16px;
   font-weight:400;
   color:rgba(100,116,139,0.65);
@@ -833,6 +834,7 @@ body{
 #summaryOverlay .pb-sub {
     margin-top: 24px;
     margin-bottom: 16px;
+    padding-top: 24px; /* Added padding */
 }
 
 .pb-workout-list { 
