@@ -52,7 +52,8 @@ body{
 .container{
   max-width:520px;
   margin:0 auto;
-  padding:18px 18px 0;
+  /* FIXED: Bottom padding 16px explicitly */
+  padding:18px 18px 16px; 
   height:100vh;
   display:flex;
   flex-direction:column;
@@ -120,10 +121,10 @@ body{
   letter-spacing:-0.05em;
   color:rgba(15,23,42,0.08);
   text-shadow: 0 1px 0 rgba(255,255,255,0.8), 0 -1px 0 rgba(15,23,42,0.05);
-  line-height: 1; /* Changed to 1 to avoid squash */
-  /* FIXED: Increased height to 180px */
-  height: 180px; 
-  overflow: hidden;
+  line-height: 1;
+  /* FIXED: 200px Height + No Overflow Clipping */
+  height: 200px; 
+  overflow: visible; 
 }
 
 .ticker-digit { position: relative; height: 100%; display: inline-block; }
@@ -133,11 +134,11 @@ body{
   transition: transform 0.8s cubic-bezier(0.18, 0.89, 0.32, 1.15);
   will-change: transform;
 }
-/* Height matches wrap to keep alignment */
-.ticker-num { height: 180px; display: flex; align-items: center; justify-content: center; } 
+/* Match wrap height */
+.ticker-num { height: 200px; display: flex; align-items: center; justify-content: center; } 
 
 .weekly-count .label{
-  margin-top:-10px; /* Pull label up */
+  margin-top:-20px; /* Adjusted for taller number box */
   font-size:16px;
   font-weight:400;
   color:rgba(100,116,139,0.65);
@@ -270,7 +271,8 @@ body{
 /* Actions */
 .actions{
   position:relative;
-  padding:12px 0 18px;
+  /* FIXED: Zero padding bottom as container handles the 16px */
+  padding:12px 0 0; 
   z-index:10;
   transform: translateY(-1.5rem);
   transition: opacity 0.4s ease;
@@ -497,7 +499,7 @@ body{
 #modal .modal-sheet {
   inset: 0;
   top: 30px;
-  bottom: 0; /* Full height to allow sticky footer */
+  bottom: 0; 
   border-radius: 24px 24px 0 0;
   transform: translateY(100%);
   display: flex;
@@ -520,7 +522,7 @@ body{
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid rgba(15,23,42,0.06);
-  flex-shrink: 0; /* Don't shrink */
+  flex-shrink: 0; 
 }
 
 /* Specialized History Header Grid */
@@ -569,13 +571,12 @@ body{
 .modal-body{ 
   padding:14px 18px 18px; 
   overflow-y:auto; 
-  flex:1; /* Takes remaining space */
-  padding-bottom: 100px; /* Space for footer */
+  flex:1; 
+  padding-bottom: 100px;
 }
 
 /* NEW MODAL FOOTER (Sticky Bottom) */
 .modal-footer {
-  /* FIXED: 16px from bottom, no top border */
   padding: 0 18px 16px; 
   border-top: none;
   background: #fff;
@@ -1684,6 +1685,8 @@ body{
               repsToDisplay = String(randomReps);
           } else if (ex.reps) {
               repsToDisplay = ex.reps;
+          } else if (ex.minReps) {
+              repsToDisplay = ex.minReps;
           }
           
           const text = repsToDisplay ? `${repsToDisplay} ${ex.name}` : ex.name;
