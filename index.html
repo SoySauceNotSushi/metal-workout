@@ -121,7 +121,8 @@ body{
   color:rgba(15,23,42,0.08);
   text-shadow: 0 1px 0 rgba(255,255,255,0.8), 0 -1px 0 rgba(15,23,42,0.05);
   line-height: 0.9;
-  height: 135px;
+  /* FIXED: Increased height so bottom isn't cut off */
+  height: 160px; 
   overflow: hidden;
 }
 
@@ -132,10 +133,10 @@ body{
   transition: transform 0.8s cubic-bezier(0.18, 0.89, 0.32, 1.15);
   will-change: transform;
 }
-.ticker-num { height: 135px; display: flex; align-items: center; justify-content: center; }
+.ticker-num { height: 160px; display: flex; align-items: center; justify-content: center; } /* Matched height */
 
 .weekly-count .label{
-  margin-top:10px;
+  margin-top:0px; /* Reduced since number is bigger */
   font-size:16px;
   font-weight:400;
   color:rgba(100,116,139,0.65);
@@ -573,8 +574,9 @@ body{
 
 /* NEW MODAL FOOTER (Sticky Bottom) */
 .modal-footer {
-  padding: 16px 18px 34px;
-  border-top: 1px solid rgba(15,23,42,0.06);
+  /* FIXED: 16px from bottom, no top border */
+  padding: 0 18px 16px; 
+  border-top: none;
   background: #fff;
   flex-shrink: 0;
   z-index: 20;
@@ -657,6 +659,13 @@ body{
   z-index: 1;
 }
 .item .reps { width: 100%; text-align: center; font-size: 15px; color: var(--sub); }
+
+/* Make inputs look like normal text when disabled */
+.item input:disabled {
+    color: var(--ink);
+    -webkit-text-fill-color: var(--ink);
+    opacity: 1;
+}
 
 .trash {
   height:36px; width:36px; border:none; border-radius:8px; background:#ffe0e0;
@@ -2091,11 +2100,13 @@ body{
               isEditing = false;
               listEl.classList.remove("editing");
               editListBtn.textContent = "Edit";
+              renderList(); // Re-render to disable inputs
           } else {
               // "Edit" Clicked -> Enter mode
               isEditing = true;
               listEl.classList.add("editing");
               editListBtn.textContent = "Save";
+              renderList(); // Re-render to enable inputs
           }
       });
       
@@ -2129,7 +2140,11 @@ body{
           if(item.hidden) wrap.classList.add("hidden-exercise");
           wrap.className = "item " + (item.hidden ? "hidden-exercise" : "");
           
-          const name = document.createElement("input"); name.className = "name"; name.value = item.name || "";
+          const name = document.createElement("input"); 
+          name.className = "name"; 
+          name.value = item.name || "";
+          name.disabled = !isEditing; // Disabled if not editing
+          
           name.addEventListener("input", ()=>{ 
               tempLibrary[activeTab][idx].name = name.value; 
               isDirty = true; 
@@ -2139,6 +2154,7 @@ body{
           minInput.className = "reps"; 
           minInput.placeholder = "Min";
           minInput.value = item.minReps || item.reps || ""; 
+          minInput.disabled = !isEditing; // Disabled if not editing
           
           minInput.addEventListener("change", ()=>{ 
               const val = minInput.value.trim();
@@ -2159,6 +2175,7 @@ body{
           maxInput.className = "reps"; 
           maxInput.placeholder = "Max";
           maxInput.value = item.maxReps || "";
+          maxInput.disabled = !isEditing; // Disabled if not editing
           
           maxInput.addEventListener("change", ()=>{ 
               const val = maxInput.value.trim();
