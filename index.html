@@ -17,15 +17,6 @@
   --card:#ffffff;
   --shadow-soft:0 18px 48px rgba(15,23,42,0.12);
 
-  --tag-purple-bg:#ede9fe; --tag-purple-ink:#6d28d9;
-  --tag-green-bg:#dcfce7;  --tag-green-ink:#16a34a;
-  --tag-blue-bg:#e4ecff;   --tag-blue-ink:#2453f5;
-  --tag-pink-bg:#ffe4f1;   --tag-pink-ink:#be185d;
-  --tag-orange-bg:#ffe6bf; --tag-orange-ink:#b45309;
-  --tag-teal-bg:#d1fae5;   --tag-teal-ink:#0f766e;
-  --tag-red-bg:#ffe0e0;    --tag-red-ink:#dc2626;
-  --tag-yellow-bg:#fef3c7; --tag-yellow-ink:#a16207;
-
   --radius:18px;
    
   /* UI System Colors */
@@ -210,24 +201,15 @@ body{
   border-bottom:0px solid rgba(15,23,42,0.04);
 }
 .row:last-child{ border-bottom:none; }
-.row-left{ display:flex; align-items:center; gap:10px; min-width:0; }
-.row-text{ font-size:16px; font-weight:400; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.tags{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
-.pill{
-  padding:6px 12px;
-  border-radius:999px;
-  font-size:14px;
-  font-weight:500;
-  line-height:1;
-  white-space:nowrap;
-}
+.row-left{ display:flex; align-items:center; gap:10px; min-width:0; flex: 1; } /* Added flex:1 */
+.row-text{ font-size:16px; font-weight:400; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width: 100%; }
 
-.pill-pull{ background:var(--tag-green-bg); color:var(--tag-green-ink); }
-.pill-push{ background:var(--tag-blue-bg); color:var(--tag-blue-ink); }
-.pill-shoulders{ background:var(--tag-pink-bg); color:var(--tag-pink-ink); }
-.pill-legs{ background:var(--tag-orange-bg); color:var(--tag-orange-ink); }
-.pill-abs{ background:var(--tag-teal-bg); color:var(--tag-teal-ink); }
-.pill-cardio{ background:var(--tag-yellow-bg); color:var(--tag-yellow-ink); }
+/* NEW TAG STYLE (Text based, no box) */
+.row-tag {
+  color: #94a3b8;
+  font-weight: 500;
+  margin-left: 2px;
+}
 
 .plan-btn{
   margin-top:14px;
@@ -479,7 +461,7 @@ body{
 #confettiCanvas{ position:fixed; left:0; top:0; width:100vw; height:100vh; pointer-events:none; z-index:2000; transition: z-index 0s; }
 
 /* =========================================================
-   UPDATED MODAL SYSTEM (Smooth Transitions)
+   UPDATED MODAL SYSTEM
 ========================================================= */
 
 /* Base Modal (The Dimmer) */
@@ -582,8 +564,7 @@ body{
   display:grid; grid-template-columns:1fr 44px 44px; gap:12px;
   margin-bottom: 16px;
 }
-#addMin{ width:44px; padding:0; text-align:center; }
-#addMax{ width:44px; padding:0; text-align:center; }
+#addReps{ width:60px; min-width:44px; max-width:44px; padding:0; text-align:center; }
 #addName{ min-width:0; }
 
 .input{
@@ -1095,7 +1076,7 @@ body{
       };
 
       const LS = {
-        library:   "jy_library_v4", // Updated version for new structure
+        library:   "jy_library_v4", 
         streak:    "jy_streak_v1",
         weekKey:   "jy_weekKey_v1",
         weekCount: "jy_weekCount_v1",
@@ -1498,14 +1479,9 @@ body{
         if(activeTags.length === 0) return null; 
 
         const count = wizCount || 3;
-        
-        // Safety: If requested exercises < number of categories, just return a random slice
-        // BUT we want to prioritize variety.
         let selectedExercises = [];
         let usedNames = new Set();
 
-        // 1. Guaranteed One Per Category (if count allows)
-        // Shuffle activeTags so if count < categories, we pick random categories
         for (let i = activeTags.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [activeTags[i], activeTags[j]] = [activeTags[j], activeTags[i]];
@@ -1514,21 +1490,13 @@ body{
         for (const tag of activeTags) {
             if (selectedExercises.length >= count) break;
             const pool = tagPools[tag];
-            // Pick random from pool
-            const randomEx = pool[Math.floor(Math.random() * pool.length)];
-            // To allow duplicates if needed? No, let's try unique first.
-            // Actually, for a single workout, unique names is better.
-            
-            // Simple approach: pick one that hasn't been used if possible
             let available = pool.filter(e => !usedNames.has(e.name));
-            if(available.length === 0) available = pool; // fallback
-            
+            if(available.length === 0) available = pool;
             const picked = available[Math.floor(Math.random() * available.length)];
             selectedExercises.push(picked);
             usedNames.add(picked.name);
         }
 
-        // 2. Fill Remainder (if any slots left)
         if (selectedExercises.length < count) {
             let remainingPool = [];
             activeTags.forEach(tag => {
@@ -1539,14 +1507,12 @@ body{
                 });
             });
 
-            // If we ran out of unique exercises, allow duplicates from original pools
             if (remainingPool.length === 0) {
                  activeTags.forEach(tag => {
                     tagPools[tag].forEach(ex => remainingPool.push(ex));
                 });
             }
 
-            // Shuffle remaining pool
             for (let i = remainingPool.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [remainingPool[i], remainingPool[j]] = [remainingPool[j], remainingPool[i]];
@@ -1554,20 +1520,17 @@ body{
 
             const needed = count - selectedExercises.length;
             for(let i=0; i<needed; i++) {
-                // If pool is small, cycle
                 const ex = remainingPool[i % remainingPool.length];
                 selectedExercises.push(ex);
             }
         }
 
-        // 3. Final Shuffle so it's not Category A, Category B, Category C in order
         for (let i = selectedExercises.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [selectedExercises[i], selectedExercises[j]] = [selectedExercises[j], selectedExercises[i]];
         }
 
         const rows = selectedExercises.map(ex => {
-          // Range Logic
           let repsToDisplay = "";
           if (ex.minReps && ex.maxReps) {
               const min = parseInt(ex.minReps);
@@ -1652,7 +1615,6 @@ body{
           if (audioCtx.state === 'suspended') audioCtx.resume();
       }
 
-      // --- BOXING BELL (DING DING DING) ---
       function playBoxingBell() {
           try {
               if(!audioCtx) initAudio();
@@ -2016,16 +1978,30 @@ body{
         cardRows.innerHTML = "";
         workout.rows.forEach(r=>{
           const row = document.createElement("div"); row.className = "row";
+          
           const left = document.createElement("div"); left.className = "row-left";
+          
+          // NEW RENDER LOGIC: Text + Dash + Tag
           const txt = document.createElement("div"); txt.className = "row-text";
-          txt.textContent = r.text; txt.dataset.base = r.text;
+          
+          // Get the tag name
+          const tagName = r.tags.length > 0 ? r.tags[0] : "";
+          // Capitalize
+          const prettyTag = tagName ? (tagName.charAt(0).toUpperCase() + tagName.slice(1)) : "";
+          
+          // Create inner HTML for the text line
+          // e.g. "10 Pull-Ups <span class='row-tag'>— Pull</span>"
+          let htmlContent = r.text;
+          if (prettyTag) {
+              htmlContent += `<span class="row-tag"> — ${prettyTag}</span>`;
+          }
+          txt.innerHTML = htmlContent; 
+          
           left.appendChild(txt);
-          const tags = document.createElement("div"); tags.className = "tags";
-          r.tags.forEach(tag=>{
-            const pill = document.createElement("span"); pill.className = `pill ${pillForTag(tag)}`;
-            pill.textContent = tag; tags.appendChild(pill);
-          });
-          row.appendChild(left); row.appendChild(tags);
+          row.appendChild(left);
+          
+          // Removed the separate tags div creation
+          
           cardRows.appendChild(row);
         });
         card.classList.remove("hidden");
@@ -2168,22 +2144,19 @@ body{
                  );
                  return;
              }
-             // Otherwise (Running or Paused with time), sliding acts as the "STOP" button -> Complete
-             // We let it fall through to completeWorkout() below.
+             // Otherwise, fall through to complete
           }
           
           // 2. AMRAP LOGIC
           else {
              // If never started OR Time still remaining
-             // Note: restTimeLeft is initialized to duration. When finished, it becomes 0.
              if (!currentWorkout.timerActivated || restTimeLeft > 0) {
                  requestAnimationFrame(()=> setSliderProgressImmediate(52));
                  snapBack();
 
-                 // If running, pause it for the modal
-                 if(restTimerInterval) {
-                     clearInterval(restTimerInterval);
-                     isResting = false; // Using isResting variable to track "running" state for AMRAP
+                 if(isResting) {
+                     if(restTimerInterval) clearInterval(restTimerInterval);
+                     isResting = false; 
                      cardTimer.classList.add("paused");
                      cardTimer.textContent = "Resume (" + formatTimerTime(restTimeLeft) + ")";
                  }
@@ -2195,7 +2168,6 @@ body{
                  );
                  return;
              }
-             // If restTimeLeft === 0, it falls through to completeWorkout()
           }
           
           requestAnimationFrame(()=>{ setSliderProgressImmediate(containerWidth); completeWorkout(); });
@@ -2273,34 +2245,34 @@ body{
           currentWorkout.rows.forEach(r => {
              const row = document.createElement("div"); row.className = "row";
              
-             // TEXT
+             // TEXT + DASH TAG
              const left = document.createElement("div"); left.className = "row-left";
              const txt = document.createElement("div"); txt.className = "row-text";
              
+             const tagName = r.tags.length > 0 ? r.tags[0] : "";
+             const prettyTag = tagName ? (tagName.charAt(0).toUpperCase() + tagName.slice(1)) : "";
+             
+             // Calculate Total Reps
+             let displayText = r.text;
              const parts = r.text.match(/^(\d+)\s+(.*)$/);
              if(parts) {
                  const repsPerRound = parseInt(parts[1], 10);
                  const name = parts[2];
                  const totalReps = repsPerRound * rounds;
-                 txt.textContent = `${totalReps} ${name}`;
-             } else {
-                 txt.textContent = r.text; 
+                 displayText = `${totalReps} ${name}`;
              }
+             
+             let htmlContent = displayText;
+             if (prettyTag) {
+                 htmlContent += `<span class="row-tag"> — ${prettyTag}</span>`;
+             }
+             txt.innerHTML = htmlContent; 
+             
              left.appendChild(txt);
              row.appendChild(left);
              
-             // TAGS (FIXED)
-             const tagsDiv = document.createElement("div"); tagsDiv.className = "tags";
-             r.tags.forEach(tag=>{
-                const pill = document.createElement("span"); pill.className = `pill ${pillForTag(tag)}`;
-                pill.textContent = tag; 
-                tagsDiv.appendChild(pill);
-             });
-             row.appendChild(tagsDiv);
-
              // ANIMATION CLASS
              row.className += " result-row";
-             // Staggered delay (0.15s per item)
              row.style.animationDelay = (summaryCardRows.children.length * 0.15) + "s";
 
              summaryCardRows.appendChild(row);
@@ -2368,18 +2340,11 @@ body{
           const name = document.createElement("input"); name.className = "name"; name.value = item.name || "";
           name.addEventListener("input", ()=>{ library[activeTab][idx].name = name.value; saveJSON(LS.library, library); });
           
-          // Legacy support: if no minReps, use reps
+          const repsInput = document.createElement("input"); 
+          repsInput.className = "reps"; 
           let valStr = "";
           if (item.minReps && item.maxReps) valStr = `${item.minReps}-${item.maxReps}`;
           else valStr = item.reps || "";
-
-          // We display the range as text in a small input or div, but for editing ranges 
-          // simply using one input field for "Range" (e.g. "5-10") is easier than split inputs in the list.
-          // Let's stick to the single input for list editing to save space, but parse it.
-          
-          // Actually, let's keep it simple: Just show the range string in the input.
-          const repsInput = document.createElement("input"); 
-          repsInput.className = "reps"; 
           repsInput.value = valStr;
           repsInput.placeholder = "5-10";
           
@@ -2414,8 +2379,6 @@ body{
       }
 
       const checkAddButtonState = () => {
-        // Valid if Name is present AND (Min exists OR Max exists)
-        // Actually, let's just require Name and Min at least.
         addBtn.disabled = !(addName.value.trim().length > 0 && addMin.value.trim().length > 0);
       };
 
