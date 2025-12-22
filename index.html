@@ -2060,216 +2060,9 @@ body{
           renderHistoryContent();
         });
       });
-
-      /* =========================================================
-         EXERCISE MODAL (EDIT & MANUAL SAVE)
-      ========================================================= */
-      const TAB_ORDER = ["push","pull","legs","shoulders","abs","cardio"];
-      let activeTab = "push";
-      let isEditing = false;
-      let tempLibrary = null;
-      let isDirty = false;
-
-      function openModal(){ 
-          modal.classList.add("show");
-          // DEEP CLONE to temp
-          tempLibrary = JSON.parse(JSON.stringify(library));
-          isDirty = false;
-          renderTabs(); 
-          renderList(); 
-      }
-      
-      // Close function now handles checking dirty state
-      function closeModalFn(force = false){ 
-          if (!force && isDirty) {
-              showUnsavedConfirm();
-              return;
-          }
-          
-          modal.classList.remove("show"); 
-          // Reset edit state on close
-          isEditing = false;
-          listEl.classList.remove("editing");
-          editListBtn.textContent = "Edit";
-          // Discard temp changes (next open re-clones from LS)
-          tempLibrary = null; 
-          isDirty = false;
-      }
-      
-      // Toggle Edit Mode Logic
-      editListBtn.addEventListener("click", () => {
-          if (isEditing) {
-              // "Save" Clicked -> Commit changes
-              library = JSON.parse(JSON.stringify(tempLibrary)); // Commit temp to main
-              saveJSON(LS.library, library);
-              isDirty = false;
-              
-              isEditing = false;
-              listEl.classList.remove("editing");
-              editListBtn.textContent = "Edit";
-              renderList(); // Re-render to disable inputs
-          } else {
-              // "Edit" Clicked -> Enter mode
-              isEditing = true;
-              listEl.classList.add("editing");
-              editListBtn.textContent = "Save";
-              renderList(); // Re-render to enable inputs
-          }
-      });
-      
-      modalBackBtn.addEventListener("click", () => {
-          closeModalFn();
-      });
-
-      exerciseBtn.addEventListener("click", openModal);
-      // modal.addEventListener("click",(e)=>{ if(e.target === modal) closeModalFn(); }); // Optional: Click outside closes? Better disable for dirty check.
-      
-      function renderTabs(){
-        tabsEl.innerHTML = "";
-        TAB_ORDER.forEach(k=>{
-          const b = document.createElement("button"); b.className = "tab" + (k===activeTab ? " active":"");
-          b.textContent = k; b.addEventListener("click", ()=>{ activeTab = k; renderTabs(); renderList(); });
-          tabsEl.appendChild(b);
-        });
-      }
-
-      function renderList(){
-        listEl.innerHTML = "";
-        // Use TEMP library for rendering
-        const arr = tempLibrary[activeTab] || [];
-        if(!tempLibrary[activeTab]) tempLibrary[activeTab]=[];
-        
-        if (isEditing) listEl.classList.add("editing");
-        else listEl.classList.remove("editing");
-
-        arr.forEach((item, idx)=>{
-          const wrap = document.createElement("div");
-          if(item.hidden) wrap.classList.add("hidden-exercise");
-          wrap.className = "item " + (item.hidden ? "hidden-exercise" : "");
-          
-          const name = document.createElement("input"); 
-          name.className = "name"; 
-          name.value = item.name || "";
-          name.disabled = !isEditing; // Disabled if not editing
-          
-          name.addEventListener("input", ()=>{ 
-              tempLibrary[activeTab][idx].name = name.value; 
-              isDirty = true; 
-          });
-          
-          const minInput = document.createElement("input"); 
-          minInput.className = "reps"; 
-          minInput.placeholder = "Min";
-          minInput.value = item.minReps || item.reps || ""; 
-          minInput.disabled = !isEditing; // Disabled if not editing
-          
-          minInput.addEventListener("change", ()=>{ 
-              const val = minInput.value.trim();
-              tempLibrary[activeTab][idx].minReps = val;
-              delete tempLibrary[activeTab][idx].reps;
-              isDirty = true;
-          });
-
-          const dash = document.createElement("span");
-          dash.className = "dash-sep";
-          dash.textContent = "-";
-          dash.style.fontSize = "18px";
-          dash.style.fontWeight = "700";
-          dash.style.color = "#cbd5e1";
-          dash.style.textAlign = "center";
-
-          const maxInput = document.createElement("input"); 
-          maxInput.className = "reps"; 
-          maxInput.placeholder = "Max";
-          maxInput.value = item.maxReps || "";
-          maxInput.disabled = !isEditing; // Disabled if not editing
-          
-          maxInput.addEventListener("change", ()=>{ 
-              const val = maxInput.value.trim();
-              tempLibrary[activeTab][idx].maxReps = val;
-              isDirty = true;
-          });
-          
-          const eyeBtn = document.createElement("button"); eyeBtn.className = "visibility-btn";
-          eyeBtn.innerHTML = item.hidden ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>` : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
-          eyeBtn.addEventListener("click", (e) => { 
-              e.stopPropagation(); 
-              item.hidden = !item.hidden; 
-              // Update temp, dirty, re-render
-              tempLibrary[activeTab][idx].hidden = item.hidden;
-              isDirty = true;
-              renderList(); 
-          });
-
-          const del = document.createElement("button"); del.className = "trash"; del.textContent = "×";
-          del.addEventListener("click", (e)=>{
-            e.stopPropagation(); e.preventDefault();
-            // Delete from temp immediately
-            tempLibrary[activeTab].splice(idx, 1);
-            isDirty = true;
-            renderList();
-          });
-
-          wrap.appendChild(name); 
-          wrap.appendChild(minInput); 
-          wrap.appendChild(dash); 
-          wrap.appendChild(maxInput); 
-          wrap.appendChild(eyeBtn); 
-          wrap.appendChild(del);
-          listEl.appendChild(wrap);
-        });
-      }
-
-      const checkAddButtonState = () => {
-        addBtn.disabled = !(addName.value.trim().length > 0 && addMin.value.trim().length > 0);
-      };
-
-      addName.addEventListener('input', checkAddButtonState);
-      addMin.addEventListener('input', checkAddButtonState);
-      addMax.addEventListener('input', checkAddButtonState);
-
-      addBtn.disabled = true;
-
-      addBtn.addEventListener("click", ()=>{
-        const n = (addName.value||"").trim(); 
-        const min = (addMin.value||"").trim();
-        const max = (addMax.value||"").trim();
-        
-        if(!n || !min) return;
-        
-        if(!tempLibrary[activeTab]) tempLibrary[activeTab]=[];
-        
-        let newEx = { name: n, hidden: false };
-        newEx.minReps = min;
-        if(max) newEx.maxReps = max;
-        
-        tempLibrary[activeTab].unshift(newEx);
-        isDirty = true;
-       
-        addName.value="";
-        addMin.value="";
-        addMax.value="";
-        addBtn.disabled = true;
-
-        renderList();
-      });
-
-      function init() {
-        ensureWeekState();
-        renderStreakUI();
-        updateExerciseButtonLabel();
-        renderInitialCounter(String(getTotalDays()));
-
-        const savedWorkout = loadJSON(LS.currentWorkout, null);
-        if (savedWorkout) {
-          currentWorkout = savedWorkout;
-          showWorkoutState(savedWorkout);
-        } else {
-          showWeeklyCenter();
-        }
-      }
+<script>
 /* =========================================================
-   MISSING FUNCTIONS (MINIMAL IMPLEMENTATIONS)
+   MISSING FUNCTIONS (FIXED UI STATE)
 ========================================================= */
 
 let currentRounds = 0;
@@ -2280,58 +2073,89 @@ function showMesh(on){
 }
 
 function showWeeklyCenter(){
+  // HOME STATE
   weeklyCenter.classList.remove("hidden");
+
+  // Hide workout card
   card.classList.add("hidden");
   card.classList.remove("visible");
   cardTimerWrap.classList.add("hidden");
+
+  // Show home buttons
+  planTriggerBtn.classList.remove("hidden");
+  exerciseBtn.classList.remove("hidden");
+
+  // Hide workout-only UI
+  slideWrap.classList.remove("show");
+  roundCounterControl.classList.remove("visible");
+  roundCounterControl.classList.add("disabled-state");
+  roundMinus.disabled = true;
+  roundPlus.disabled = true;
+
+  actionsArea.classList.remove("faded");
+  historyBtn.classList.remove("hidden");
 }
 
 function showWorkoutState(workout){
-  // Hide big weekly counter, show workout card
+  // WORKOUT STATE
   weeklyCenter.classList.add("hidden");
 
+  // Show workout card
   card.classList.remove("hidden");
   requestAnimationFrame(()=> card.classList.add("visible"));
 
+  // Hide home buttons
+  planTriggerBtn.classList.add("hidden");
+  exerciseBtn.classList.add("hidden");
+
+  // Show workout-only UI
+  slideWrap.classList.add("show");
+  roundCounterControl.classList.add("visible");
+
+  // Disable rounds until timer starts
+  roundCounterControl.classList.add("disabled-state");
+  roundMinus.disabled = true;
+  roundPlus.disabled = true;
+
+  // Render workout
   cardTitle.textContent = workout.type || "Workout";
   cardRows.innerHTML = "";
 
   (workout.rows || []).forEach(r=>{
     const row = document.createElement("div");
     row.className = "row";
-    row.innerHTML = `<div class="row-left"><div class="row-text">${r.text}</div></div>`;
+    row.innerHTML = `
+      <div class="row-left">
+        <div class="row-text">${r.text}</div>
+      </div>`;
     cardRows.appendChild(row);
   });
 
-  // Reset/restore rounds
+  // Restore rounds
   currentRounds = workout.roundsDone || 0;
   updateRoundBtn();
 
-  // Show timer button
+  // Show timer
   cardTimerWrap.classList.remove("hidden");
 
-  // Set correct timer button label
+  // Restore timer state
   if (workout.type === "Metabolic Conditioning") {
-    cardTimer.textContent = "Start Workout";
-    // If a metacon is running from before, keep it live
+    resetMetaconUI();
+
     if (metaconState?.running) {
       cardTimer.classList.add("active");
       if (metaconTimerInterval) clearInterval(metaconTimerInterval);
       metaconTimerInterval = setInterval(updateMetaconDisplay, 100);
       updateMetaconDisplay();
-    } else {
-      resetMetaconUI();
     }
   } else {
-    // AMRAP duration label
     resetAmrapUI();
 
-    // Restore timeLeft if saved
     if (typeof workout.timeLeft === "number") {
       restTimeLeft = workout.timeLeft;
-      if (workout.timerActivated) enableRoundButtons();
-      if (workout.timeLeft > 0 && workout.timerActivated) {
-        // Don’t auto-run timer (you can change this if you want)
+
+      if (workout.timerActivated) {
+        enableRoundButtons();
         cardTimer.textContent = formatTimerTime(restTimeLeft);
       }
     }
@@ -2339,35 +2163,36 @@ function showWorkoutState(workout){
 }
 
 function triggerHomeTransition(){
-  // Clear current workout and return to home counter
+  // Clear current workout
   currentWorkout = null;
   localStorage.removeItem(LS.currentWorkout);
 
-  // Reset timers UI
+  // Stop timers
+  if (restTimerInterval) clearInterval(restTimerInterval);
+  if (metaconTimerInterval) clearInterval(metaconTimerInterval);
+
+  isResting = false;
+  restTimeLeft = 20;
+
+  // Reset metacon state
+  metaconState = { running:false, startTime:0, accumulated:0 };
+  saveJSON(LS.metaconState, metaconState);
+
+  // Reset UI
   resetMetaconUI();
   resetAmrapUI();
 
-  // Disable rounds UI again
-  roundCounterControl.classList.add("disabled-state");
-  roundMinus.disabled = true;
-  roundPlus.disabled = true;
   currentRounds = 0;
   updateRoundBtn();
 
   showWeeklyCenter();
-
-  // restore buttons
-  actionsArea.classList.remove("faded");
-  historyBtn.classList.remove("hidden");
 }
 
 function getTotalDays(){
-  // simple: total sessions logged
   return (metaconHistory?.length || 0) + (workoutHistory?.length || 0);
 }
 
 function renderInitialCounter(totalStr){
-  // Minimal: just show number without fancy ticker animation
   weekNumWrap.innerHTML = `
     <div class="ticker-digit">
       <div class="ticker-track" style="transform:none">
@@ -2377,17 +2202,36 @@ function renderInitialCounter(totalStr){
 }
 
 function ensureWeekState(){
-  // Minimal: make sure required keys exist (prevents null weirdness)
   if (!localStorage.getItem(LS.streak)) saveJSON(LS.streak, { weeks: 0 });
   if (!localStorage.getItem(LS.weekKey)) localStorage.setItem(LS.weekKey, isoWeekKey());
   if (!localStorage.getItem(LS.weekCount)) localStorage.setItem(LS.weekCount, "0");
 }
 
 function renderStreakUI(){
-  // Minimal: just show "0 week streak" if you don’t have full logic
   streakInline.textContent = "0 week streak";
 }
-      init();
-    </script>
-    </body>
-    </html>
+
+/* =========================================================
+   INIT
+========================================================= */
+
+function init() {
+  ensureWeekState();
+  renderStreakUI();
+  updateExerciseButtonLabel();
+  renderInitialCounter(String(getTotalDays()));
+
+  const savedWorkout = loadJSON(LS.currentWorkout, null);
+  if (savedWorkout) {
+    currentWorkout = savedWorkout;
+    showWorkoutState(savedWorkout);
+  } else {
+    showWeeklyCenter();
+  }
+}
+
+init();
+</script>
+</body>
+</html>
+  
