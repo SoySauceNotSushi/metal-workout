@@ -2268,7 +2268,125 @@ body{
           showWeeklyCenter();
         }
       }
+/* =========================================================
+   MISSING FUNCTIONS (MINIMAL IMPLEMENTATIONS)
+========================================================= */
 
+let currentRounds = 0;
+
+function showMesh(on){
+  aiStage.style.display = on ? "block" : "none";
+  aiStage.classList.toggle("show", !!on);
+}
+
+function showWeeklyCenter(){
+  weeklyCenter.classList.remove("hidden");
+  card.classList.add("hidden");
+  card.classList.remove("visible");
+  cardTimerWrap.classList.add("hidden");
+}
+
+function showWorkoutState(workout){
+  // Hide big weekly counter, show workout card
+  weeklyCenter.classList.add("hidden");
+
+  card.classList.remove("hidden");
+  requestAnimationFrame(()=> card.classList.add("visible"));
+
+  cardTitle.textContent = workout.type || "Workout";
+  cardRows.innerHTML = "";
+
+  (workout.rows || []).forEach(r=>{
+    const row = document.createElement("div");
+    row.className = "row";
+    row.innerHTML = `<div class="row-left"><div class="row-text">${r.text}</div></div>`;
+    cardRows.appendChild(row);
+  });
+
+  // Reset/restore rounds
+  currentRounds = workout.roundsDone || 0;
+  updateRoundBtn();
+
+  // Show timer button
+  cardTimerWrap.classList.remove("hidden");
+
+  // Set correct timer button label
+  if (workout.type === "Metabolic Conditioning") {
+    cardTimer.textContent = "Start Workout";
+    // If a metacon is running from before, keep it live
+    if (metaconState?.running) {
+      cardTimer.classList.add("active");
+      if (metaconTimerInterval) clearInterval(metaconTimerInterval);
+      metaconTimerInterval = setInterval(updateMetaconDisplay, 100);
+      updateMetaconDisplay();
+    } else {
+      resetMetaconUI();
+    }
+  } else {
+    // AMRAP duration label
+    resetAmrapUI();
+
+    // Restore timeLeft if saved
+    if (typeof workout.timeLeft === "number") {
+      restTimeLeft = workout.timeLeft;
+      if (workout.timerActivated) enableRoundButtons();
+      if (workout.timeLeft > 0 && workout.timerActivated) {
+        // Don’t auto-run timer (you can change this if you want)
+        cardTimer.textContent = formatTimerTime(restTimeLeft);
+      }
+    }
+  }
+}
+
+function triggerHomeTransition(){
+  // Clear current workout and return to home counter
+  currentWorkout = null;
+  localStorage.removeItem(LS.currentWorkout);
+
+  // Reset timers UI
+  resetMetaconUI();
+  resetAmrapUI();
+
+  // Disable rounds UI again
+  roundCounterControl.classList.add("disabled-state");
+  roundMinus.disabled = true;
+  roundPlus.disabled = true;
+  currentRounds = 0;
+  updateRoundBtn();
+
+  showWeeklyCenter();
+
+  // restore buttons
+  actionsArea.classList.remove("faded");
+  historyBtn.classList.remove("hidden");
+}
+
+function getTotalDays(){
+  // simple: total sessions logged
+  return (metaconHistory?.length || 0) + (workoutHistory?.length || 0);
+}
+
+function renderInitialCounter(totalStr){
+  // Minimal: just show number without fancy ticker animation
+  weekNumWrap.innerHTML = `
+    <div class="ticker-digit">
+      <div class="ticker-track" style="transform:none">
+        <div class="ticker-num">${totalStr}</div>
+      </div>
+    </div>`;
+}
+
+function ensureWeekState(){
+  // Minimal: make sure required keys exist (prevents null weirdness)
+  if (!localStorage.getItem(LS.streak)) saveJSON(LS.streak, { weeks: 0 });
+  if (!localStorage.getItem(LS.weekKey)) localStorage.setItem(LS.weekKey, isoWeekKey());
+  if (!localStorage.getItem(LS.weekCount)) localStorage.setItem(LS.weekCount, "0");
+}
+
+function renderStreakUI(){
+  // Minimal: just show "0 week streak" if you don’t have full logic
+  streakInline.textContent = "0 week streak";
+}
       init();
     </script>
     </body>
