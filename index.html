@@ -284,35 +284,74 @@ body{
 .plan-btn.hidden{ display:none; }
 
 /* Base gold button (already yours) */
+/* ===============================
+   TEST DAY — GOD MODE BUTTON
+================================ */
+
 .plan-option[data-val="metacon"].selected {
   position: relative;
-  background: #FFF8E6;
-  border: 2px solid #F7D47C;
+  background: linear-gradient(180deg, #FFFBEA, #FFF3C4);
+  border: 2px solid #F5D56B;
   color: #B28103;
+  font-weight: 600;
   overflow: hidden;
+  box-shadow:
+    0 0 0 rgba(0,0,0,0),
+    0 8px 24px rgba(245, 213, 107, 0.35);
 }
 
-/* ✨ Sparkle layer */
+/* ✨ PARTICLE LAYER 1 — small stars */
 .plan-option[data-val="metacon"].selected::before {
   content: "";
   position: absolute;
-  inset: 0;
+  inset: -40%;
   background:
-    radial-gradient(circle at 20% 30%, #FFD700 1.5px, transparent 2px),
-    radial-gradient(circle at 70% 20%, #FFE066 1.5px, transparent 2px),
-    radial-gradient(circle at 40% 70%, #FFF3B0 1.5px, transparent 2px),
-    radial-gradient(circle at 80% 60%, #FFD700 1.5px, transparent 2px);
-  background-size: 100% 100%;
-  animation: sparkleFloat 2.2s ease-in-out infinite;
-  pointer-events: none;
+    radial-gradient(circle, #FFD700 1.2px, transparent 2px),
+    radial-gradient(circle, #FFE066 1.2px, transparent 2px),
+    radial-gradient(circle, #FFF3B0 1.2px, transparent 2px);
+  background-size: 80px 80px;
+  animation: goldParticlesSlow 14s linear infinite;
   opacity: 0.9;
+  pointer-events: none;
 }
 
-/* ✨ Gentle shimmer motion */
-@keyframes sparkleFloat {
-  0%   { transform: translateY(0); opacity: 0.7; }
-  50%  { transform: translateY(-2px); opacity: 1; }
-  100% { transform: translateY(0); opacity: 0.7; }
+/* ✨ PARTICLE LAYER 2 — bigger glowing dots */
+.plan-option[data-val="metacon"].selected::after {
+  content: "";
+  position: absolute;
+  inset: -50%;
+  background:
+    radial-gradient(circle, rgba(255,215,0,0.8) 2.2px, transparent 3px),
+    radial-gradient(circle, rgba(255,240,160,0.9) 2.2px, transparent 3px);
+  background-size: 140px 140px;
+  animation: goldParticlesFast 9s linear infinite;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* 🌟 GLOW PULSE */
+.plan-option[data-val="metacon"].selected {
+  animation: goldGlowPulse 3.2s ease-in-out infinite;
+}
+
+/* ===============================
+   ANIMATIONS
+================================ */
+
+@keyframes goldParticlesSlow {
+  0%   { transform: translate(0, 0); }
+  100% { transform: translate(60px, -80px); }
+}
+
+@keyframes goldParticlesFast {
+  0%   { transform: translate(0, 0); }
+  100% { transform: translate(-120px, 100px); }
+}
+
+@keyframes goldGlowPulse {
+  0%   { box-shadow: 0 0 0 rgba(245,213,107,0.25); }
+  50%  { box-shadow: 0 10px 30px rgba(245,213,107,0.55); }
+  100% { box-shadow: 0 0 0 rgba(245,213,107,0.25); }
 }
     
 /* --- GRADIENT --- */
