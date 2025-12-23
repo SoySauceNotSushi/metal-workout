@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,6 +25,9 @@
   --tag-teal-bg:#d1fae5;   --tag-teal-ink:#0f766e;
   --tag-red-bg:#ffe0e0;    --tag-red-ink:#dc2626;
   --tag-yellow-bg:#fef3c7; --tag-yellow-ink:#a16207;
+  
+  /* PB Gold Colors */
+  --tag-gold-bg: #fff7d1;  --tag-gold-ink: #b45309;
 
   --radius:18px;
     
@@ -104,7 +105,8 @@ body{
 }
 
 .train-left{ display:flex; flex-direction:column; gap:8px; width: 100%; }
-.train-title{ font-size:20px; font-weight:600; letter-spacing:-0.02em; }
+.train-title{ font-size:24px; font-weight:700; letter-spacing:-0.02em; }
+.train-sub{ font-size:15px; color:#64748b; line-height:1.4; max-width: 90%; }
 
 .weekly-center{
   position:absolute;
@@ -137,8 +139,9 @@ body{
 
 .ticker-digit { position: relative; height: 100%; display: inline-block; }
 .ticker-track {
-  display: flex; flex-direction: column;
-  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  transform: translateY(0%);
   transition: transform 0.8s cubic-bezier(0.18, 0.89, 0.32, 1.15);
   will-change: transform;
 }
@@ -175,7 +178,8 @@ body{
 .card.visible{ opacity:1; transform:translateY(0) scale(1); }
 .card.hidden{ display:none; }
 
-.card-title{ font-size:20px; font-weight:600; margin:0 0 18px; letter-spacing:-0.03em; }
+.card-title{ font-size:20px; font-weight:700; margin:0 0 4px; letter-spacing:-0.03em; color: var(--ink); }
+.card-sub{ font-size:15px; color:#64748b; margin:0 0 20px; line-height:1.4; }
 
 /* SHARED CARD TIMER (In Card Bottom) */
 .card-timer-wrap {
@@ -190,8 +194,8 @@ body{
 .card-timer {
   background: transparent;
   color: var(--brand);
-  font-size: 17px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 500;
   padding: 10px 24px;
   border-radius: 999px;
   border: none;
@@ -208,20 +212,55 @@ body{
   align-items:center;
   justify-content:space-between;
   gap:12px;
-  padding:10px 0;
+  padding:14px 0;
   border-bottom:0px solid rgba(15,23,42,0.04);
 }
-.row:last-child{ border-bottom:none; }
-.row-left{ display:flex; align-items:center; gap:10px; min-width:0; }
-.row-text{ font-size:16px; font-weight:400; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+/* --- TEST DAY ROW: GRID LAYOUT FOR ALIGNMENT --- */
+.test-row {
+    display: grid;
+    /* 1fr for name, fixed for input, fixed for tag area */
+    grid-template-columns: 1fr 44px 75px;
+    gap: 12px;
+    align-items: center;
+    padding: 14px 0;
+}
+
+.row:last-child, .test-row:last-child { border-bottom:none; }
+
+.row-left{ display:flex; flex-direction:column; gap:2px; min-width:0; flex:1; }
+.row-text{ font-size:16px; font-weight:400; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color: #334155; }
+.row-sub{ font-size:13px; color: #94a3b8; font-weight:500; }
+
+/* INPUT FOR REPS */
+.rep-input {
+    width: 44px;
+    height: 44px;
+    background: #f8fafc;
+    border: none;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--brand);
+    outline: none;
+    padding: 0;
+    -moz-appearance: textfield;
+}
+.rep-input:focus { background: #e2e8f0; }
+
 .tags{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+/* Forced right alignment for test grid */
+.test-row .tags { justify-content: flex-end; width: 100%; }
+
 .pill{
   padding:6px 12px;
   border-radius:999px;
-  font-size:14px;
-  font-weight:500;
+  font-size:13px;
+  font-weight:700;
   line-height:1;
   white-space:nowrap;
+  text-transform: capitalize;
 }
 
 .pill-pull{ background:var(--tag-green-bg); color:var(--tag-green-ink); }
@@ -230,7 +269,7 @@ body{
 .pill-legs{ background:var(--tag-orange-bg); color:var(--tag-orange-ink); }
 .pill-abs{ background:var(--tag-teal-bg); color:var(--tag-teal-ink); }
 .pill-cardio{ background:var(--tag-yellow-bg); color:var(--tag-yellow-ink); }
-
+.pill-pb{ background:var(--tag-gold-bg); color:var(--tag-gold-ink); }
 .plan-btn{
   margin-top:14px;
   width:100%;
@@ -244,6 +283,38 @@ body{
 }
 .plan-btn.hidden{ display:none; }
 
+/* Base gold button (already yours) */
+.plan-option[data-val="metacon"].selected {
+  position: relative;
+  background: #FFF8E6;
+  border: 2px solid #F7D47C;
+  color: #B28103;
+  overflow: hidden;
+}
+
+/* ✨ Sparkle layer */
+.plan-option[data-val="metacon"].selected::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 30%, #FFD700 1.5px, transparent 2px),
+    radial-gradient(circle at 70% 20%, #FFE066 1.5px, transparent 2px),
+    radial-gradient(circle at 40% 70%, #FFF3B0 1.5px, transparent 2px),
+    radial-gradient(circle at 80% 60%, #FFD700 1.5px, transparent 2px);
+  background-size: 100% 100%;
+  animation: sparkleFloat 2.2s ease-in-out infinite;
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+/* ✨ Gentle shimmer motion */
+@keyframes sparkleFloat {
+  0%   { transform: translateY(0); opacity: 0.7; }
+  50%  { transform: translateY(-2px); opacity: 1; }
+  100% { transform: translateY(0); opacity: 0.7; }
+}
+    
 /* --- GRADIENT --- */
 .ai-stage{
   position:absolute;
@@ -405,11 +476,32 @@ body{
 
 .btn.hidden{ display:none; }
 
+/* REST BUTTON (Bottom) */
+.rest-btn {
+  width: 100%;
+  height: 52px;
+  border: none;
+  border-radius: 999px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--brand);
+  color: white;
+  margin-bottom: 16px; /* Space before slider */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s;
+}
+.rest-btn:active { transform: scale(0.98); }
+.rest-btn.active-timer { background: #eef2ff; color: var(--brand); }
+.rest-btn.hidden { display: none; }
+
 /* --- STRETCHY SLIDER CSS --- */
 .slide-wrap {
   width: 100%;
   height: 52px;
-  margin-top: 16px;
+  /* margin-top: 16px; REMOVED to handle dynamic rest button spacing */
   border-radius: 999px;
   background: #f7f8f9;
   position: relative;
@@ -478,7 +570,8 @@ body{
 }
 
 /* Confetti canvas */
-#confettiCanvas{ position:fixed; left:0; top:0; width:100vw; height:100vh; pointer-events:none; z-index:2; transition: z-index 0s; }
+#confettiCanvas{ position:fixed; left:0; top:0; width:100vw; height:100vh; pointer-events:none; z-index:2000; transition: z-index 0s; }
+
 /* =========================================================
    UPDATED MODAL SYSTEM (Smooth Transitions)
 ========================================================= */
@@ -624,7 +717,90 @@ body{
 .plan-name{ font-size:16px; font-weight:400; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
 /* --- HISTORY ROW STYLES --- */
-.history-list{ display:flex; flex-direction:column; gap:12px; }
+    /* Force Test Day title + date to be LEFT aligned */
+    .history-row-test .history-left {
+      align-items: flex-start !important;
+      text-align: left !important;
+    }
+
+    .history-row-test .history-time,
+    .history-row-test .history-date {
+      text-align: left !important;
+    }
+    
+    
+    /* --- Test Day Results (Expandable) --- */
+    .history-results{
+      margin-top:10px;
+      padding-top:8px;
+      border-top:1px solid rgba(15,23,42,0.06);
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .history-results.hidden{ display:none; }
+
+    .history-result-row{
+      display:flex;
+      justify-content:space-between;
+      font-size:14px;
+      color:#334155;
+    }
+    .history-result-row .res-name{ font-weight:500; }
+    .history-result-row .res-reps{ font-weight:700; color:#0f172a; }
+    
+    
+    
+.history-list{ display:flex; flex-direction:column; gap:12px; }|
+
+/* Test Day results should be left-aligned, not spaced */
+.history-row-test .history-result-row {
+  justify-content: flex-start;
+  gap: 12px;
+}
+    
+.history-row-test .history-results {
+    align-items: flex-start;
+    text-align: left;
+}
+
+.history-row-test .history-results {
+  width: 100%;
+}
+
+/* --- Test Day History Layout (Stacked) --- */
+.history-row-test {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+    /* Force left alignment for Test Day history */
+    .history-row-test {
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    .history-row-test .history-left {
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    .history-row-test .history-time,
+    .history-row-test .history-date {
+      text-align: left;
+    }
+    
+/* Left block stays left-aligned */
+.history-row-test .history-left {
+  align-items: flex-start;
+}
+
+/* Right block moves below title/date */
+.history-row-test .history-right {
+  width: 100%;
+  justify-content: flex-end;
+}
 
 .history-row{
   display:flex;
@@ -723,23 +899,64 @@ body{
 }
 .pb-overlay.show { visibility: visible; opacity: 1; pointer-events: auto; }
 
+/* SUMMARY OVERLAY & CARD SIZING */
 .pb-card {
-  width: 100%; height: 92vh; background: #fff; border-radius: 28px 28px 0 0;
-  padding: 32px 24px 24px; text-align: center; box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
-  transform: scale(0.95) translateY(15px); transform-origin: bottom center;
-  opacity: 0; transition: all 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.15);
+  width: 100%;
+  height: auto;
+  max-height: 85vh; /* Responsive Height */
+  background: #fff;
+  border-radius: 28px 28px 0 0;
+  padding: 32px 24px 24px;
+  text-align: center;
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
+  transform: scale(0.95) translateY(15px);
+  transform-origin: bottom center;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.15);
   padding-bottom: calc(24px + env(safe-area-inset-bottom));
-  display: flex; flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
-.pb-card.short-sheet { height: auto; min-height: 250px; }
+.pb-card.short-sheet { min-height: 250px; }
 .pb-overlay.show .pb-card { transform: scale(1) translateY(0); opacity: 1; }
 
 .pb-title { font-size: 24px; font-weight: 600; color: #0f172a; margin: 0 0 8px; letter-spacing: -0.02em; }
 .pb-time { font-size: 52px; font-weight: 500; color: var(--brand); letter-spacing: -1.5px; margin: 8px 0; line-height: 1; }
-.pb-sub { font-size: 16px; color: #64748b; margin-bottom: 24px; font-weight: 500; }
+/* Left Align and Bold */
+.pb-sub {
+    font-size: 16px;
+    color: #64748b;
+    font-weight: 600;
+    text-align: left;
+    width: 100%;
+}
+/* Specific Spacing for Summary Card Subheader */
+#summaryOverlay .pb-sub {
+    margin-top: 24px;
+    margin-bottom: 16px;
+}
 
-.pb-workout-list { flex: 1; overflow-y: auto; background: transparent; border: none; padding: 0; margin-bottom: 20px; text-align: left; }
+.pb-workout-list {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin-bottom: 20px;
+  text-align: left;
+}
 .pb-workout-list .row { border-bottom: none; padding: 8px 0; }
+
+/* RESULT ROW ANIMATION */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.result-row {
+  animation: fadeInUp 0.4s ease forwards;
+  opacity: 0;
+}
 
 .pb-btn {
   width: 100%; height: 56px; background: var(--brand); color: #fff;
@@ -823,7 +1040,7 @@ body{
 
 <body>
     <audio id="successAudio" src="success.mp3" preload="auto"></audio>
-   
+    
     <div class="modal" id="historyModal">
         <div class="modal-sheet">
             <div class="modal-head history-head-layout">
@@ -835,7 +1052,7 @@ body{
                 <div style="width:70px"></div>
             </div>
             <div class="tabs" id="historyTabs">
-                <button class="tab active" data-tab="metacon">Metacon</button>
+                <button class="tab active" data-tab="metacon">Test Day</button>
                 <button class="tab" data-tab="training">Training</button>
             </div>
             <div class="modal-body">
@@ -843,17 +1060,26 @@ body{
             </div>
         </div>
     </div>
-   
+    
     <div class="pb-overlay" id="pbOverlay">
         <div class="pb-card">
-            <div class="pb-title" id="pbTitle">New Personal Best!</div>
+            <div class="pb-title">New Personal Best!</div>
             <div class="pb-time" id="pbTimeDisplay">0:00</div>
             <div class="pb-sub" id="pbPrevDisplay">Previous: 0:00</div>
             <div id="pbCardRows" class="pb-workout-list"></div>
             <button class="pb-btn hidden-state" id="pbCloseBtn">Awesome</button>
         </div>
     </div>
-   
+
+    <div class="pb-overlay" id="summaryOverlay">
+        <div class="pb-card">
+            <div class="pb-time" id="summaryRounds">0 Rounds</div>
+            <div class="pb-sub">Results</div>
+            <div id="summaryCardRows" class="pb-workout-list"></div>
+            <button class="pb-btn" id="summaryCloseBtn">Finish</button>
+        </div>
+    </div>
+    
     <div class="pb-overlay" id="errorOverlay">
         <div class="pb-card short-sheet">
             <div class="pb-title">Oops not enough exercises</div>
@@ -861,7 +1087,7 @@ body{
             <button class="pb-btn" id="errorCloseBtn">Okay</button>
         </div>
     </div>
-   
+    
     <div class="pb-overlay" id="planSheetOverlay">
         <div class="pb-card wizard-sheet">
             <div class="wizard-head">
@@ -877,7 +1103,7 @@ body{
                         <button class="plan-option" data-val="shoulders">Shoulders</button>
                         <button class="plan-option" data-val="abs">Abs</button>
                         <button class="plan-option" data-val="cardio">Cardio</button>
-                        <button class="plan-option" data-val="metacon">Metacon</button>
+                        <button class="plan-option" data-val="metacon">Test Day</button>
                     </div>
                 </div>
                
@@ -895,6 +1121,18 @@ body{
                         <button class="plan-option" data-val="10">10 Exercises</button>
                     </div>
                 </div>
+
+                <div class="wizard-step" id="wizStep3">
+                    <div class="plan-grid">
+                        <button class="plan-option" data-val="10">10s (Test)</button>
+                        <button class="plan-option" data-val="300">5 minutes</button>
+                        <button class="plan-option" data-val="600">10 minutes</button>
+                        <button class="plan-option" data-val="900">15 minutes</button>
+                        <button class="plan-option" data-val="1200">20 minutes</button>
+                        <button class="plan-option" data-val="1500">25 minutes</button>
+                        <button class="plan-option" data-val="1800">30 minutes</button>
+                    </div>
+                </div>
             </div>
            
             <div class="wizard-footer">
@@ -903,13 +1141,14 @@ body{
             </div>
         </div>
     </div>
-   
+    
     <canvas id="confettiCanvas"></canvas>
-   
+    
     <div class="container">
         <div class="train-header" id="focusPicker">
             <div class="train-left">
                 <div class="train-title"></div>
+                <div class="train-sub"></div>
             </div>
             <button class="history-btn" id="historyBtn">History</button>
         </div>
@@ -917,26 +1156,24 @@ body{
         <div class="center">
             <div class="ai-stage" id="aiStage"></div>
             <div class="weekly-center" id="weeklyCenter">
-                <div class="weekly-count">
-                    <div class="num-wrap" id="weekNumWrap">
-                        <div class="ticker-digit">
-                            <div class="ticker-track"><div class="ticker-num">0</div></div>
-                        </div>
-                    </div>
-                    <div class="label" id="weekLabel">
-                        <span id="weekLabelText">workouts completed</span>
-                        <span class="dot">·</span>
-                        <span class="streak-inline" id="streakInline">0 week streak</span>
-                    </div>
+              <div class="weekly-count">
+                <div class="num-wrap" id="weekNumWrap"></div>
+
+                <div class="label">
+                  <span>workouts completed</span>
+                  <span class="dot">·</span>
+                  <span class="streak-inline" id="streakInline">0 week streak</span>
                 </div>
+              </div>
             </div>
            
             <div class="card hidden" id="card">
                 <div class="card-title" id="cardTitle"></div>
+                <div class="card-sub" id="cardSub"></div>
                 <div id="cardRows"></div>
               
                 <div class="card-timer-wrap hidden" id="cardTimerWrap">
-                   <button class="card-timer" id="cardTimer">Start Workout</button>
+                 <button class="card-timer" id="cardTimer">Start Your Workout</button>
                 </div>
 
                 <button class="plan-btn hidden" id="planWorkoutBtn">Plan Workout</button>
@@ -956,15 +1193,17 @@ body{
             <button class="btn" id="planTriggerBtn">Plan Workout</button>
            
             <button class="btn secondary" id="exerciseBtn">Exercises</button>
+            
+            <button class="rest-btn hidden" id="restBtn">Rest</button>
            
             <div class="slide-wrap" id="slideWrap">
-                <div class="slide-label-base">Slide to Finish</div>
+                <div class="slide-label-base">Slide to Complete</div>
                 <div class="slide-knob" id="slideKnob"><span>→</span></div>
-                <div class="slide-label-white" id="slideWhite">Slide to Finish</div>
+                <div class="slide-label-white" id="slideWhite">Slide to Complete</div>
             </div>
         </div>
     </div>
-   
+    
     <div class="modal" id="modal">
         <div class="modal-sheet">
             <div class="modal-head">
@@ -983,7 +1222,7 @@ body{
             </div>
         </div>
     </div>
-   
+    
     <div class="modal" id="planModal">
         <div class="modal-sheet">
             <div class="modal-head">
@@ -995,7 +1234,7 @@ body{
             </div>
         </div>
     </div>
-   
+    
     <div class="confirm-overlay" id="customConfirm">
         <div class="confirm-box">
             <div class="confirm-content">
@@ -1008,1487 +1247,1517 @@ body{
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+              /* =========================================================
+                 CONFIG & STATE
+              ========================================================= */
+        
+              const TAGS = [
+                { key:"push",      label:"push",      pill:"pill-push" },
+                { key:"pull",      label:"pull",      pill:"pill-pull" },
+                { key:"legs",      label:"legs",      pill:"pill-legs" },
+                { key:"shoulders", label:"shoulders", pill:"pill-shoulders" },
+                { key:"abs",       label:"abs",       pill:"pill-abs" },
+                { key:"cardio",    label:"cardio",    pill:"pill-cardio" },
+              ];
 
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-<script>
-  /* =========================================================
-     CONFIG & STATE
-  ========================================================= */
-  const TAGS = [
-    { key:"push",      label:"push",      pill:"pill-push" },
-    { key:"pull",      label:"pull",      pill:"pill-pull" },
-    { key:"legs",      label:"legs",      pill:"pill-legs" },
-    { key:"shoulders", label:"shoulders", pill:"pill-shoulders" },
-    { key:"abs",       label:"abs",       pill:"pill-abs" },
-    { key:"cardio",    label:"cardio",    pill:"pill-cardio" },
-  ];
+              const DEFAULT_LIBRARY = {
+                push:  [ { name:"Push-Ups", reps:"10", hidden: false }, { name:"Dips", reps:"10", hidden: false }, { name:"Decline Push-Ups", reps:"10", hidden: false }, { name:"Diamond Push-Ups", reps:"10", hidden: false } ],
+                pull:  [ { name:"Pull-Ups", reps:"5", hidden: false }, { name:"Chin-Ups", reps:"5", hidden: false }, { name:"Australian Chin-Ups", reps:"10", hidden: false } ],
+                legs:  [ { name:"Squats", reps:"20", hidden: false }, { name:"Lunges", reps:"20", hidden: false }, { name:"Jumping Squats", reps:"15", hidden: false }, { name:"Jumping Lunges", reps:"15", hidden: false } ],
+                shoulders:[ { name:"Dolphin Push-Ups", reps:"10", hidden: false }, { name:"Pike Push-Ups", reps:"10", hidden: false } ],
+                abs:   [ { name:"Knee Raises", reps:"20", hidden: false }, { name:"Full Body Raises", reps:"20", hidden: false }, { name:"Oblique Twists", reps:"10", hidden: false }, { name:"L-Sit Hold", reps:"15s", hidden: false }, { name:"Plank", reps:"45s", hidden: false }, { name:"Dead Bug", reps:"20", hidden: false } ],
+                cardio:[ { name:"Jumping Jacks", reps:"20", hidden: false }, { name:"Mountain Climbers", reps:"20", hidden: false } ],
+              };
 
-  const DEFAULT_LIBRARY = {
-    push:  [ { name:"Push-Ups", minReps: 10, maxReps: 20, hidden: false }, { name:"Dips", minReps: 8, maxReps: 15, hidden: false }, { name:"Decline Push-Ups", minReps: 10, maxReps: 20, hidden: false }, { name:"Diamond Push-Ups", minReps: 8, maxReps: 15, hidden: false } ],
-    pull:  [ { name:"Pull-Ups", minReps: 5, maxReps: 10, hidden: false }, { name:"Chin-Ups", minReps: 5, maxReps: 10, hidden: false }, { name:"Australian Chin-Ups", minReps: 8, maxReps: 15, hidden: false } ],
-    legs:  [ { name:"Squats", minReps: 20, maxReps: 30, hidden: false }, { name:"Lunges", minReps: 20, maxReps: 30, hidden: false }, { name:"Jumping Squats", minReps: 15, maxReps: 25, hidden: false }, { name:"Jumping Lunges", minReps: 15, maxReps: 25, hidden: false } ],
-    shoulders:[ { name:"Dolphin Push-Ups", minReps: 10, maxReps: 15, hidden: false }, { name:"Pike Push-Ups", minReps: 8, maxReps: 12, hidden: false } ],
-    abs:   [ { name:"Knee Raises", minReps: 15, maxReps: 25, hidden: false }, { name:"Full Body Raises", minReps: 15, maxReps: 25, hidden: false }, { name:"Oblique Twists", minReps: 20, maxReps: 40, hidden: false }, { name:"Plank", minReps: 30, maxReps: 60, hidden: false }, { name:"Dead Bug", minReps: 20, maxReps: 30, hidden: false } ],
-    cardio:[ { name:"Jumping Jacks", minReps: 30, maxReps: 50, hidden: false }, { name:"Mountain Climbers", minReps: 30, maxReps: 50, hidden: false } ],
-  };
+              const LS = {
+                library:   "jy_library_v3",
+                streak:    "jy_streak_v1",
+                weekKey:   "jy_weekKey_v1",
+                weekCount: "jy_weekCount_v1",
+                weekCounted:"jy_week_counted_v1",
+                totalDays: "jy_total_days_trained_v1",
+                lastDone:  "jy_last_workout_date_v1",
+                metaconHistory: "jy_metacon_history_v1",
+                workoutHistory: "jy_workout_history_v1",
+                currentWorkout: "jy_current_workout_v1",
+                metaconState: "jy_metacon_state_v2",
+              };
 
-  const LS = {
-    library:   "jy_library_v4", 
-    streak:    "jy_streak_v1",
-    weekKey:   "jy_weekKey_v1",
-    weekCount: "jy_weekCount_v1",
-    weekCounted:"jy_week_counted_v1",
-    totalDays: "jy_total_days_trained_v1",
-    lastDone:  "jy_last_workout_date_v1",
-    metaconHistory: "jy_metacon_history_v1",
-    workoutHistory: "jy_workout_history_v1",
-    currentWorkout: "jy_current_workout_v1",
-    metaconState: "jy_metacon_state_v2", 
-  };
+              /* =========================================================
+                 UTIL
+              ========================================================= */
+              const qs    = s => document.querySelector(s);
+              const rand  = arr => arr[Math.floor(Math.random()*arr.length)];
 
-  /* =========================================================
-     UTIL
-  ========================================================= */
-  const qs    = s => document.querySelector(s);
-  const rand  = arr => arr[Math.floor(Math.random()*arr.length)];
+              function hardResetPointerState() {
+                document.body.style.pointerEvents = "none";
+                requestAnimationFrame(() => {
+                  document.body.style.pointerEvents = "";
+                });
+              }
 
-  function hardResetPointerState() {
-    document.body.style.pointerEvents = "none";
-    requestAnimationFrame(() => {
-      document.body.style.pointerEvents = "";
-    });
-  }
+              function isoWeekKey(d=new Date()){
+                const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+                const dayNum = date.getUTCDay() || 7;
+                date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+                const yearStart = new Date(Date.UTC(date.getUTCFullYear(),0,1));
+                const weekNo = Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+                return `${date.getUTCFullYear()}-W${String(weekNo).padStart(2,"0")}`;
+              }
+              function todayKey(){
+                const d = new Date();
+                return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+              }
+              function formatDate(dateStr){
+                const d = new Date(dateStr);
+                return d.toLocaleDateString(undefined, { day:"numeric", month:"short", year:"numeric" });
+              }
+              function loadJSON(key, fallback){
+                try{
+                  const raw = localStorage.getItem(key);
+                  if(!raw) return fallback;
+                  return JSON.parse(raw);
+                }catch{ return fallback; }
+              }
+              function saveJSON(key, val){
+                localStorage.setItem(key, JSON.stringify(val));
+              }
 
-  function isoWeekKey(d=new Date()){
-    const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-    const dayNum = date.getUTCDay() || 7;
-    date.setUTCDate(date.getUTCDate() + 4 - dayNum);
-    const yearStart = new Date(Date.UTC(date.getUTCFullYear(),0,1));
-    const weekNo = Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
-    return `${date.getUTCFullYear()}-W${String(weekNo).padStart(2,"0")}`;
-  }
-  function todayKey(){
-    const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-  }
-  function formatDate(dateStr){
-    const d = new Date(dateStr);
-    return d.toLocaleDateString(undefined, { day:"numeric", month:"short", year:"numeric" });
-  }
-  function loadJSON(key, fallback){
-    try{
-      const raw = localStorage.getItem(key);
-      if(!raw) return fallback;
-      return JSON.parse(raw);
-    }catch{ return fallback; }
-  }
-  function saveJSON(key, val){
-    localStorage.setItem(key, JSON.stringify(val));
-  }
+        function canDoTestDay() {
+          const history = loadJSON(LS.metaconHistory, []);
+          if (!history.length) return true;
 
-  /* =========================================================
-     CUSTOM CONFIRMATION LOGIC
-  ========================================================= */
-  const confirmOverlay = qs("#customConfirm");
-  const confirmMsg = qs("#confirmMsg");
-  const confirmYes = qs("#confirmYes");
-  const confirmCancel = qs("#confirmCancel");
-  let confirmCallback = null;
+          const last = history[history.length - 1];
+          const lastDate = new Date(last.date);
 
-  function triggerCustomConfirm(message, callback, confirmText = "Delete", isDanger = true) {
-    confirmMsg.textContent = message;
-    confirmYes.textContent = confirmText;
-    confirmYes.className = isDanger ? "confirm-btn danger" : "confirm-btn";
-    confirmCallback = callback;
-    confirmOverlay.classList.add("show");
-  }
+          const now = new Date();
 
-  confirmCancel.addEventListener("click", () => {
-    confirmOverlay.classList.remove("show");
-    confirmCallback = null;
-  });
-
-  confirmYes.addEventListener("click", () => {
-    if (confirmCallback) confirmCallback();
-    confirmOverlay.classList.remove("show");
-    confirmCallback = null;
-  });
-  
-  // UNSAVED CONFIRMATION
-  const unsavedOverlay = qs("#unsavedOverlay");
-  const unsavedYes = qs("#unsavedYes");
-  const unsavedNo = qs("#unsavedNo");
-  
-  function showUnsavedConfirm() {
-      unsavedOverlay.classList.add("show");
-  }
-  
-  unsavedYes.addEventListener("click", () => {
-      // Save
-      library = JSON.parse(JSON.stringify(tempLibrary));
-      saveJSON(LS.library, library);
-      unsavedOverlay.classList.remove("show");
-      closeModalFn(true); 
-  });
-  
-  unsavedNo.addEventListener("click", () => {
-      // Discard
-      unsavedOverlay.classList.remove("show");
-      closeModalFn(true); 
-  });
-
-  /* =========================================================
-     DOM ELEMENTS
-  ========================================================= */
-  const weeklyCenter = qs("#weeklyCenter");
-  const weekNumWrap  = qs("#weekNumWrap");
-  const streakInline = qs("#streakInline");
-
-  const card      = qs("#card");
-  const cardTitle = qs("#cardTitle");
-  const cardRows  = qs("#cardRows");
-  const planWorkoutBtn = qs("#planWorkoutBtn");
-
-  const aiStage   = qs("#aiStage");
-  const focusPicker = qs("#focusPicker");
-  const planTriggerBtn = qs("#planTriggerBtn");
-   
-  const exerciseBtn = qs("#exerciseBtn");
-  
-  const roundCounterControl = qs("#roundCounterControl");
-  const roundMinus = qs("#roundMinus");
-  const roundPlus = qs("#roundPlus");
-  
-  const cardTimer = qs("#cardTimer"); 
-  const cardTimerWrap = qs("#cardTimerWrap");
-  const actionsArea = qs("#actionsArea");
-
-  const slideWrap  = qs("#slideWrap");
-  const slideKnob  = qs("#slideKnob");
-  const slideWhite = qs("#slideWhite");
-
-  const modal     = qs("#modal");
-  const modalBackBtn = qs("#modalBackBtn"); 
-  
-  const tabsEl    = qs("#tabs");
-  const listEl    = qs("#list");
-  const addName   = qs("#addName");
-  const addMin    = qs("#addMin");
-  const addMax    = qs("#addMax");
-  const addBtn    = qs("#addBtn");
-  
-  const editListBtn = qs("#editListBtn");
-
-  const historyBtn = qs("#historyBtn");
-  const historyModal = qs("#historyModal");
-  const closeHistoryModal = qs("#closeHistoryModal");
-  const historyList = qs("#historyList");
-  const historyTabs = qs("#historyTabs");
-
-  const planModal = qs("#planModal");
-  const planBody  = qs("#planBody");
-  const closePlanModal = qs("#closePlanModal");
-
-  const confettiCanvas = qs("#confettiCanvas");
-  const confettiInstance = window.confetti
-    ? window.confetti.create(confettiCanvas, { resize:true, useWorker:true })
-    : null;
-
-  // PB / Summary Elements
-  const pbOverlay = qs("#pbOverlay");
-  const pbTitle = qs("#pbTitle");
-  const pbTimeDisplay = qs("#pbTimeDisplay");
-  const pbPrevDisplay = qs("#pbPrevDisplay");
-  const pbCloseBtn = qs("#pbCloseBtn");
-  const pbCardRows = qs("#pbCardRows");
-  
-  // New Summary Specific Elements
-  const summaryOverlay = qs("#summaryOverlay");
-  const summaryRounds = qs("#summaryRounds");
-  const summaryCardRows = qs("#summaryCardRows");
-  const summaryCloseBtn = qs("#summaryCloseBtn");
-  
-  const successAudio = qs("#successAudio");
-
-  // Error Sheet
-  const errorOverlay = qs("#errorOverlay");
-  const errorCloseBtn = qs("#errorCloseBtn");
-  errorCloseBtn.addEventListener("click", () => errorOverlay.classList.remove("show"));
-
-  pbCloseBtn.addEventListener("click", () => {
-    pbOverlay.classList.remove("show");
-    setTimeout(() => pbCloseBtn.classList.add('hidden-state'), 300);
-    triggerHomeTransition();
-  });
-  
-  summaryCloseBtn.addEventListener("click", () => {
-     summaryOverlay.classList.remove("show");
-     triggerHomeTransition();
-  });
-
-  // --- WIZARD ELEMENTS ---
-  const planSheetOverlay = qs("#planSheetOverlay");
-  const wizTitle = qs("#wizTitle");
-  const wizStep1 = qs("#wizStep1");
-  const wizStep2 = qs("#wizStep2");
-  const wizStep3 = qs("#wizStep3");
-  const wizBackBtn = qs("#wizBackBtn");
-  const wizNextBtn = qs("#wizNextBtn");
-   
-  let wizStep = 1;
-  let wizSelection = new Set();
-  let wizCount = null;
-  let wizDuration = null;
-
-  /* =========================================================
-     STATE LOADING & UPDATE LABEL
-  ========================================================= */
-  let library = loadJSON(LS.library, null);
-  if(!library){
-    library = structuredClone(DEFAULT_LIBRARY);
-    saveJSON(LS.library, library);
-  }
-
-  function updateExerciseButtonLabel() {
-    let hiddenCount = 0;
-    if (library) {
-      Object.values(library).forEach(list => {
-        if(Array.isArray(list)) {
-          list.forEach(ex => {
-            if (ex.hidden) hiddenCount++;
-          });
+          return (
+            lastDate.getFullYear() !== now.getFullYear() ||
+            lastDate.getMonth() !== now.getMonth()
+          );
         }
-      });
-    }
-    if (hiddenCount > 0) {
-      exerciseBtn.textContent = `Exercises (${hiddenCount} hidden)`;
-    } else {
-      exerciseBtn.textContent = "Exercises";
-    }
-  }
+        
+        function getTimeUntilNextMonth() {
+          const now = new Date();
+          const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
 
-  let currentWorkout = null;
-  let plannedReps = {};
-  let currentRounds = 0; // Initialize global rounds variable
-  
-  // Timer Vars
-  let isResting = false; // For AMRAP
-  let restTimeLeft = 20; 
-  let restTimerInterval = null;
+          const diffMs = nextMonth - now;
+          const totalSeconds = Math.floor(diffMs / 1000);
 
-  // Metacon Timer Vars (Persistent State)
-  let metaconState = loadJSON(LS.metaconState, { running: false, startTime: 0, accumulated: 0 });
-  let metaconTimerInterval = null;
+          const days = Math.floor(totalSeconds / 86400);
+          const hours = Math.floor((totalSeconds % 86400) / 3600);
 
-  let metaconHistory = loadJSON(LS.metaconHistory, []);
-  let workoutHistory = loadJSON(LS.workoutHistory, []);
-
-  /* =========================================================
-     WIZARD LOGIC (EXCLUSIVE METACON + 3 STEPS)
-  ========================================================= */
-  function initWizard(){
-    wizStep = 1;
-    wizSelection.clear(); 
-    wizCount = null;
-    wizDuration = null;
-    updateWizardUI();
-    document.querySelectorAll(".plan-option").forEach(b => b.classList.remove("selected"));
-    planSheetOverlay.classList.add("show");
-  }
-
-  function updateWizardUI(){
-    if(wizStep === 1){
-      wizTitle.textContent = "What would you like to train?";
-      wizBackBtn.textContent = "Back";
-      wizNextBtn.textContent = "Next";
-      wizNextBtn.disabled = wizSelection.size === 0;
-      wizStep1.classList.add("active");
-      wizStep2.classList.remove("active");
-      wizStep3.classList.remove("active");
-    } else if(wizStep === 2){
-      wizTitle.textContent = "How many exercises?";
-      wizBackBtn.textContent = "Back";
-      wizNextBtn.textContent = "Next";
-      wizNextBtn.disabled = !wizCount;
-      wizStep1.classList.remove("active");
-      wizStep2.classList.add("active");
-      wizStep3.classList.remove("active");
-    } else if(wizStep === 3){
-      wizTitle.textContent = "For how long?";
-      wizBackBtn.textContent = "Back";
-      wizNextBtn.textContent = "Generate";
-      wizNextBtn.disabled = !wizDuration;
-      wizStep1.classList.remove("active");
-      wizStep2.classList.remove("active");
-      wizStep3.classList.add("active");
-    }
-  }
-
-  // Step 1: Logic
-  document.querySelectorAll("#wizStep1 .plan-option").forEach(btn => {
-    btn.addEventListener("click", () => {
-        const val = btn.dataset.val;
-        const allBtns = document.querySelectorAll("#wizStep1 .plan-option");
-
-        if (val === "metacon") {
-           const wasSelected = wizSelection.has("metacon");
-           wizSelection.clear(); 
-           allBtns.forEach(b => b.classList.remove("selected"));
-           if (!wasSelected) {
-               wizSelection.add("metacon");
-               btn.classList.add("selected");
-           }
-        } else {
-           if (wizSelection.has("metacon")) {
-               wizSelection.clear();
-               allBtns.forEach(b => b.classList.remove("selected"));
-           }
-           if (wizSelection.has(val)) {
-               wizSelection.delete(val);
-               btn.classList.remove("selected");
-           } else {
-               wizSelection.add(val);
-               btn.classList.add("selected");
-           }
+          return { days, hours };
         }
-        updateWizardUI();
-    });
-  });
+        
+              /* =========================================================
+                 CUSTOM CONFIRMATION LOGIC
+              ========================================================= */
+              const confirmOverlay = qs("#customConfirm");
+              const confirmMsg = qs("#confirmMsg");
+              const confirmYes = qs("#confirmYes");
+              const confirmCancel = qs("#confirmCancel");
+              let confirmCallback = null;
 
-  // Step 2: Count
-  document.querySelectorAll("#wizStep2 .plan-option").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll("#wizStep2 .plan-option").forEach(b => b.classList.remove("selected"));
-      btn.classList.add("selected");
-      wizCount = parseInt(btn.dataset.val, 10);
-      updateWizardUI();
-    });
-  });
+              function triggerCustomConfirm(message, callback, confirmText = "Delete", isDanger = true) {
+                confirmMsg.textContent = message;
+                confirmYes.textContent = confirmText;
+                confirmYes.className = isDanger ? "confirm-btn danger" : "confirm-btn";
+                confirmCallback = callback;
+                confirmOverlay.classList.add("show");
+              }
 
-  // Step 3: Duration
-  document.querySelectorAll("#wizStep3 .plan-option").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll("#wizStep3 .plan-option").forEach(b => b.classList.remove("selected"));
-      btn.classList.add("selected");
-      wizDuration = parseInt(btn.dataset.val, 10); // Seconds
-      updateWizardUI();
-    });
-  });
+              confirmCancel.addEventListener("click", () => {
+                confirmOverlay.classList.remove("show");
+                confirmCallback = null;
+              });
 
-  // Navigation
-  wizBackBtn.addEventListener("click", () => {
-    if(wizStep === 3){
-      wizStep = 2; updateWizardUI();
-    } else if(wizStep === 2){
-      wizStep = 1; updateWizardUI();
-    } else {
-      planSheetOverlay.classList.remove("show");
-    }
-  });
+              confirmYes.addEventListener("click", () => {
+                if (confirmCallback) confirmCallback();
+                confirmOverlay.classList.remove("show");
+                confirmCallback = null;
+              });
 
-  wizNextBtn.addEventListener("click", () => {
-    if(wizStep === 1){
-        if(wizSelection.has("metacon")) {
-            planSheetOverlay.classList.remove("show");
-            triggerGenerationSequence();
-        } else {
-            wizStep = 2; updateWizardUI();
-        }
-    } else if(wizStep === 2){
-        wizStep = 3; updateWizardUI();
-    } else {
-        planSheetOverlay.classList.remove("show");
-        triggerGenerationSequence();
-    }
-  });
+              /* =========================================================
+                 DOM ELEMENTS
+              ========================================================= */
+              const weeklyCenter = qs("#weeklyCenter");
+              const weekNumWrap  = qs("#weekNumWrap");
+              const streakInline = qs("#streakInline");
 
-  // Trigger from Main Button
-  planTriggerBtn.addEventListener("click", initWizard);
+              const card      = qs("#card");
+              const cardTitle = qs("#cardTitle");
+              const cardSub   = qs("#cardSub");
+              const cardRows  = qs("#cardRows");
+              const planWorkoutBtn = qs("#planWorkoutBtn");
 
-  // --- GENERATION SEQUENCE ---
-  function triggerGenerationSequence(){
-    actionsArea.classList.add("faded");
-    historyBtn.classList.add("hidden");
-   
-    showMesh(true);
-    setTimeout(()=>{
-      let workout = null;
-     
-      try {
-          if(wizSelection.has("metacon")) {
-             workout = generateMETACON();
-          } else {
-             workout = generateAMRAP_FOCUSED();
-          }
-      } catch(e) { console.error(e); }
-
-      if (!workout) {
-         showMesh(false);
-         actionsArea.classList.remove("faded");
-         historyBtn.classList.remove("hidden");
-         errorOverlay.classList.add("show");
-         return;
-      }
-
-      currentWorkout = workout;
-      saveJSON(LS.currentWorkout, workout);
-     
-      showMesh(false);
-      setTimeout(() => {
-        showWorkoutState(workout);
-        actionsArea.classList.remove("faded");
-      }, 300);
-
-    }, 1000);
-  }
-
-  /* =========================================================
-     WORKOUT GEN LOGIC (FIXED)
-  ========================================================= */
-  function pillForTag(tagKey){
-    const t = TAGS.find(t=>t.key===tagKey);
-    return t ? t.pill : "";
-  }
-
-  function generateAMRAP_FOCUSED(){
-    let selectedTags = Array.from(wizSelection);
-    if(selectedTags.length === 0) selectedTags = ["push","pull","legs","shoulders","abs","cardio"];
-    
-    let tagPools = {};
-    selectedTags.forEach(tag => {
-        if(library[tag]) {
-            const valid = library[tag].filter(ex => !ex.hidden).map(ex => ({...ex, originTag: tag}));
-            if(valid.length > 0) tagPools[tag] = valid;
-        }
-    });
-
-    let activeTags = Object.keys(tagPools);
-    if(activeTags.length === 0) return null; 
-
-    const count = wizCount || 3;
-    let selectedExercises = [];
-    let usedNames = new Set();
-
-    for (let i = activeTags.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [activeTags[i], activeTags[j]] = [activeTags[j], activeTags[i]];
-    }
-
-    for (const tag of activeTags) {
-        if (selectedExercises.length >= count) break;
-        const pool = tagPools[tag];
-        let available = pool.filter(e => !usedNames.has(e.name));
-        if(available.length === 0) available = pool;
-        const picked = available[Math.floor(Math.random() * available.length)];
-        selectedExercises.push(picked);
-        usedNames.add(picked.name);
-    }
-
-    if (selectedExercises.length < count) {
-        let remainingPool = [];
-        activeTags.forEach(tag => {
-            tagPools[tag].forEach(ex => {
-                if (!usedNames.has(ex.name)) {
-                    remainingPool.push(ex);
-                }
-            });
-        });
-
-        if (remainingPool.length === 0) {
-             activeTags.forEach(tag => {
-                tagPools[tag].forEach(ex => remainingPool.push(ex));
-            });
-        }
-
-        for (let i = remainingPool.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [remainingPool[i], remainingPool[j]] = [remainingPool[j], remainingPool[i]];
-        }
-
-        const needed = count - selectedExercises.length;
-        for(let i=0; i<needed; i++) {
-            const ex = remainingPool[i % remainingPool.length];
-            selectedExercises.push(ex);
-        }
-    }
-
-    for (let i = selectedExercises.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [selectedExercises[i], selectedExercises[j]] = [selectedExercises[j], selectedExercises[i]];
-    }
-
-    const rows = selectedExercises.map(ex => {
-      let repsToDisplay = "";
-      // Robust checking for numbers
-      if (ex.minReps && ex.maxReps) {
-          const min = parseInt(ex.minReps, 10);
-          const max = parseInt(ex.maxReps, 10);
-          if (!isNaN(min) && !isNaN(max) && max >= min) {
-              const randomReps = Math.floor(Math.random() * (max - min + 1)) + min;
-              repsToDisplay = String(randomReps);
-          } else {
-              repsToDisplay = ex.minReps || "10";
-          }
-      } else if (ex.minReps) {
-          repsToDisplay = ex.minReps;
-      } else if (ex.reps) {
-          repsToDisplay = ex.reps;
-      }
-      
-      const text = repsToDisplay ? `${repsToDisplay} ${ex.name}` : ex.name;
-      return { text, tags: [ex.originTag] };
-    });
-
-    let title = "";
-    if (selectedTags.length === 1) {
-        title = selectedTags[0].charAt(0).toUpperCase() + selectedTags[0].slice(1);
-    } else if (selectedTags.length === 2) {
-         title = selectedTags.map(t => t.charAt(0).toUpperCase() + t.slice(1)).join(" & ");
-    } else {
-        title = "Mixed Workout";
-    }
-
-    return { type: title, rows, duration: wizDuration || 300 };
-  }
-     
-  function generateMETACON(){
-    return {
-      type: "Metabolic Conditioning",
-      rows: [
-        { text: "50 Pull-Ups", tags:["pull"] },
-        { text: "50 Dips", tags:["push"] },
-        { text: "100 Jumping Squats", tags:["legs"] },
-        { text: "50 Pike Push-Ups", tags:["shoulders"] },
-        { text: "50 Push-Ups", tags:["push"] },
-        { text: "100 Full Body Crunches", tags:["abs"] },
-        { text: "50 Kettlebell Swings", tags:["legs"] }, 
-        { text: "50 Australian Rows", tags:["pull"] },
-        { text: "100 Jumping Jacks", tags:["cardio"] },
-        { text: "10 Muscle-Ups", tags:["push"] } 
-      ]
-    };
-  }
-
-  /* =========================================================
-     ROUND COUNTER LOGIC (SPLIT)
-  ========================================================= */
-  function updateRoundBtn(){
-      roundPlus.textContent = "Rounds completed: " + currentRounds;
-      if (currentWorkout) {
-          currentWorkout.roundsDone = currentRounds;
-          saveJSON(LS.currentWorkout, currentWorkout);
-      }
-  }
-
-  function enableRoundButtons() {
-      roundCounterControl.classList.remove("disabled-state");
-      roundMinus.disabled = false;
-      roundPlus.disabled = false;
-      if (currentWorkout) {
-          currentWorkout.timerActivated = true;
-          saveJSON(LS.currentWorkout, currentWorkout);
-      }
-  }
-
-  roundPlus.addEventListener("click", () => {
-      currentRounds++;
-      updateRoundBtn();
-  });
-
-  roundMinus.addEventListener("click", () => {
-      if(currentRounds > 0) currentRounds--;
-      updateRoundBtn();
-  });
-
-  /* =========================================================
-     AUDIO ENGINE (Boxing Bell & Victory Fanfare)
-  ========================================================= */
-  let audioCtx = null;
-  function initAudio() {
-      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-  }
-
-  function playBoxingBell() {
-      try {
-          if(!audioCtx) initAudio();
-          const now = audioCtx.currentTime;
-          const strikeBell = (time) => {
-              const osc = audioCtx.createOscillator();
-              const gain = audioCtx.createGain();
-              osc.connect(gain);
-              gain.connect(audioCtx.destination);
-              osc.type = "triangle"; osc.frequency.value = 750;
-              gain.gain.setValueAtTime(0, time);
-              gain.gain.linearRampToValueAtTime(0.5, time + 0.01);
-              gain.gain.exponentialRampToValueAtTime(0.001, time + 1.2);
-              osc.start(time); osc.stop(time + 1.3);
+              const aiStage   = qs("#aiStage");
+              const focusPicker = qs("#focusPicker");
+              const planTriggerBtn = qs("#planTriggerBtn");
+                
+              const exerciseBtn = qs("#exerciseBtn");
+             
+              const roundCounterControl = qs("#roundCounterControl");
+              const roundMinus = qs("#roundMinus");
+              const roundPlus = qs("#roundPlus");
               
-              const overtone = audioCtx.createOscillator();
-              const ogain = audioCtx.createGain();
-              overtone.connect(ogain);
-              ogain.connect(audioCtx.destination);
-              overtone.type = "sine"; overtone.frequency.value = 1200;
-              ogain.gain.setValueAtTime(0, time);
-              ogain.gain.linearRampToValueAtTime(0.2, time + 0.01);
-              ogain.gain.exponentialRampToValueAtTime(0.001, time + 0.5);
-              overtone.start(time); overtone.stop(time + 0.6);
-          };
-          strikeBell(now); strikeBell(now + 0.25); strikeBell(now + 0.5);
-      } catch(e) {}
-  }
+              const restBtn = qs("#restBtn"); // NEW REST BUTTON
+             
+              const cardTimer = qs("#cardTimer");
+              const cardTimerWrap = qs("#cardTimerWrap");
+              const actionsArea = qs("#actionsArea");
 
-  function playCelebrationSound() {
-      try {
-          if(!audioCtx) initAudio();
-          const now = audioCtx.currentTime;
-          
-          const bufferSize = audioCtx.sampleRate * 0.5;
-          const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-          const data = buffer.getChannelData(0);
-          for (let i = 0; i < bufferSize; i++) { data[i] = Math.random() * 2 - 1; }
-          const noise = audioCtx.createBufferSource();
-          noise.buffer = buffer;
-          const noiseGain = audioCtx.createGain();
-          noise.connect(noiseGain);
-          noiseGain.connect(audioCtx.destination);
-          noiseGain.gain.setValueAtTime(0.2, now);
-          noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-          noise.start(now);
+              const slideWrap  = qs("#slideWrap");
+              const slideKnob  = qs("#slideKnob");
+              const slideWhite = qs("#slideWhite");
 
-          const notes = [523.25, 587.33, 659.25, 698.46, 783.99, 880.00, 987.77, 1046.50];
-          const noteDur = 0.06; 
-          notes.forEach((freq, i) => {
-              const osc = audioCtx.createOscillator();
-              const gain = audioCtx.createGain();
-              osc.connect(gain);
-              gain.connect(audioCtx.destination);
-              osc.type = "sawtooth"; osc.frequency.value = freq;
-              const start = now + (i * noteDur);
-              gain.gain.setValueAtTime(0, start);
-              gain.gain.linearRampToValueAtTime(0.2, start + 0.01);
-              gain.gain.linearRampToValueAtTime(0, start + noteDur);
-              osc.start(start); osc.stop(start + noteDur + 0.05);
+              const modal     = qs("#modal");
+              const closeModal= qs("#closeModal");
+              const tabsEl    = qs("#tabs");
+              const listEl    = qs("#list");
+              const addName   = qs("#addName");
+              const addReps   = qs("#addReps");
+              const addBtn    = qs("#addBtn");
+
+              const historyBtn = qs("#historyBtn");
+              const historyModal = qs("#historyModal");
+              const closeHistoryModal = qs("#closeHistoryModal");
+              const historyList = qs("#historyList");
+              const historyTabs = qs("#historyTabs");
+
+              const planModal = qs("#planModal");
+              const planBody  = qs("#planBody");
+              const closePlanModal = qs("#closePlanModal");
+
+              const confettiCanvas = qs("#confettiCanvas");
+              const confettiInstance = window.confetti
+                ? window.confetti.create(confettiCanvas, { resize:true, useWorker:true })
+                : null;
+
+              // PB Elements
+              const pbOverlay = qs("#pbOverlay");
+              const pbTimeDisplay = qs("#pbTimeDisplay");
+              const pbPrevDisplay = qs("#pbPrevDisplay");
+              const pbCloseBtn = qs("#pbCloseBtn");
+              const pbCardRows = qs("#pbCardRows");
+             
+              // Summary Elements
+              const summaryOverlay = qs("#summaryOverlay");
+              const summaryRounds = qs("#summaryRounds");
+              const summaryCardRows = qs("#summaryCardRows");
+              const summaryCloseBtn = qs("#summaryCloseBtn");
+             
+              const successAudio = qs("#successAudio");
+
+              // Error Sheet
+              const errorOverlay = qs("#errorOverlay");
+              const errorCloseBtn = qs("#errorCloseBtn");
+              errorCloseBtn.addEventListener("click", () => errorOverlay.classList.remove("show"));
+
+              pbCloseBtn.addEventListener("click", () => {
+                pbOverlay.classList.remove("show");
+                setTimeout(() => pbCloseBtn.classList.add('hidden-state'), 300);
+                triggerHomeTransition();
+              });
+             
+              summaryCloseBtn.addEventListener("click", () => {
+                 summaryOverlay.classList.remove("show");
+                 triggerHomeTransition();
+              });
+
+              // --- WIZARD ELEMENTS ---
+              const planSheetOverlay = qs("#planSheetOverlay");
+              const wizTitle = qs("#wizTitle");
+              const wizStep1 = qs("#wizStep1");
+              const wizStep2 = qs("#wizStep2");
+              const wizStep3 = qs("#wizStep3");
+              const wizBackBtn = qs("#wizBackBtn");
+              const wizNextBtn = qs("#wizNextBtn");
+                
+              let wizStep = 1;
+              let wizSelection = new Set();
+              let wizCount = null;
+              let wizDuration = null;
+
+              /* =========================================================
+                 STATE LOADING & UPDATE LABEL
+              ========================================================= */
+              let library = loadJSON(LS.library, null);
+              if(!library){
+                library = structuredClone(DEFAULT_LIBRARY);
+                saveJSON(LS.library, library);
+              }
+
+              function updateExerciseButtonLabel() {
+                let hiddenCount = 0;
+                if (library) {
+                  Object.values(library).forEach(list => {
+                    if(Array.isArray(list)) {
+                      list.forEach(ex => {
+                        if (ex.hidden) hiddenCount++;
+                      });
+                    }
+                  });
+                }
+                if (hiddenCount > 0) {
+                  exerciseBtn.textContent = `Exercises (${hiddenCount} hidden)`;
+                } else {
+                  exerciseBtn.textContent = "Exercises";
+                }
+              }
+
+              let currentWorkout = null;
+              let plannedReps = {};
+             
+              // Timer Vars
+              let isResting = false; // For AMRAP
+              let restTimeLeft = 20;
+              let restTimerInterval = null;
+              
+              let bigRestTimeLeft = 120; // For Test Day Rest Button
+              let bigRestInterval = null;
+
+              // Counter animation queue (so it animates when returning home)
+              let pendingCounterAnim = null;
+
+              // Metacon Timer Vars (Persistent State)
+              let metaconState = loadJSON(LS.metaconState, { running: false, startTime: 0, accumulated: 0 });
+              let metaconTimerInterval = null;
+
+              let metaconHistory = loadJSON(LS.metaconHistory, []);
+              let workoutHistory = loadJSON(LS.workoutHistory, []);
+
+              /* =========================================================
+                 WIZARD LOGIC (EXCLUSIVE METACON + 3 STEPS)
+              ========================================================= */
+        function initWizard(){
+          wizStep = 1;
+          wizSelection.clear();
+          wizCount = null;
+          wizDuration = null;
+
+          // Reset all buttons
+          document.querySelectorAll(".plan-option").forEach(b => {
+            b.classList.remove("selected");
+            b.disabled = false;
+            b.style.opacity = "";
           });
 
-          const chordTime = now + (notes.length * noteDur);
-          const chordNotes = [523.25, 659.25, 783.99, 1046.50]; 
-          chordNotes.forEach(freq => {
-              const osc = audioCtx.createOscillator();
-              const gain = audioCtx.createGain();
-              osc.connect(gain);
-              gain.connect(audioCtx.destination);
-              osc.type = "sawtooth"; osc.frequency.value = freq;
-              gain.gain.setValueAtTime(0, chordTime);
-              gain.gain.linearRampToValueAtTime(0.15, chordTime + 0.05);
-              gain.gain.exponentialRampToValueAtTime(0.001, chordTime + 1.5); 
-              osc.start(chordTime); osc.stop(chordTime + 1.5);
-          });
-      } catch(e) {}
-  }
+          const testBtn = document.querySelector('[data-val="metacon"]');
+          const grid = document.querySelector('#wizStep1 .plan-grid');
 
-  /* =========================================================
-     TIMER LOGIC (UNIFIED CARD TIMER)
-  ========================================================= */
-  cardTimer.addEventListener("click", () => {
-      initAudio();
-      
-      if (currentWorkout?.type === "Metabolic Conditioning") {
-          toggleMetaconTimer();
-      } else {
-          toggleAmrapTimer();
-      }
-  });
+          if (testBtn && grid) {
+            if (canDoTestDay()) {
+              // ✅ AVAILABLE → move to top
+              grid.prepend(testBtn);
 
-  // --- AMRAP LOGIC (Fixed Duration Timer) ---
-  function formatTimerTime(s) {
-      if (s < 60) return s + "s";
-      const m = Math.floor(s / 60);
-      const sc = s % 60;
-      return `${m}:${String(sc).padStart(2,'0')}`;
-  }
-  
-  function getStartText() {
-      const dur = currentWorkout.duration || 300;
-      const mins = Math.floor(dur / 60);
-      if (dur < 60) return `Start Your ${dur}s Workout`; // Test case
-      return `Start Your ${mins} Minute Workout`;
-  }
-
-  function toggleAmrapTimer() {
-      if (roundPlus.disabled) enableRoundButtons();
-      
-      if (isResting) {
-         // Pause
-         if(restTimerInterval) clearInterval(restTimerInterval);
-         isResting = false;
-         cardTimer.classList.add("paused");
-         cardTimer.textContent = "Resume (" + formatTimerTime(restTimeLeft) + ")";
-      } else {
-         // Start/Resume
-         if(restTimerInterval) clearInterval(restTimerInterval);
-         isResting = true;
-         cardTimer.classList.add("active");
-         cardTimer.classList.remove("paused");
-         
-         if (restTimeLeft <= 0) restTimeLeft = currentWorkout.duration || 300;
-         cardTimer.textContent = formatTimerTime(restTimeLeft);
-         
-         restTimerInterval = setInterval(() => {
-            restTimeLeft--;
-            if (restTimeLeft < 0) {
-               // Finish
-               if(restTimerInterval) clearInterval(restTimerInterval);
-               isResting = false;
-               restTimeLeft = 0;
-               cardTimer.classList.remove("active");
-               cardTimer.classList.remove("paused");
-               cardTimer.textContent = "Finished";
-               
-               // Disable Rounds on Finish
-               roundCounterControl.classList.add("disabled-state");
-               roundMinus.disabled = true;
-               roundPlus.disabled = true;
-               
-               playBoxingBell();
+              testBtn.disabled = false;
+              testBtn.textContent = "Test Day";
+              testBtn.style.opacity = "";
             } else {
-               cardTimer.textContent = formatTimerTime(restTimeLeft);
+              // 🔒 LOCKED → move to bottom
+              grid.append(testBtn);
+
+              const { days, hours } = getTimeUntilNextMonth();
+              testBtn.disabled = true;
+              testBtn.textContent = `Test Day — unlocks in ${days}d ${hours}h`;
+              testBtn.style.opacity = "0.5";
             }
-            
-            if (currentWorkout) {
-                currentWorkout.timeLeft = restTimeLeft;
-                saveJSON(LS.currentWorkout, currentWorkout);
-            }
-         }, 1000);
-      }
-  }
-
-  // --- METACON LOGIC (Stopwatch) ---
-  function updateMetaconDisplay() {
-      let displayTime = metaconState.accumulated;
-      if (metaconState.running) {
-          displayTime += (Date.now() - metaconState.startTime);
-      }
-      cardTimer.textContent = formatTime(displayTime);
-  }
-
-  function toggleMetaconTimer() {
-      if (metaconState.running) {
-          // PAUSE
-          metaconState.accumulated += (Date.now() - metaconState.startTime);
-          metaconState.running = false;
-          if (metaconTimerInterval) clearInterval(metaconTimerInterval);
-          cardTimer.classList.add("paused");
-          updateMetaconDisplay();
-      } else {
-          // START
-          metaconState.startTime = Date.now();
-          metaconState.running = true;
-          cardTimer.classList.remove("paused");
-          cardTimer.classList.add("active");
-          metaconTimerInterval = setInterval(updateMetaconDisplay, 100);
-      }
-      saveJSON(LS.metaconState, metaconState);
-  }
-
-  function stopMetaconTimer() {
-      if (metaconState.running) {
-          metaconState.accumulated += (Date.now() - metaconState.startTime);
-          metaconState.running = false;
-      }
-      if (metaconTimerInterval) clearInterval(metaconTimerInterval);
-      const finalTime = metaconState.accumulated;
-      
-      metaconState = { running: false, startTime: 0, accumulated: 0 };
-      saveJSON(LS.metaconState, metaconState);
-      
-      cardTimer.classList.remove("paused");
-      cardTimer.classList.remove("active");
-      cardTimer.textContent = "Start Workout";
-      
-      return finalTime;
-  }
-
-  function resetMetaconUI() {
-      if (metaconTimerInterval) clearInterval(metaconTimerInterval);
-      cardTimer.textContent = "Start Workout";
-      cardTimer.classList.remove("paused");
-      cardTimer.classList.remove("active");
-  }
-  
-  function resetAmrapUI() {
-      if (restTimerInterval) clearInterval(restTimerInterval);
-      cardTimer.textContent = getStartText();
-      cardTimer.classList.remove("paused");
-      cardTimer.classList.remove("active");
-  }
-
-  /* =========================================================
-     HISTORY & MODALS etc (Standard)
-  ========================================================= */
-  // ... (Standard history/modal logic as before) ...
-  let currentHistoryTab = 'metacon';
-  document.querySelectorAll('#historyTabs .tab').forEach(t => {
-    t.addEventListener('click', () => {
-      document.querySelectorAll('#historyTabs .tab').forEach(b => b.classList.remove('active'));
-      t.classList.add('active');
-      currentHistoryTab = t.dataset.tab;
-      renderHistoryContent();
-    });
-  });
-  historyBtn.addEventListener("click", ()=>{ renderHistoryContent(); historyModal.classList.add("show"); });
-  closeHistoryModal.addEventListener("click", ()=> historyModal.classList.remove("show"));
-  historyModal.addEventListener("click",(e)=>{ if(e.target === historyModal) historyModal.classList.remove("show"); });
-
-  function formatTime(ms){
-    const total = Math.floor(ms / 1000);
-    const m = String(Math.floor(total / 60)).padStart(2,"0");
-    const s = String(total % 60).padStart(2,"0");
-    return `${m}:${s}`;
-  }
-
-  function renderHistoryContent(){
-    historyList.innerHTML = "";
-    if (currentHistoryTab === 'metacon') {
-      if (!metaconHistory.length) {
-        historyList.innerHTML = `<div style="color:#64748b;font-size:14px;padding:20px;text-align:center;">No Metacon attempts yet</div>`;
-        return;
-      }
-      const bestTime = Math.min(...metaconHistory.map(h => h.time));
-      const bestIndex = metaconHistory.findIndex(h => h.time === bestTime);
-      const bestEntry = metaconHistory[bestIndex];
-      if (bestEntry) renderHistoryRow(bestEntry, true, bestIndex, 'metacon');
-      metaconHistory.slice().reverse().forEach((e, i) => {
-        const originalIndex = metaconHistory.length - 1 - i;
-        if(originalIndex !== bestIndex) renderHistoryRow(e, false, originalIndex, 'metacon');
-      });
-    } else {
-      if (!workoutHistory.length) {
-        historyList.innerHTML = `<div style="color:#64748b;font-size:14px;padding:20px;text-align:center;">No training sessions yet</div>`;
-        return;
-      }
-      workoutHistory.slice().reverse().forEach((e, i) => {
-        const originalIndex = workoutHistory.length - 1 - i;
-        renderHistoryRow(e, false, originalIndex, 'training');
-      });
-    }
-  }
-
-  function renderHistoryRow(entry, isPB, originalIndex, type) {
-    const row = document.createElement("div");
-    row.className = "history-row";
-    let leftContent = "";
-    let badgeHtml = isPB ? '<span class="pr-badge">🏆 PB</span>' : '';
-    if (type === 'metacon') {
-      leftContent = `<div class="history-time">${formatTime(entry.time)}</div><div class="history-date">${formatDate(entry.date)}</div>`;
-    } else {
-      let roundsText = entry.rounds ? ` (${entry.rounds} Rnds)` : "";
-      leftContent = `<div class="history-time">${entry.type || "Workout"}${roundsText}</div><div class="history-date">${formatDate(entry.date)}</div>`;
-    }
-    row.innerHTML = `<div class="history-left">${leftContent}</div><div class="history-right">${badgeHtml}<button class="history-delete" type="button" data-index="${originalIndex}" data-type="${type}">×</button></div>`;
-    historyList.appendChild(row);
-  }
-
-  historyList.addEventListener("click", (e) => {
-    const btn = e.target.closest(".history-delete");
-    if (!btn) return;
-    e.stopPropagation(); e.preventDefault();
-    const realIndex = parseInt(btn.dataset.index, 10);
-    const type = btn.dataset.type;
-    triggerCustomConfirm("Delete this session?", () => {
-      if (type === 'metacon') { metaconHistory.splice(realIndex, 1); saveJSON(LS.metaconHistory, metaconHistory); }
-      else { workoutHistory.splice(realIndex, 1); saveJSON(LS.workoutHistory, workoutHistory); }
-      const total = metaconHistory.length + workoutHistory.length;
-      renderInitialCounter(String(total));
-      renderHistoryContent();
-    });
-  });
-
-  /* =========================================================
-     EXERCISE MODAL (EDIT & MANUAL SAVE)
-  ========================================================= */
-  const TAB_ORDER = ["push","pull","legs","shoulders","abs","cardio"];
-  let activeTab = "push";
-  let isEditing = false;
-  let tempLibrary = null;
-  let isDirty = false;
-
-  function openModal(){ 
-      modal.classList.add("show");
-      // DEEP CLONE to temp
-      tempLibrary = JSON.parse(JSON.stringify(library));
-      isDirty = false;
-      renderTabs(); 
-      renderList(); 
-  }
-  
-  // Close function now handles checking dirty state
-  function closeModalFn(force = false){ 
-      if (!force && isDirty) {
-          showUnsavedConfirm();
-          return;
-      }
-      
-      modal.classList.remove("show"); 
-      // Reset edit state on close
-      isEditing = false;
-      listEl.classList.remove("editing");
-      editListBtn.textContent = "Edit";
-      // Discard temp changes (next open re-clones from LS)
-      tempLibrary = null; 
-      isDirty = false;
-  }
-  
-  // Toggle Edit Mode Logic
-  editListBtn.addEventListener("click", () => {
-      if (isEditing) {
-          // "Save" Clicked -> Commit changes
-          library = JSON.parse(JSON.stringify(tempLibrary)); // Commit temp to main
-          saveJSON(LS.library, library);
-          isDirty = false;
-          
-          isEditing = false;
-          listEl.classList.remove("editing");
-          editListBtn.textContent = "Edit";
-          renderList(); // Re-render to disable inputs
-      } else {
-          // "Edit" Clicked -> Enter mode
-          isEditing = true;
-          listEl.classList.add("editing");
-          editListBtn.textContent = "Save";
-          renderList(); // Re-render to enable inputs
-      }
-  });
-  
-  modalBackBtn.addEventListener("click", () => {
-      closeModalFn();
-  });
-
-  exerciseBtn.addEventListener("click", openModal);
-  // modal.addEventListener("click",(e)=>{ if(e.target === modal) closeModalFn(); }); // Optional: Click outside closes? Better disable for dirty check.
-  
-  function renderTabs(){
-    tabsEl.innerHTML = "";
-    TAB_ORDER.forEach(k=>{
-      const b = document.createElement("button"); b.className = "tab" + (k===activeTab ? " active":"");
-      b.textContent = k; b.addEventListener("click", ()=>{ activeTab = k; renderTabs(); renderList(); });
-      tabsEl.appendChild(b);
-    });
-  }
-
-  function renderList(){
-    listEl.innerHTML = "";
-    // Use TEMP library for rendering
-    const arr = tempLibrary[activeTab] || [];
-    if(!tempLibrary[activeTab]) tempLibrary[activeTab]=[];
-    
-    if (isEditing) listEl.classList.add("editing");
-    else listEl.classList.remove("editing");
-
-    arr.forEach((item, idx)=>{
-      const wrap = document.createElement("div");
-      if(item.hidden) wrap.classList.add("hidden-exercise");
-      wrap.className = "item " + (item.hidden ? "hidden-exercise" : "");
-      
-      const name = document.createElement("input"); 
-      name.className = "name"; 
-      name.value = item.name || "";
-      name.disabled = !isEditing; // Disabled if not editing
-      
-      name.addEventListener("input", ()=>{ 
-          tempLibrary[activeTab][idx].name = name.value; 
-          isDirty = true; 
-      });
-      
-      const minInput = document.createElement("input"); 
-      minInput.className = "reps"; 
-      minInput.placeholder = "Min";
-      minInput.value = item.minReps || item.reps || ""; 
-      minInput.disabled = !isEditing; // Disabled if not editing
-      
-      minInput.addEventListener("change", ()=>{ 
-          const val = minInput.value.trim();
-          tempLibrary[activeTab][idx].minReps = val;
-          delete tempLibrary[activeTab][idx].reps;
-          isDirty = true;
-      });
-
-      const dash = document.createElement("span");
-      dash.className = "dash-sep";
-      dash.textContent = "-";
-      dash.style.fontSize = "18px";
-      dash.style.fontWeight = "700";
-      dash.style.color = "#cbd5e1";
-      dash.style.textAlign = "center";
-
-      const maxInput = document.createElement("input"); 
-      maxInput.className = "reps"; 
-      maxInput.placeholder = "Max";
-      maxInput.value = item.maxReps || "";
-      maxInput.disabled = !isEditing; // Disabled if not editing
-      
-      maxInput.addEventListener("change", ()=>{ 
-          const val = maxInput.value.trim();
-          tempLibrary[activeTab][idx].maxReps = val;
-          isDirty = true;
-      });
-      
-      const eyeBtn = document.createElement("button"); eyeBtn.className = "visibility-btn";
-      eyeBtn.innerHTML = item.hidden ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>` : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
-      eyeBtn.addEventListener("click", (e) => { 
-          e.stopPropagation(); 
-          item.hidden = !item.hidden; 
-          // Update temp, dirty, re-render
-          tempLibrary[activeTab][idx].hidden = item.hidden;
-          isDirty = true;
-          renderList(); 
-      });
-
-      const del = document.createElement("button"); del.className = "trash"; del.textContent = "×";
-      del.addEventListener("click", (e)=>{
-        e.stopPropagation(); e.preventDefault();
-        // Delete from temp immediately
-        tempLibrary[activeTab].splice(idx, 1);
-        isDirty = true;
-        renderList();
-      });
-
-      wrap.appendChild(name); 
-      wrap.appendChild(minInput); 
-      wrap.appendChild(dash); 
-      wrap.appendChild(maxInput); 
-      wrap.appendChild(eyeBtn); 
-      wrap.appendChild(del);
-      listEl.appendChild(wrap);
-    });
-  }
-
-  const checkAddButtonState = () => {
-    addBtn.disabled = !(addName.value.trim().length > 0 && addMin.value.trim().length > 0);
-  };
-
-  addName.addEventListener('input', checkAddButtonState);
-  addMin.addEventListener('input', checkAddButtonState);
-  addMax.addEventListener('input', checkAddButtonState);
-
-  addBtn.disabled = true;
-
-  addBtn.addEventListener("click", ()=>{
-    const n = (addName.value||"").trim(); 
-    const min = (addMin.value||"").trim();
-    const max = (addMax.value||"").trim();
-    
-    if(!n || !min) return;
-    
-    if(!tempLibrary[activeTab]) tempLibrary[activeTab]=[];
-    
-    let newEx = { name: n, hidden: false };
-    newEx.minReps = min;
-    if(max) newEx.maxReps = max;
-    
-    tempLibrary[activeTab].unshift(newEx);
-    isDirty = true;
-   
-    addName.value="";
-    addMin.value="";
-    addMax.value="";
-    addBtn.disabled = true;
-
-    renderList();
-  });
-
-  function init() {
-    ensureWeekState();
-    renderStreakUI();
-    updateExerciseButtonLabel();
-    renderInitialCounter(String(getTotalDays()));
-
-    const savedWorkout = loadJSON(LS.currentWorkout, null);
-    if (savedWorkout) {
-      currentWorkout = savedWorkout;
-      showWorkoutState(savedWorkout);
-    } else {
-      showWeeklyCenter();
-    }
-  }
-
-  /* =========================================================
-     COUNTER LOGIC (FIXED)
-  ========================================================= */
-  function getStreak(){ return parseInt(localStorage.getItem(LS.streak)||"0",10); }
-  function setStreak(n){ localStorage.setItem(LS.streak, String(Math.max(0, n|0))); }
-  function getWeekCount(){ return parseInt(localStorage.getItem(LS.weekCount)||"0",10); }
-  function setWeekCount(n){ localStorage.setItem(LS.weekCount, String(Math.max(0, n|0))); }
-  function getWeekCounted(){ return localStorage.getItem(LS.weekCounted)==="1"; }
-  function setWeekCounted(v){ localStorage.setItem(LS.weekCounted, v ? "1" : "0"); }
-  function getTotalDays(){ return metaconHistory.length + workoutHistory.length; }
-
-  function ensureWeekState(){
-    const current = isoWeekKey();
-    const storedWeek = localStorage.getItem(LS.weekKey);
-    if(!storedWeek){
-      localStorage.setItem(LS.weekKey, current);
-      localStorage.setItem(LS.weekCount, "0");
-      localStorage.setItem(LS.weekCounted, "0");
-      return;
-    }
-    if(storedWeek !== current){
-      const lastCount = parseInt(localStorage.getItem(LS.weekCount)||"0",10);
-      if(lastCount < 3) localStorage.setItem(LS.streak, "0");
-      localStorage.setItem(LS.weekKey, current);
-      localStorage.setItem(LS.weekCount, "0");
-      localStorage.setItem(LS.weekCounted, "0");
-    }
-  }
-
-  function renderStreakUI(){
-    if (getTotalDays() === 0) setStreak(0);
-    if(streakInline) streakInline.textContent = `${getStreak()} week streak`;
-  }
-  function renderInitialCounter(valStr) {
-    weekNumWrap.innerHTML = "";
-    valStr.split("").forEach(char => {
-      const d = document.createElement("div"); d.className = "ticker-digit";
-      d.innerHTML = `<div class="ticker-track" style="transform: translateY(0%)"><div class="ticker-num">${char}</div></div>`;
-      weekNumWrap.appendChild(d);
-    });
-  }
-  function animateCounter(oldVal, newVal) {
-    if (oldVal.length !== newVal.length) { renderInitialCounter(newVal); return; }
-    weekNumWrap.innerHTML = "";
-    const oldChars = oldVal.split(""); const newChars = newVal.split("");
-    oldChars.forEach((oldChar, i) => {
-      const newChar = newChars[i];
-      const digitDiv = document.createElement("div"); digitDiv.className = "ticker-digit";
-      if (oldChar === newChar) {
-         digitDiv.innerHTML = `<div class="ticker-track" style="transform: translateY(0%)"><div class="ticker-num">${newChar}</div></div>`;
-      } else {
-         digitDiv.innerHTML = `<div class="ticker-track" style="transform: translateY(-50%)"><div class="ticker-num">${newChar}</div><div class="ticker-num">${oldChar}</div></div>`;
-         requestAnimationFrame(() => { requestAnimationFrame(() => { digitDiv.querySelector(".ticker-track").style.transform = "translateY(0%)"; }); });
-      }
-      weekNumWrap.appendChild(digitDiv);
-    });
-  }
-  function updateCounterUI(oldVal, newVal, animate) {
-    if (animate) animateCounter(oldVal, newVal); else renderInitialCounter(newVal);
-  }
-
-  function showPlanButton(){ planWorkoutBtn.classList.add("hidden"); }
-
-  function renderWorkout(workout){
-    cardTitle.textContent = workout.type;
-    cardRows.innerHTML = "";
-    workout.rows.forEach(r=>{
-      const row = document.createElement("div"); row.className = "row";
-      
-      const left = document.createElement("div"); left.className = "row-left";
-      
-      // NEW RENDER LOGIC: Text + Dash + Tag
-      const txt = document.createElement("div"); txt.className = "row-text";
-      
-      const tagName = r.tags.length > 0 ? r.tags[0] : "";
-      const prettyTag = tagName ? (tagName.charAt(0).toUpperCase() + tagName.slice(1)) : "";
-      
-      let htmlContent = r.text;
-      if (prettyTag) {
-          htmlContent += `<span class="row-tag"> — ${prettyTag}</span>`;
-      }
-      txt.innerHTML = htmlContent; 
-      
-      left.appendChild(txt);
-      row.appendChild(left);
-      
-      cardRows.appendChild(row);
-    });
-    card.classList.remove("hidden");
-    requestAnimationFrame(()=> card.classList.add("visible"));
-    showPlanButton(workout);
-  }
-
-  function showWeeklyCenter(){
-    historyBtn.classList.remove("hidden");
-    weeklyCenter.classList.remove("hidden"); weeklyCenter.style.opacity = '0';
-    focusPicker.classList.remove("hidden");
-    card.classList.remove("visible"); card.classList.add("hidden");
-    slideWrap.classList.remove("show"); slideWrap.style.opacity = ''; slideWrap.style.pointerEvents = '';
-    planTriggerBtn.classList.remove("hidden");
-    exerciseBtn.classList.remove("hidden");
-    currentWorkout = null; plannedReps = {}; showPlanButton(null);
-    
-    roundCounterControl.classList.remove("visible");
-    
-    if(restTimerInterval) clearInterval(restTimerInterval);
-    isResting = false; restTimeLeft = 20;
-    resetMetaconUI();
-    
-    requestAnimationFrame(() => { weeklyCenter.style.opacity = '1'; actionsArea.classList.remove("faded"); });
-  }
-
-  function showWorkoutState(workout){
-    weeklyCenter.classList.add("hidden");
-    historyBtn.classList.add("hidden");
-    focusPicker.classList.add("hidden");
-    renderWorkout(workout);
-    planTriggerBtn.classList.add("hidden");
-    exerciseBtn.classList.add("hidden");
-    slideWrap.classList.add("show"); slideWrap.style.opacity = '1';
-    
-    // Show Timer Wrapper
-    cardTimerWrap.classList.remove("hidden");
-    
-    if(workout.type === "Metabolic Conditioning") {
-        // Metacon Setup
-        roundCounterControl.classList.remove("visible"); 
-        
-        // Check state
-        if (metaconState.running || metaconState.accumulated > 0) {
-            if(metaconState.running) {
-                cardTimer.classList.add("active");
-                metaconTimerInterval = setInterval(updateMetaconDisplay, 100);
-            } else {
-                cardTimer.classList.add("paused");
-            }
-            updateMetaconDisplay();
-        } else {
-            cardTimer.textContent = "Start Workout";
+          }
+          updateWizardUI();
+          planSheetOverlay.classList.add("show");
         }
-        
-    } else {
-        // AMRAP Setup
-        currentRounds = workout.roundsDone || 0;
-        updateRoundBtn();
-        roundCounterControl.classList.add("visible");
-        
-        if (workout.timerActivated) {
-            roundCounterControl.classList.remove("disabled-state");
-            roundMinus.disabled = false;
-            roundPlus.disabled = false;
-        } else {
-            roundCounterControl.classList.add("disabled-state");
-            roundMinus.disabled = true;
-            roundPlus.disabled = true;
-        }
-        
-        // Check for saved time
-        restTimeLeft = (workout.timeLeft !== undefined) ? workout.timeLeft : (workout.duration || 300);
-        
-        // Initial Text
-        if (restTimeLeft === (workout.duration || 300) && !workout.timerActivated) {
-            cardTimer.textContent = getStartText();
-        } else {
-            // If loaded in a "paused" state (implied by reload)
-            cardTimer.textContent = "Resume (" + formatTimerTime(restTimeLeft) + ")";
-            cardTimer.classList.add("paused"); 
-        }
-    }
-    
-    plannedReps = {}; resetSlider();
-  }
 
-  function showMesh(on){
-    if(on){ aiStage.style.display = "block"; requestAnimationFrame(()=> aiStage.classList.add("show")); }
-    else{ aiStage.classList.remove("show"); setTimeout(()=>{ aiStage.style.display="none"; }, 250); }
-  }
+              function updateWizardUI(){
+                if(wizStep === 1){
+                  wizTitle.textContent = "What would you like to train?";
+                  wizBackBtn.textContent = "Back";
+                  wizNextBtn.textContent = "Next";
+                  wizNextBtn.disabled = wizSelection.size === 0;
+                  wizStep1.classList.add("active");
+                  wizStep2.classList.remove("active");
+                  wizStep3.classList.remove("active");
+                } else if(wizStep === 2){
+                  wizTitle.textContent = "How many exercises?";
+                  wizBackBtn.textContent = "Back";
+                  wizNextBtn.textContent = "Next";
+                  wizNextBtn.disabled = !wizCount;
+                  wizStep1.classList.remove("active");
+                  wizStep2.classList.add("active");
+                  wizStep3.classList.remove("active");
+                } else if(wizStep === 3){
+                  wizTitle.textContent = "For how long?";
+                  wizBackBtn.textContent = "Back";
+                  wizNextBtn.textContent = "Generate";
+                  wizNextBtn.disabled = !wizDuration;
+                  wizStep1.classList.remove("active");
+                  wizStep2.classList.remove("active");
+                  wizStep3.classList.add("active");
+                }
+              }
 
-  let sliding = false, startClientX = 0, currentWidth = 52, rafPending = false, pendingWidth = 52;
-  function applyTransitions(on){
-    if(on){ slideKnob.style.transition = "width .2s ease-out, transform .2s ease-out"; slideWhite.style.transition = "clip-path .2s ease-out"; }
-    else { slideKnob.style.transition = "none"; slideWhite.style.transition = "none"; }
-  }
-  function resetSlider(){
-    currentWidth = 52; applyTransitions(false);
-    requestAnimationFrame(()=>{ slideKnob.style.width = "52px"; slideWhite.style.clipPath = "inset(0 100% 0 0)"; });
-  }
-  function setSliderProgressImmediate(width){
-    const containerWidth = slideWrap.getBoundingClientRect().width;
-    const w = Math.max(52, Math.min(width, containerWidth));
-    currentWidth = w; slideKnob.style.width = `${w}px`;
-    const pct = (w / containerWidth) * 100; slideWhite.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
-  }
-  function setSliderProgress(px){
-    pendingWidth = px; if(rafPending) return; rafPending = true;
-    requestAnimationFrame(()=>{ rafPending = false; setSliderProgressImmediate(pendingWidth); });
-  }
-  function snapBack(){ applyTransitions(true); requestAnimationFrame(()=> setSliderProgressImmediate(52)); }
+              // Step 1: Logic
+              document.querySelectorAll("#wizStep1 .plan-option").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const val = btn.dataset.val;
+                    const allBtns = document.querySelectorAll("#wizStep1 .plan-option");
 
-  slideKnob.addEventListener("pointerdown", (e)=>{
-    sliding = true; slideKnob.setPointerCapture(e.pointerId); applyTransitions(false);
-    startClientX = e.clientX; if (navigator.vibrate) navigator.vibrate(10);
-  });
-  slideKnob.addEventListener("pointermove", (e)=>{
-    if(!sliding) return; const delta = e.clientX - startClientX; if (delta < 0) return;
-    setSliderProgress(52 + delta);
-  });
-  function finishSlide(e){
-    if(!sliding) return; sliding = false; try{ slideKnob.releasePointerCapture(e.pointerId); }catch{}
-    const containerWidth = slideWrap.getBoundingClientRect().width;
-    
-    if(currentWidth > containerWidth * 0.92){
-      applyTransitions(true);
-      
-      // 1. METACON CHECKS
-         if (currentWorkout?.type === "Metabolic Conditioning") {
-             if (!metaconState.running && metaconState.accumulated === 0) {
-                 requestAnimationFrame(()=> setSliderProgressImmediate(52));
-                 snapBack();
-                 triggerCustomConfirm(
-                     "You haven't started the timer. Quit?",
-                     () => { discardWorkout(); },
-                     "Quit Workout", true
-                 );
-                 return;
-             }
-         }
-         // 2. AMRAP CHECKS
-         else {
-             if (!currentWorkout.timerActivated || isResting) {
-                 requestAnimationFrame(()=> setSliderProgressImmediate(52));
-                 snapBack();
+                    if (val === "metacon") {
+                       const wasSelected = wizSelection.has("metacon");
+                       wizSelection.clear();
+                       allBtns.forEach(b => b.classList.remove("selected"));
+                       if (!wasSelected) {
+                           wizSelection.add("metacon");
+                           btn.classList.add("selected");
+                       }
+                    } else {
+                       if (wizSelection.has("metacon")) {
+                           wizSelection.clear();
+                           allBtns.forEach(b => b.classList.remove("selected"));
+                       }
+                       if (wizSelection.has(val)) {
+                           wizSelection.delete(val);
+                           btn.classList.remove("selected");
+                       } else {
+                           wizSelection.add(val);
+                           btn.classList.add("selected");
+                       }
+                    }
+                    updateWizardUI();
+                });
+              });
 
-                 if(isResting) {
+              // Step 2: Count
+              document.querySelectorAll("#wizStep2 .plan-option").forEach(btn => {
+                btn.addEventListener("click", () => {
+                  document.querySelectorAll("#wizStep2 .plan-option").forEach(b => b.classList.remove("selected"));
+                  btn.classList.add("selected");
+                  wizCount = parseInt(btn.dataset.val, 10);
+                  updateWizardUI();
+                });
+              });
+
+              // Step 3: Duration
+              document.querySelectorAll("#wizStep3 .plan-option").forEach(btn => {
+                btn.addEventListener("click", () => {
+                  document.querySelectorAll("#wizStep3 .plan-option").forEach(b => b.classList.remove("selected"));
+                  btn.classList.add("selected");
+                  wizDuration = parseInt(btn.dataset.val, 10); // Seconds
+                  updateWizardUI();
+                });
+              });
+
+              // Navigation
+              wizBackBtn.addEventListener("click", () => {
+                if(wizStep === 3){
+                  wizStep = 2; updateWizardUI();
+                } else if(wizStep === 2){
+                  wizStep = 1; updateWizardUI();
+                } else {
+                  planSheetOverlay.classList.remove("show");
+                }
+              });
+
+              wizNextBtn.addEventListener("click", () => {
+                if(wizStep === 1){
+                    if(wizSelection.has("metacon")) {
+                        planSheetOverlay.classList.remove("show");
+                        triggerGenerationSequence();
+                    } else {
+                        wizStep = 2; updateWizardUI();
+                    }
+                } else if(wizStep === 2){
+                    wizStep = 3; updateWizardUI();
+                } else {
+                    planSheetOverlay.classList.remove("show");
+                    triggerGenerationSequence();
+                }
+              });
+
+              // Trigger from Main Button
+              planTriggerBtn.addEventListener("click", initWizard);
+
+              // --- GENERATION SEQUENCE ---
+              function triggerGenerationSequence(){
+                actionsArea.classList.add("faded");
+                historyBtn.classList.add("hidden");
+                
+                showMesh(true);
+                setTimeout(()=>{
+                  let workout = null;
+                  
+                  if(wizSelection.has("metacon")) {
+                     workout = generateMETACON();
+                  } else {
+                     workout = generateAMRAP_FOCUSED();
+                  }
+
+                  if (!workout) {
+                     showMesh(false);
+                     actionsArea.classList.remove("faded");
+                     historyBtn.classList.remove("hidden");
+                     errorOverlay.classList.add("show");
+                     return;
+                  }
+
+                  currentWorkout = workout;
+                  saveJSON(LS.currentWorkout, workout);
+                  
+                  showMesh(false);
+                  setTimeout(() => {
+                    showWorkoutState(workout);
+                    actionsArea.classList.remove("faded");
+                  }, 300);
+
+                }, 1000);
+              }
+
+              /* =========================================================
+                 WORKOUT GEN LOGIC
+              ========================================================= */
+              function pillForTag(tagKey){
+                const t = TAGS.find(t=>t.key===tagKey);
+                return t ? t.pill : "";
+              }
+
+              function generateAMRAP_FOCUSED(){
+                let selectedTags = Array.from(wizSelection);
+                if(selectedTags.length === 0) selectedTags = ["push","pull","legs","shoulders","abs","cardio"];
+                 
+                let tagPools = {};
+                selectedTags.forEach(tag => {
+                    if(library[tag]) {
+                        const valid = library[tag].filter(ex => !ex.hidden).map(ex => ({...ex, originTag: tag}));
+                        if(valid.length > 0) tagPools[tag] = valid;
+                    }
+                });
+
+                let activeTags = Object.keys(tagPools);
+                if(activeTags.length === 0) return null;
+
+                const count = wizCount || 3;
+                let selectedExercises = [];
+                let usedNames = new Set();
+
+                // 1. Guaranteed One Per Category
+                for (let i = activeTags.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [activeTags[i], activeTags[j]] = [activeTags[j], activeTags[i]];
+                }
+
+                for (const tag of activeTags) {
+                    if (selectedExercises.length >= count) break;
+                    const pool = tagPools[tag];
+                    const randomEx = pool[Math.floor(Math.random() * pool.length)];
+                    if (!usedNames.has(randomEx.name)) {
+                        selectedExercises.push(randomEx);
+                        usedNames.add(randomEx.name);
+                    }
+                }
+
+                // 2. Fill Remainder
+                if (selectedExercises.length < count) {
+                    let remainingPool = [];
+                    activeTags.forEach(tag => {
+                        tagPools[tag].forEach(ex => {
+                            if (!usedNames.has(ex.name)) {
+                                remainingPool.push(ex);
+                            }
+                        });
+                    });
+
+                    for (let i = remainingPool.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [remainingPool[i], remainingPool[j]] = [remainingPool[j], remainingPool[i]];
+                    }
+
+                    const needed = count - selectedExercises.length;
+                    if (remainingPool.length < needed) return null;
+                   
+                    for(let i=0; i<needed; i++) {
+                        selectedExercises.push(remainingPool[i]);
+                    }
+                }
+
+                // 3. Final Shuffle
+                for (let i = selectedExercises.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [selectedExercises[i], selectedExercises[j]] = [selectedExercises[i], selectedExercises[j]];
+                }
+
+                const rows = selectedExercises.map(ex => {
+                  const reps = (ex.reps || "").trim();
+                  const text = reps ? `${reps} ${ex.name}` : ex.name;
+                  return { text, tags: [ex.originTag] };
+                });
+
+                let title = "";
+                if (selectedTags.length === 1) {
+                    title = selectedTags[0].charAt(0).toUpperCase() + selectedTags[0].slice(1);
+                } else if (selectedTags.length === 2) {
+                     title = selectedTags.map(t => t.charAt(0).toUpperCase() + t.slice(1)).join(" & ");
+                } else {
+                    title = "Mixed Workout";
+                }
+
+                return { type: title, rows, duration: wizDuration || 300 };
+              }
+                  
+              function generateMETACON(){
+                return {
+                  type: "Test day",
+                  subtitle: "This is your test day perform one set at max reps.",
+                  rows: [
+                    { text: "Pull-Ups", tags:["pull"] },
+                    { text: "Dips", tags:["push"] },
+                    { text: "Jumping Squats", tags:["legs"] },
+                    { text: "Push-Ups", tags:["push"] },
+                    { text: "Full body Crunches", tags:["abs"] }
+                  ]
+                };
+              }
+
+              /* =========================================================
+                 ROUND COUNTER LOGIC (SPLIT)
+              ========================================================= */
+              function updateRoundBtn(){
+                  roundPlus.textContent = "Rounds completed: " + currentRounds;
+                  if (currentWorkout) {
+                      currentWorkout.roundsDone = currentRounds;
+                      saveJSON(LS.currentWorkout, currentWorkout);
+                  }
+              }
+
+              function enableRoundButtons() {
+                  roundCounterControl.classList.remove("disabled-state");
+                  roundMinus.disabled = false;
+                  roundPlus.disabled = false;
+                  if (currentWorkout) {
+                      currentWorkout.timerActivated = true;
+                      saveJSON(LS.currentWorkout, currentWorkout);
+                  }
+              }
+
+              roundPlus.addEventListener("click", () => {
+                  currentRounds++;
+                  updateRoundBtn();
+              });
+
+              roundMinus.addEventListener("click", () => {
+                  if(currentRounds > 0) currentRounds--;
+                  updateRoundBtn();
+              });
+
+              /* =========================================================
+                 AUDIO ENGINE (Boxing Bell & Victory Fanfare)
+              ========================================================= */
+              let audioCtx = null;
+              function initAudio() {
+                  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                  if (audioCtx.state === 'suspended') audioCtx.resume();
+              }
+
+              // --- BOXING BELL (DING DING DING) ---
+              function playBoxingBell() {
+                  try {
+                      if(!audioCtx) initAudio();
+                      const now = audioCtx.currentTime;
+                      const strikeBell = (time) => {
+                          const osc = audioCtx.createOscillator();
+                          const gain = audioCtx.createGain();
+                          osc.connect(gain);
+                          gain.connect(audioCtx.destination);
+                          osc.type = "triangle"; osc.frequency.value = 750;
+                          gain.gain.setValueAtTime(0, time);
+                          gain.gain.linearRampToValueAtTime(0.5, time + 0.01);
+                          gain.gain.exponentialRampToValueAtTime(0.001, time + 1.2);
+                          osc.start(time); osc.stop(time + 1.3);
+                           
+                          const overtone = audioCtx.createOscillator();
+                          const ogain = audioCtx.createGain();
+                          overtone.connect(ogain);
+                          ogain.connect(audioCtx.destination);
+                          overtone.type = "sine"; overtone.frequency.value = 1200;
+                          ogain.gain.setValueAtTime(0, time);
+                          ogain.gain.linearRampToValueAtTime(0.2, time + 0.01);
+                          ogain.gain.exponentialRampToValueAtTime(0.001, time + 0.5);
+                          overtone.start(time); overtone.stop(time + 0.6);
+                      };
+                      strikeBell(now); strikeBell(now + 0.25); strikeBell(now + 0.5);
+                  } catch(e) {}
+              }
+
+              function playCelebrationSound() {
+                  try {
+                      if(!audioCtx) initAudio();
+                      const now = audioCtx.currentTime;
+                     
+                      const bufferSize = audioCtx.sampleRate * 0.5;
+                      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                      const data = buffer.getChannelData(0);
+                      for (let i = 0; i < bufferSize; i++) { data[i] = Math.random() * 2 - 1; }
+                      const noise = audioCtx.createBufferSource();
+                      noise.buffer = buffer;
+                      const noiseGain = audioCtx.createGain();
+                      noise.connect(noiseGain);
+                      noiseGain.connect(audioCtx.destination);
+                      noiseGain.gain.setValueAtTime(0.2, now);
+                      noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                      noise.start(now);
+
+                      const notes = [523.25, 587.33, 659.25, 698.46, 783.99, 880.00, 987.77, 1046.50];
+                      const noteDur = 0.06;
+                      notes.forEach((freq, i) => {
+                          const osc = audioCtx.createOscillator();
+                          const gain = audioCtx.createGain();
+                          osc.connect(gain);
+                          gain.connect(audioCtx.destination);
+                          osc.type = "sawtooth"; osc.frequency.value = freq;
+                          const start = now + (i * noteDur);
+                          gain.gain.setValueAtTime(0, start);
+                          gain.gain.linearRampToValueAtTime(0.2, start + 0.01);
+                          gain.gain.linearRampToValueAtTime(0, start + noteDur);
+                          osc.start(start); osc.stop(start + noteDur + 0.05);
+                      });
+
+                      const chordTime = now + (notes.length * noteDur);
+                      const chordNotes = [523.25, 659.25, 783.99, 1046.50];
+                      chordNotes.forEach(freq => {
+                          const osc = audioCtx.createOscillator();
+                          const gain = audioCtx.createGain();
+                          osc.connect(gain);
+                          gain.connect(audioCtx.destination);
+                          osc.type = "sawtooth"; osc.frequency.value = freq;
+                          gain.gain.setValueAtTime(0, chordTime);
+                          gain.gain.linearRampToValueAtTime(0.15, chordTime + 0.05);
+                          gain.gain.exponentialRampToValueAtTime(0.001, chordTime + 1.5);
+                          osc.start(chordTime); osc.stop(chordTime + 1.5);
+                      });
+                  } catch(e) {}
+              }
+
+              /* =========================================================
+                 TIMER LOGIC (UNIFIED CARD TIMER)
+              ========================================================= */
+              
+              // Test Day Rest Button Logic
+              restBtn.addEventListener("click", toggleBigRestTimer);
+
+              function toggleBigRestTimer() {
+                  if (bigRestInterval) {
+                     // Stop
+                     clearInterval(bigRestInterval);
+                     bigRestInterval = null;
+                     restBtn.textContent = "Rest";
+                     restBtn.classList.remove("active-timer");
+                     bigRestTimeLeft = 120;
+                  } else {
+                     // Start
+                     initAudio();
+                     restBtn.classList.add("active-timer");
+                     bigRestTimeLeft = 120;
+                     restBtn.textContent = formatTimerTime(bigRestTimeLeft);
+                     
+                     bigRestInterval = setInterval(() => {
+                         bigRestTimeLeft--;
+                         if(bigRestTimeLeft <= 0) {
+                             clearInterval(bigRestInterval);
+                             bigRestInterval = null;
+                             restBtn.textContent = "Rest";
+                             restBtn.classList.remove("active-timer");
+                             playBoxingBell();
+                             bigRestTimeLeft = 120;
+                         } else {
+                             restBtn.textContent = formatTimerTime(bigRestTimeLeft);
+                         }
+                     }, 1000);
+                  }
+              }
+
+              cardTimer.addEventListener("click", () => {
+                  initAudio();
+                 
+                  if (currentWorkout?.type === "Test day") {
+                       // Test day uses the big rest button, so Start Workout here is a placeholder or could enable interactions
+                       // For now, it just removes itself
+                       cardTimerWrap.classList.add("hidden");
+                  } else {
+                      toggleAmrapTimer();
+                  }
+              });
+
+              // --- AMRAP LOGIC (Fixed Duration Timer) ---
+              function formatTimerTime(s) {
+                  if (s < 60) return s + "s";
+                  const m = Math.floor(s / 60);
+                  const sc = s % 60;
+                  return `${m}:${String(sc).padStart(2,'0')}`;
+              }
+             
+              function getStartText() {
+                  const dur = currentWorkout.duration || 300;
+                  const mins = Math.floor(dur / 60);
+                  if (dur < 60) return `Start Your ${dur}s Workout`; // Test case
+                  return `Start Your ${mins} Minute Workout`;
+              }
+
+              function toggleAmrapTimer() {
+                  if (roundPlus.disabled) enableRoundButtons();
+                 
+                  if (isResting) {
+                     // Pause
                      if(restTimerInterval) clearInterval(restTimerInterval);
                      isResting = false;
                      cardTimer.classList.add("paused");
                      cardTimer.textContent = "Resume (" + formatTimerTime(restTimeLeft) + ")";
-                 }
+                  } else {
+                     // Start/Resume
+                     if(restTimerInterval) clearInterval(restTimerInterval);
+                     isResting = true;
+                     cardTimer.classList.add("active");
+                     cardTimer.classList.remove("paused");
+                      
+                     if (restTimeLeft <= 0) restTimeLeft = currentWorkout.duration || 300;
+                     cardTimer.textContent = formatTimerTime(restTimeLeft);
+                      
+                     restTimerInterval = setInterval(() => {
+                        restTimeLeft--;
+                        if (restTimeLeft < 0) {
+                           // Finish
+                           if(restTimerInterval) clearInterval(restTimerInterval);
+                           isResting = false;
+                           restTimeLeft = 0;
+                           cardTimer.classList.remove("active");
+                           cardTimer.classList.remove("paused");
+                           cardTimer.textContent = "Finished";
+                            
+                           // Disable Rounds on Finish
+                           roundCounterControl.classList.add("disabled-state");
+                           roundMinus.disabled = true;
+                           roundPlus.disabled = true;
+                            
+                           playBoxingBell();
+                        } else {
+                           cardTimer.textContent = formatTimerTime(restTimeLeft);
+                        }
+                       
+                        if (currentWorkout) {
+                            currentWorkout.timeLeft = restTimeLeft;
+                            saveJSON(LS.currentWorkout, currentWorkout);
+                        }
+                     }, 1000);
+                  }
+              }
+             
+              function resetAmrapUI() {
+                  if (restTimerInterval) clearInterval(restTimerInterval);
+                  cardTimer.textContent = getStartText();
+                  cardTimer.classList.remove("paused");
+                  cardTimer.classList.remove("active");
+              }
 
-                 triggerCustomConfirm(
-                     "Are you sure you want to quit this workout?",
-                     () => { discardWorkout(); },
-                     "Quit Workout", true
-                 );
-                 return;
-             }
-         }
-      
-      requestAnimationFrame(()=>{ setSliderProgressImmediate(containerWidth); completeWorkout(); });
-    } else snapBack();
-  }
-  slideKnob.addEventListener("pointerup", finishSlide); slideKnob.addEventListener("pointercancel", finishSlide);
-  window.addEventListener("pointerup", finishSlide, { passive: true }); window.addEventListener("pointercancel", finishSlide, { passive: true });
+              /* =========================================================
+                 HISTORY & MODALS etc (Standard)
+              ========================================================= */
+              // ... (Standard history/modal logic as before) ...
+              let currentHistoryTab = 'metacon';
+              document.querySelectorAll('#historyTabs .tab').forEach(t => {
+                t.addEventListener('click', () => {
+                  document.querySelectorAll('#historyTabs .tab').forEach(b => b.classList.remove('active'));
+                  t.classList.add('active');
+                  currentHistoryTab = t.dataset.tab;
+                  renderHistoryContent();
+                });
+              });
+              historyBtn.addEventListener("click", ()=>{ renderHistoryContent(); historyModal.classList.add("show"); });
+              closeHistoryModal.addEventListener("click", ()=> historyModal.classList.remove("show"));
+              historyModal.addEventListener("click",(e)=>{ if(e.target === historyModal) historyModal.classList.remove("show"); });
 
-  function shootConfetti(isPB = false){
-    if(!confettiInstance) return;
-    if (isPB) confettiInstance({ particleCount: 200, spread: 120, origin: { x: 0.5, y: 1 }, startVelocity: 60, colors: ['#FFD700', '#FFA500', '#FFFFFF'], zIndex: 300 });
-    else {
-      const rect = slideWrap.getBoundingClientRect();
-      const x = (rect.left + rect.width * 0.5) / window.innerWidth;
-      const y = (rect.bottom - 6) / window.innerHeight;
-      confettiInstance({ particleCount:160, spread:90, startVelocity:35, origin:{ x, y }, zIndex: 2 });
-    }
-  }
+              function formatTime(ms){
+                // Legacy for old metacon timer logic
+                const total = Math.floor(ms / 1000);
+                const m = String(Math.floor(total / 60)).padStart(2,"0");
+                const s = String(total % 60).padStart(2,"0");
+                return `${m}:${s}`;
+              }
 
-  function triggerHomeTransition(oldVal, newVal) {
-    card.style.opacity = '0'; card.style.transform = 'translateY(20px) scale(0.95)';
-    actionsArea.classList.add("faded");
-    if (document.activeElement) document.activeElement.blur();
-    setTimeout(() => {
-      card.style.opacity = ''; card.style.transform = ''; slideWrap.style.opacity = '';
-      showWeeklyCenter();
-      if (oldVal && newVal) updateCounterUI(oldVal, newVal, true);
-      hardResetPointerState();
-    }, 400);
-  }
+              function renderHistoryContent(){
+                historyList.innerHTML = "";
+                if (currentHistoryTab === 'metacon') {
+                  if (!metaconHistory.length) {
+                    historyList.innerHTML = `<div style="color:#64748b;font-size:14px;padding:20px;text-align:center;">No Test Days recorded yet</div>`;
+                    return;
+                  }
+                  // For Test Days, we might just list them, or show "Completed"
+                  metaconHistory.slice().reverse().forEach((e, i) => {
+                    const originalIndex = metaconHistory.length - 1 - i;
+                    renderHistoryRow(e, false, originalIndex, 'metacon');
+                  });
+                } else {
+                  if (!workoutHistory.length) {
+                    historyList.innerHTML = `<div style="color:#64748b;font-size:14px;padding:20px;text-align:center;">No training sessions yet</div>`;
+                    return;
+                  }
+                  workoutHistory.slice().reverse().forEach((e, i) => {
+                    const originalIndex = workoutHistory.length - 1 - i;
+                    renderHistoryRow(e, false, originalIndex, 'training');
+                  });
+                }
+              }
 
-  function discardWorkout() {
-      localStorage.removeItem(LS.currentWorkout);
-      if(restTimerInterval) clearInterval(restTimerInterval);
-      stopMetaconTimer(); // Clean up state
-      triggerHomeTransition();
-  }
+              function renderHistoryRow(entry, isPB, originalIndex, type) {
+                  const row = document.createElement("div");
+                  row.className = "history-row" + (type === "metacon" ? " history-row-test" : "");
+                let leftContent = "";
+                let badgeHtml = isPB ? '<span class="pr-badge">🏆 PB</span>' : '';
+                if (type === 'metacon') {
+                  leftContent = `<div class="history-time">Test Day</div><div class="history-date">${formatDate(entry.date)}</div>`;
+                } else {
+                  let roundsText = entry.rounds ? ` (${entry.rounds} Rnds)` : "";
+                  leftContent = `<div class="history-time">${entry.type || "Workout"}${roundsText}</div><div class="history-date">${formatDate(entry.date)}</div>`;
+                }
+                const deleteBtn =
+                  type === "training"
+                    ? `<button class="history-delete"
+                         type="button"
+                         data-index="${originalIndex}"
+                         data-type="${type}">×</button>`
+                    : "";
 
-  function completeWorkout(){
-    localStorage.removeItem(LS.currentWorkout);
-    let isPBRun = false; slideWrap.style.opacity = '0'; slideWrap.style.pointerEvents = 'none';
-    const oldTotal = String(getTotalDays());
+                row.innerHTML = `
+                  <div class="history-left">${leftContent}</div>
+                  <div class="history-right">
+                    ${badgeHtml}
+                    ${deleteBtn}
+                  </div>
+                `;
+                historyList.appendChild(row);
+                // --- Expandable results for Test Day ---
+                if (type === "metacon" && Array.isArray(entry.results)) {
+                  const resultsWrap = document.createElement("div");
+                  resultsWrap.className = "history-results hidden";
 
-    // Handle METACON Completion
-    if (currentWorkout?.type === "Metabolic Conditioning") {
-      const finalTimeMs = stopMetaconTimer(); 
-      
-      const previousTimes = metaconHistory.map(h => h.time);
-      const bestPrevious = previousTimes.length ? Math.min(...previousTimes) : Infinity;
-      
-      metaconHistory.push({ time: finalTimeMs, date: todayKey() });
-      saveJSON(LS.metaconHistory, metaconHistory);
-      
-      if (previousTimes.length > 0 && finalTimeMs < bestPrevious) {
-        isPBRun = true; pbTimeDisplay.textContent = formatTime(finalTimeMs);
-        pbPrevDisplay.textContent = `Previous Best: ${formatTime(bestPrevious)}`;
-        pbCardRows.innerHTML = document.getElementById("cardRows").innerHTML;
-        pbCloseBtn.classList.add('hidden-state'); pbOverlay.classList.add('show');
-        shootConfetti(true); setTimeout(() => { pbCloseBtn.classList.remove('hidden-state'); }, 2500);
-      } else shootConfetti(false);
-      
-    } else {
-      // Handle AMRAP Completion
-      if(restTimerInterval) clearInterval(restTimerInterval);
-      resetAmrapUI();
-      
-      const title = currentWorkout.type;
-      const rounds = currentWorkout.roundsDone || 0;
-      
-      summaryRounds.textContent = rounds + " Rounds";
-      summaryCardRows.innerHTML = "";
-      
-      currentWorkout.rows.forEach(r => {
-         const row = document.createElement("div"); row.className = "row";
-         
-         const left = document.createElement("div"); left.className = "row-left";
-         const txt = document.createElement("div"); txt.className = "row-text";
-         
-         const tagName = r.tags.length > 0 ? r.tags[0] : "";
-         const prettyTag = tagName ? (tagName.charAt(0).toUpperCase() + tagName.slice(1)) : "";
-         
-         let displayText = r.text;
-         const parts = r.text.match(/^(\d+)\s+(.*)$/);
-         if(parts) {
-             const repsPerRound = parseInt(parts[1], 10);
-             const name = parts[2];
-             const totalReps = repsPerRound * rounds;
-             displayText = `${totalReps} ${name}`;
-         }
-         
-         let htmlContent = displayText;
-         if (prettyTag) {
-             htmlContent += `<span class="row-tag"> — ${prettyTag}</span>`;
-         }
-         txt.innerHTML = htmlContent; 
-         
-         left.appendChild(txt);
-         row.appendChild(left);
-         
-         row.className += " result-row";
-         row.style.animationDelay = (summaryCardRows.children.length * 0.15) + "s";
+                  entry.results.forEach(r => {
+                    const line = document.createElement("div");
+                    line.className = "history-result-row";
+                    line.innerHTML = `
+                      <span class="res-reps">${r.reps || "—"}</span>
+                      <span class="res-name">${r.name}</span>
+                    `;
+                    resultsWrap.appendChild(line);
+                  });
 
-         summaryCardRows.appendChild(row);
-      });
-      
-      workoutHistory.push({ type: title, date: todayKey(), rounds: rounds });
-      saveJSON(LS.workoutHistory, workoutHistory);
-      
-      summaryOverlay.classList.add("show");
-      shootConfetti(false);
-    }
-    
-    playCelebrationSound();
+                  row.appendChild(resultsWrap);
 
-    const newTotal = String(getTotalDays());
-    roundCounterControl.classList.remove("visible");
+                  row.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    resultsWrap.classList.toggle("hidden");
+                  });
+                }
+              }
 
-    ensureWeekState();
-    let count = getWeekCount() + 1; setWeekCount(count);
-    if(count >= 3 && !getWeekCounted()){ setStreak(getStreak() + 1); setWeekCounted(true); }
-    renderStreakUI();
+        
+              historyList.addEventListener("click", (e) => {
+                const btn = e.target.closest(".history-delete");
+                if (!btn) return;
+                e.stopPropagation(); e.preventDefault();
+                const realIndex = parseInt(btn.dataset.index, 10);
+                const type = btn.dataset.type;
+                triggerCustomConfirm("Delete this session?", () => {
+                  if (type === 'metacon') { metaconHistory.splice(realIndex, 1); saveJSON(LS.metaconHistory, metaconHistory); }
+                  else { workoutHistory.splice(realIndex, 1); saveJSON(LS.workoutHistory, workoutHistory); }
+                  const total = metaconHistory.length + workoutHistory.length;
+                  renderInitialCounter(String(total));
+                  renderHistoryContent();
+                });
+              });
 
-    if (!isPBRun && currentWorkout?.type === "Metabolic Conditioning") {
-       setTimeout(() => { triggerHomeTransition(oldTotal, newTotal); }, 1200);
-    } else if (!isPBRun) {
-       updateCounterUI(oldTotal, newTotal, false);
-    }
-  }
+              /* =========================================================
+                 COUNTERS & UI
+              ========================================================= */
+              function getStreak(){ return parseInt(localStorage.getItem(LS.streak)||"0",10); }
+              function setStreak(n){ localStorage.setItem(LS.streak, String(Math.max(0, n|0))); }
+              function getWeekCount(){ return parseInt(localStorage.getItem(LS.weekCount)||"0",10); }
+              function setWeekCount(n){ localStorage.setItem(LS.weekCount, String(Math.max(0, n|0))); }
+              function getWeekCounted(){ return localStorage.getItem(LS.weekCounted)==="1"; }
+              function setWeekCounted(v){ localStorage.setItem(LS.weekCounted, v ? "1" : "0"); }
+              function getTotalDays(){ return metaconHistory.length + workoutHistory.length; }
 
-  init();
-</script>
-</body>
-</html>
+              function ensureWeekState(){
+                const current = isoWeekKey();
+                const storedWeek = localStorage.getItem(LS.weekKey);
+                if(!storedWeek){
+                  localStorage.setItem(LS.weekKey, current);
+                  localStorage.setItem(LS.weekCount, "0");
+                  localStorage.setItem(LS.weekCounted, "0");
+                  return;
+                }
+                if(storedWeek !== current){
+                  const lastCount = parseInt(localStorage.getItem(LS.weekCount)||"0",10);
+                  if(lastCount < 3) localStorage.setItem(LS.streak, "0");
+                  localStorage.setItem(LS.weekKey, current);
+                  localStorage.setItem(LS.weekCount, "0");
+                  localStorage.setItem(LS.weekCounted, "0");
+                }
+              }
+
+              function renderStreakUI(){
+                if (getTotalDays() === 0) setStreak(0);
+                if(streakInline) streakInline.textContent = `${getStreak()} week streak`;
+              }
+              function renderInitialCounter(valStr) {
+                weekNumWrap.innerHTML = "";
+                valStr.split("").forEach(char => {
+                  const d = document.createElement("div"); d.className = "ticker-digit";
+                  d.innerHTML = `<div class="ticker-track" style="transform: translateY(0%)"><div class="ticker-num">${char}</div></div>`;
+                  weekNumWrap.appendChild(d);
+                });
+              }
+              function animateCounter(oldVal, newVal) {
+                if (oldVal.length !== newVal.length) { renderInitialCounter(newVal); return; }
+                weekNumWrap.innerHTML = "";
+                const oldChars = oldVal.split(""); const newChars = newVal.split("");
+                oldChars.forEach((oldChar, i) => {
+                  const newChar = newChars[i];
+                  const digitDiv = document.createElement("div"); digitDiv.className = "ticker-digit";
+                  if (oldChar === newChar) {
+                     digitDiv.innerHTML = `<div class="ticker-track" style="transform: translateY(0%)"><div class="ticker-num">${newChar}</div></div>`;
+                  } else {
+                     digitDiv.innerHTML = `<div class="ticker-track" style="transform: translateY(-50%)"><div class="ticker-num">${newChar}</div><div class="ticker-num">${oldChar}</div></div>`;
+                     requestAnimationFrame(() => { requestAnimationFrame(() => { digitDiv.querySelector(".ticker-track").style.transform = "translateY(0%)"; }); });
+                  }
+                  weekNumWrap.appendChild(digitDiv);
+                });
+              }
+              function updateCounterUI(oldVal, newVal, animate) {
+                if (animate) animateCounter(oldVal, newVal); else renderInitialCounter(newVal);
+              }
+
+              function showPlanButton(){ planWorkoutBtn.classList.add("hidden"); }
+
+              function renderWorkout(workout){
+                cardTitle.textContent = workout.type;
+                cardSub.textContent = workout.subtitle || ""; // Subtitle for Test Day
+                cardRows.innerHTML = "";
+                
+                const isTestDay = workout.type === "Test day";
+                
+                workout.rows.forEach((r, idx)=>{
+                  const row = document.createElement("div");
+                  // Use grid layout class for Test Day to ensure vertical alignment
+                  row.className = isTestDay ? "test-row" : "row";
+                  
+                  const left = document.createElement("div"); left.className = "row-left";
+                  const txt = document.createElement("div"); txt.className = "row-text";
+                  txt.textContent = r.text; txt.dataset.base = r.text;
+                  left.appendChild(txt);
+                  
+                  const tags = document.createElement("div"); tags.className = "tags";
+                  
+                  // IF TEST DAY -> Add Input
+                  if(isTestDay) {
+                      const input = document.createElement("input");
+                      input.className = "rep-input";
+                      input.type = "number";
+                      input.inputMode = "numeric";
+                      input.pattern = "[0-9]*";
+                      input.id = `repInput-${idx}`;
+                      // Prevent click bubbling to card
+                      input.addEventListener("click", e => e.stopPropagation());
+                      // No placeholder needed as per screenshot
+                      
+                      // In Grid Layout: Add items directly to row, NOT nested in 'tags' for the input
+                      // But to keep code simpler, let's append input to row directly if test day
+                      row.appendChild(left);
+                      row.appendChild(input);
+                      
+                      // Add tags to tags container
+                      r.tags.forEach(tag=>{
+                        const pill = document.createElement("span"); pill.className = `pill ${pillForTag(tag)}`;
+                        pill.textContent = tag; tags.appendChild(pill);
+                      });
+                      row.appendChild(tags);
+                  } else {
+                      // Standard Row Layout
+                      r.tags.forEach(tag=>{
+                        const pill = document.createElement("span"); pill.className = `pill ${pillForTag(tag)}`;
+                        pill.textContent = tag; tags.appendChild(pill);
+                      });
+                      row.appendChild(left);
+                      row.appendChild(tags);
+                  }
+
+                  cardRows.appendChild(row);
+                });
+                card.classList.remove("hidden");
+                requestAnimationFrame(()=> card.classList.add("visible"));
+                showPlanButton(workout);
+              }
+
+              function showWeeklyCenter(){
+                historyBtn.classList.remove("hidden");
+                weeklyCenter.classList.remove("hidden"); weeklyCenter.style.opacity = '0';
+                focusPicker.classList.remove("hidden");
+                card.classList.remove("visible"); card.classList.add("hidden");
+                slideWrap.classList.remove("show"); slideWrap.style.opacity = ''; slideWrap.style.pointerEvents = '';
+                planTriggerBtn.classList.remove("hidden");
+                exerciseBtn.classList.remove("hidden");
+                currentWorkout = null; plannedReps = {}; showPlanButton(null);
+                 
+                roundCounterControl.classList.remove("visible");
+                restBtn.classList.add("hidden"); // Hide Rest Button
+                
+                if(restTimerInterval) clearInterval(restTimerInterval);
+                isResting = false; restTimeLeft = 20;
+                
+                // Clean big rest
+                if(bigRestInterval) clearInterval(bigRestInterval);
+                bigRestInterval = null;
+                restBtn.textContent = "Rest";
+                restBtn.classList.remove("active-timer");
+                 
+                requestAnimationFrame(() => { weeklyCenter.style.opacity = '1'; actionsArea.classList.remove("faded"); });
+              }
+
+              function showWorkoutState(workout){
+                weeklyCenter.classList.add("hidden");
+                historyBtn.classList.add("hidden");
+                focusPicker.classList.add("hidden");
+                renderWorkout(workout);
+                planTriggerBtn.classList.add("hidden");
+                exerciseBtn.classList.add("hidden");
+                slideWrap.classList.add("show"); slideWrap.style.opacity = '1';
+                
+                if(workout.type === "Test day") {
+                    // Test Day Setup
+                    roundCounterControl.classList.remove("visible");
+                    cardTimerWrap.classList.add("hidden"); // Use main Rest button instead
+                    
+                    // Show Rest Button
+                    restBtn.classList.remove("hidden");
+                     
+                } else {
+                    // AMRAP Setup
+                    cardTimerWrap.classList.remove("hidden");
+                    restBtn.classList.add("hidden");
+                    
+                    currentRounds = workout.roundsDone || 0;
+                    updateRoundBtn();
+                    roundCounterControl.classList.add("visible");
+                     
+                    if (workout.timerActivated) {
+                        roundCounterControl.classList.remove("disabled-state");
+                        roundMinus.disabled = false;
+                        roundPlus.disabled = false;
+                    } else {
+                        roundCounterControl.classList.add("disabled-state");
+                        roundMinus.disabled = true;
+                        roundPlus.disabled = true;
+                    }
+                     
+                    // Check for saved time
+                    restTimeLeft = (workout.timeLeft !== undefined) ? workout.timeLeft : (workout.duration || 300);
+                     
+                    // Initial Text
+                    if (restTimeLeft === (workout.duration || 300) && !workout.timerActivated) {
+                        cardTimer.textContent = getStartText();
+                    } else {
+                        // If loaded in a "paused" state (implied by reload)
+                        cardTimer.textContent = "Resume (" + formatTimerTime(restTimeLeft) + ")";
+                        cardTimer.classList.add("paused");
+                    }
+                }
+                 
+                plannedReps = {}; resetSlider();
+              }
+
+              function showMesh(on){
+                if(on){ aiStage.style.display = "block"; requestAnimationFrame(()=> aiStage.classList.add("show")); }
+                else{ aiStage.classList.remove("show"); setTimeout(()=>{ aiStage.style.display="none"; }, 250); }
+              }
+
+              let sliding = false, startClientX = 0, currentWidth = 52, rafPending = false, pendingWidth = 52;
+              function applyTransitions(on){
+                if(on){ slideKnob.style.transition = "width .2s ease-out, transform .2s ease-out"; slideWhite.style.transition = "clip-path .2s ease-out"; }
+                else { slideKnob.style.transition = "none"; slideWhite.style.transition = "none"; }
+              }
+              function resetSlider(){
+                currentWidth = 52; applyTransitions(false);
+                requestAnimationFrame(()=>{ slideKnob.style.width = "52px"; slideWhite.style.clipPath = "inset(0 100% 0 0)"; });
+              }
+              function setSliderProgressImmediate(width){
+                const containerWidth = slideWrap.getBoundingClientRect().width;
+                const w = Math.max(52, Math.min(width, containerWidth));
+                currentWidth = w; slideKnob.style.width = `${w}px`;
+                const pct = (w / containerWidth) * 100; slideWhite.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
+              }
+              function setSliderProgress(px){
+                pendingWidth = px; if(rafPending) return; rafPending = true;
+                requestAnimationFrame(()=>{ rafPending = false; setSliderProgressImmediate(pendingWidth); });
+              }
+              function snapBack(){ applyTransitions(true); requestAnimationFrame(()=> setSliderProgressImmediate(52)); }
+
+              slideKnob.addEventListener("pointerdown", (e)=>{
+                sliding = true; slideKnob.setPointerCapture(e.pointerId); applyTransitions(false);
+                startClientX = e.clientX; if (navigator.vibrate) navigator.vibrate(10);
+              });
+              slideKnob.addEventListener("pointermove", (e)=>{
+                if(!sliding) return; const delta = e.clientX - startClientX; if (delta < 0) return;
+                setSliderProgress(52 + delta);
+              });
+              function finishSlide(e){
+                if(!sliding) return; sliding = false; try{ slideKnob.releasePointerCapture(e.pointerId); }catch{}
+                const containerWidth = slideWrap.getBoundingClientRect().width;
+                 
+                if(currentWidth > containerWidth * 0.92){
+                  applyTransitions(true);
+                 
+                  // AMRAP CHECKS
+                  if (currentWorkout?.type !== "Test day") {
+                         // If timer never activated OR timer is currently ticking (Resting)
+                         if (!currentWorkout.timerActivated || isResting) {
+                             requestAnimationFrame(()=> setSliderProgressImmediate(52));
+                             snapBack();
+
+                             if(isResting) {
+                                 if(restTimerInterval) clearInterval(restTimerInterval);
+                                 isResting = false;
+                                 cardTimer.classList.add("paused");
+                                 cardTimer.textContent = "Resume (" + formatTimerTime(restTimeLeft) + ")";
+                             }
+
+                             triggerCustomConfirm(
+                                 "Are you sure you want to quit this workout?",
+                                 () => { discardWorkout(); },
+                                 "Quit Workout", true
+                             );
+                             return;
+                         }
+                  }
+                 
+                  requestAnimationFrame(()=>{ setSliderProgressImmediate(containerWidth); completeWorkout(); });
+                } else snapBack();
+              }
+              slideKnob.addEventListener("pointerup", finishSlide); slideKnob.addEventListener("pointercancel", finishSlide);
+              window.addEventListener("pointerup", finishSlide, { passive: true }); window.addEventListener("pointercancel", finishSlide, { passive: true });
+
+              function shootConfetti(isPB = false){
+                if(!confettiInstance) return;
+                if (isPB) confettiInstance({ particleCount: 200, spread: 120, origin: { x: 0.5, y: 1 }, startVelocity: 60, colors: ['#FFD700', '#FFA500', '#FFFFFF'], zIndex: 300 });
+                else {
+                  const rect = slideWrap.getBoundingClientRect();
+                  const x = (rect.left + rect.width * 0.5) / window.innerWidth;
+                  const y = (rect.bottom - 6) / window.innerHeight;
+                  confettiInstance({ particleCount:160, spread:90, startVelocity:35, origin:{ x, y }, zIndex: 2 });
+                }
+              }
+
+        function triggerHomeTransition() {
+          card.style.opacity = '0';
+          card.style.transform = 'translateY(20px) scale(0.95)';
+          actionsArea.classList.add("faded");
+
+          if (document.activeElement) document.activeElement.blur();
+
+          setTimeout(() => {
+            card.style.opacity = '';
+            card.style.transform = '';
+            slideWrap.style.opacity = '';
+
+            showWeeklyCenter();
+
+            // Run queued counter animation (if any)
+            if (pendingCounterAnim) {
+              updateCounterUI(
+                pendingCounterAnim.oldVal,
+                pendingCounterAnim.newVal,
+                true
+              );
+              pendingCounterAnim = null;
+            }
+
+            hardResetPointerState();
+          }, 400);
+        }
+
+              function discardWorkout() {
+                  localStorage.removeItem(LS.currentWorkout);
+                  if(restTimerInterval) clearInterval(restTimerInterval);
+                  if(bigRestInterval) clearInterval(bigRestInterval);
+                  triggerHomeTransition();
+              }
+
+              function completeWorkout(){
+                localStorage.removeItem(LS.currentWorkout);
+                let isPBRun = false; slideWrap.style.opacity = '0'; slideWrap.style.pointerEvents = 'none';
+                const oldTotal = String(getTotalDays());
+
+                // Handle TEST DAY Completion
+                if (currentWorkout?.type === "Test day") {
+                  // Collect Inputs
+                  summaryCardRows.innerHTML = "";
+                  summaryRounds.textContent = "Completed";
+                  
+                  // New Data structure for results: [{name: 'Pullups', reps: 15, tag: 'pull'}]
+                  const resultEntries = [];
+                  
+                  // Helper to find best reps for a given exercise name in history
+                  const getPersonalBest = (exName) => {
+                      let max = 0;
+                      metaconHistory.forEach(entry => {
+                          if (entry.results && Array.isArray(entry.results)) {
+                              entry.results.forEach(r => {
+                                  if (r.name === exName) {
+                                      if (r.reps > max) max = r.reps;
+                                  }
+                              });
+                          }
+                      });
+                      return max;
+                  };
+                  
+                  currentWorkout.rows.forEach((r, idx) => {
+                      const inputEl = document.getElementById(`repInput-${idx}`);
+                      const val = inputEl ? inputEl.value : "";
+                      const currentRep = val ? parseInt(val, 10) : 0;
+                      
+                      // Store Result
+                      resultEntries.push({
+                          name: r.text,
+                          reps: currentRep,
+                          tag: r.tags[0] || 'cardio' // Fallback
+                      });
+                      
+                      // Calculate PB Status
+                      const previousMax = getPersonalBest(r.text);
+                      const isNewPB = currentRep > previousMax;
+                      if(isNewPB) isPBRun = true;
+                      
+                      // CREATE SUMMARY ROW
+                      const row = document.createElement("div"); row.className = "row";
+                      
+                      // Left Side (Text stack)
+                      const left = document.createElement("div"); left.className = "row-left";
+                      
+                      const txt = document.createElement("div"); txt.className = "row-text";
+                      txt.textContent = `${currentRep} ${r.text}`;
+                      
+                      const sub = document.createElement("div"); sub.className = "row-sub";
+                      if (isNewPB) {
+                          sub.textContent = `Previous Best: ${previousMax}`;
+                      } else {
+                          sub.textContent = `Best: ${previousMax}`;
+                      }
+                      
+                      left.appendChild(txt);
+                      left.appendChild(sub);
+                      row.appendChild(left);
+                      
+                      // TAGS
+                      const tagsDiv = document.createElement("div"); tagsDiv.className = "tags";
+                      
+                      // Prepend PB Tag if applicable
+                      if (isNewPB) {
+                          const pbPill = document.createElement("span");
+                          pbPill.className = "pill pill-pb";
+                          pbPill.textContent = "PB";
+                          tagsDiv.appendChild(pbPill);
+                      }
+                      
+                      r.tags.forEach(tag=>{
+                          const pill = document.createElement("span"); pill.className = `pill ${pillForTag(tag)}`;
+                          pill.textContent = tag; tagsDiv.appendChild(pill);
+                      });
+                      row.appendChild(tagsDiv);
+
+                      row.className += " result-row";
+                      row.style.animationDelay = (summaryCardRows.children.length * 0.15) + "s";
+                      summaryCardRows.appendChild(row);
+                  });
+                 
+                  // Save Detailed History
+                  metaconHistory.push({
+                      date: todayKey(),
+                      results: resultEntries
+                  });
+                  saveJSON(LS.metaconHistory, metaconHistory);
+                  
+                  summaryOverlay.classList.add("show");
+                  shootConfetti(isPBRun);
+                 
+                } else {
+                  // Handle AMRAP Completion
+                  if(restTimerInterval) clearInterval(restTimerInterval);
+                  resetAmrapUI();
+                 
+                  const title = currentWorkout.type;
+                  const rounds = currentWorkout.roundsDone || 0;
+                 
+                  // Generate Summary
+                  summaryRounds.textContent = rounds + " Rounds";
+                  summaryCardRows.innerHTML = "";
+                 
+                  currentWorkout.rows.forEach(r => {
+                     const row = document.createElement("div"); row.className = "row";
+                      
+                     // TEXT
+                     const left = document.createElement("div"); left.className = "row-left";
+                     const txt = document.createElement("div"); txt.className = "row-text";
+                      
+                     const parts = r.text.match(/^(\d+)\s+(.*)$/);
+                     if(parts) {
+                         const repsPerRound = parseInt(parts[1], 10);
+                         const name = parts[2];
+                         const totalReps = repsPerRound * rounds;
+                         txt.textContent = `${totalReps} ${name}`;
+                     } else {
+                         txt.textContent = r.text;
+                     }
+                     left.appendChild(txt);
+                     row.appendChild(left);
+                      
+                     // TAGS (FIXED)
+                     const tagsDiv = document.createElement("div"); tagsDiv.className = "tags";
+                     r.tags.forEach(tag=>{
+                         const pill = document.createElement("span"); pill.className = `pill ${pillForTag(tag)}`;
+                         pill.textContent = tag;
+                         tagsDiv.appendChild(pill);
+                     });
+                     row.appendChild(tagsDiv);
+
+                     // ANIMATION CLASS
+                     row.className += " result-row";
+                     // Staggered delay (0.15s per item)
+                     row.style.animationDelay = (summaryCardRows.children.length * 0.15) + "s";
+
+                     summaryCardRows.appendChild(row);
+                  });
+                 
+                  workoutHistory.push({ type: title, date: todayKey(), rounds: rounds });
+                  saveJSON(LS.workoutHistory, workoutHistory);
+                 
+                  summaryOverlay.classList.add("show");
+                  shootConfetti(false);
+                }
+                 
+                playCelebrationSound();
+
+                const newTotal = String(getTotalDays());
+                roundCounterControl.classList.remove("visible");
+
+                ensureWeekState();
+                let count = getWeekCount() + 1;
+                setWeekCount(count);
+                if(count >= 3 && !getWeekCounted()){
+                  setStreak(getStreak() + 1);
+                  setWeekCounted(true);
+                }
+                renderStreakUI();
+
+                // Queue counter animation for when we return home
+                pendingCounterAnim = {
+                  oldVal: oldTotal,
+                  newVal: newTotal
+                };
+                }
+
+              pbCloseBtn.onclick = () => {
+                 pbOverlay.classList.remove("show");
+                 setTimeout(() => pbCloseBtn.classList.add('hidden-state'), 300);
+                 triggerHomeTransition(String(getTotalDays()), String(getTotalDays()));
+              };
+
+              /* =========================================================
+                 EXERCISE MODAL
+              ========================================================= */
+              const TAB_ORDER = ["push","pull","legs","shoulders","abs","cardio"];
+              let activeTab = "push";
+              function openModal(){ modal.classList.add("show"); renderTabs(); renderList(); }
+              function closeModalFn(){ modal.classList.remove("show"); saveJSON(LS.library, library); }
+              exerciseBtn.addEventListener("click", openModal);
+              closeModal.addEventListener("click", closeModalFn);
+              modal.addEventListener("click",(e)=>{ if(e.target === modal) closeModalFn(); });
+
+              function renderTabs(){
+                tabsEl.innerHTML = "";
+                TAB_ORDER.forEach(k=>{
+                  const b = document.createElement("button"); b.className = "tab" + (k===activeTab ? " active":"");
+                  b.textContent = k; b.addEventListener("click", ()=>{ activeTab = k; renderTabs(); renderList(); });
+                  tabsEl.appendChild(b);
+                });
+              }
+
+              function renderList(){
+                listEl.innerHTML = "";
+                const arr = library[activeTab] || [];
+                if(!library[activeTab]) library[activeTab]=[];
+                arr.forEach((item, idx)=>{
+                  const wrap = document.createElement("div");
+                  if(item.hidden) wrap.classList.add("hidden-exercise");
+                  wrap.className = "item " + (item.hidden ? "hidden-exercise" : "");
+                 
+                  const name = document.createElement("input"); name.className = "name"; name.value = item.name || "";
+                  name.addEventListener("input", ()=>{ library[activeTab][idx].name = name.value; saveJSON(LS.library, library); });
+                 
+                  const reps = document.createElement("input"); reps.className = "reps"; reps.placeholder = "Reps"; reps.value = item.reps || "";
+                  reps.addEventListener("input", ()=>{ library[activeTab][idx].reps = reps.value; saveJSON(LS.library, library); });
+                 
+                  const eyeBtn = document.createElement("button"); eyeBtn.className = "visibility-btn";
+                  eyeBtn.innerHTML = item.hidden ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>` : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+                  eyeBtn.addEventListener("click", (e) => { e.stopPropagation(); item.hidden = !item.hidden; saveJSON(LS.library, library); updateExerciseButtonLabel(); renderList(); });
+
+                  const del = document.createElement("button"); del.className = "trash"; del.textContent = "×";
+                  del.addEventListener("click", (e)=>{
+                    e.stopPropagation(); e.preventDefault();
+                    triggerCustomConfirm("Delete this exercise?", () => { library[activeTab].splice(idx, 1); saveJSON(LS.library, library); updateExerciseButtonLabel(); renderList(); });
+                  });
+
+                  wrap.appendChild(name); wrap.appendChild(reps); wrap.appendChild(eyeBtn); wrap.appendChild(del);
+                  listEl.appendChild(wrap);
+                });
+              }
+
+              const checkAddButtonState = () => {
+                addBtn.disabled = !(addName.value.trim().length > 0 && addReps.value.trim().length > 0);
+              };
+
+              addName.addEventListener('input', checkAddButtonState);
+              addReps.addEventListener('input', checkAddButtonState);
+
+              addBtn.disabled = true;
+
+              addBtn.addEventListener("click", ()=>{
+                const n = (addName.value||"").trim(); const r = (addReps.value||"").trim();
+                if(!n || !r) return;
+                if(!library[activeTab]) library[activeTab]=[];
+                library[activeTab].unshift({ name:n, reps:r, hidden: false });
+                
+                addName.value="";
+                addReps.value="";
+                addBtn.disabled = true;
+
+                saveJSON(LS.library, library); updateExerciseButtonLabel(); renderList();
+              });
+
+              function init() {
+                ensureWeekState();
+                renderStreakUI();
+                updateExerciseButtonLabel();
+                renderInitialCounter(String(getTotalDays()));
+
+                const savedWorkout = loadJSON(LS.currentWorkout, null);
+                if (savedWorkout) {
+                  currentWorkout = savedWorkout;
+                  showWorkoutState(savedWorkout);
+                } else {
+                  showWeeklyCenter();
+                }
+              }
+
+              init();
+        </script>
+    </body>
+    </html>
