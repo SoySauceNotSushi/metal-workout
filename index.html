@@ -283,63 +283,56 @@ body{
 }
 .plan-btn.hidden{ display:none; }
 
-/* Base gold button (already yours) */
-/* ===============================
-   TEST DAY — GOD MODE BUTTON
-================================ */
-
 /* =========================================
-   TEST DAY — COMET STROKE (CSS ONLY)
+   TEST DAY — TRAVELING BORDER STROKE
+   (Inspired by premium "Add to Cart" UI)
 ========================================= */
 
 .plan-option[data-val="metacon"].selected {
   position: relative;
   background: #FFF8E6;
-  border-radius: 16px;
   color: #B28103;
   font-weight: 600;
-  border: 2px solid #F5D56B;
+  border-radius: 16px;
+  border: 2px solid transparent;
   overflow: hidden;
 }
 
-/* Animated comet tracing the border */
+/* Border container */
 .plan-option[data-val="metacon"].selected::before {
   content: "";
   position: absolute;
-  inset: -2px;
+  inset: 0;
   border-radius: inherit;
+  padding: 2px;
 
-  /* Comet gradient */
-  background: conic-gradient(
-    from 0deg,
-    transparent 0deg,
-    transparent 300deg,
-    rgba(255, 215, 100, 0) 315deg,
-    rgba(255, 215, 100, 0.95) 340deg,
-    rgba(255, 215, 100, 0) 360deg
+  /* Gradient stroke */
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 30%,
+    #FFD36A 45%,
+    #FFE9A3 50%,
+    #FFD36A 55%,
+    transparent 70%,
+    transparent 100%
   );
 
-  /* Mask so only the border is visible */
+  /* Mask to show ONLY the border */
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
 
-  padding: 2px;
+  animation: borderSweep 2.8s linear infinite;
   pointer-events: none;
-
-  /* Motion */
-  animation: testDayComet 3.6s linear infinite;
-
-  /* Soft glow */
-  filter: drop-shadow(0 0 6px rgba(255, 215, 100, 0.6));
 }
 
-/* Rotation animation */
-@keyframes testDayComet {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+/* Animation moves the stroke around the perimeter */
+@keyframes borderSweep {
+  0%   { background-position: 0% 0%; }
+  100% { background-position: 200% 0%; }
 }
 /* --- GRADIENT --- */
 .ai-stage{
