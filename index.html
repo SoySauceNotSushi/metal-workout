@@ -283,57 +283,21 @@ body{
 }
 .plan-btn.hidden{ display:none; }
 
-/* =========================================
-   TEST DAY — TRAVELING BORDER STROKE
-   (Inspired by premium "Add to Cart" UI)
-========================================= */
-
-.plan-option[data-val="metacon"].selected {
-  position: relative;
+/* Test Day = gold ONLY when enabled */
+.plan-option[data-val="metacon"]:not(:disabled) {
   background: #FFF8E6;
   color: #B28103;
   font-weight: 600;
-  border-radius: 16px;
-  border: 2px solid transparent;
-  overflow: hidden;
+  font-color: #000;
 }
-
-/* Border container */
-.plan-option[data-val="metacon"].selected::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 2px;
-
-  /* Gradient stroke */
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    transparent 30%,
-    #FFD36A 45%,
-    #FFE9A3 50%,
-    #FFD36A 55%,
-    transparent 70%,
-    transparent 100%
-  );
-
-  /* Mask to show ONLY the border */
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-
-  animation: borderSweep 2.8s linear infinite;
-  pointer-events: none;
-}
-
-/* Animation moves the stroke around the perimeter */
-@keyframes borderSweep {
-  0%   { background-position: 0% 0%; }
-  100% { background-position: 200% 0%; }
-}
+    /* Test Day → GOLD only when SELECTED */
+    .plan-option[data-val="metacon"].selected {
+      background: #FFF8E6;
+      border: 2px solid #F7D47C;
+      color: #B28103;
+      font-weight: 600;
+    }
+    
 /* --- GRADIENT --- */
 .ai-stage{
   position:absolute;
@@ -747,12 +711,17 @@ body{
       text-align: left !important;
     }
     
+    /* 🔑 THIS is what you were missing */
+    .history-row-test {
+      align-items: flex-start;   /* override center */
+    }
+
+    .history-row-test .history-left {
+      width: 100%;               /* allow left alignment */
+    }
     
     /* --- Test Day Results (Expandable) --- */
     .history-results{
-      margin-top:10px;
-      padding-top:8px;
-      border-top:1px solid rgba(15,23,42,0.06);
       display:flex;
       flex-direction:column;
       gap:6px;
@@ -768,8 +737,11 @@ body{
     .history-result-row .res-name{ font-weight:500; }
     .history-result-row .res-reps{ font-weight:700; color:#0f172a; }
     
-    
-    
+    .history-row-test .res-reps {
+      color: #64748b;         /* softer grey */
+      font-weight: 600;
+      min-width: 20px;        /* keeps alignment tidy */
+    }
 .history-list{ display:flex; flex-direction:column; gap:12px; }|
 
 /* Test Day results should be left-aligned, not spaced */
@@ -988,7 +960,7 @@ body{
 
 /* --- WIZARD SHEET STYLES --- */
 .wizard-sheet {
-  height: auto; max-height: 90vh; padding: 24px 24px 34px;
+  height: auto; max-height: 75vh; padding: 24px 24px 34px;
   display: flex; flex-direction: column;
 }
 
@@ -999,6 +971,24 @@ body{
   font-size: 22px; font-weight: 700; color: #0f172a; text-align: left;
 }
 
+    /* ===============================
+       HIDE SCROLLBARS (but keep scroll)
+       =============================== */
+
+    /* iOS / WebKit */
+    .wizard-body,
+    .modal-body {
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;        /* Firefox */
+    }
+
+    .wizard-body::-webkit-scrollbar,
+    .modal-body::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+      display: none;
+    }
+    
 .wizard-body {
   flex: 1; overflow-y: auto; position: relative;
   display: flex; flex-direction: column;
@@ -1029,7 +1019,43 @@ body{
   color: var(--brand);
   box-shadow: none;
 }
+    
+    /* Workout of the Day — base style (neutral) */
+    .plan-option[data-val="wod"]{
+      background:#f1f5f9;
+      color:#475569;
+      font-weight:600;
+    }
+
+    /* Selected state (same as others for now) */
+    .plan-option[data-val="wod"].selected{
+      background:#eef2ff;
+      border-color:#eef2ff;
+      color:var(--brand);
+    }
+    
+    
 .plan-option:active { transform: scale(0.98); }
+
+
+/* --- Test Day LOCKED: no background at all --- */
+.plan-option[data-val="metacon"]:disabled {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+
+  color: #94a3b8;       /* soft grey text */
+  opacity: 1;           /* prevent faded look */
+  cursor: default;
+}
+
+/* Optional: subtle lock feel */
+.plan-option[data-val="metacon"]:disabled::after {
+  content: "🔒";
+  margin-left: 8px;
+  font-size: 14px;
+  opacity: 0.7;
+}
 
 .wizard-footer {
   display: flex; gap: 12px; margin-top: 16px; padding-top: 0; flex-shrink: 0;
@@ -2780,3 +2806,4 @@ body{
         </script>
     </body>
     </html>
+
