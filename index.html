@@ -1,2809 +1,1732 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover"/>
 <title>Jy Workout</title>
-
 <style>
 :root{
-  --brand:#2453f5;
-  --ink:#0f172a;
-  --sub:#64748b;
-
-  --bgTop:#ffffff;
-  --bgBottom:#ffffff;
-
-  --card:#ffffff;
-  --shadow-soft:0 18px 48px rgba(15,23,42,0.12);
-
-  --tag-purple-bg:#ede9fe; --tag-purple-ink:#6d28d9;
-  --tag-green-bg:#dcfce7;  --tag-green-ink:#16a34a;
-  --tag-blue-bg:#e4ecff;   --tag-blue-ink:#2453f5;
-  --tag-pink-bg:#ffe4f1;   --tag-pink-ink:#be185d;
-  --tag-orange-bg:#ffe6bf; --tag-orange-ink:#b45309;
-  --tag-teal-bg:#d1fae5;   --tag-teal-ink:#0f766e;
-  --tag-red-bg:#ffe0e0;    --tag-red-ink:#dc2626;
-  --tag-yellow-bg:#fef3c7; --tag-yellow-ink:#a16207;
-  
-  /* PB Gold Colors */
-  --tag-gold-bg: #fff7d1;  --tag-gold-ink: #b45309;
-
-  --radius:18px;
-    
-  /* UI System Colors */
-  --btn-secondary-bg: #f7f8f9;
-  --btn-disabled-text: #cbd5e1;
+  --brand:#2453f5;--ink:#0f172a;--sub:#64748b;
+  --bg:#ffffff;--card:#fff;
+  --shadow:0 18px 48px rgba(15,23,42,.10);
+  --btn-secondary-bg:#f0f2f5;--btn-disabled-bg:#f0f2f5;--btn-disabled-text:#c8cdd6;
+  --tag-pull-bg:#dcfce7;--tag-pull-ink:#16a34a;
+  --tag-push-bg:#e4ecff;--tag-push-ink:#2453f5;
+  --tag-legs-bg:#ffe6bf;--tag-legs-ink:#b45309;
+  --tag-shoulders-bg:#ffe4f1;--tag-shoulders-ink:#be185d;
+  --tag-abs-bg:#d1fae5;--tag-abs-ink:#0f766e;
+  --tag-cardio-bg:#fef3c7;--tag-cardio-ink:#a16207;
+  --tag-pb-bg:#fff7d1;--tag-pb-ink:#b45309;
+  --green:#16a34a;--green-light:#dcfce7;
 }
-
-*{ box-sizing:border-box; }
-html,body{ height:100%; }
-
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;background:#f8f9fb;}
 body{
-  margin:0;
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro",Segoe UI,Roboto,sans-serif;
-  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",Segoe UI,sans-serif;
+  background:#fff;color:var(--ink);
   -webkit-font-smoothing:antialiased;
-  background:linear-gradient(180deg,var(--bgTop),var(--bgBottom));
-  overflow:hidden;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-user-select: none;
-  user-select: none;
-}
-
-/* --- APP ENTRANCE ANIMATION --- */
-@keyframes appEntrance {
-  0% { opacity: 0; transform: scale(0.94) translateY(12px); filter: blur(4px); }
-  100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
-}
-
-.container{
-  max-width:520px;
-  margin:0 auto;
-  padding:18px 18px 0;
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-  animation: appEntrance 0.75s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-}
-
-.top-bar{ display:flex; justify-content:flex-end; align-items:center; padding-bottom:8px; }
-.top-bar.hidden{ display:none; }
-
-.history-btn{
-  background:none;
-  border:none;
-  color:var(--ink);
-  font-size:14px;
-  font-weight:600;
-  cursor:pointer;
-  padding: 8px;
-  transition: opacity 0.2s;
-}
-.history-btn:active { opacity: 0.6; }
-.history-btn.hidden{ display:none; }
-
-.center{
-  position:relative;
-  flex:1;
-  display:flex;
-  align-items:flex-start;
-  justify-content:center;
-  padding-top:18px;
-}
-.train-header{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:16px;
-  padding-bottom:12px;
-  z-index:10;
-  transition: opacity 0.3s ease;
-}
-
-.train-left{ display:flex; flex-direction:column; gap:8px; width: 100%; }
-.train-title{ font-size:24px; font-weight:700; letter-spacing:-0.02em; }
-.train-sub{ font-size:15px; color:#64748b; line-height:1.4; max-width: 90%; }
-
-.weekly-center{
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  pointer-events:none;
-  opacity: 1;
-  transition: opacity 0.5s ease;
-}
-.weekly-center.hidden{ display:none; opacity: 0; }
-
-.weekly-count{ text-align:center; transform:translateY(-10px); opacity:.95; }
-
-/* --- COUNTER ANIMATION CSS --- */
-.weekly-count .num-wrap {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size:150px;
-  font-weight:900;
-  letter-spacing:-0.05em;
-  color:rgba(15,23,42,0.08);
-  text-shadow: 0 1px 0 rgba(255,255,255,0.8), 0 -1px 0 rgba(15,23,42,0.05);
-  line-height: 0.9;
-  height: 135px;
-  overflow: hidden;
-}
-
-.ticker-digit { position: relative; height: 100%; display: inline-block; }
-.ticker-track {
-  display: flex;
-  flex-direction: column;
-  transform: translateY(0%);
-  transition: transform 0.8s cubic-bezier(0.18, 0.89, 0.32, 1.15);
-  will-change: transform;
-}
-.ticker-num { height: 135px; display: flex; align-items: center; justify-content: center; }
-
-.weekly-count .label{
-  margin-top:10px;
-  font-size:16px;
-  font-weight:400;
-  color:rgba(100,116,139,0.65);
-  letter-spacing:-0.02em;
-  display:inline-flex;
-  align-items:baseline;
-  gap:8px;
-  flex-wrap:wrap;
-  justify-content:center;
-  max-width:90vw;
-}
-.weekly-count .label .dot{ opacity:.55; }
-.weekly-count .label .streak-inline{ color:rgba(15,23,42,0.88); font-weight:500; }
-
-.card{
-  width:min(460px, 100%);
-  background:var(--card);
-  border-radius:22px;
-  box-shadow:var(--shadow-soft);
-  padding:22px 22px;
-  opacity:0;
-  transform:translateY(18px) scale(.98);
-  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-  position:relative;
-  z-index:3;
-}
-.card.visible{ opacity:1; transform:translateY(0) scale(1); }
-.card.hidden{ display:none; }
-
-.card-title{ font-size:20px; font-weight:700; margin:0 0 4px; letter-spacing:-0.03em; color: var(--ink); }
-.card-sub{ font-size:15px; color:#64748b; margin:0 0 20px; line-height:1.4; }
-
-/* SHARED CARD TIMER (In Card Bottom) */
-.card-timer-wrap {
-  display: flex;
-  justify-content: center;
-  padding-top: 18px;
-  border-top: 1px solid rgba(15,23,42,0.04);
-  margin-top: 12px;
-}
-.card-timer-wrap.hidden { display: none; }
-
-.card-timer {
-  background: transparent;
-  color: var(--brand);
-  font-size: 16px;
-  font-weight: 500;
-  padding: 10px 24px;
-  border-radius: 999px;
-  border: none;
-  cursor: pointer;
-  transition: transform 0.1s, color 0.2s;
-  min-width: 140px;
-}
-.card-timer:active { transform: scale(0.96); opacity: 0.7; }
-.card-timer.paused { color: #dc2626; /* Red when paused */ }
-
-
-.row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  padding:14px 0;
-  border-bottom:0px solid rgba(15,23,42,0.04);
-}
-
-/* --- TEST DAY ROW: GRID LAYOUT FOR ALIGNMENT --- */
-.test-row {
-    display: grid;
-    /* 1fr for name, fixed for input, fixed for tag area */
-    grid-template-columns: 1fr 44px 75px;
-    gap: 12px;
-    align-items: center;
-    padding: 14px 0;
-}
-
-.row:last-child, .test-row:last-child { border-bottom:none; }
-
-.row-left{ display:flex; flex-direction:column; gap:2px; min-width:0; flex:1; }
-.row-text{ font-size:16px; font-weight:400; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color: #334155; }
-.row-sub{ font-size:13px; color: #94a3b8; font-weight:500; }
-
-/* INPUT FOR REPS */
-.rep-input {
-    width: 44px;
-    height: 44px;
-    background: #f8fafc;
-    border: none;
-    border-radius: 8px;
-    text-align: center;
-    font-weight: 600;
-    font-size: 16px;
-    color: var(--brand);
-    outline: none;
-    padding: 0;
-    -moz-appearance: textfield;
-}
-.rep-input:focus { background: #e2e8f0; }
-
-.tags{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
-/* Forced right alignment for test grid */
-.test-row .tags { justify-content: flex-end; width: 100%; }
-
-.pill{
-  padding:6px 12px;
-  border-radius:999px;
-  font-size:13px;
-  font-weight:700;
-  line-height:1;
-  white-space:nowrap;
-  text-transform: capitalize;
-}
-
-.pill-pull{ background:var(--tag-green-bg); color:var(--tag-green-ink); }
-.pill-push{ background:var(--tag-blue-bg); color:var(--tag-blue-ink); }
-.pill-shoulders{ background:var(--tag-pink-bg); color:var(--tag-pink-ink); }
-.pill-legs{ background:var(--tag-orange-bg); color:var(--tag-orange-ink); }
-.pill-abs{ background:var(--tag-teal-bg); color:var(--tag-teal-ink); }
-.pill-cardio{ background:var(--tag-yellow-bg); color:var(--tag-yellow-ink); }
-.pill-pb{ background:var(--tag-gold-bg); color:var(--tag-gold-ink); }
-.plan-btn{
-  margin-top:14px;
-  width:100%;
-  background:none;
-  border:none;
-  color:var(--brand);
-  font-size:14px;
-  font-weight:600;
-  cursor:pointer;
-  padding:6px 0;
-}
-.plan-btn.hidden{ display:none; }
-
-/* Test Day = gold ONLY when enabled */
-.plan-option[data-val="metacon"]:not(:disabled) {
-  background: #FFF8E6;
-  color: #B28103;
-  font-weight: 600;
-  font-color: #000;
-}
-    /* Test Day → GOLD only when SELECTED */
-    .plan-option[data-val="metacon"].selected {
-      background: #FFF8E6;
-      border: 2px solid #F7D47C;
-      color: #B28103;
-      font-weight: 600;
-    }
-    
-/* --- GRADIENT --- */
-.ai-stage{
-  position:absolute;
-  left:50%;
-  top:38%;
-  transform:translate(-50%,-50%);
-  width:260px;
-  height:260px;
-  border-radius:50%;
-  pointer-events:none;
-  display:none;
-  z-index:1;
-  overflow:visible;
-}
-.ai-stage::before{
-  content:"";
-  position:absolute;
-  inset:-20% -15% -25% -15%;
-  filter:blur(84px) saturate(160%) contrast(115%);
-  opacity:0;
-  transition:opacity .25s ease;
-  background:
-    radial-gradient(22rem 22rem at 30% 36%, #3A7BFF77 0, #0000 50%),
-    radial-gradient(22rem 22rem at 72% 34%, #7DFF5C77 0, #0000 54%),
-    radial-gradient(24rem 20rem at 40% 72%, #FFA43A77 0, #0000 54%),
-    radial-gradient(20rem 20rem at 70% 74%, #9B8FFF99 0, #0000 80%);
-  animation:meshBreath 2s ease-in-out infinite, meshDrift 3s ease-in-out infinite;
-}
-.ai-stage.show::before{ opacity:.9; }
-
-@keyframes meshBreath{
-  0%,100%{ transform:scale(1); opacity:.65 }
-  50%{ transform:scale(1.04); opacity:.35 }
-}
-@keyframes meshDrift{
-  0%{ transform:translate3d(0,0,0); }
-  50%{ transform:translate3d(2%,-1.5%,0); }
-  100%{ transform:translate3d(0,0,0); }
-}
-
-.train-header.hidden { display: none; }
-/* Actions */
-.actions{
-  position:relative;
-  padding:12px 0 18px;
-  z-index:10;
-  transform: translateY(-1.5rem);
-  transition: opacity 0.4s ease;
-}
-.actions.faded { opacity: 0; pointer-events: none; }
-
-/* === ROUND COUNTER (SPLIT STYLE & DISABLED STATE) === */
-.round-counter-wrap {
-  position: absolute;
-  right: 0;
-  bottom: calc(52px + 16px + 16px);
-  width: 100%;
-  height: 52px;
-  display: flex;
-  gap: 0;
-  z-index: 20;
-  transition: transform 0.1s, opacity 0.2s, box-shadow 0.2s;
-  opacity: 0;
-  pointer-events: none;
-  transform: scale(0.9);
-   
-  box-shadow: 0 4px 12px rgba(36, 83, 245, 0.4);
-  border-radius: 999px;
-  overflow: hidden;
-}
-.round-counter-wrap.visible {
-  opacity: 1;
-  pointer-events: auto;
-  transform: scale(1);
-}
-
-/* Disabled Wrapper Styling */
-.round-counter-wrap.disabled-state {
-  box-shadow: none;
-  background: var(--btn-secondary-bg);
-}
-
-.round-btn {
-  border: none;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.2s, opacity 0.2s, color 0.2s;
-}
-.round-btn:active { opacity: 0.8; }
-
-/* Disabled Buttons Styling */
-.round-btn:disabled {
-  background: var(--btn-secondary-bg) !important;
-  color: var(--btn-disabled-text) !important;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-.round-minus {
-  width: 52px; /* Fixed width matching slider knob */
-  background: var(--brand); /* Blue */
-  color: white;
-  border-right: 1px solid rgba(255,255,255,0.3);
-  flex-shrink: 0;
-}
-.round-minus:disabled { border-right: none; }
-
-.round-plus {
-  flex: 1;
-  background: var(--brand);
-  color: white;
-  font-weight: 500;
-}
-
-/* === GLOBAL BUTTON STYLES === */
-.btn, .wiz-next, .add-btn, .pb-btn {
-  width:100%;
-  height:52px;
-  border:none;
-  border-radius:999px;
-  font-size:18px;
-  font-weight:600;
-  cursor:pointer;
-  background:var(--brand); /* Primary Blue */
-  color:white;
-  box-shadow:none;
-  touch-action: manipulation;
-  transition: transform 0.1s, opacity 0.2s, background-color 0.2s;
-}
-.btn:active, .wiz-next:active, .add-btn:active, .pb-btn:active { transform:scale(.98); }
-
-/* SECONDARY (Back, Cancel, Exercises) */
-.btn.secondary {
-  margin-top: 16px;
-  background: var(--btn-secondary-bg); /* #f7f8f9 */
-  color: var(--brand); /* Blue Text */
-  font-weight:600;
-}
-
-.wiz-back, .confirm-btn.cancel {
-  background: var(--btn-secondary-bg); /* #f7f8f9 */
-  color: var(--brand); /* Blue Text */
-  font-weight:600;
-}
-
-/* DISABLED STATE (Same for all) */
-.btn:disabled, .wiz-next:disabled, .add-btn:disabled {
-  background: var(--btn-secondary-bg) !important; /* #f7f8f9 */
-  color: var(--btn-disabled-text) !important; /* Grey Text */
-  opacity: 1; /* Reset opacity */
-  cursor: not-allowed;
-  transform: none !important;
-}
-
-.btn.hidden{ display:none; }
-
-/* REST BUTTON (Bottom) */
-.rest-btn {
-  width: 100%;
-  height: 52px;
-  border: none;
-  border-radius: 999px;
-  font-size: 18px;
-  font-weight: 600;
-  cursor: pointer;
-  background: var(--brand);
-  color: white;
-  margin-bottom: 16px; /* Space before slider */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.1s;
-}
-.rest-btn:active { transform: scale(0.98); }
-.rest-btn.active-timer { background: #eef2ff; color: var(--brand); }
-.rest-btn.hidden { display: none; }
-
-/* --- STRETCHY SLIDER CSS --- */
-.slide-wrap {
-  width: 100%;
-  height: 52px;
-  /* margin-top: 16px; REMOVED to handle dynamic rest button spacing */
-  border-radius: 999px;
-  background: #f7f8f9;
-  position: relative;
-  overflow: hidden;
-  box-shadow: none;
-  display: none;
-  touch-action: pan-y;
-  transition: opacity 0.2s ease;
-}
-.slide-wrap.show { display: block; opacity: 1; }
-
-.slide-label-base {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: .2px;
-  pointer-events: none;
-  color: #2453f5;
-  z-index: 1;
-}
-
-.slide-knob {
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 52px;
-  border-radius: 999px;
-  background: var(--brand);
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding-right: 16px;
-  box-shadow: 0 4px 12px rgba(36, 83, 245, 0.25);
-  z-index: 2;
-  cursor: grab;
-  will-change: width;
-}
-.slide-knob:active { cursor: grabbing; }
-
-.slide-knob span { font-size: 18px; color: white; font-weight: 600; }
-
-.slide-label-white {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: .2px;
-  pointer-events: none;
-  color: #fff;
-  z-index: 3;
-  clip-path: inset(0 100% 0 0);
-  will-change: clip-path;
-}
-
-.slide-wrap.animating .slide-knob,
-.slide-wrap.animating .slide-label-white {
-  transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-/* Confetti canvas */
-#confettiCanvas{ position:fixed; left:0; top:0; width:100vw; height:100vh; pointer-events:none; z-index:2000; transition: z-index 0s; }
-
-/* =========================================================
-   UPDATED MODAL SYSTEM (Smooth Transitions)
-========================================================= */
-
-/* Base Modal (The Dimmer) */
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.2);
-  z-index: 100;
-  visibility: hidden;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease, visibility 0.3s;
-}
-.modal.show {
-  visibility: visible;
-  opacity: 1;
-  pointer-events: auto;
-}
-
-/* Base Modal Sheet */
-.modal-sheet {
-  position: absolute;
-  background: #fff;
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: transform;
-}
-
-/* --- EXERCISE MODAL (Slide Up) --- */
-#modal .modal-sheet {
-  inset: 0;
-  top: 30px;
-  border-radius: 24px 24px 0 0;
-  transform: translateY(100%);
-}
-#modal.show .modal-sheet { transform: translateY(0); }
-
-/* --- HISTORY MODAL (Slide In Right) --- */
-#historyModal .modal-sheet {
-  inset: 0;
-  border-radius: 0;
-  transform: translateX(100%);
-}
-#historyModal.show .modal-sheet { transform: translateX(0); }
-
-/* Modal Headers */
-.modal-head {
-  padding: 16px 18px 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid rgba(15,23,42,0.06);
-}
-
-/* Specialized History Header Grid */
-.history-head-layout {
-  display: grid;
-  grid-template-columns: 70px 1fr 70px;
-  justify-items: center;
-}
-.history-head-layout .modal-title { text-align: center; }
-
-/* BACK BUTTON STYLE */
-.back-btn {
-  justify-self: start;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  color: var(--ink); /* Ink Color */
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 16px;
-  font-weight: 400;
-  transition: opacity 0.2s;
-}
-.back-btn:active { opacity: 0.6; }
-
-.modal-title { font-size: 20px; font-weight: 800; }
-
-.modal-close {
-  border: none; background: #eef2f7; color: var(--ink); border-radius: 10px;
-  height: 38px; padding: 0 14px; font-weight: 700; cursor: pointer;
-}
-
-.tabs{
-  display:flex; gap:10px; padding:10px 18px; border-bottom:1px solid rgba(15,23,42,0.06);
-  overflow-x:auto; -webkit-overflow-scrolling:touch;
-}
-.tab{
-  border:none; background:#eef2f7; color:#0f172a; padding:10px 14px;
-  border-radius:999px; font-weight:500; font-size:14px; white-space:nowrap; cursor:pointer;
-}
-.tab.active{ background:#e4ecff; color:var(--brand); }
-.modal-body{ padding:14px 18px 18px; overflow:auto; flex:1; }
-
-.add-row{
-  display:grid; grid-template-columns:1fr 44px; gap:12px;
-  margin-bottom: 16px;
-}
-#addReps{ width:60px; min-width:44px; max-width:44px; padding:0; text-align:center; }
-#addName{ min-width:0; }
-
-.input{
-  height:48px; border-radius:12px; border:1px solid rgba(15,23,42,0.12);
-  padding:0 14px; font-size:16px;
-}
-
-.add-btn {
-  margin-top: 0;
-  margin-bottom: 16px;
-}
-
-.list{ display:flex; flex-direction:column; gap:10px; }
-.item{
-  display:grid; grid-template-columns:1fr 44px 44px 44px; gap:16px;
-  align-items:center; padding:0px; border-radius:14px; background:#ffffff;
-}
-.item .name, .item .reps {
-  height:44px; border-radius:12px; border:1px solid rgba(15,23,42,0.10);
-  padding:0 12px; font-size:16px; background:#fff; min-width: 0; position: relative; z-index: 1;
-}
-.item .reps{ width:44px; padding:0; text-align:center; font-size:14px; }
-.trash{
-  height:44px; width:44px; border:none; border-radius:12px; background:#ffe0e0;
-  color:#dc2626; font-weight:900; font-size:18px; cursor:pointer; z-index: 10;
-  position: relative; touch-action: manipulation;
-}
-.visibility-btn {
-  height:44px; width:44px; border:none; border-radius:12px; background:#eef2f7;
-  color:#64748b; font-size:18px; display:flex; align-items:center;
-  justify-content:center; cursor:pointer; touch-action: manipulation;
-}
-.item.hidden-exercise .name, .item.hidden-exercise .reps { opacity: 0.5; background: #f8fafc; }
-
-/* Plan modal */
-.plan-list{ display:flex; flex-direction:column; gap:12px; }
-.plan-row{ display:grid; grid-template-columns: 86px 1fr; gap:12px; align-items:center; }
-.plan-name{ font-size:16px; font-weight:400; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-
-/* --- HISTORY ROW STYLES --- */
-    /* Force Test Day title + date to be LEFT aligned */
-    .history-row-test .history-left {
-      align-items: flex-start !important;
-      text-align: left !important;
-    }
-
-    .history-row-test .history-time,
-    .history-row-test .history-date {
-      text-align: left !important;
-    }
-    
-    /* 🔑 THIS is what you were missing */
-    .history-row-test {
-      align-items: flex-start;   /* override center */
-    }
-
-    .history-row-test .history-left {
-      width: 100%;               /* allow left alignment */
-    }
-    
-    /* --- Test Day Results (Expandable) --- */
-    .history-results{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-    }
-    .history-results.hidden{ display:none; }
-
-    .history-result-row{
-      display:flex;
-      justify-content:space-between;
-      font-size:14px;
-      color:#334155;
-    }
-    .history-result-row .res-name{ font-weight:500; }
-    .history-result-row .res-reps{ font-weight:700; color:#0f172a; }
-    
-    .history-row-test .res-reps {
-      color: #64748b;         /* softer grey */
-      font-weight: 600;
-      min-width: 20px;        /* keeps alignment tidy */
-    }
-.history-list{ display:flex; flex-direction:column; gap:12px; }|
-
-/* Test Day results should be left-aligned, not spaced */
-.history-row-test .history-result-row {
-  justify-content: flex-start;
-  gap: 12px;
-}
-    
-.history-row-test .history-results {
-    align-items: flex-start;
-    text-align: left;
-}
-
-.history-row-test .history-results {
-  width: 100%;
-}
-
-/* --- Test Day History Layout (Stacked) --- */
-.history-row-test {
-  flex-direction: column;
-  align-items: stretch;
-  gap: 10px;
-}
-
-    /* Force left alignment for Test Day history */
-    .history-row-test {
-      align-items: flex-start;
-      text-align: left;
-    }
-
-    .history-row-test .history-left {
-      align-items: flex-start;
-      text-align: left;
-    }
-
-    .history-row-test .history-time,
-    .history-row-test .history-date {
-      text-align: left;
-    }
-    
-/* Left block stays left-aligned */
-.history-row-test .history-left {
-  align-items: flex-start;
-}
-
-/* Right block moves below title/date */
-.history-row-test .history-right {
-  width: 100%;
-  justify-content: flex-end;
-}
-
+  padding-top:env(safe-area-inset-top);
+  padding-bottom:env(safe-area-inset-bottom);
+  touch-action:pan-y;-webkit-tap-highlight-color:transparent;
+  -webkit-user-select:none;user-select:none;
+}
+
+/* ── APP SHELL ── */
+/* pages track — slides horizontally */
+.pages-track{
+display:flex;
+flex-direction:row;
+width:200%;
+height:100%;
+transform:translateX(0);
+transition:transform .42s cubic-bezier(.25,.1,.1,1);
+will-change:transform;
+isolation:isolate;
+}
+.pages-track.show-history{
+transform:translateX(-50%);
+}
+/* when snap is called, inline style is cleared — class takes over with transition */
+
+/* history panel = left page */
+.history-panel{
+width:50%;
+height:100%;
+display:flex;flex-direction:column;
+background:#f8f9fb;
+flex-shrink:0;
+overflow:hidden;
+position:relative;
+z-index:0;
+}
+.history-panel-body{flex:1;overflow-y:auto;scrollbar-width:none;padding:0;padding-bottom:calc(130px + env(safe-area-inset-bottom));}
+.history-panel-body::-webkit-scrollbar{display:none;}
+/* when history is showing, boost its z-index above all fixed overlays */
+.pages-track.show-history .history-panel{
+z-index:500;
+}
+
+/* main app = right page */
+.app{
+width:50%;
+height:100%;
+display:flex;flex-direction:column;
+background:#f8f9fb;
+flex-shrink:0;
+animation:appIn .6s cubic-bezier(.2,.8,.2,1) forwards;
+padding-bottom:calc(130px + env(safe-area-inset-bottom));
+}
+@keyframes appIn{from{opacity:0}to{opacity:1}}
+
+/* fixed dock — outside track, always visible */
+.dock{
+position:fixed;
+bottom:0;left:0;right:0;
+padding:12px 1rem calc(18px + env(safe-area-inset-bottom));
+display:flex;flex-direction:column;gap:0;
+z-index:200;
+background:linear-gradient(to top,rgba(248,249,251,0.95) 55%,rgba(248,249,251,0));
+-webkit-backdrop-filter:blur(12px);
+backdrop-filter:blur(12px);
+pointer-events:auto;
+transition:opacity .3s;
+max-width:520px;
+margin:0 auto;
+}
+.dock.faded{opacity:0;pointer-events:none;height:0;overflow:hidden;padding:0;min-height:0;-webkit-backdrop-filter:none;backdrop-filter:none;background:none;}
+
+/* page indicator dots */
+.page-dot{
+width:6px;height:6px;border-radius:50%;
+background:rgba(15,23,42,.18);
+transition:background .3s,transform .3s;
+}
+.page-dot.active{background:var(–brand);transform:scale(1.25);}
+.history-panel-head{
+display:flex;align-items:center;justify-content:space-between;
+padding:20px 20px 12px;
+border-bottom:1px solid rgba(15,23,42,.07);
+flex-shrink:0;
+}
+.history-panel-title{font-size:20px;font-weight:700;letter-spacing:-.03em;}
+.history-panel-count{font-size:13px;color:var(–sub);}
 .history-row{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:12px 14px;
-  border-radius:12px;
-  background:#f8fafc;
+padding:16px 20px;
+border-bottom:1px solid rgba(15,23,42,.06);
+display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+}
+.h-title{font-size:15px;font-weight:600;color:var(–ink);}
+.h-date{font-size:12px;color:var(–sub);margin-top:3px;}
+.h-sub{font-size:12px;color:#94a3b8;margin-top:5px;line-height:1.5;}
+.h-del{background:none;border:none;font-size:20px;color:#c8cdd6;cursor:pointer;padding:0;flex-shrink:0;line-height:1;}
+.h-del:active{color:#ef4444;}
+.h-tabs{display:flex;gap:0;padding:0 16px;border-bottom:1px solid rgba(15,23,42,.07);flex-shrink:0;}
+.h-tab{background:none;border:none;border-bottom:2px solid transparent;padding:10px 16px;font-size:14px;font-weight:600;color:var(–sub);cursor:pointer;margin-bottom:-1px;transition:color .2s,border-color .2s;}
+.h-tab.active{color:var(–brand);border-bottom-color:var(–brand);}
+.h-empty{padding:48px 20px;text-align:center;color:var(–sub);font-size:15px;}
+
+/* history cards */
+.h-card{
+background:#fff;border-radius:20px;
+box-shadow:0 2px 12px rgba(15,23,42,.07);
+margin:12px 16px;
+}
+.h-card-head{
+display:flex;align-items:flex-start;justify-content:space-between;
+padding:18px 18px 12px;
+border-bottom:1px solid rgba(15,23,42,.06);
+}
+.h-card-label{font-size:11px;font-weight:700;color:var(–sub);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+.h-card-title{font-size:20px;font-weight:800;color:var(–ink);letter-spacing:-.03em;}
+.h-card-meta{font-size:12px;color:var(–sub);margin-top:4px;}
+.h-card-total{text-align:right;flex-shrink:0;}
+.h-card-total-num{font-size:28px;font-weight:800;color:var(–brand);letter-spacing:-.04em;line-height:1;}
+.h-card-total-label{font-size:11px;color:var(–sub);margin-top:2px;}
+.h-ex-list{padding:8px 0 0;}
+.h-ex-row{
+display:flex;align-items:center;
+padding:11px 18px;
+border-bottom:1px solid rgba(15,23,42,.04);
+gap:12px;
+}
+.h-ex-row:last-child{border-bottom:none;}
+.h-ex-reps{font-size:15px;font-weight:700;color:var(–ink);flex-shrink:0;min-width:28px;}
+.h-ex-left{display:flex;align-items:center;gap:6px;flex:1;min-width:0;}
+.h-ex-name{font-size:14px;font-weight:400;color:var(–ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.h-trophy{font-size:13px;line-height:1;}
+.h-ex-pill{flex-shrink:0;margin-left:auto;}
+.h-del-btn{
+display:block;width:100%;margin:0;
+height:40px;border:none;border-radius:999px;
+background:#f5f5f7;color:#ef4444;
+font-size:14px;font-weight:600;cursor:pointer;
+box-sizing:border-box;
+}
+.h-del-btn:active{background:#ffe0e0;}
+.h-card-footer{padding:8px 18px 18px;}
+
+/* swipe hint dot indicator */
+.page-dots{
+display:flex;gap:6px;
+justify-content:center;
+padding-bottom:0.5rem;
+transition:opacity .3s;
+}
+.page-dot{width:6px;height:6px;border-radius:50%;background:rgba(15,23,42,.15);transition:background .3s,transform .3s;}
+.page-dot.active{background:var(–brand);transform:scale(1.3);}
+
+/* ── TOP BAR ── */
+.top-bar{
+display:flex;justify-content:space-between;align-items:center;
+padding:16px 1rem 8px;min-height:52px;flex-shrink:0;
+}
+.top-bar-title{font-size:15px;font-weight:700;opacity:0;transition:opacity .3s;}
+.top-bar-title.show{opacity:1;}
+.tba{background:none;border:none;font-size:14px;font-weight:600;color:var(–ink);cursor:pointer;padding:8px;transition:opacity .2s;}
+.tba:active{opacity:.6;}
+.tba.hidden{opacity:0;pointer-events:none;}
+
+/* ── CENTRE STAGE ── */
+.center{
+flex:1;display:flex;align-items:flex-start;justify-content:center;
+padding:16px 1rem 0;position:relative;overflow:hidden;
 }
 
-.history-left{ display:flex; flex-direction:column; }
-.history-time{ font-size:16px; font-weight:700; }
-.history-date{ font-size:12px; color:#64748b; }
+/* ── HOME ── */
+.home-view{
+position:absolute;inset:0;
+display:flex;align-items:center;justify-content:center;flex-direction:column;
+transition:opacity .4s,transform .4s;
+}
+.home-view.hidden{opacity:0;pointer-events:none;transform:scale(.96);}
+.big-number{font-size:140px;font-weight:900;letter-spacing:-.05em;color:rgba(15,23,42,.07);line-height:1;}
+.home-label{font-size:15px;color:var(–sub);margin-top:10px;font-weight:400;text-align:center;}
+.home-streak{font-weight:600;color:var(–ink);}
 
-.history-right{ display:flex; align-items:center; gap:10px; }
+/* ── PREVIEW CARD ── */
+.workout-card{
+background:var(–card);border-radius:22px;
+box-shadow:var(–shadow);padding:22px 22px 20px;
+position:absolute;top:0;left:1rem;right:1rem;
+opacity:0;transform:translateY(20px) scale(.97);
+transition:opacity .4s ease,transform .4s cubic-bezier(.18,.89,.32,1.2);
+pointer-events:none;
+max-height:calc(100vh - 200px);
+overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+}
+.workout-card::-webkit-scrollbar{display:none;}
+.workout-card.visible{opacity:1;transform:none;pointer-events:auto;}
+.workout-card.hidden{display:none;}
+.card-label{font-size:12px;font-weight:700;color:var(–sub);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;}
+.card-title{font-size:24px;font-weight:800;letter-spacing:-.03em;margin-bottom:4px;}
+.card-subtitle{font-size:14px;color:var(–sub);margin-bottom:20px;line-height:1.4;}
+.preview-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid rgba(15,23,42,.05);}
+.preview-row:last-child{border-bottom:none;}
+.preview-name{font-size:16px;font-weight:500;color:#334155;}
+.preview-tags{display:flex;gap:6px;align-items:center;}
+.pill{padding:5px 12px;border-radius:999px;font-size:13px;font-weight:700;white-space:nowrap;text-transform:capitalize;}
+.pill-pull{background:var(–tag-pull-bg);color:var(–tag-pull-ink);}
+.pill-push{background:var(–tag-push-bg);color:var(–tag-push-ink);}
+.pill-legs{background:var(–tag-legs-bg);color:var(–tag-legs-ink);}
+.pill-shoulders{background:var(–tag-shoulders-bg);color:var(–tag-shoulders-ink);}
+.pill-abs{background:var(–tag-abs-bg);color:var(–tag-abs-ink);}
+.pill-cardio{background:var(–tag-cardio-bg);color:var(–tag-cardio-ink);}
+.pill-pb{background:var(–tag-pb-bg);color:var(–tag-pb-ink);}
+.pill-weight{background:#fdf4ff;color:#7c3aed;font-size:12px;}
 
-.pr-badge{
-  font-size:11px; font-weight:700; background:#dcfce7; color:#16a34a;
-  padding:4px 8px; border-radius:999px;
+/* ── BASELINE VIEW ── */
+.baseline-view{
+position:absolute;inset:0;
+display:flex;flex-direction:column;
+opacity:0;pointer-events:none;transform:translateY(20px);
+transition:opacity .4s,transform .4s;
+padding:28px 24px 0;
+background:#f8f9fb;
+}
+.baseline-view.visible{opacity:1;pointer-events:auto;transform:none;}
+.baseline-view.visible{opacity:1;pointer-events:auto;transform:none;}
+.bl-step{font-size:12px;font-weight:600;color:#c0c8d8;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;}
+
+.bl-name-row{display:flex;align-items:center;gap:12px;margin-bottom:4px;}
+.bl-weight-pill{display:none;}
+.bl-weight-pill.visible{display:inline-block;}
+.bl-name{font-size:28px;font-weight:700;letter-spacing:-.03em;margin-bottom:4px;color:var(–ink);}
+.bl-sub{font-size:14px;color:#94a3b8;margin-bottom:0;line-height:1.5;}
+.pin-display{
+font-size:100px;font-weight:700;letter-spacing:-.06em;
+color:var(–ink);line-height:1;
+font-variant-numeric:tabular-nums;
+margin:auto 0;text-align:center;
+transition:color .15s;
+}
+.pin-display.zero{color:#e2e8f0;}
+.pin-display.has-value{color:var(–brand);}
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;}
+.numpad-btn{
+height:68px;border-radius:999px;border:none;
+background:transparent;
+font-size:26px;font-weight:400;color:var(–ink);
+cursor:pointer;display:flex;align-items:center;justify-content:center;
+transition:opacity .1s;
+-webkit-tap-highlight-color:transparent;
+}
+.numpad-btn:active{opacity:.35;}
+.numpad-btn.del{font-size:19px;color:#ef4444;}
+.numpad-btn.ok{
+background:var(–brand);color:white;
+border-radius:999px;font-size:20px;
+transition:transform .15s cubic-bezier(.34,1.56,.64,1),opacity .1s;
+}
+.numpad-btn.ok:active{transform:scale(.93);}
+.bl-spacer{flex:1;}
+.bl-numpad-area{
+flex-shrink:0;
+padding:0 0 calc(14px + env(safe-area-inset-bottom));
+width:100%;
 }
 
-.history-delete{
-  border:none;
-  background:#ffe0e0;
-  color:#dc2626;
-  border-radius:8px;
-  padding:6px 10px;
-  font-size:12px;
-  font-weight:700;
-  cursor:pointer;
-  z-index: 10;
-  position: relative;
-  touch-action: manipulation;
-  flex-shrink: 0;
-  transition: transform 0.1s;
+/* ═══════════════════════════════════════════
+WORKOUT SCREEN
+═══════════════════════════════════════════ */
+.workout-screen{
+position:fixed;inset:0;
+background:#f8f9fb;
+display:flex;flex-direction:column;
+padding-top:env(safe-area-inset-top);
+z-index:50;
+opacity:0;pointer-events:none;visibility:hidden;
+transform:translateY(28px) scale(.985);
+transition:opacity .4s cubic-bezier(.16,1,.3,1),transform .4s cubic-bezier(.16,1,.3,1),visibility 0s .4s;
 }
-.history-delete:active { transform: scale(0.95); }
+.workout-screen.visible{opacity:1;pointer-events:auto;transform:none;visibility:visible;transition:opacity .4s cubic-bezier(.16,1,.3,1),transform .4s cubic-bezier(.16,1,.3,1),visibility 0s 0s;}
 
-/* --- DELETE ACTION SHEET (New Style) --- */
-.confirm-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200;
-  visibility: hidden; opacity: 0; pointer-events: none;
-  display: flex; align-items: flex-end; justify-content: center;
-  transition: opacity 0.3s ease, visibility 0.3s;
+.ws-topbar{
+display:flex;align-items:center;justify-content:space-between;
+padding:16px 24px 10px;flex-shrink:0;
 }
-.confirm-overlay.show { visibility: visible; opacity: 1; pointer-events: auto; }
+.ws-timer{font-size:13px;font-weight:600;color:#c0c8d8;font-variant-numeric:tabular-nums;letter-spacing:.02em;}
+.ws-quit{background:none;border:none;font-size:14px;font-weight:500;color:#ef4444;cursor:pointer;padding:0;transition:opacity .15s;}
+.ws-quit:active{opacity:.4;}
 
-.confirm-box {
-  width: 100%;
-  background: #fff;
-  border-radius: 24px 24px 0 0;
-  padding: 24px 24px 34px;
-  text-align: center;
-  box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
-  transform: translateY(100%);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+/* scrollable accordion area */
+.ws-accordion-list{
+flex:1;overflow-y:auto;
+padding:0;
+display:flex;flex-direction:column;gap:0;
+scrollbar-width:none;
 }
-.confirm-overlay.show .confirm-box { transform: translateY(0); }
+.ws-accordion-list::-webkit-scrollbar{display:none;}
 
-.confirm-content { padding: 0 0 24px; }
-.confirm-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; color: #0f172a; }
-.confirm-text { font-size: 15px; color: #64748b; }
-
-.confirm-actions {
-  display: flex; flex-direction: column; gap: 12px;
-  border-top: none;
+/* accordion card — Trade Republic list style */
+.ws-acc{
+background:#fff;
+border-bottom:1px solid rgba(15,23,42,.07);
+flex-shrink:0;
+transition:background .2s;
 }
+.ws-acc:first-child{border-top:1px solid rgba(15,23,42,.07);}
+.ws-acc.open{background:#fafbff;}
+.ws-acc.done .ws-acc-header{opacity:.4;}
 
-/* Primary Delete Button (Red) */
-.confirm-btn.danger {
-  width: 100%; height: 52px;
-  background: #dc2626; color: white;
-  border: none; border-radius: 999px;
-  font-size: 17px; font-weight: 700; cursor: pointer;
-  transition: transform 0.1s;
+.ws-acc-header{
+display:flex;align-items:center;justify-content:space-between;
+padding:16px 20px;cursor:pointer;gap:12px;
+-webkit-tap-highlight-color:transparent;
 }
-.confirm-btn.danger:active { transform: scale(0.98); }
+.ws-acc-header:active{background:rgba(15,23,42,.03);}
 
-/* Secondary Cancel Button (Grey) */
-.confirm-btn.cancel {
-  width: 100%; height: 52px;
-  background: var(--btn-secondary-bg);
-  color: var(--brand); /* Blue Text */
-  border: none; border-radius: 999px;
-  font-size: 17px; font-weight: 600; cursor: pointer;
-  transition: transform 0.1s;
+.ws-acc-left{display:flex;align-items:center;gap:14px;flex:1;min-width:0;}
+
+.ws-acc-icon{
+width:40px;height:40px;border-radius:12px;
+background:#f0f2f5;display:flex;align-items:center;justify-content:center;
+flex-shrink:0;font-size:15px;font-weight:700;color:#94a3b8;
+transition:background .2s,color .2s;
 }
-.confirm-btn.cancel:active { transform: scale(0.98); }
+.ws-acc.open .ws-acc-icon{background:#e8edf8;color:var(–brand);}
+.ws-acc.done .ws-acc-icon{background:var(–green-light);color:var(–green);}
 
-/* --- PB / ACTION SHEET OVERLAY --- */
-.pb-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200;
-  display: flex; align-items: flex-end; justify-content: center;
-  visibility: hidden; opacity: 0; pointer-events: none;
-  transition: opacity 0.3s ease, visibility 0.3s;
+.ws-acc-info{flex:1;min-width:0;}
+.ws-acc-name{font-size:15px;font-weight:600;color:var(–ink);letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ws-acc-meta{font-size:12px;color:#94a3b8;margin-top:1px;font-weight:400;}
+
+.ws-acc-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.ws-acc-tally{font-size:18px;font-weight:700;color:var(–brand);font-variant-numeric:tabular-nums;min-width:24px;text-align:right;}
+.ws-acc-tally.done-tally{color:var(–green);}
+.ws-acc-check{width:24px;height:24px;border-radius:50%;background:#f0f2f5;display:flex;align-items:center;justify-content:center;font-size:12px;transition:background .2s,transform .2s;flex-shrink:0;}
+.ws-acc.done .ws-acc-check{background:var(–green-light);color:var(–green);transform:scale(1.1);}
+
+/* accordion body */
+.ws-acc-body{overflow:hidden;height:0;opacity:0;transition:height .55s cubic-bezier(.25,.1,.1,1),opacity .45s cubic-bezier(.25,.1,.1,1);}
+.ws-acc.open .ws-acc-body{}
+
+.ws-acc-inner{padding:0 20px 20px;display:flex;flex-direction:column;align-items:center;gap:8px;}
+
+.ws-acc-bignum{
+font-size:88px;font-weight:700;letter-spacing:-.06em;
+color:var(–ink);line-height:1;
+font-variant-numeric:tabular-nums;
+transition:transform .15s cubic-bezier(.34,1.56,.64,1),color .2s;
 }
-.pb-overlay.show { visibility: visible; opacity: 1; pointer-events: auto; }
+.ws-acc-bignum.typing{color:var(–brand);}
+.ws-acc-bignum.bump{transform:scale(1.1);}
 
-/* SUMMARY OVERLAY & CARD SIZING */
-.pb-card {
-  width: 100%;
-  height: auto;
-  max-height: 85vh; /* Responsive Height */
-  background: #fff;
-  border-radius: 28px 28px 0 0;
-  padding: 32px 24px 24px;
-  text-align: center;
-  box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
-  transform: scale(0.95) translateY(15px);
-  transform-origin: bottom center;
-  opacity: 0;
-  transition: all 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.15);
-  padding-bottom: calc(24px + env(safe-area-inset-bottom));
-  display: flex;
-  flex-direction: column;
+.ws-acc-sublabel{font-size:13px;color:#94a3b8;font-weight:400;}
+
+.ws-acc-bar-wrap{width:100%;height:2px;background:#e8edf8;border-radius:999px;overflow:hidden;}
+.ws-acc-bar{height:100%;background:var(–brand);border-radius:999px;transition:width .5s cubic-bezier(.16,1,.3,1);}
+
+/* fixed bottom panel */
+.ws-bottom{
+flex-shrink:0;
+padding:0 16px;
+background:#f8f9fb;
+display:none;
 }
-.pb-card.short-sheet { min-height: 250px; }
-.pb-overlay.show .pb-card { transform: scale(1) translateY(0); opacity: 1; }
-
-.pb-title { font-size: 24px; font-weight: 600; color: #0f172a; margin: 0 0 8px; letter-spacing: -0.02em; }
-.pb-time { font-size: 52px; font-weight: 500; color: var(--brand); letter-spacing: -1.5px; margin: 8px 0; line-height: 1; }
-/* Left Align and Bold */
-.pb-sub {
-    font-size: 16px;
-    color: #64748b;
-    font-weight: 600;
-    text-align: left;
-    width: 100%;
+.workout-screen.visible .ws-bottom{
+display:block;
 }
-/* Specific Spacing for Summary Card Subheader */
-#summaryOverlay .pb-sub {
-    margin-top: 24px;
-    margin-bottom: 16px;
+.ws-numpad-grid{
+display:grid;grid-template-columns:repeat(3,1fr);
+gap:2px;padding-top:8px;
 }
+.slide-wrap{display:none;width:100%;height:52px;border-radius:999px;background:#eef2ff;position:relative;overflow:hidden;touch-action:pan-y;margin-top:8px;margin-bottom:calc(12px + env(safe-area-inset-bottom));}
+.slide-wrap.show{display:block;}
 
-.pb-workout-list {
-  flex: 1;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  background: transparent;
-  border: none;
-  padding: 0;
-  margin-bottom: 20px;
-  text-align: left;
+.ws-acc-log-btn{
+width:100%;height:52px;border-radius:999px;border:none;
+font-size:17px;font-weight:600;cursor:pointer;
+background:var(–brand);color:white;
+margin-bottom:8px;
+transition:transform .15s cubic-bezier(.34,1.56,.64,1),opacity .2s;
 }
-.pb-workout-list .row { border-bottom: none; padding: 8px 0; }
+.ws-acc-log-btn:not(:disabled):active{transform:scale(.97);}
+.ws-acc-log-btn:disabled{background:var(–btn-disabled-bg);color:var(–btn-disabled-text);cursor:not-allowed;}
 
-/* RESULT ROW ANIMATION */
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+.ws-nk{
+height:62px;border-radius:999px;border:none;
+background:transparent;font-size:26px;font-weight:400;color:var(–ink);
+cursor:pointer;display:flex;align-items:center;justify-content:center;
+transition:opacity .1s;-webkit-tap-highlight-color:transparent;
 }
-.result-row {
-  animation: fadeInUp 0.4s ease forwards;
-  opacity: 0;
+.ws-nk:active{opacity:.35;}
+.ws-nk.del{font-size:20px;color:#ef4444;}
+.nk-confirm{
+width:56px;height:56px;border-radius:50%;border:none;
+background:var(–brand);color:#fff;
+display:flex;align-items:center;justify-content:center;
+cursor:pointer;transition:opacity .15s,transform .15s,background .2s;
+-webkit-tap-highlight-color:transparent;
+margin:auto;
 }
+.nk-confirm:disabled{background:#e8edf8;color:#c0c8d8;cursor:not-allowed;}
+.nk-confirm:not(:disabled):active{transform:scale(.92);opacity:.85;}
 
-.pb-btn {
-  width: 100%; height: 56px; background: var(--brand); color: #fff;
-  border: none; border-radius: 999px; font-size: 18px; font-weight: 700;
-  cursor: pointer; box-shadow: 0 8px 20px rgba(36, 83, 245, 0.25);
-  transition: opacity 0.5s ease, transform 0.1s; flex-shrink: 0;
+/* ── ACTIONS (home/preview states) ── */
+.actions{
+padding:12px 1rem 18px;display:flex;flex-direction:column;gap:0;
+z-index:10;flex-shrink:0;transition:opacity .3s;
 }
-.pb-btn.hidden-state { opacity: 0; pointer-events: none; }
-.pb-btn:active { transform: scale(0.98); }
+.actions.faded{opacity:0;pointer-events:none;height:0;overflow:hidden;padding:0;}
+.btn{width:100%;height:52px;border:none;border-radius:999px;font-size:17px;font-weight:700;cursor:pointer;background:var(–brand);color:white;transition:transform .1s,opacity .2s;display:flex;align-items:center;justify-content:center;}
+.btn:active{transform:scale(.98);}
+.btn.secondary{background:var(–btn-disabled-bg);color:var(–brand);margin-top:12px;border:none;}
+.btn.danger-soft{background:var(–btn-disabled-bg);color:#ef4444;margin-top:12px;border:none;}
+.btn:disabled{background:var(–btn-disabled-bg)!important;color:var(–btn-disabled-text)!important;cursor:not-allowed;transform:none!important;}
+.btn.hidden{display:none;}
 
-/* --- WIZARD SHEET STYLES --- */
-.wizard-sheet {
-  height: auto; max-height: 75vh; padding: 24px 24px 34px;
-  display: flex; flex-direction: column;
-}
+/* slide to complete */
+.slide-label-base{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:var(–brand);pointer-events:none;z-index:1;}
+.slide-knob{position:absolute;left:0;top:0;height:100%;width:52px;border-radius:999px;background:var(–brand);display:flex;align-items:center;justify-content:flex-end;padding-right:16px;z-index:2;cursor:grab;will-change:width;box-shadow:0 4px 12px rgba(36,83,245,.3);}
+.slide-knob span{font-size:18px;color:white;font-weight:700;}
+.slide-label-white{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:white;pointer-events:none;z-index:3;clip-path:inset(0 100% 0 0);will-change:clip-path;}
 
-.wizard-head {
-  display: flex; justify-content: flex-start; margin-bottom: 16px; flex-shrink: 0;
-}
-.wizard-title {
-  font-size: 22px; font-weight: 700; color: #0f172a; text-align: left;
-}
+/* ── OVERLAYS ── */
+.overlay{position:fixed;inset:0;background:rgba(15,23,42,0);z-index:300;visibility:hidden;opacity:0;pointer-events:none;transition:opacity .3s,visibility .3s;display:flex;align-items:flex-end;justify-content:center;}
+.overlay.show{visibility:visible;opacity:1;pointer-events:auto;}
+.sheet{width:100%;background:white;border-radius:28px 28px 0 0;padding:24px 24px calc(28px + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .4s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column;max-height:90vh;overflow-y:auto;scrollbar-width:none;box-shadow:0 -8px 40px rgba(15,23,42,.12);}
+.sheet::-webkit-scrollbar{display:none;}
+.overlay.show .sheet{transform:none;}
+.sheet-handle{display:none;}
+.sheet-title{font-size:22px;font-weight:800;letter-spacing:-.03em;margin-bottom:6px;}
+.sheet-sub{font-size:14px;color:var(–sub);margin-bottom:24px;line-height:1.4;}
+.option-grid{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.wiz-btns{display:flex;gap:10px;}.wiz-btns .btn{flex:1;margin-top:0;}
+.option-btn{width:100%;padding:16px 20px;border-radius:999px;border:none;background:#f7f8f9;font-size:16px;font-weight:600;color:#475569;cursor:pointer;text-align:left;display:flex;align-items:center;gap:12px;transition:all .2s;}
+.option-btn:active{transform:scale(.99);}
+.option-btn.selected{background:#eef2ff;color:var(–brand);border:none;}
+.opt-check{display:none;}
 
-    /* ===============================
-       HIDE SCROLLBARS (but keep scroll)
-       =============================== */
+/* summary */
+.summary-stat{font-size:48px;font-weight:900;letter-spacing:-.04em;color:var(–brand);text-align:center;margin-bottom:4px;}
+.summary-lbl{font-size:14px;color:var(–sub);text-align:center;margin-bottom:20px;}
+.result-list{display:flex;flex-direction:column;gap:8px;flex:1;overflow-y:auto;margin-bottom:16px;scrollbar-width:none;}
+.result-list::-webkit-scrollbar{display:none;}
+.result-item{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:14px;background:#fff;animation:fadeUp .4s ease forwards;opacity:0;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.r-name{font-size:15px;font-weight:600;}
+.r-reps{font-size:16px;font-weight:800;color:var(–brand);}
+.r-tags{display:flex;gap:6px;align-items:center;}
 
-    /* iOS / WebKit */
-    .wizard-body,
-    .modal-body {
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;        /* Firefox */
-    }
+/* history */
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.2);z-index:400;visibility:hidden;opacity:0;pointer-events:none;transition:opacity .3s,visibility .3s;}
+.modal.show{visibility:visible;opacity:1;pointer-events:auto;}
+.modal-sheet{position:absolute;inset:0;top:30px;background:white;border-radius:24px 24px 0 0;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .4s cubic-bezier(.16,1,.3,1);}
+.modal.show .modal-sheet{transform:none;}
+.modal-head{padding:16px 18px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(15,23,42,.06);}
+.modal-title{font-size:20px;font-weight:800;}
+.modal-close{border:none;background:#fff;border:1.5px solid #e8eaed;color:var(–ink);border-radius:999px;height:38px;padding:0 14px;font-weight:700;cursor:pointer;}
+.modal-body{padding:16px 18px;overflow-y:auto;flex:1;scrollbar-width:none;}
+.modal-body::-webkit-scrollbar{display:none;}
+.history-list{display:flex;flex-direction:column;gap:10px;}
+.history-row{padding:12px 14px;border-radius:14px;background:#fff;display:flex;justify-content:space-between;align-items:flex-start;}
+.h-title{font-size:15px;font-weight:700;}
+.h-date{font-size:12px;color:var(–sub);margin-top:2px;}
+.h-sub{font-size:12px;color:var(–sub);margin-top:3px;line-height:1.4;}
 
-    .wizard-body::-webkit-scrollbar,
-    .modal-body::-webkit-scrollbar {
-      width: 0;
-      height: 0;
-      display: none;
-    }
-    
-.wizard-body {
-  flex: 1; overflow-y: auto; position: relative;
-  display: flex; flex-direction: column;
-}
+/* confirm */
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;visibility:hidden;opacity:0;pointer-events:none;display:flex;align-items:flex-end;justify-content:center;transition:opacity .3s,visibility .3s;}
+.confirm-overlay.show{visibility:visible;opacity:1;pointer-events:auto;}
+.confirm-box{width:100%;background:white;border-radius:24px 24px 0 0;padding:24px 24px 34px;text-align:center;transform:translateY(100%);transition:transform .3s cubic-bezier(.16,1,.3,1);}
+.confirm-overlay.show .confirm-box{transform:none;}
+.confirm-title{font-size:20px;font-weight:700;margin-bottom:8px;}
+.confirm-text{font-size:15px;color:var(–sub);margin-bottom:24px;}
+.confirm-actions{display:flex;flex-direction:column;gap:10px;}
+.c-btn{width:100%;height:52px;border-radius:999px;border:none;font-size:17px;font-weight:700;cursor:pointer;transition:transform .1s;}
+.c-btn:active{transform:scale(.98);}
+.c-btn.danger{background:#ef4444;color:white;}
+.c-btn.cancel{background:var(–btn-disabled-bg);color:var(–brand);}
 
-.wizard-step {
-  display: none; flex-direction: column; animation: fadeIn 0.3s ease;
-}
-.wizard-step.active { display: flex; }
+/* mesh */
+.ai-stage{position:absolute;inset:0;pointer-events:none;display:none;z-index:0;}
+.ai-stage::before{content:’’;position:absolute;inset:10%;border-radius:50%;filter:blur(80px) saturate(160%);opacity:0;background:radial-gradient(22rem at 30% 36%,#3A7BFF77 0,#0000 50%),radial-gradient(22rem at 72% 34%,#7DFF5C77 0,#0000 54%),radial-gradient(24rem at 40% 72%,#FFA43A77 0,#0000 54%),radial-gradient(20rem at 70% 74%,#9B8FFF99 0,#0000 80%);animation:meshB 2s ease-in-out infinite;transition:opacity .25s;}
+.ai-stage.show{display:block;}
+.ai-stage.show::before{opacity:.8;}
+@keyframes meshB{0%,100%{transform:scale(1);opacity:.65}50%{transform:scale(1.05);opacity:.35}}
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.plan-grid { display: flex; flex-direction: column; gap: 12px; padding-bottom: 4px; }
-
-.plan-option {
-  width: 100%; background: #f1f5f9;
-  border: 2px solid transparent;
-  border-radius: 16px;
-  padding: 18px 0; font-size: 16px; font-weight: 600; color: #475569;
-  cursor: pointer; transition: all 0.2s; text-align: center;
-}
-.plan-option.selected {
-  background: #eef2ff;
-  border-color: #eef2ff;
-  color: var(--brand);
-  box-shadow: none;
-}
-    
-    /* Workout of the Day — base style (neutral) */
-    .plan-option[data-val="wod"]{
-      background:#f1f5f9;
-      color:#475569;
-      font-weight:600;
-    }
-
-    /* Selected state (same as others for now) */
-    .plan-option[data-val="wod"].selected{
-      background:#eef2ff;
-      border-color:#eef2ff;
-      color:var(--brand);
-    }
-    
-    
-.plan-option:active { transform: scale(0.98); }
-
-
-/* --- Test Day LOCKED: no background at all --- */
-.plan-option[data-val="metacon"]:disabled {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-
-  color: #94a3b8;       /* soft grey text */
-  opacity: 1;           /* prevent faded look */
-  cursor: default;
-}
-
-/* Optional: subtle lock feel */
-.plan-option[data-val="metacon"]:disabled::after {
-  content: "🔒";
-  margin-left: 8px;
-  font-size: 14px;
-  opacity: 0.7;
-}
-
-.wizard-footer {
-  display: flex; gap: 12px; margin-top: 16px; padding-top: 0; flex-shrink: 0;
-}
-
-.wiz-btn {
-  height: 54px; border-radius: 999px; font-size: 17px; font-weight: 600; cursor: pointer; border: none;
-  transition: transform 0.1s;
-}
-.wiz-btn:active { transform: scale(0.98); }
-
-.wiz-back {
-  width: 90px;
-  background: var(--btn-secondary-bg); /* #f7f8f9 */
-  color: var(--brand);
-}
-.wiz-next { flex: 1; background: var(--brand); color: white; }
-.wiz-next:disabled {
-  background: var(--btn-secondary-bg);
-  color: var(--btn-disabled-text);
-  cursor: not-allowed;
-  transform: none;
-}
-
+#confettiCanvas{position:fixed;inset:0;pointer-events:none;z-index:1000;}
+/* ── EXERCISE MODAL ── */
+.ex-tabs{display:flex;gap:10px;padding:10px 18px;border-bottom:1px solid rgba(15,23,42,.06);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.ex-tabs::-webkit-scrollbar{display:none;}
+.ex-tab{border:none;background:#f0f2f5;color:#0f172a;padding:10px 14px;border-radius:999px;font-weight:500;font-size:14px;white-space:nowrap;cursor:pointer;}
+.ex-tab.active{background:#eef2ff;color:var(–brand);}
+.ex-add-row{display:grid;gap:12px;margin-bottom:12px;}
+.ex-input{height:48px;border-radius:12px;border:1px solid rgba(15,23,42,.12);padding:0 14px;font-size:16px;font-family:inherit;outline:none;}
+.ex-input:focus{border-color:var(–brand);}
+.ex-add-btn{height:48px;font-size:16px;margin-bottom:0;}
+.ex-list{display:flex;flex-direction:column;gap:10px;overflow:hidden;}
+.ex-item{display:grid;grid-template-columns:1fr 44px 44px 44px 0px;gap:6px;align-items:center;min-width:0;overflow:hidden;transition:grid-template-columns .2s;}
+.ex-list.editing .ex-item{grid-template-columns:1fr 44px 44px 44px 44px;}
+.ex-item-name{height:44px;border-radius:12px;border:1px solid rgba(15,23,42,.10);padding:0 12px;font-size:15px;font-family:inherit;background:#fff;outline:none;min-width:0;width:100%;}
+.ex-item-name:focus{border-color:var(–brand);}
+.ex-vis-btn{height:44px;width:44px;border:none;border-radius:12px;background:#f0f2f5;color:#64748b;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.ex-kg-btn{height:44px;width:44px;border:none;border-radius:12px;background:#f0f2f5;color:#94a3b8;font-size:11px;font-weight:700;letter-spacing:.03em;cursor:pointer;transition:background .15s,color .15s;}
+.ex-kg-btn.active{background:#e8edf8;color:var(–brand);}
+.ex-prob-btn{height:44px;width:44px;border:none;border-radius:12px;font-size:10px;font-weight:700;letter-spacing:.03em;cursor:pointer;background:#f0f2f5;color:#94a3b8;transition:background .15s,color .15s;}
+.ex-list.editing .ex-prob-btn.high{background:#dcfce7;color:#16a34a;}
+.ex-list.editing .ex-prob-btn.med{background:#fef9c3;color:#ca8a04;}
+.ex-list.editing .ex-prob-btn.low{background:#fee2e2;color:#dc2626;}
+.ex-del-btn{height:44px;width:44px;border:none;border-radius:12px;background:#ffe0e0;color:#dc2626;font-weight:900;font-size:18px;cursor:pointer;display:none;}
+.ex-list.editing .ex-del-btn{display:block;}
+.ex-item.ex-hidden .ex-item-name{opacity:.45;background:#f8fafc;}
 </style>
+
 </head>
-
 <body>
-    <audio id="successAudio" src="success.mp3" preload="auto"></audio>
-    
-    <div class="modal" id="historyModal">
-        <div class="modal-sheet">
-            <div class="modal-head history-head-layout">
-                <button class="back-btn" id="closeHistoryModal">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5m7-7l-7 7 7 7"/></svg>
-                    <span>Back</span>
-                </button>
-                <div class="modal-title">History</div>
-                <div style="width:70px"></div>
-            </div>
-            <div class="tabs" id="historyTabs">
-                <button class="tab active" data-tab="metacon">Test Day</button>
-                <button class="tab" data-tab="training">Training</button>
-            </div>
-            <div class="modal-body">
-                <div class="history-list" id="historyList"></div>
-            </div>
-        </div>
+<canvas id="confettiCanvas"></canvas>
+
+<!-- ══════════════════════════════════════
+     PAGES WRAPPER (swipe left = history)
+══════════════════════════════════════ -->
+
+<div class="pages-track" id="pagesTrack">
+
+<!-- MAIN APP -->
+
+<div class="app">
+  <div class="top-bar">
+    <div class="top-bar-title" id="topBarTitle"></div>
+    <button class="tba hidden" style="color:#ef4444;font-weight:500;" id="blQuitBtn">Quit</button>
+  </div>
+
+  <div class="center">
+    <div class="ai-stage" id="aiStage"></div>
+
+```
+<!-- HOME -->
+<div class="home-view" id="homeView">
+  <div class="big-number" id="bigNumber">0</div>
+  <div class="home-label">workouts completed · <span class="home-streak" id="streakLabel">0 week streak</span></div>
+
+</div>
+
+<!-- PREVIEW CARD -->
+<div class="workout-card hidden" id="workoutCard">
+  <div class="card-label">Today's Workout</div>
+  <div class="card-title" id="cardTitle"></div>
+  <div class="card-subtitle" id="cardSubtitle"></div>
+  <div id="previewRows"></div>
+</div>
+
+<!-- BASELINE -->
+<div class="baseline-view" id="baselineView">
+  <div class="bl-step" id="blStepLabel">Exercise 1 of 4</div>
+  <div class="bl-name-row">
+    <div class="bl-name" id="blExName"></div>
+    <span class="pill pill-weight bl-weight-pill" id="blWeightPill"></span>
+  </div>
+  <div class="bl-sub" id="blExSub">Do as many reps as you can.</div>
+  <div class="pin-display zero" id="pinDisplay">0</div>
+  <div class="bl-numpad-area">
+    <div class="numpad">
+      <button class="numpad-btn" data-v="1">1</button>
+      <button class="numpad-btn" data-v="2">2</button>
+      <button class="numpad-btn" data-v="3">3</button>
+      <button class="numpad-btn" data-v="4">4</button>
+      <button class="numpad-btn" data-v="5">5</button>
+      <button class="numpad-btn" data-v="6">6</button>
+      <button class="numpad-btn" data-v="7">7</button>
+      <button class="numpad-btn" data-v="8">8</button>
+      <button class="numpad-btn" data-v="9">9</button>
+      <button class="numpad-btn del" data-v="del">⌫</button>
+      <button class="numpad-btn" data-v="0">0</button>
+      <button class="nk-confirm" id="blConfirmBtn" disabled><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
     </div>
-    
-    <div class="pb-overlay" id="pbOverlay">
-        <div class="pb-card">
-            <div class="pb-title">New Personal Best!</div>
-            <div class="pb-time" id="pbTimeDisplay">0:00</div>
-            <div class="pb-sub" id="pbPrevDisplay">Previous: 0:00</div>
-            <div id="pbCardRows" class="pb-workout-list"></div>
-            <button class="pb-btn hidden-state" id="pbCloseBtn">Awesome</button>
-        </div>
+  </div>
+</div>
+```
+
+  </div><!-- end center -->
+
+  </div><!-- end .app -->
+<!-- HISTORY PANEL -->
+<div class="history-panel" id="historyPanel">
+    <div class="history-panel-head">
+      <div>
+        <div class="history-panel-title">History</div>
+        <div class="history-panel-count" id="historyPanelCount"></div>
+      </div>
     </div>
-
-    <div class="pb-overlay" id="summaryOverlay">
-        <div class="pb-card">
-            <div class="pb-time" id="summaryRounds">0 Rounds</div>
-            <div class="pb-sub">Results</div>
-            <div id="summaryCardRows" class="pb-workout-list"></div>
-            <button class="pb-btn" id="summaryCloseBtn">Finish</button>
-        </div>
+    <div class="h-tabs">
+      <button class="h-tab active" id="hTabHistory">Sessions</button>
+      <button class="h-tab" id="hTabRecords">Records</button>
     </div>
-    
-    <div class="pb-overlay" id="errorOverlay">
-        <div class="pb-card short-sheet">
-            <div class="pb-title">Oops not enough exercises</div>
-            <div class="pb-sub" style="margin-bottom:30px; margin-top:8px;">You asked for more exercises than you have available in these categories.</div>
-            <button class="pb-btn" id="errorCloseBtn">Okay</button>
-        </div>
+    <div class="history-panel-body">
+      <div id="historyList"></div>
+      <div id="recordsList" style="display:none;"></div>
     </div>
-    
-    <div class="pb-overlay" id="planSheetOverlay">
-        <div class="pb-card wizard-sheet">
-            <div class="wizard-head">
-                <div class="wizard-title" id="wizTitle">What would you like to train?</div>
-            </div>
-           
-            <div class="wizard-body">
-                <div class="wizard-step active" id="wizStep1">
-                    <div class="plan-grid">
-                        <button class="plan-option" data-val="push">Push</button>
-                        <button class="plan-option" data-val="pull">Pull</button>
-                        <button class="plan-option" data-val="legs">Legs</button>
-                        <button class="plan-option" data-val="shoulders">Shoulders</button>
-                        <button class="plan-option" data-val="abs">Abs</button>
-                        <button class="plan-option" data-val="cardio">Cardio</button>
-                        <button class="plan-option" data-val="metacon">Test Day</button>
-                    </div>
-                </div>
-               
-                <div class="wizard-step" id="wizStep2">
-                    <div class="plan-grid">
-                        <button class="plan-option" data-val="1">1 Exercise</button>
-                        <button class="plan-option" data-val="2">2 Exercises</button>
-                        <button class="plan-option" data-val="3">3 Exercises</button>
-                        <button class="plan-option" data-val="4">4 Exercises</button>
-                        <button class="plan-option" data-val="5">5 Exercises</button>
-                        <button class="plan-option" data-val="6">6 Exercises</button>
-                        <button class="plan-option" data-val="7">7 Exercises</button>
-                        <button class="plan-option" data-val="8">8 Exercises</button>
-                        <button class="plan-option" data-val="9">9 Exercises</button>
-                        <button class="plan-option" data-val="10">10 Exercises</button>
-                    </div>
-                </div>
+  </div>
 
-                <div class="wizard-step" id="wizStep3">
-                    <div class="plan-grid">
-                        <button class="plan-option" data-val="10">10s (Test)</button>
-                        <button class="plan-option" data-val="300">5 minutes</button>
-                        <button class="plan-option" data-val="600">10 minutes</button>
-                        <button class="plan-option" data-val="900">15 minutes</button>
-                        <button class="plan-option" data-val="1200">20 minutes</button>
-                        <button class="plan-option" data-val="1500">25 minutes</button>
-                        <button class="plan-option" data-val="1800">30 minutes</button>
-                    </div>
-                </div>
-            </div>
-           
-            <div class="wizard-footer">
-                <button class="wiz-btn wiz-back" id="wizBackBtn">Back</button>
-                <button class="wiz-btn wiz-next" id="wizNextBtn" disabled>Next</button>
-            </div>
-        </div>
+</div><!-- end .pages-track -->
+
+<div class="dock" id="actionsArea">
+  <div class="page-dots" id="pageDots">
+    <div class="page-dot active" id="dotHome"></div>
+    <div class="page-dot" id="dotHistory"></div>
+  </div>
+  <button class="btn" id="mainBtn">Plan Workout</button>
+  <button class="btn hidden" id="findBaselineBtn">Find Your Baseline</button>
+  <button class="btn secondary hidden" id="backBtn">Back</button>
+  <button class="btn secondary" id="exercisesBtn">Exercises</button>
+</div>
+
+<!-- EXERCISE MODAL -->
+
+<div class="modal" id="exerciseModal">
+  <div class="modal-sheet">
+    <div class="modal-head">
+      <div class="modal-title">Exercises</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="modal-close" id="editExBtn">Edit</button>
+        <button class="modal-close" id="closeExerciseModal">Done</button>
+      </div>
     </div>
-    
-    <canvas id="confettiCanvas"></canvas>
-    
-    <div class="container">
-        <div class="train-header" id="focusPicker">
-            <div class="train-left">
-                <div class="train-title"></div>
-                <div class="train-sub"></div>
-            </div>
-            <button class="history-btn" id="historyBtn">History</button>
-        </div>
-       
-        <div class="center">
-            <div class="ai-stage" id="aiStage"></div>
-            <div class="weekly-center" id="weeklyCenter">
-              <div class="weekly-count">
-                <div class="num-wrap" id="weekNumWrap"></div>
-
-                <div class="label">
-                  <span>workouts completed</span>
-                  <span class="dot">·</span>
-                  <span class="streak-inline" id="streakInline">0 week streak</span>
-                </div>
-              </div>
-            </div>
-           
-            <div class="card hidden" id="card">
-                <div class="card-title" id="cardTitle"></div>
-                <div class="card-sub" id="cardSub"></div>
-                <div id="cardRows"></div>
-              
-                <div class="card-timer-wrap hidden" id="cardTimerWrap">
-                 <button class="card-timer" id="cardTimer">Start Your Workout</button>
-                </div>
-
-                <button class="plan-btn hidden" id="planWorkoutBtn">Plan Workout</button>
-            </div>
-        </div>
-       
-        <div class="actions" id="actionsArea">
-            <div class="round-counter-wrap disabled-state" id="roundCounterControl">
-                <button class="round-btn round-minus" id="roundMinus" disabled>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                </button>
-                <button class="round-btn round-plus" id="roundPlus" disabled>
-                    Rounds completed: 0
-                </button>
-            </div>
-           
-            <button class="btn" id="planTriggerBtn">Plan Workout</button>
-           
-            <button class="btn secondary" id="exerciseBtn">Exercises</button>
-            
-            <button class="rest-btn hidden" id="restBtn">Rest</button>
-           
-            <div class="slide-wrap" id="slideWrap">
-                <div class="slide-label-base">Slide to Complete</div>
-                <div class="slide-knob" id="slideKnob"><span>→</span></div>
-                <div class="slide-label-white" id="slideWhite">Slide to Complete</div>
-            </div>
-        </div>
+    <div class="ex-tabs" id="exTabs"></div>
+    <div class="modal-body">
+      <div class="ex-add-row" style="grid-template-columns:1fr;">
+        <input class="ex-input ex-name-input" id="exAddName" placeholder="Exercise name" /></div>
+      <button class="btn ex-add-btn" id="exAddBtn" disabled>Add Exercise</button>
+      <div style="height:12px"></div>
+      <div class="ex-list" id="exList"></div>
     </div>
-    
-    <div class="modal" id="modal">
-        <div class="modal-sheet">
-            <div class="modal-head">
-                <div class="modal-title">Exercises</div>
-                <button class="modal-close" id="closeModal">Done</button>
-            </div>
-            <div class="tabs" id="tabs"></div>
-            <div class="modal-body">
-                <div class="add-row">
-                    <input class="input" id="addName" placeholder="Exercise name" />
-                    <input class="input" id="addReps" placeholder="Reps" />
-                </div>
-                <button class="add-btn" id="addBtn">Add Exercise</button>
-                <div style="height:12px"></div>
-                <div class="list" id="list"></div>
-            </div>
-        </div>
+  </div>
+</div>
+
+<!-- WIZARD OVERLAY -->
+
+<div class="overlay" id="wizardOverlay">
+  <div class="sheet"><div class="sheet-handle"></div><div id="wizContent"></div></div>
+</div>
+
+<!-- SUMMARY OVERLAY -->
+
+<div class="overlay" id="summaryOverlay" style="z-index:150;">
+  <div class="sheet" style="max-height:88vh;">
+    <div class="sheet-handle"></div>
+    <div class="summary-stat" id="summaryTime">0:00</div>
+    <div class="summary-lbl">Total Time</div>
+    <div class="result-list" id="summaryList"></div>
+    <button class="btn" id="summaryDoneBtn">Finish</button>
+  </div>
+</div>
+
+<!-- CONFIRM -->
+
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-title" id="confirmTitle">Confirm</div>
+    <div class="confirm-text" id="confirmText">Are you sure?</div>
+    <div class="confirm-actions">
+      <button class="c-btn danger" id="confirmYes">Delete</button>
+      <button class="c-btn cancel" id="confirmNo">Cancel</button>
     </div>
-    
-    <div class="modal" id="planModal">
-        <div class="modal-sheet">
-            <div class="modal-head">
-                <div class="modal-title">Plan Workout</div>
-                <button class="modal-close" id="closePlanModal">Save</button>
-            </div>
-            <div class="modal-body">
-                <div class="plan-list" id="planBody"></div>
-            </div>
-        </div>
+  </div>
+</div>
+
+<!-- WORKOUT SCREEN — fixed full-screen, outside track so it covers everything -->
+
+<div class="workout-screen" id="workoutScreen">
+  <div class="ws-topbar">
+    <div class="ws-timer" id="wsTimer">0:00</div>
+    <button class="ws-quit" id="wsQuitBtn">Quit</button>
+  </div>
+  <div class="ws-accordion-list" id="wsAccordionList"></div>
+  <div class="ws-bottom" id="wsBottom">
+    <div class="ws-numpad-grid" id="wsNumpad">
+      <button class="ws-nk" data-v="1">1</button>
+      <button class="ws-nk" data-v="2">2</button>
+      <button class="ws-nk" data-v="3">3</button>
+      <button class="ws-nk" data-v="4">4</button>
+      <button class="ws-nk" data-v="5">5</button>
+      <button class="ws-nk" data-v="6">6</button>
+      <button class="ws-nk" data-v="7">7</button>
+      <button class="ws-nk" data-v="8">8</button>
+      <button class="ws-nk" data-v="9">9</button>
+      <button class="ws-nk del" data-v="del">⌫</button>
+      <button class="ws-nk" data-v="0">0</button>
+      <button class="ws-nk nk-confirm" data-v="confirm" id="wsSharedLog" disabled>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
     </div>
-    
-    <div class="confirm-overlay" id="customConfirm">
-        <div class="confirm-box">
-            <div class="confirm-content">
-                <div class="confirm-title" id="confirmTitle">Confirm</div>
-                <div class="confirm-text" id="confirmMsg">Are you sure?</div>
-            </div>
-            <div class="confirm-actions">
-                <button class="confirm-btn danger" id="confirmYes">Delete</button>
-                <button class="confirm-btn cancel" id="confirmCancel">Cancel</button>
-            </div>
-        </div>
+    <div class="slide-wrap" id="slideWrap">
+      <div class="slide-label-base">Slide to Complete</div>
+      <div class="slide-knob" id="slideKnob"><span>→</span></div>
+      <div class="slide-label-white" id="slideWhite">Slide to Complete</div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script>
-              /* =========================================================
-                 CONFIG & STATE
-              ========================================================= */
-        
-              const TAGS = [
-                { key:"push",      label:"push",      pill:"pill-push" },
-                { key:"pull",      label:"pull",      pill:"pill-pull" },
-                { key:"legs",      label:"legs",      pill:"pill-legs" },
-                { key:"shoulders", label:"shoulders", pill:"pill-shoulders" },
-                { key:"abs",       label:"abs",       pill:"pill-abs" },
-                { key:"cardio",    label:"cardio",    pill:"pill-cardio" },
-              ];
-
-              const DEFAULT_LIBRARY = {
-                push:  [ { name:"Push-Ups", reps:"10", hidden: false }, { name:"Dips", reps:"10", hidden: false }, { name:"Decline Push-Ups", reps:"10", hidden: false }, { name:"Diamond Push-Ups", reps:"10", hidden: false } ],
-                pull:  [ { name:"Pull-Ups", reps:"5", hidden: false }, { name:"Chin-Ups", reps:"5", hidden: false }, { name:"Australian Chin-Ups", reps:"10", hidden: false } ],
-                legs:  [ { name:"Squats", reps:"20", hidden: false }, { name:"Lunges", reps:"20", hidden: false }, { name:"Jumping Squats", reps:"15", hidden: false }, { name:"Jumping Lunges", reps:"15", hidden: false } ],
-                shoulders:[ { name:"Dolphin Push-Ups", reps:"10", hidden: false }, { name:"Pike Push-Ups", reps:"10", hidden: false } ],
-                abs:   [ { name:"Knee Raises", reps:"20", hidden: false }, { name:"Full Body Raises", reps:"20", hidden: false }, { name:"Oblique Twists", reps:"10", hidden: false }, { name:"L-Sit Hold", reps:"15s", hidden: false }, { name:"Plank", reps:"45s", hidden: false }, { name:"Dead Bug", reps:"20", hidden: false } ],
-                cardio:[ { name:"Jumping Jacks", reps:"20", hidden: false }, { name:"Mountain Climbers", reps:"20", hidden: false } ],
-              };
-
-              const LS = {
-                library:   "jy_library_v3",
-                streak:    "jy_streak_v1",
-                weekKey:   "jy_weekKey_v1",
-                weekCount: "jy_weekCount_v1",
-                weekCounted:"jy_week_counted_v1",
-                totalDays: "jy_total_days_trained_v1",
-                lastDone:  "jy_last_workout_date_v1",
-                metaconHistory: "jy_metacon_history_v1",
-                workoutHistory: "jy_workout_history_v1",
-                currentWorkout: "jy_current_workout_v1",
-                metaconState: "jy_metacon_state_v2",
-              };
-
-              /* =========================================================
-                 UTIL
-              ========================================================= */
-              const qs    = s => document.querySelector(s);
-              const rand  = arr => arr[Math.floor(Math.random()*arr.length)];
-
-              function hardResetPointerState() {
-                document.body.style.pointerEvents = "none";
-                requestAnimationFrame(() => {
-                  document.body.style.pointerEvents = "";
-                });
-              }
-
-              function isoWeekKey(d=new Date()){
-                const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-                const dayNum = date.getUTCDay() || 7;
-                date.setUTCDate(date.getUTCDate() + 4 - dayNum);
-                const yearStart = new Date(Date.UTC(date.getUTCFullYear(),0,1));
-                const weekNo = Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
-                return `${date.getUTCFullYear()}-W${String(weekNo).padStart(2,"0")}`;
-              }
-              function todayKey(){
-                const d = new Date();
-                return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-              }
-              function formatDate(dateStr){
-                const d = new Date(dateStr);
-                return d.toLocaleDateString(undefined, { day:"numeric", month:"short", year:"numeric" });
-              }
-              function loadJSON(key, fallback){
-                try{
-                  const raw = localStorage.getItem(key);
-                  if(!raw) return fallback;
-                  return JSON.parse(raw);
-                }catch{ return fallback; }
-              }
-              function saveJSON(key, val){
-                localStorage.setItem(key, JSON.stringify(val));
-              }
-
-        function canDoTestDay() {
-          const history = loadJSON(LS.metaconHistory, []);
-          if (!history.length) return true;
-
-          const last = history[history.length - 1];
-          const lastDate = new Date(last.date);
-
-          const now = new Date();
-
-          return (
-            lastDate.getFullYear() !== now.getFullYear() ||
-            lastDate.getMonth() !== now.getMonth()
-          );
-        }
-        
-        function getTimeUntilNextMonth() {
-          const now = new Date();
-          const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-
-          const diffMs = nextMonth - now;
-          const totalSeconds = Math.floor(diffMs / 1000);
-
-          const days = Math.floor(totalSeconds / 86400);
-          const hours = Math.floor((totalSeconds % 86400) / 3600);
-
-          return { days, hours };
-        }
-        
-              /* =========================================================
-                 CUSTOM CONFIRMATION LOGIC
-              ========================================================= */
-              const confirmOverlay = qs("#customConfirm");
-              const confirmMsg = qs("#confirmMsg");
-              const confirmYes = qs("#confirmYes");
-              const confirmCancel = qs("#confirmCancel");
-              let confirmCallback = null;
-
-              function triggerCustomConfirm(message, callback, confirmText = "Delete", isDanger = true) {
-                confirmMsg.textContent = message;
-                confirmYes.textContent = confirmText;
-                confirmYes.className = isDanger ? "confirm-btn danger" : "confirm-btn";
-                confirmCallback = callback;
-                confirmOverlay.classList.add("show");
-              }
-
-              confirmCancel.addEventListener("click", () => {
-                confirmOverlay.classList.remove("show");
-                confirmCallback = null;
-              });
-
-              confirmYes.addEventListener("click", () => {
-                if (confirmCallback) confirmCallback();
-                confirmOverlay.classList.remove("show");
-                confirmCallback = null;
-              });
-
-              /* =========================================================
-                 DOM ELEMENTS
-              ========================================================= */
-              const weeklyCenter = qs("#weeklyCenter");
-              const weekNumWrap  = qs("#weekNumWrap");
-              const streakInline = qs("#streakInline");
-
-              const card      = qs("#card");
-              const cardTitle = qs("#cardTitle");
-              const cardSub   = qs("#cardSub");
-              const cardRows  = qs("#cardRows");
-              const planWorkoutBtn = qs("#planWorkoutBtn");
-
-              const aiStage   = qs("#aiStage");
-              const focusPicker = qs("#focusPicker");
-              const planTriggerBtn = qs("#planTriggerBtn");
-                
-              const exerciseBtn = qs("#exerciseBtn");
-             
-              const roundCounterControl = qs("#roundCounterControl");
-              const roundMinus = qs("#roundMinus");
-              const roundPlus = qs("#roundPlus");
-              
-              const restBtn = qs("#restBtn"); // NEW REST BUTTON
-             
-              const cardTimer = qs("#cardTimer");
-              const cardTimerWrap = qs("#cardTimerWrap");
-              const actionsArea = qs("#actionsArea");
-
-              const slideWrap  = qs("#slideWrap");
-              const slideKnob  = qs("#slideKnob");
-              const slideWhite = qs("#slideWhite");
-
-              const modal     = qs("#modal");
-              const closeModal= qs("#closeModal");
-              const tabsEl    = qs("#tabs");
-              const listEl    = qs("#list");
-              const addName   = qs("#addName");
-              const addReps   = qs("#addReps");
-              const addBtn    = qs("#addBtn");
-
-              const historyBtn = qs("#historyBtn");
-              const historyModal = qs("#historyModal");
-              const closeHistoryModal = qs("#closeHistoryModal");
-              const historyList = qs("#historyList");
-              const historyTabs = qs("#historyTabs");
-
-              const planModal = qs("#planModal");
-              const planBody  = qs("#planBody");
-              const closePlanModal = qs("#closePlanModal");
-
-              const confettiCanvas = qs("#confettiCanvas");
-              const confettiInstance = window.confetti
-                ? window.confetti.create(confettiCanvas, { resize:true, useWorker:true })
-                : null;
-
-              // PB Elements
-              const pbOverlay = qs("#pbOverlay");
-              const pbTimeDisplay = qs("#pbTimeDisplay");
-              const pbPrevDisplay = qs("#pbPrevDisplay");
-              const pbCloseBtn = qs("#pbCloseBtn");
-              const pbCardRows = qs("#pbCardRows");
-             
-              // Summary Elements
-              const summaryOverlay = qs("#summaryOverlay");
-              const summaryRounds = qs("#summaryRounds");
-              const summaryCardRows = qs("#summaryCardRows");
-              const summaryCloseBtn = qs("#summaryCloseBtn");
-             
-              const successAudio = qs("#successAudio");
-
-              // Error Sheet
-              const errorOverlay = qs("#errorOverlay");
-              const errorCloseBtn = qs("#errorCloseBtn");
-              errorCloseBtn.addEventListener("click", () => errorOverlay.classList.remove("show"));
-
-              pbCloseBtn.addEventListener("click", () => {
-                pbOverlay.classList.remove("show");
-                setTimeout(() => pbCloseBtn.classList.add('hidden-state'), 300);
-                triggerHomeTransition();
-              });
-             
-              summaryCloseBtn.addEventListener("click", () => {
-                 summaryOverlay.classList.remove("show");
-                 triggerHomeTransition();
-              });
-
-              // --- WIZARD ELEMENTS ---
-              const planSheetOverlay = qs("#planSheetOverlay");
-              const wizTitle = qs("#wizTitle");
-              const wizStep1 = qs("#wizStep1");
-              const wizStep2 = qs("#wizStep2");
-              const wizStep3 = qs("#wizStep3");
-              const wizBackBtn = qs("#wizBackBtn");
-              const wizNextBtn = qs("#wizNextBtn");
-                
-              let wizStep = 1;
-              let wizSelection = new Set();
-              let wizCount = null;
-              let wizDuration = null;
-
-              /* =========================================================
-                 STATE LOADING & UPDATE LABEL
-              ========================================================= */
-              let library = loadJSON(LS.library, null);
-              if(!library){
-                library = structuredClone(DEFAULT_LIBRARY);
-                saveJSON(LS.library, library);
-              }
-
-              function updateExerciseButtonLabel() {
-                let hiddenCount = 0;
-                if (library) {
-                  Object.values(library).forEach(list => {
-                    if(Array.isArray(list)) {
-                      list.forEach(ex => {
-                        if (ex.hidden) hiddenCount++;
-                      });
-                    }
-                  });
-                }
-                if (hiddenCount > 0) {
-                  exerciseBtn.textContent = `Exercises (${hiddenCount} hidden)`;
-                } else {
-                  exerciseBtn.textContent = "Exercises";
-                }
-              }
-
-              let currentWorkout = null;
-              let plannedReps = {};
-             
-              // Timer Vars
-              let isResting = false; // For AMRAP
-              let restTimeLeft = 20;
-              let restTimerInterval = null;
-              
-              let bigRestTimeLeft = 120; // For Test Day Rest Button
-              let bigRestInterval = null;
-
-              // Counter animation queue (so it animates when returning home)
-              let pendingCounterAnim = null;
-
-              // Metacon Timer Vars (Persistent State)
-              let metaconState = loadJSON(LS.metaconState, { running: false, startTime: 0, accumulated: 0 });
-              let metaconTimerInterval = null;
-
-              let metaconHistory = loadJSON(LS.metaconHistory, []);
-              let workoutHistory = loadJSON(LS.workoutHistory, []);
-
-              /* =========================================================
-                 WIZARD LOGIC (EXCLUSIVE METACON + 3 STEPS)
-              ========================================================= */
-        function initWizard(){
-          wizStep = 1;
-          wizSelection.clear();
-          wizCount = null;
-          wizDuration = null;
-
-          // Reset all buttons
-          document.querySelectorAll(".plan-option").forEach(b => {
-            b.classList.remove("selected");
-            b.disabled = false;
-            b.style.opacity = "";
-          });
-
-          const testBtn = document.querySelector('[data-val="metacon"]');
-          const grid = document.querySelector('#wizStep1 .plan-grid');
-
-          if (testBtn && grid) {
-            if (canDoTestDay()) {
-              // ✅ AVAILABLE → move to top
-              grid.prepend(testBtn);
-
-              testBtn.disabled = false;
-              testBtn.textContent = "Test Day";
-              testBtn.style.opacity = "";
-            } else {
-              // 🔒 LOCKED → move to bottom
-              grid.append(testBtn);
-
-              const { days, hours } = getTimeUntilNextMonth();
-              testBtn.disabled = true;
-              testBtn.textContent = `Test Day — unlocks in ${days}d ${hours}h`;
-              testBtn.style.opacity = "0.5";
-            }
-          }
-          updateWizardUI();
-          planSheetOverlay.classList.add("show");
-        }
-
-              function updateWizardUI(){
-                if(wizStep === 1){
-                  wizTitle.textContent = "What would you like to train?";
-                  wizBackBtn.textContent = "Back";
-                  wizNextBtn.textContent = "Next";
-                  wizNextBtn.disabled = wizSelection.size === 0;
-                  wizStep1.classList.add("active");
-                  wizStep2.classList.remove("active");
-                  wizStep3.classList.remove("active");
-                } else if(wizStep === 2){
-                  wizTitle.textContent = "How many exercises?";
-                  wizBackBtn.textContent = "Back";
-                  wizNextBtn.textContent = "Next";
-                  wizNextBtn.disabled = !wizCount;
-                  wizStep1.classList.remove("active");
-                  wizStep2.classList.add("active");
-                  wizStep3.classList.remove("active");
-                } else if(wizStep === 3){
-                  wizTitle.textContent = "For how long?";
-                  wizBackBtn.textContent = "Back";
-                  wizNextBtn.textContent = "Generate";
-                  wizNextBtn.disabled = !wizDuration;
-                  wizStep1.classList.remove("active");
-                  wizStep2.classList.remove("active");
-                  wizStep3.classList.add("active");
-                }
-              }
-
-              // Step 1: Logic
-              document.querySelectorAll("#wizStep1 .plan-option").forEach(btn => {
-                btn.addEventListener("click", () => {
-                    const val = btn.dataset.val;
-                    const allBtns = document.querySelectorAll("#wizStep1 .plan-option");
-
-                    if (val === "metacon") {
-                       const wasSelected = wizSelection.has("metacon");
-                       wizSelection.clear();
-                       allBtns.forEach(b => b.classList.remove("selected"));
-                       if (!wasSelected) {
-                           wizSelection.add("metacon");
-                           btn.classList.add("selected");
-                       }
-                    } else {
-                       if (wizSelection.has("metacon")) {
-                           wizSelection.clear();
-                           allBtns.forEach(b => b.classList.remove("selected"));
-                       }
-                       if (wizSelection.has(val)) {
-                           wizSelection.delete(val);
-                           btn.classList.remove("selected");
-                       } else {
-                           wizSelection.add(val);
-                           btn.classList.add("selected");
-                       }
-                    }
-                    updateWizardUI();
-                });
-              });
-
-              // Step 2: Count
-              document.querySelectorAll("#wizStep2 .plan-option").forEach(btn => {
-                btn.addEventListener("click", () => {
-                  document.querySelectorAll("#wizStep2 .plan-option").forEach(b => b.classList.remove("selected"));
-                  btn.classList.add("selected");
-                  wizCount = parseInt(btn.dataset.val, 10);
-                  updateWizardUI();
-                });
-              });
-
-              // Step 3: Duration
-              document.querySelectorAll("#wizStep3 .plan-option").forEach(btn => {
-                btn.addEventListener("click", () => {
-                  document.querySelectorAll("#wizStep3 .plan-option").forEach(b => b.classList.remove("selected"));
-                  btn.classList.add("selected");
-                  wizDuration = parseInt(btn.dataset.val, 10); // Seconds
-                  updateWizardUI();
-                });
-              });
-
-              // Navigation
-              wizBackBtn.addEventListener("click", () => {
-                if(wizStep === 3){
-                  wizStep = 2; updateWizardUI();
-                } else if(wizStep === 2){
-                  wizStep = 1; updateWizardUI();
-                } else {
-                  planSheetOverlay.classList.remove("show");
-                }
-              });
-
-              wizNextBtn.addEventListener("click", () => {
-                if(wizStep === 1){
-                    if(wizSelection.has("metacon")) {
-                        planSheetOverlay.classList.remove("show");
-                        triggerGenerationSequence();
-                    } else {
-                        wizStep = 2; updateWizardUI();
-                    }
-                } else if(wizStep === 2){
-                    wizStep = 3; updateWizardUI();
-                } else {
-                    planSheetOverlay.classList.remove("show");
-                    triggerGenerationSequence();
-                }
-              });
-
-              // Trigger from Main Button
-              planTriggerBtn.addEventListener("click", initWizard);
-
-              // --- GENERATION SEQUENCE ---
-              function triggerGenerationSequence(){
-                actionsArea.classList.add("faded");
-                historyBtn.classList.add("hidden");
-                
-                showMesh(true);
-                setTimeout(()=>{
-                  let workout = null;
-                  
-                  if(wizSelection.has("metacon")) {
-                     workout = generateMETACON();
-                  } else {
-                     workout = generateAMRAP_FOCUSED();
-                  }
-
-                  if (!workout) {
-                     showMesh(false);
-                     actionsArea.classList.remove("faded");
-                     historyBtn.classList.remove("hidden");
-                     errorOverlay.classList.add("show");
-                     return;
-                  }
-
-                  currentWorkout = workout;
-                  saveJSON(LS.currentWorkout, workout);
-                  
-                  showMesh(false);
-                  setTimeout(() => {
-                    showWorkoutState(workout);
-                    actionsArea.classList.remove("faded");
-                  }, 300);
-
-                }, 1000);
-              }
-
-              /* =========================================================
-                 WORKOUT GEN LOGIC
-              ========================================================= */
-              function pillForTag(tagKey){
-                const t = TAGS.find(t=>t.key===tagKey);
-                return t ? t.pill : "";
-              }
-
-              function generateAMRAP_FOCUSED(){
-                let selectedTags = Array.from(wizSelection);
-                if(selectedTags.length === 0) selectedTags = ["push","pull","legs","shoulders","abs","cardio"];
-                 
-                let tagPools = {};
-                selectedTags.forEach(tag => {
-                    if(library[tag]) {
-                        const valid = library[tag].filter(ex => !ex.hidden).map(ex => ({...ex, originTag: tag}));
-                        if(valid.length > 0) tagPools[tag] = valid;
-                    }
-                });
-
-                let activeTags = Object.keys(tagPools);
-                if(activeTags.length === 0) return null;
-
-                const count = wizCount || 3;
-                let selectedExercises = [];
-                let usedNames = new Set();
-
-                // 1. Guaranteed One Per Category
-                for (let i = activeTags.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [activeTags[i], activeTags[j]] = [activeTags[j], activeTags[i]];
-                }
-
-                for (const tag of activeTags) {
-                    if (selectedExercises.length >= count) break;
-                    const pool = tagPools[tag];
-                    const randomEx = pool[Math.floor(Math.random() * pool.length)];
-                    if (!usedNames.has(randomEx.name)) {
-                        selectedExercises.push(randomEx);
-                        usedNames.add(randomEx.name);
-                    }
-                }
-
-                // 2. Fill Remainder
-                if (selectedExercises.length < count) {
-                    let remainingPool = [];
-                    activeTags.forEach(tag => {
-                        tagPools[tag].forEach(ex => {
-                            if (!usedNames.has(ex.name)) {
-                                remainingPool.push(ex);
-                            }
-                        });
-                    });
-
-                    for (let i = remainingPool.length - 1; i > 0; i--) {
-                        const j = Math.floor(Math.random() * (i + 1));
-                        [remainingPool[i], remainingPool[j]] = [remainingPool[j], remainingPool[i]];
-                    }
-
-                    const needed = count - selectedExercises.length;
-                    if (remainingPool.length < needed) return null;
-                   
-                    for(let i=0; i<needed; i++) {
-                        selectedExercises.push(remainingPool[i]);
-                    }
-                }
-
-                // 3. Final Shuffle
-                for (let i = selectedExercises.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [selectedExercises[i], selectedExercises[j]] = [selectedExercises[i], selectedExercises[j]];
-                }
-
-                const rows = selectedExercises.map(ex => {
-                  const reps = (ex.reps || "").trim();
-                  const text = reps ? `${reps} ${ex.name}` : ex.name;
-                  return { text, tags: [ex.originTag] };
-                });
-
-                let title = "";
-                if (selectedTags.length === 1) {
-                    title = selectedTags[0].charAt(0).toUpperCase() + selectedTags[0].slice(1);
-                } else if (selectedTags.length === 2) {
-                     title = selectedTags.map(t => t.charAt(0).toUpperCase() + t.slice(1)).join(" & ");
-                } else {
-                    title = "Mixed Workout";
-                }
-
-                return { type: title, rows, duration: wizDuration || 300 };
-              }
-                  
-              function generateMETACON(){
-                return {
-                  type: "Test day",
-                  subtitle: "This is your test day perform one set at max reps.",
-                  rows: [
-                    { text: "Pull-Ups", tags:["pull"] },
-                    { text: "Dips", tags:["push"] },
-                    { text: "Jumping Squats", tags:["legs"] },
-                    { text: "Push-Ups", tags:["push"] },
-                    { text: "Full body Crunches", tags:["abs"] }
-                  ]
-                };
-              }
-
-              /* =========================================================
-                 ROUND COUNTER LOGIC (SPLIT)
-              ========================================================= */
-              function updateRoundBtn(){
-                  roundPlus.textContent = "Rounds completed: " + currentRounds;
-                  if (currentWorkout) {
-                      currentWorkout.roundsDone = currentRounds;
-                      saveJSON(LS.currentWorkout, currentWorkout);
-                  }
-              }
-
-              function enableRoundButtons() {
-                  roundCounterControl.classList.remove("disabled-state");
-                  roundMinus.disabled = false;
-                  roundPlus.disabled = false;
-                  if (currentWorkout) {
-                      currentWorkout.timerActivated = true;
-                      saveJSON(LS.currentWorkout, currentWorkout);
-                  }
-              }
-
-              roundPlus.addEventListener("click", () => {
-                  currentRounds++;
-                  updateRoundBtn();
-              });
-
-              roundMinus.addEventListener("click", () => {
-                  if(currentRounds > 0) currentRounds--;
-                  updateRoundBtn();
-              });
-
-              /* =========================================================
-                 AUDIO ENGINE (Boxing Bell & Victory Fanfare)
-              ========================================================= */
-              let audioCtx = null;
-              function initAudio() {
-                  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                  if (audioCtx.state === 'suspended') audioCtx.resume();
-              }
-
-              // --- BOXING BELL (DING DING DING) ---
-              function playBoxingBell() {
-                  try {
-                      if(!audioCtx) initAudio();
-                      const now = audioCtx.currentTime;
-                      const strikeBell = (time) => {
-                          const osc = audioCtx.createOscillator();
-                          const gain = audioCtx.createGain();
-                          osc.connect(gain);
-                          gain.connect(audioCtx.destination);
-                          osc.type = "triangle"; osc.frequency.value = 750;
-                          gain.gain.setValueAtTime(0, time);
-                          gain.gain.linearRampToValueAtTime(0.5, time + 0.01);
-                          gain.gain.exponentialRampToValueAtTime(0.001, time + 1.2);
-                          osc.start(time); osc.stop(time + 1.3);
-                           
-                          const overtone = audioCtx.createOscillator();
-                          const ogain = audioCtx.createGain();
-                          overtone.connect(ogain);
-                          ogain.connect(audioCtx.destination);
-                          overtone.type = "sine"; overtone.frequency.value = 1200;
-                          ogain.gain.setValueAtTime(0, time);
-                          ogain.gain.linearRampToValueAtTime(0.2, time + 0.01);
-                          ogain.gain.exponentialRampToValueAtTime(0.001, time + 0.5);
-                          overtone.start(time); overtone.stop(time + 0.6);
-                      };
-                      strikeBell(now); strikeBell(now + 0.25); strikeBell(now + 0.5);
-                  } catch(e) {}
-              }
-
-              function playCelebrationSound() {
-                  try {
-                      if(!audioCtx) initAudio();
-                      const now = audioCtx.currentTime;
-                     
-                      const bufferSize = audioCtx.sampleRate * 0.5;
-                      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-                      const data = buffer.getChannelData(0);
-                      for (let i = 0; i < bufferSize; i++) { data[i] = Math.random() * 2 - 1; }
-                      const noise = audioCtx.createBufferSource();
-                      noise.buffer = buffer;
-                      const noiseGain = audioCtx.createGain();
-                      noise.connect(noiseGain);
-                      noiseGain.connect(audioCtx.destination);
-                      noiseGain.gain.setValueAtTime(0.2, now);
-                      noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-                      noise.start(now);
-
-                      const notes = [523.25, 587.33, 659.25, 698.46, 783.99, 880.00, 987.77, 1046.50];
-                      const noteDur = 0.06;
-                      notes.forEach((freq, i) => {
-                          const osc = audioCtx.createOscillator();
-                          const gain = audioCtx.createGain();
-                          osc.connect(gain);
-                          gain.connect(audioCtx.destination);
-                          osc.type = "sawtooth"; osc.frequency.value = freq;
-                          const start = now + (i * noteDur);
-                          gain.gain.setValueAtTime(0, start);
-                          gain.gain.linearRampToValueAtTime(0.2, start + 0.01);
-                          gain.gain.linearRampToValueAtTime(0, start + noteDur);
-                          osc.start(start); osc.stop(start + noteDur + 0.05);
-                      });
-
-                      const chordTime = now + (notes.length * noteDur);
-                      const chordNotes = [523.25, 659.25, 783.99, 1046.50];
-                      chordNotes.forEach(freq => {
-                          const osc = audioCtx.createOscillator();
-                          const gain = audioCtx.createGain();
-                          osc.connect(gain);
-                          gain.connect(audioCtx.destination);
-                          osc.type = "sawtooth"; osc.frequency.value = freq;
-                          gain.gain.setValueAtTime(0, chordTime);
-                          gain.gain.linearRampToValueAtTime(0.15, chordTime + 0.05);
-                          gain.gain.exponentialRampToValueAtTime(0.001, chordTime + 1.5);
-                          osc.start(chordTime); osc.stop(chordTime + 1.5);
-                      });
-                  } catch(e) {}
-              }
-
-              /* =========================================================
-                 TIMER LOGIC (UNIFIED CARD TIMER)
-              ========================================================= */
-              
-              // Test Day Rest Button Logic
-              restBtn.addEventListener("click", toggleBigRestTimer);
-
-              function toggleBigRestTimer() {
-                  if (bigRestInterval) {
-                     // Stop
-                     clearInterval(bigRestInterval);
-                     bigRestInterval = null;
-                     restBtn.textContent = "Rest";
-                     restBtn.classList.remove("active-timer");
-                     bigRestTimeLeft = 120;
-                  } else {
-                     // Start
-                     initAudio();
-                     restBtn.classList.add("active-timer");
-                     bigRestTimeLeft = 120;
-                     restBtn.textContent = formatTimerTime(bigRestTimeLeft);
-                     
-                     bigRestInterval = setInterval(() => {
-                         bigRestTimeLeft--;
-                         if(bigRestTimeLeft <= 0) {
-                             clearInterval(bigRestInterval);
-                             bigRestInterval = null;
-                             restBtn.textContent = "Rest";
-                             restBtn.classList.remove("active-timer");
-                             playBoxingBell();
-                             bigRestTimeLeft = 120;
-                         } else {
-                             restBtn.textContent = formatTimerTime(bigRestTimeLeft);
-                         }
-                     }, 1000);
-                  }
-              }
-
-              cardTimer.addEventListener("click", () => {
-                  initAudio();
-                 
-                  if (currentWorkout?.type === "Test day") {
-                       // Test day uses the big rest button, so Start Workout here is a placeholder or could enable interactions
-                       // For now, it just removes itself
-                       cardTimerWrap.classList.add("hidden");
-                  } else {
-                      toggleAmrapTimer();
-                  }
-              });
-
-              // --- AMRAP LOGIC (Fixed Duration Timer) ---
-              function formatTimerTime(s) {
-                  if (s < 60) return s + "s";
-                  const m = Math.floor(s / 60);
-                  const sc = s % 60;
-                  return `${m}:${String(sc).padStart(2,'0')}`;
-              }
-             
-              function getStartText() {
-                  const dur = currentWorkout.duration || 300;
-                  const mins = Math.floor(dur / 60);
-                  if (dur < 60) return `Start Your ${dur}s Workout`; // Test case
-                  return `Start Your ${mins} Minute Workout`;
-              }
-
-              function toggleAmrapTimer() {
-                  if (roundPlus.disabled) enableRoundButtons();
-                 
-                  if (isResting) {
-                     // Pause
-                     if(restTimerInterval) clearInterval(restTimerInterval);
-                     isResting = false;
-                     cardTimer.classList.add("paused");
-                     cardTimer.textContent = "Resume (" + formatTimerTime(restTimeLeft) + ")";
-                  } else {
-                     // Start/Resume
-                     if(restTimerInterval) clearInterval(restTimerInterval);
-                     isResting = true;
-                     cardTimer.classList.add("active");
-                     cardTimer.classList.remove("paused");
-                      
-                     if (restTimeLeft <= 0) restTimeLeft = currentWorkout.duration || 300;
-                     cardTimer.textContent = formatTimerTime(restTimeLeft);
-                      
-                     restTimerInterval = setInterval(() => {
-                        restTimeLeft--;
-                        if (restTimeLeft < 0) {
-                           // Finish
-                           if(restTimerInterval) clearInterval(restTimerInterval);
-                           isResting = false;
-                           restTimeLeft = 0;
-                           cardTimer.classList.remove("active");
-                           cardTimer.classList.remove("paused");
-                           cardTimer.textContent = "Finished";
-                            
-                           // Disable Rounds on Finish
-                           roundCounterControl.classList.add("disabled-state");
-                           roundMinus.disabled = true;
-                           roundPlus.disabled = true;
-                            
-                           playBoxingBell();
-                        } else {
-                           cardTimer.textContent = formatTimerTime(restTimeLeft);
-                        }
-                       
-                        if (currentWorkout) {
-                            currentWorkout.timeLeft = restTimeLeft;
-                            saveJSON(LS.currentWorkout, currentWorkout);
-                        }
-                     }, 1000);
-                  }
-              }
-             
-              function resetAmrapUI() {
-                  if (restTimerInterval) clearInterval(restTimerInterval);
-                  cardTimer.textContent = getStartText();
-                  cardTimer.classList.remove("paused");
-                  cardTimer.classList.remove("active");
-              }
-
-              /* =========================================================
-                 HISTORY & MODALS etc (Standard)
-              ========================================================= */
-              // ... (Standard history/modal logic as before) ...
-              let currentHistoryTab = 'metacon';
-              document.querySelectorAll('#historyTabs .tab').forEach(t => {
-                t.addEventListener('click', () => {
-                  document.querySelectorAll('#historyTabs .tab').forEach(b => b.classList.remove('active'));
-                  t.classList.add('active');
-                  currentHistoryTab = t.dataset.tab;
-                  renderHistoryContent();
-                });
-              });
-              historyBtn.addEventListener("click", ()=>{ renderHistoryContent(); historyModal.classList.add("show"); });
-              closeHistoryModal.addEventListener("click", ()=> historyModal.classList.remove("show"));
-              historyModal.addEventListener("click",(e)=>{ if(e.target === historyModal) historyModal.classList.remove("show"); });
-
-              function formatTime(ms){
-                // Legacy for old metacon timer logic
-                const total = Math.floor(ms / 1000);
-                const m = String(Math.floor(total / 60)).padStart(2,"0");
-                const s = String(total % 60).padStart(2,"0");
-                return `${m}:${s}`;
-              }
-
-              function renderHistoryContent(){
-                historyList.innerHTML = "";
-                if (currentHistoryTab === 'metacon') {
-                  if (!metaconHistory.length) {
-                    historyList.innerHTML = `<div style="color:#64748b;font-size:14px;padding:20px;text-align:center;">No Test Days recorded yet</div>`;
-                    return;
-                  }
-                  // For Test Days, we might just list them, or show "Completed"
-                  metaconHistory.slice().reverse().forEach((e, i) => {
-                    const originalIndex = metaconHistory.length - 1 - i;
-                    renderHistoryRow(e, false, originalIndex, 'metacon');
-                  });
-                } else {
-                  if (!workoutHistory.length) {
-                    historyList.innerHTML = `<div style="color:#64748b;font-size:14px;padding:20px;text-align:center;">No training sessions yet</div>`;
-                    return;
-                  }
-                  workoutHistory.slice().reverse().forEach((e, i) => {
-                    const originalIndex = workoutHistory.length - 1 - i;
-                    renderHistoryRow(e, false, originalIndex, 'training');
-                  });
-                }
-              }
-
-              function renderHistoryRow(entry, isPB, originalIndex, type) {
-                  const row = document.createElement("div");
-                  row.className = "history-row" + (type === "metacon" ? " history-row-test" : "");
-                let leftContent = "";
-                let badgeHtml = isPB ? '<span class="pr-badge">🏆 PB</span>' : '';
-                if (type === 'metacon') {
-                  leftContent = `<div class="history-time">Test Day</div><div class="history-date">${formatDate(entry.date)}</div>`;
-                } else {
-                  let roundsText = entry.rounds ? ` (${entry.rounds} Rnds)` : "";
-                  leftContent = `<div class="history-time">${entry.type || "Workout"}${roundsText}</div><div class="history-date">${formatDate(entry.date)}</div>`;
-                }
-                const deleteBtn =
-                  type === "training"
-                    ? `<button class="history-delete"
-                         type="button"
-                         data-index="${originalIndex}"
-                         data-type="${type}">×</button>`
-                    : "";
-
-                row.innerHTML = `
-                  <div class="history-left">${leftContent}</div>
-                  <div class="history-right">
-                    ${badgeHtml}
-                    ${deleteBtn}
-                  </div>
-                `;
-                historyList.appendChild(row);
-                // --- Expandable results for Test Day ---
-                if (type === "metacon" && Array.isArray(entry.results)) {
-                  const resultsWrap = document.createElement("div");
-                  resultsWrap.className = "history-results hidden";
-
-                  entry.results.forEach(r => {
-                    const line = document.createElement("div");
-                    line.className = "history-result-row";
-                    line.innerHTML = `
-                      <span class="res-reps">${r.reps || "—"}</span>
-                      <span class="res-name">${r.name}</span>
-                    `;
-                    resultsWrap.appendChild(line);
-                  });
-
-                  row.appendChild(resultsWrap);
-
-                  row.addEventListener("click", (e) => {
-                    e.stopPropagation();
-                    resultsWrap.classList.toggle("hidden");
-                  });
-                }
-              }
-
-        
-              historyList.addEventListener("click", (e) => {
-                const btn = e.target.closest(".history-delete");
-                if (!btn) return;
-                e.stopPropagation(); e.preventDefault();
-                const realIndex = parseInt(btn.dataset.index, 10);
-                const type = btn.dataset.type;
-                triggerCustomConfirm("Delete this session?", () => {
-                  if (type === 'metacon') { metaconHistory.splice(realIndex, 1); saveJSON(LS.metaconHistory, metaconHistory); }
-                  else { workoutHistory.splice(realIndex, 1); saveJSON(LS.workoutHistory, workoutHistory); }
-                  const total = metaconHistory.length + workoutHistory.length;
-                  renderInitialCounter(String(total));
-                  renderHistoryContent();
-                });
-              });
-
-              /* =========================================================
-                 COUNTERS & UI
-              ========================================================= */
-              function getStreak(){ return parseInt(localStorage.getItem(LS.streak)||"0",10); }
-              function setStreak(n){ localStorage.setItem(LS.streak, String(Math.max(0, n|0))); }
-              function getWeekCount(){ return parseInt(localStorage.getItem(LS.weekCount)||"0",10); }
-              function setWeekCount(n){ localStorage.setItem(LS.weekCount, String(Math.max(0, n|0))); }
-              function getWeekCounted(){ return localStorage.getItem(LS.weekCounted)==="1"; }
-              function setWeekCounted(v){ localStorage.setItem(LS.weekCounted, v ? "1" : "0"); }
-              function getTotalDays(){ return metaconHistory.length + workoutHistory.length; }
-
-              function ensureWeekState(){
-                const current = isoWeekKey();
-                const storedWeek = localStorage.getItem(LS.weekKey);
-                if(!storedWeek){
-                  localStorage.setItem(LS.weekKey, current);
-                  localStorage.setItem(LS.weekCount, "0");
-                  localStorage.setItem(LS.weekCounted, "0");
-                  return;
-                }
-                if(storedWeek !== current){
-                  const lastCount = parseInt(localStorage.getItem(LS.weekCount)||"0",10);
-                  if(lastCount < 3) localStorage.setItem(LS.streak, "0");
-                  localStorage.setItem(LS.weekKey, current);
-                  localStorage.setItem(LS.weekCount, "0");
-                  localStorage.setItem(LS.weekCounted, "0");
-                }
-              }
-
-              function renderStreakUI(){
-                if (getTotalDays() === 0) setStreak(0);
-                if(streakInline) streakInline.textContent = `${getStreak()} week streak`;
-              }
-              function renderInitialCounter(valStr) {
-                weekNumWrap.innerHTML = "";
-                valStr.split("").forEach(char => {
-                  const d = document.createElement("div"); d.className = "ticker-digit";
-                  d.innerHTML = `<div class="ticker-track" style="transform: translateY(0%)"><div class="ticker-num">${char}</div></div>`;
-                  weekNumWrap.appendChild(d);
-                });
-              }
-              function animateCounter(oldVal, newVal) {
-                if (oldVal.length !== newVal.length) { renderInitialCounter(newVal); return; }
-                weekNumWrap.innerHTML = "";
-                const oldChars = oldVal.split(""); const newChars = newVal.split("");
-                oldChars.forEach((oldChar, i) => {
-                  const newChar = newChars[i];
-                  const digitDiv = document.createElement("div"); digitDiv.className = "ticker-digit";
-                  if (oldChar === newChar) {
-                     digitDiv.innerHTML = `<div class="ticker-track" style="transform: translateY(0%)"><div class="ticker-num">${newChar}</div></div>`;
-                  } else {
-                     digitDiv.innerHTML = `<div class="ticker-track" style="transform: translateY(-50%)"><div class="ticker-num">${newChar}</div><div class="ticker-num">${oldChar}</div></div>`;
-                     requestAnimationFrame(() => { requestAnimationFrame(() => { digitDiv.querySelector(".ticker-track").style.transform = "translateY(0%)"; }); });
-                  }
-                  weekNumWrap.appendChild(digitDiv);
-                });
-              }
-              function updateCounterUI(oldVal, newVal, animate) {
-                if (animate) animateCounter(oldVal, newVal); else renderInitialCounter(newVal);
-              }
-
-              function showPlanButton(){ planWorkoutBtn.classList.add("hidden"); }
-
-              function renderWorkout(workout){
-                cardTitle.textContent = workout.type;
-                cardSub.textContent = workout.subtitle || ""; // Subtitle for Test Day
-                cardRows.innerHTML = "";
-                
-                const isTestDay = workout.type === "Test day";
-                
-                workout.rows.forEach((r, idx)=>{
-                  const row = document.createElement("div");
-                  // Use grid layout class for Test Day to ensure vertical alignment
-                  row.className = isTestDay ? "test-row" : "row";
-                  
-                  const left = document.createElement("div"); left.className = "row-left";
-                  const txt = document.createElement("div"); txt.className = "row-text";
-                  txt.textContent = r.text; txt.dataset.base = r.text;
-                  left.appendChild(txt);
-                  
-                  const tags = document.createElement("div"); tags.className = "tags";
-                  
-                  // IF TEST DAY -> Add Input
-                  if(isTestDay) {
-                      const input = document.createElement("input");
-                      input.className = "rep-input";
-                      input.type = "number";
-                      input.inputMode = "numeric";
-                      input.pattern = "[0-9]*";
-                      input.id = `repInput-${idx}`;
-                      // Prevent click bubbling to card
-                      input.addEventListener("click", e => e.stopPropagation());
-                      // No placeholder needed as per screenshot
-                      
-                      // In Grid Layout: Add items directly to row, NOT nested in 'tags' for the input
-                      // But to keep code simpler, let's append input to row directly if test day
-                      row.appendChild(left);
-                      row.appendChild(input);
-                      
-                      // Add tags to tags container
-                      r.tags.forEach(tag=>{
-                        const pill = document.createElement("span"); pill.className = `pill ${pillForTag(tag)}`;
-                        pill.textContent = tag; tags.appendChild(pill);
-                      });
-                      row.appendChild(tags);
-                  } else {
-                      // Standard Row Layout
-                      r.tags.forEach(tag=>{
-                        const pill = document.createElement("span"); pill.className = `pill ${pillForTag(tag)}`;
-                        pill.textContent = tag; tags.appendChild(pill);
-                      });
-                      row.appendChild(left);
-                      row.appendChild(tags);
-                  }
-
-                  cardRows.appendChild(row);
-                });
-                card.classList.remove("hidden");
-                requestAnimationFrame(()=> card.classList.add("visible"));
-                showPlanButton(workout);
-              }
-
-              function showWeeklyCenter(){
-                historyBtn.classList.remove("hidden");
-                weeklyCenter.classList.remove("hidden"); weeklyCenter.style.opacity = '0';
-                focusPicker.classList.remove("hidden");
-                card.classList.remove("visible"); card.classList.add("hidden");
-                slideWrap.classList.remove("show"); slideWrap.style.opacity = ''; slideWrap.style.pointerEvents = '';
-                planTriggerBtn.classList.remove("hidden");
-                exerciseBtn.classList.remove("hidden");
-                currentWorkout = null; plannedReps = {}; showPlanButton(null);
-                 
-                roundCounterControl.classList.remove("visible");
-                restBtn.classList.add("hidden"); // Hide Rest Button
-                
-                if(restTimerInterval) clearInterval(restTimerInterval);
-                isResting = false; restTimeLeft = 20;
-                
-                // Clean big rest
-                if(bigRestInterval) clearInterval(bigRestInterval);
-                bigRestInterval = null;
-                restBtn.textContent = "Rest";
-                restBtn.classList.remove("active-timer");
-                 
-                requestAnimationFrame(() => { weeklyCenter.style.opacity = '1'; actionsArea.classList.remove("faded"); });
-              }
-
-              function showWorkoutState(workout){
-                weeklyCenter.classList.add("hidden");
-                historyBtn.classList.add("hidden");
-                focusPicker.classList.add("hidden");
-                renderWorkout(workout);
-                planTriggerBtn.classList.add("hidden");
-                exerciseBtn.classList.add("hidden");
-                slideWrap.classList.add("show"); slideWrap.style.opacity = '1';
-                
-                if(workout.type === "Test day") {
-                    // Test Day Setup
-                    roundCounterControl.classList.remove("visible");
-                    cardTimerWrap.classList.add("hidden"); // Use main Rest button instead
-                    
-                    // Show Rest Button
-                    restBtn.classList.remove("hidden");
-                     
-                } else {
-                    // AMRAP Setup
-                    cardTimerWrap.classList.remove("hidden");
-                    restBtn.classList.add("hidden");
-                    
-                    currentRounds = workout.roundsDone || 0;
-                    updateRoundBtn();
-                    roundCounterControl.classList.add("visible");
-                     
-                    if (workout.timerActivated) {
-                        roundCounterControl.classList.remove("disabled-state");
-                        roundMinus.disabled = false;
-                        roundPlus.disabled = false;
-                    } else {
-                        roundCounterControl.classList.add("disabled-state");
-                        roundMinus.disabled = true;
-                        roundPlus.disabled = true;
-                    }
-                     
-                    // Check for saved time
-                    restTimeLeft = (workout.timeLeft !== undefined) ? workout.timeLeft : (workout.duration || 300);
-                     
-                    // Initial Text
-                    if (restTimeLeft === (workout.duration || 300) && !workout.timerActivated) {
-                        cardTimer.textContent = getStartText();
-                    } else {
-                        // If loaded in a "paused" state (implied by reload)
-                        cardTimer.textContent = "Resume (" + formatTimerTime(restTimeLeft) + ")";
-                        cardTimer.classList.add("paused");
-                    }
-                }
-                 
-                plannedReps = {}; resetSlider();
-              }
-
-              function showMesh(on){
-                if(on){ aiStage.style.display = "block"; requestAnimationFrame(()=> aiStage.classList.add("show")); }
-                else{ aiStage.classList.remove("show"); setTimeout(()=>{ aiStage.style.display="none"; }, 250); }
-              }
-
-              let sliding = false, startClientX = 0, currentWidth = 52, rafPending = false, pendingWidth = 52;
-              function applyTransitions(on){
-                if(on){ slideKnob.style.transition = "width .2s ease-out, transform .2s ease-out"; slideWhite.style.transition = "clip-path .2s ease-out"; }
-                else { slideKnob.style.transition = "none"; slideWhite.style.transition = "none"; }
-              }
-              function resetSlider(){
-                currentWidth = 52; applyTransitions(false);
-                requestAnimationFrame(()=>{ slideKnob.style.width = "52px"; slideWhite.style.clipPath = "inset(0 100% 0 0)"; });
-              }
-              function setSliderProgressImmediate(width){
-                const containerWidth = slideWrap.getBoundingClientRect().width;
-                const w = Math.max(52, Math.min(width, containerWidth));
-                currentWidth = w; slideKnob.style.width = `${w}px`;
-                const pct = (w / containerWidth) * 100; slideWhite.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
-              }
-              function setSliderProgress(px){
-                pendingWidth = px; if(rafPending) return; rafPending = true;
-                requestAnimationFrame(()=>{ rafPending = false; setSliderProgressImmediate(pendingWidth); });
-              }
-              function snapBack(){ applyTransitions(true); requestAnimationFrame(()=> setSliderProgressImmediate(52)); }
-
-              slideKnob.addEventListener("pointerdown", (e)=>{
-                sliding = true; slideKnob.setPointerCapture(e.pointerId); applyTransitions(false);
-                startClientX = e.clientX; if (navigator.vibrate) navigator.vibrate(10);
-              });
-              slideKnob.addEventListener("pointermove", (e)=>{
-                if(!sliding) return; const delta = e.clientX - startClientX; if (delta < 0) return;
-                setSliderProgress(52 + delta);
-              });
-              function finishSlide(e){
-                if(!sliding) return; sliding = false; try{ slideKnob.releasePointerCapture(e.pointerId); }catch{}
-                const containerWidth = slideWrap.getBoundingClientRect().width;
-                 
-                if(currentWidth > containerWidth * 0.92){
-                  applyTransitions(true);
-                 
-                  // AMRAP CHECKS
-                  if (currentWorkout?.type !== "Test day") {
-                         // If timer never activated OR timer is currently ticking (Resting)
-                         if (!currentWorkout.timerActivated || isResting) {
-                             requestAnimationFrame(()=> setSliderProgressImmediate(52));
-                             snapBack();
-
-                             if(isResting) {
-                                 if(restTimerInterval) clearInterval(restTimerInterval);
-                                 isResting = false;
-                                 cardTimer.classList.add("paused");
-                                 cardTimer.textContent = "Resume (" + formatTimerTime(restTimeLeft) + ")";
-                             }
-
-                             triggerCustomConfirm(
-                                 "Are you sure you want to quit this workout?",
-                                 () => { discardWorkout(); },
-                                 "Quit Workout", true
-                             );
-                             return;
-                         }
-                  }
-                 
-                  requestAnimationFrame(()=>{ setSliderProgressImmediate(containerWidth); completeWorkout(); });
-                } else snapBack();
-              }
-              slideKnob.addEventListener("pointerup", finishSlide); slideKnob.addEventListener("pointercancel", finishSlide);
-              window.addEventListener("pointerup", finishSlide, { passive: true }); window.addEventListener("pointercancel", finishSlide, { passive: true });
-
-              function shootConfetti(isPB = false){
-                if(!confettiInstance) return;
-                if (isPB) confettiInstance({ particleCount: 200, spread: 120, origin: { x: 0.5, y: 1 }, startVelocity: 60, colors: ['#FFD700', '#FFA500', '#FFFFFF'], zIndex: 300 });
-                else {
-                  const rect = slideWrap.getBoundingClientRect();
-                  const x = (rect.left + rect.width * 0.5) / window.innerWidth;
-                  const y = (rect.bottom - 6) / window.innerHeight;
-                  confettiInstance({ particleCount:160, spread:90, startVelocity:35, origin:{ x, y }, zIndex: 2 });
-                }
-              }
-
-        function triggerHomeTransition() {
-          card.style.opacity = '0';
-          card.style.transform = 'translateY(20px) scale(0.95)';
-          actionsArea.classList.add("faded");
-
-          if (document.activeElement) document.activeElement.blur();
-
-          setTimeout(() => {
-            card.style.opacity = '';
-            card.style.transform = '';
-            slideWrap.style.opacity = '';
-
-            showWeeklyCenter();
-
-            // Run queued counter animation (if any)
-            if (pendingCounterAnim) {
-              updateCounterUI(
-                pendingCounterAnim.oldVal,
-                pendingCounterAnim.newVal,
-                true
-              );
-              pendingCounterAnim = null;
-            }
-
-            hardResetPointerState();
-          }, 400);
-        }
-
-              function discardWorkout() {
-                  localStorage.removeItem(LS.currentWorkout);
-                  if(restTimerInterval) clearInterval(restTimerInterval);
-                  if(bigRestInterval) clearInterval(bigRestInterval);
-                  triggerHomeTransition();
-              }
-
-              function completeWorkout(){
-                localStorage.removeItem(LS.currentWorkout);
-                let isPBRun = false; slideWrap.style.opacity = '0'; slideWrap.style.pointerEvents = 'none';
-                const oldTotal = String(getTotalDays());
-
-                // Handle TEST DAY Completion
-                if (currentWorkout?.type === "Test day") {
-                  // Collect Inputs
-                  summaryCardRows.innerHTML = "";
-                  summaryRounds.textContent = "Completed";
-                  
-                  // New Data structure for results: [{name: 'Pullups', reps: 15, tag: 'pull'}]
-                  const resultEntries = [];
-                  
-                  // Helper to find best reps for a given exercise name in history
-                  const getPersonalBest = (exName) => {
-                      let max = 0;
-                      metaconHistory.forEach(entry => {
-                          if (entry.results && Array.isArray(entry.results)) {
-                              entry.results.forEach(r => {
-                                  if (r.name === exName) {
-                                      if (r.reps > max) max = r.reps;
-                                  }
-                              });
-                          }
-                      });
-                      return max;
-                  };
-                  
-                  currentWorkout.rows.forEach((r, idx) => {
-                      const inputEl = document.getElementById(`repInput-${idx}`);
-                      const val = inputEl ? inputEl.value : "";
-                      const currentRep = val ? parseInt(val, 10) : 0;
-                      
-                      // Store Result
-                      resultEntries.push({
-                          name: r.text,
-                          reps: currentRep,
-                          tag: r.tags[0] || 'cardio' // Fallback
-                      });
-                      
-                      // Calculate PB Status
-                      const previousMax = getPersonalBest(r.text);
-                      const isNewPB = currentRep > previousMax;
-                      if(isNewPB) isPBRun = true;
-                      
-                      // CREATE SUMMARY ROW
-                      const row = document.createElement("div"); row.className = "row";
-                      
-                      // Left Side (Text stack)
-                      const left = document.createElement("div"); left.className = "row-left";
-                      
-                      const txt = document.createElement("div"); txt.className = "row-text";
-                      txt.textContent = `${currentRep} ${r.text}`;
-                      
-                      const sub = document.createElement("div"); sub.className = "row-sub";
-                      if (isNewPB) {
-                          sub.textContent = `Previous Best: ${previousMax}`;
-                      } else {
-                          sub.textContent = `Best: ${previousMax}`;
-                      }
-                      
-                      left.appendChild(txt);
-                      left.appendChild(sub);
-                      row.appendChild(left);
-                      
-                      // TAGS
-                      const tagsDiv = document.createElement("div"); tagsDiv.className = "tags";
-                      
-                      // Prepend PB Tag if applicable
-                      if (isNewPB) {
-                          const pbPill = document.createElement("span");
-                          pbPill.className = "pill pill-pb";
-                          pbPill.textContent = "PB";
-                          tagsDiv.appendChild(pbPill);
-                      }
-                      
-                      r.tags.forEach(tag=>{
-                          const pill = document.createElement("span"); pill.className = `pill ${pillForTag(tag)}`;
-                          pill.textContent = tag; tagsDiv.appendChild(pill);
-                      });
-                      row.appendChild(tagsDiv);
-
-                      row.className += " result-row";
-                      row.style.animationDelay = (summaryCardRows.children.length * 0.15) + "s";
-                      summaryCardRows.appendChild(row);
-                  });
-                 
-                  // Save Detailed History
-                  metaconHistory.push({
-                      date: todayKey(),
-                      results: resultEntries
-                  });
-                  saveJSON(LS.metaconHistory, metaconHistory);
-                  
-                  summaryOverlay.classList.add("show");
-                  shootConfetti(isPBRun);
-                 
-                } else {
-                  // Handle AMRAP Completion
-                  if(restTimerInterval) clearInterval(restTimerInterval);
-                  resetAmrapUI();
-                 
-                  const title = currentWorkout.type;
-                  const rounds = currentWorkout.roundsDone || 0;
-                 
-                  // Generate Summary
-                  summaryRounds.textContent = rounds + " Rounds";
-                  summaryCardRows.innerHTML = "";
-                 
-                  currentWorkout.rows.forEach(r => {
-                     const row = document.createElement("div"); row.className = "row";
-                      
-                     // TEXT
-                     const left = document.createElement("div"); left.className = "row-left";
-                     const txt = document.createElement("div"); txt.className = "row-text";
-                      
-                     const parts = r.text.match(/^(\d+)\s+(.*)$/);
-                     if(parts) {
-                         const repsPerRound = parseInt(parts[1], 10);
-                         const name = parts[2];
-                         const totalReps = repsPerRound * rounds;
-                         txt.textContent = `${totalReps} ${name}`;
-                     } else {
-                         txt.textContent = r.text;
-                     }
-                     left.appendChild(txt);
-                     row.appendChild(left);
-                      
-                     // TAGS (FIXED)
-                     const tagsDiv = document.createElement("div"); tagsDiv.className = "tags";
-                     r.tags.forEach(tag=>{
-                         const pill = document.createElement("span"); pill.className = `pill ${pillForTag(tag)}`;
-                         pill.textContent = tag;
-                         tagsDiv.appendChild(pill);
-                     });
-                     row.appendChild(tagsDiv);
-
-                     // ANIMATION CLASS
-                     row.className += " result-row";
-                     // Staggered delay (0.15s per item)
-                     row.style.animationDelay = (summaryCardRows.children.length * 0.15) + "s";
-
-                     summaryCardRows.appendChild(row);
-                  });
-                 
-                  workoutHistory.push({ type: title, date: todayKey(), rounds: rounds });
-                  saveJSON(LS.workoutHistory, workoutHistory);
-                 
-                  summaryOverlay.classList.add("show");
-                  shootConfetti(false);
-                }
-                 
-                playCelebrationSound();
-
-                const newTotal = String(getTotalDays());
-                roundCounterControl.classList.remove("visible");
-
-                ensureWeekState();
-                let count = getWeekCount() + 1;
-                setWeekCount(count);
-                if(count >= 3 && !getWeekCounted()){
-                  setStreak(getStreak() + 1);
-                  setWeekCounted(true);
-                }
-                renderStreakUI();
-
-                // Queue counter animation for when we return home
-                pendingCounterAnim = {
-                  oldVal: oldTotal,
-                  newVal: newTotal
-                };
-                }
-
-              pbCloseBtn.onclick = () => {
-                 pbOverlay.classList.remove("show");
-                 setTimeout(() => pbCloseBtn.classList.add('hidden-state'), 300);
-                 triggerHomeTransition(String(getTotalDays()), String(getTotalDays()));
-              };
-
-              /* =========================================================
-                 EXERCISE MODAL
-              ========================================================= */
-              const TAB_ORDER = ["push","pull","legs","shoulders","abs","cardio"];
-              let activeTab = "push";
-              function openModal(){ modal.classList.add("show"); renderTabs(); renderList(); }
-              function closeModalFn(){ modal.classList.remove("show"); saveJSON(LS.library, library); }
-              exerciseBtn.addEventListener("click", openModal);
-              closeModal.addEventListener("click", closeModalFn);
-              modal.addEventListener("click",(e)=>{ if(e.target === modal) closeModalFn(); });
-
-              function renderTabs(){
-                tabsEl.innerHTML = "";
-                TAB_ORDER.forEach(k=>{
-                  const b = document.createElement("button"); b.className = "tab" + (k===activeTab ? " active":"");
-                  b.textContent = k; b.addEventListener("click", ()=>{ activeTab = k; renderTabs(); renderList(); });
-                  tabsEl.appendChild(b);
-                });
-              }
-
-              function renderList(){
-                listEl.innerHTML = "";
-                const arr = library[activeTab] || [];
-                if(!library[activeTab]) library[activeTab]=[];
-                arr.forEach((item, idx)=>{
-                  const wrap = document.createElement("div");
-                  if(item.hidden) wrap.classList.add("hidden-exercise");
-                  wrap.className = "item " + (item.hidden ? "hidden-exercise" : "");
-                 
-                  const name = document.createElement("input"); name.className = "name"; name.value = item.name || "";
-                  name.addEventListener("input", ()=>{ library[activeTab][idx].name = name.value; saveJSON(LS.library, library); });
-                 
-                  const reps = document.createElement("input"); reps.className = "reps"; reps.placeholder = "Reps"; reps.value = item.reps || "";
-                  reps.addEventListener("input", ()=>{ library[activeTab][idx].reps = reps.value; saveJSON(LS.library, library); });
-                 
-                  const eyeBtn = document.createElement("button"); eyeBtn.className = "visibility-btn";
-                  eyeBtn.innerHTML = item.hidden ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>` : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
-                  eyeBtn.addEventListener("click", (e) => { e.stopPropagation(); item.hidden = !item.hidden; saveJSON(LS.library, library); updateExerciseButtonLabel(); renderList(); });
-
-                  const del = document.createElement("button"); del.className = "trash"; del.textContent = "×";
-                  del.addEventListener("click", (e)=>{
-                    e.stopPropagation(); e.preventDefault();
-                    triggerCustomConfirm("Delete this exercise?", () => { library[activeTab].splice(idx, 1); saveJSON(LS.library, library); updateExerciseButtonLabel(); renderList(); });
-                  });
-
-                  wrap.appendChild(name); wrap.appendChild(reps); wrap.appendChild(eyeBtn); wrap.appendChild(del);
-                  listEl.appendChild(wrap);
-                });
-              }
-
-              const checkAddButtonState = () => {
-                addBtn.disabled = !(addName.value.trim().length > 0 && addReps.value.trim().length > 0);
-              };
-
-              addName.addEventListener('input', checkAddButtonState);
-              addReps.addEventListener('input', checkAddButtonState);
-
-              addBtn.disabled = true;
-
-              addBtn.addEventListener("click", ()=>{
-                const n = (addName.value||"").trim(); const r = (addReps.value||"").trim();
-                if(!n || !r) return;
-                if(!library[activeTab]) library[activeTab]=[];
-                library[activeTab].unshift({ name:n, reps:r, hidden: false });
-                
-                addName.value="";
-                addReps.value="";
-                addBtn.disabled = true;
-
-                saveJSON(LS.library, library); updateExerciseButtonLabel(); renderList();
-              });
-
-              function init() {
-                ensureWeekState();
-                renderStreakUI();
-                updateExerciseButtonLabel();
-                renderInitialCounter(String(getTotalDays()));
-
-                const savedWorkout = loadJSON(LS.currentWorkout, null);
-                if (savedWorkout) {
-                  currentWorkout = savedWorkout;
-                  showWorkoutState(savedWorkout);
-                } else {
-                  showWeeklyCenter();
-                }
-              }
-
-              init();
-        </script>
-    </body>
-    </html>
-
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<script>
+/* ── INLINE CONFETTI FALLBACK ── */
+function fireConfetti(){
+  const canvas=document.getElementById('confettiCanvas');
+  const ctx=canvas.getContext('2d');
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
+  const pieces=[];
+  const colors=['#2453f5','#16a34a','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f97316'];
+  for(let i=0;i<140;i++){
+    pieces.push({
+      x:Math.random()*canvas.width,
+      y:canvas.height*0.4+Math.random()*canvas.height*0.2,
+      r:Math.random()*6+3,
+      d:Math.random()*140,
+      color:colors[Math.floor(Math.random()*colors.length)],
+      tilt:Math.random()*10-10,
+      tiltAngle:0,
+      tiltAngleInc:Math.random()*.07+.05,
+      vx:(Math.random()-0.5)*8,
+      vy:-(Math.random()*12+6),
+      gravity:.4,
+      alpha:1,
+    });
+  }
+  let frame=0;
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p=>{
+      p.tiltAngle+=p.tiltAngleInc;
+      p.x+=p.vx;
+      p.vy+=p.gravity;
+      p.y+=p.vy;
+      p.tilt=Math.sin(p.tiltAngle)*12;
+      p.alpha-=0.012;
+      if(p.alpha<=0) return;
+      ctx.globalAlpha=Math.max(0,p.alpha);
+      ctx.fillStyle=p.color;
+      ctx.beginPath();
+      ctx.ellipse(p.x,p.y,p.r,p.r*0.4,p.tilt,0,Math.PI*2);
+      ctx.fill();
+    });
+    ctx.globalAlpha=1;
+    frame++;
+    if(frame<120) requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  draw();
+}
+</script>
+
+<script>
+/* ── STORAGE ── */
+const LS={library:"jy_library_v4",history:"jy_wh_v4",streak:"jy_streak_v1",weekKey:"jy_weekKey_v1",weekCount:"jy_weekCount_v1",weekCounted:"jy_week_counted_v1",pbStore:"jy_pb_v1"};
+const DEFAULT_LIBRARY={
+  push:[
+    {name:"Push-Ups",hidden:false},
+    {name:"Diamond Push-Ups",hidden:false},
+    {name:"Wide Push-Ups",hidden:false},
+    {name:"Decline Push-Ups",hidden:false},
+    {name:"Incline Push-Ups",hidden:false},
+    {name:"Archer Push-Ups",hidden:false},
+    {name:"Dips",hidden:false},
+    {name:"Korean Dips",hidden:false},
+    {name:"Close Grip Push-Ups",hidden:false},
+    {name:"Pseudo Planche Push-Ups",hidden:false},
+  ],
+  pull:[
+    {name:"Pull-Ups",hidden:false},
+    {name:"Chin-Ups",hidden:false},
+    {name:"Wide Pull-Ups",hidden:false},
+    {name:"Neutral Grip Pull-Ups",hidden:false},
+    {name:"Australian Rows",hidden:false},
+    {name:"Archer Pull-Ups",hidden:false},
+    {name:"Commando Pull-Ups",hidden:false},
+    {name:"Typewriter Pull-Ups",hidden:false},
+    {name:"Scapular Pull-Ups",hidden:false},
+    {name:"Inverted Rows",hidden:false},
+  ],
+  legs:[
+    {name:"Squats",hidden:false},
+    {name:"Bulgarian Split Squats",hidden:false},
+    {name:"Lunges",hidden:false},
+    {name:"Reverse Lunges",hidden:false},
+    {name:"Jump Squats",hidden:false},
+    {name:"Jump Lunges",hidden:false},
+    {name:"Pistol Squats",hidden:false},
+    {name:"Step-Ups",hidden:false},
+    {name:"Glute Bridges",hidden:false},
+    {name:"Nordic Curls",hidden:false},
+    {name:"Calf Raises",hidden:false},
+  ],
+  shoulders:[
+    {name:"Pike Push-Ups",hidden:false},
+    {name:"Dolphin Push-Ups",hidden:false},
+    {name:"Handstand Push-Ups",hidden:false},
+    {name:"Wall Handstand Push-Ups",hidden:false},
+    {name:"Pike Hold",hidden:false},
+    {name:"Lateral Raises",hidden:false},
+    {name:"Pike Roll-Outs",hidden:false},
+  ],
+  abs:[
+    {name:"Knee Raises",hidden:false},
+    {name:"Leg Raises",hidden:false},
+    {name:"Toes to Bar",hidden:false},
+    {name:"V-Ups",hidden:false},
+    {name:"Hollow Body Hold",hidden:false},
+    {name:"Plank",hidden:false},
+    {name:"Side Plank",hidden:false},
+    {name:"Dead Bug",hidden:false},
+    {name:"Dragon Flag Negatives",hidden:false},
+    {name:"Oblique Twists",hidden:false},
+    {name:"Ab Wheel Roll-Outs",hidden:false},
+    {name:"L-Sit Hold",hidden:false},
+  ],
+  cardio:[
+    {name:"Burpees",hidden:false},
+    {name:"Jumping Jacks",hidden:false},
+    {name:"Mountain Climbers",hidden:false},
+    {name:"High Knees",hidden:false},
+    {name:"Box Jumps",hidden:false},
+    {name:"Jump Rope",hidden:false},
+    {name:"Bear Crawl",hidden:false},
+    {name:"Broad Jumps",hidden:false},
+  ],
+};
+const UPPER_CATS=["push","pull","abs","shoulders"];
+const LOWER_CATS=["legs","cardio","abs"];
+const FULL_CATS=["push","pull","legs","shoulders","abs","cardio"];
+const WEIGHTS=[5,10,15,20];
+const PILL_MAP={push:"pill-push",pull:"pill-pull",legs:"pill-legs",shoulders:"pill-shoulders",abs:"pill-abs",cardio:"pill-cardio"};
+
+function loadJSON(k,fb){try{const r=localStorage.getItem(k);return r?JSON.parse(r):fb;}catch{return fb;}}
+function saveJSON(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
+let library=loadJSON(LS.library,null)||structuredClone(DEFAULT_LIBRARY);
+let workoutHistory=loadJSON(LS.history,[]);
+let pbStore=loadJSON(LS.pbStore,{});
+function todayKey(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;}
+function isoWeekKey(d=new Date()){const dt=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const day=dt.getUTCDay()||7;dt.setUTCDate(dt.getUTCDate()+4-day);const ys=new Date(Date.UTC(dt.getUTCFullYear(),0,1));return `${dt.getUTCFullYear()}-W${String(Math.ceil((((dt-ys)/86400000)+1)/7)).padStart(2,"0")}`;}
+function formatDate(s){return new Date(s).toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"});}
+function fmtTime(s){const m=Math.floor(s/60);return `${m}:${String(s%60).padStart(2,"0")}`;}
+
+/* ── DOM ── */
+const $=s=>document.querySelector(s);
+const homeView=$('#homeView'),workoutCard=$('#workoutCard'),baselineView=$('#baselineView');
+const aiStage=$('#aiStage'),actionsArea=$('#actionsArea');
+const mainBtn=$('#mainBtn'),findBaselineBtn=$('#findBaselineBtn'),backBtn=$('#backBtn');
+const exercisesBtn=$('#exercisesBtn');
+const blQuitBtn=$('#blQuitBtn');
+const topBarTitle=$('#topBarTitle');
+const bigNumber=$('#bigNumber'),streakLabel=$('#streakLabel');
+const cardTitle=$('#cardTitle'),cardSubtitle=$('#cardSubtitle'),previewRows=$('#previewRows');
+const blStepLabel=$('#blStepLabel'),blExName=$('#blExName'),blExSub=$('#blExSub'),pinDisplay=$('#pinDisplay'),blConfirmBtn=$('#blConfirmBtn'),blWeightPill=$('#blWeightPill');
+// workout screen
+const workoutScreen=$('#workoutScreen');
+const wsTimer=$('#wsTimer'),wsQuitBtn=$('#wsQuitBtn');
+// (accordion-based workout screen — no single wsExTitle/wsBigNum etc)
+const slideWrap=$('#slideWrap'),slideKnob=$('#slideKnob'),slideWhite=$('#slideWhite');
+// overlays
+const wizardOverlay=$('#wizardOverlay');
+const summaryOverlay=$('#summaryOverlay'),summaryTime=$('#summaryTime'),summaryList=$('#summaryList'),summaryDoneBtn=$('#summaryDoneBtn');
+const historyList=$('#historyList');
+const confirmOverlay=$('#confirmOverlay'),confirmTitle=$('#confirmTitle'),confirmText=$('#confirmText'),confirmYes=$('#confirmYes'),confirmNo=$('#confirmNo');
+const confettiCanvas=$('#confettiCanvas');
+
+/* ── STATE ── */
+let appState="home";
+let wizBodyType=null,wizWeighted=false;
+let currentExercises=[];
+let baselineIndex=0,pinValue="";
+let activeExIdx=0;
+let wsRepInput=""; // rep input buffer in workout screen
+let timerSec=0,timerInterval=null;
+
+/* ── AUDIO ── */
+let audioCtx=null;
+function initAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();}
+function playCelebration(){
+  try{initAudio();const now=audioCtx.currentTime;
+    const notes=[523.25,587.33,659.25,698.46,783.99,880,987.77,1046.5],nd=.06;
+    notes.forEach((f,i)=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.type="sawtooth";o.frequency.value=f;const st=now+i*nd;g.gain.setValueAtTime(0,st);g.gain.linearRampToValueAtTime(.2,st+.01);g.gain.linearRampToValueAtTime(0,st+nd);o.start(st);o.stop(st+nd+.05);});
+    const ct=now+notes.length*nd;[523.25,659.25,783.99,1046.5].forEach(f=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.type="sawtooth";o.frequency.value=f;g.gain.setValueAtTime(0,ct);g.gain.linearRampToValueAtTime(.15,ct+.05);g.gain.exponentialRampToValueAtTime(.001,ct+1.5);o.start(ct);o.stop(ct+1.5);});
+  }catch(e){}
+}
+
+/* ── CONFIRM ── */
+let _cb=null;
+function showConfirm(title,text,cb,yesLabel="Delete"){confirmTitle.textContent=title;confirmText.textContent=text;confirmYes.textContent=yesLabel;_cb=cb;confirmOverlay.classList.add("show");}
+confirmYes.addEventListener("click",()=>{confirmOverlay.classList.remove("show");if(_cb)_cb();_cb=null;});
+confirmNo.addEventListener("click",()=>{confirmOverlay.classList.remove("show");_cb=null;});
+
+/* ── STREAK ── */
+function getStreak(){return parseInt(localStorage.getItem(LS.streak)||"0",10);}
+function setStreak(n){localStorage.setItem(LS.streak,String(Math.max(0,n)));}
+function getWeekCount(){return parseInt(localStorage.getItem(LS.weekCount)||"0",10);}
+function setWeekCount(n){localStorage.setItem(LS.weekCount,String(n));}
+function getWeekCounted(){return localStorage.getItem(LS.weekCounted)==="1";}
+function setWeekCounted(v){localStorage.setItem(LS.weekCounted,v?"1":"0");}
+function ensureWeekState(){const cur=isoWeekKey(),stored=localStorage.getItem(LS.weekKey);if(!stored){localStorage.setItem(LS.weekKey,cur);setWeekCount(0);setWeekCounted(false);return;}if(stored!==cur){if(getWeekCount()<3)setStreak(0);localStorage.setItem(LS.weekKey,cur);setWeekCount(0);setWeekCounted(false);}}
+function incrementStreak(){let c=getWeekCount()+1;setWeekCount(c);if(c>=3&&!getWeekCounted()){setStreak(getStreak()+1);setWeekCounted(true);}}
+function renderHome(animate){
+  const newVal=String(workoutHistory.length);
+  streakLabel.textContent=`${getStreak()} week streak`;
+  if(animate && bigNumber.textContent !== newVal){
+    setTimeout(()=>{
+      bigNumber.animate([
+        {transform:'translateY(0)',opacity:1},
+        {transform:'translateY(60px)',opacity:0}
+      ],{duration:250,easing:'ease-in',fill:'forwards'}).onfinish=()=>{
+        bigNumber.textContent=newVal;
+        bigNumber.animate([
+          {transform:'translateY(-60px)',opacity:0},
+          {transform:'translateY(0)',opacity:1}
+        ],{duration:400,easing:'cubic-bezier(0.16,1,0.3,1)',fill:'forwards'});
+      };
+    }, 600);
+  } else {
+    bigNumber.textContent=newVal;
+  }
+}
+
+/* ── VIEW TRANSITIONS ── */
+function hideAllMain(){homeView.classList.add("hidden");workoutCard.classList.remove("visible");workoutCard.classList.add("hidden");baselineView.classList.remove("visible");}
+
+function goHome(animate){
+  workoutCompleted=false;
+  appState="home";
+  workoutScreen.classList.remove("visible");
+  hideAllMain();
+  homeView.classList.remove("hidden");
+  topBarTitle.classList.remove("show");
+  blQuitBtn.classList.add("hidden");
+  mainBtn.classList.remove("hidden");findBaselineBtn.classList.add("hidden");backBtn.classList.add("hidden");
+  exercisesBtn.classList.remove("hidden");
+  actionsArea.classList.remove("faded");
+  actionsArea.style.display='';
+  document.querySelector('.app').style.paddingBottom='';
+  $('#pageDots').style.opacity='1';$('#pageDots').style.pointerEvents='';
+  stopTimer();renderHome(animate);
+}
+
+function goPreview(){
+  appState="preview";hideAllMain();
+  topBarTitle.classList.remove("show");
+  blQuitBtn.classList.add("hidden");
+  mainBtn.classList.add("hidden");findBaselineBtn.classList.remove("hidden");backBtn.classList.remove("hidden");
+  exercisesBtn.classList.add("hidden");
+  workoutCard.classList.remove("hidden");
+  actionsArea.style.display='';
+  document.querySelector('.app').style.paddingBottom='';
+  $('#pageDots').style.opacity='0';$('#pageDots').style.pointerEvents='none';
+  requestAnimationFrame(()=>workoutCard.classList.add("visible"));
+}
+
+function goBaseline(){
+  appState="baseline";
+  workoutCard.classList.remove("visible");
+  setTimeout(()=>workoutCard.classList.add("hidden"),350);
+  findBaselineBtn.classList.add("hidden");backBtn.classList.add("hidden");
+  exercisesBtn.classList.add("hidden");
+  blQuitBtn.classList.remove("hidden");
+  topBarTitle.textContent="Finding Baseline";topBarTitle.classList.add("show");
+  baselineIndex=0;pinValue="";
+  $('#pageDots').style.opacity='0';$('#pageDots').style.pointerEvents='none';
+  actionsArea.style.display='none';
+  document.querySelector('.app').style.paddingBottom='0';
+  showBaselineStep();
+  requestAnimationFrame(()=>baselineView.classList.add("visible"));
+}
+
+function goWorkout(){
+  workoutCompleted=false;
+  appState="workout";
+  actionsArea.style.display='none';
+  baselineView.classList.remove("visible");
+  hideAllMain();
+  buildAccordions();
+  startTimer();
+  updateSlideVisibility();
+  requestAnimationFrame(()=>workoutScreen.classList.add("visible"));
+}
+
+/* ── WIZARD ── */
+function openWizard(){wizBodyType=null;wizWeighted=false;renderWizStep(1);wizardOverlay.classList.add("show");}
+function renderWizStep(step){
+  const wc=$('#wizContent');
+  if(step===1){
+    wc.innerHTML=`<div class="sheet-title">What are you training?</div><div class="sheet-sub">Choose your focus area</div><div class="option-grid"><button class="option-btn" data-v="upper"><span class="opt-label">Upper Body</span></button><button class="option-btn" data-v="lower"><span class="opt-label">Lower Body</span></button><button class="option-btn" data-v="full"><span class="opt-label">Full Body</span></button></div><div class="wiz-btns"><button class="btn secondary" id="wiz1Back">Back</button><button class="btn" id="wiz1Next" disabled>Next</button></div>`;
+    wc.querySelectorAll(".option-btn").forEach(b=>{b.addEventListener("click",()=>{wizBodyType=b.dataset.v;wc.querySelectorAll(".option-btn").forEach(x=>x.classList.remove("selected"));b.classList.add("selected");wc.querySelector('#wiz1Next').disabled=false;});});
+    wc.querySelector('#wiz1Next').addEventListener("click",()=>renderWizStep(2));
+    wc.querySelector('#wiz1Back').addEventListener("click",()=>wizardOverlay.classList.remove("show"));
+  } else {
+    wc.innerHTML=`<div class="sheet-title">Add weight?</div><div class="sheet-sub">Each exercise has a chance of getting a surprise weight (5–20kg)</div><div class="option-grid"><button class="option-btn" data-v="no"><span class="opt-label">No, only bodyweight</span></button><button class="option-btn" data-v="yes"><span class="opt-label">Yes, add weight</span></button></div><div class="wiz-btns"><button class="btn secondary" id="wiz2Back">Back</button><button class="btn" id="wiz2Gen" disabled>Generate</button></div>`;
+    const wiz2Gen=wc.querySelector('#wiz2Gen');
+    wc.querySelectorAll(".option-btn").forEach(b=>{b.addEventListener("click",()=>{wizWeighted=b.dataset.v==="yes";wc.querySelectorAll(".option-btn").forEach(x=>x.classList.remove("selected"));b.classList.add("selected");wiz2Gen.disabled=false;});});
+    wiz2Gen.addEventListener("click",()=>{wizardOverlay.classList.remove("show");triggerGeneration();});
+    wc.querySelector('#wiz2Back').addEventListener("click",()=>renderWizStep(1));
+  }
+}
+wizardOverlay.addEventListener("click",e=>{if(e.target===wizardOverlay)wizardOverlay.classList.remove("show");});
+
+/* ── GENERATION ── */
+function triggerGeneration(){
+  actionsArea.classList.add("faded");
+  actionsArea.style.display='none';
+  document.querySelector('.app').style.paddingBottom='0';
+  $('#pageDots').style.opacity='0';$('#pageDots').style.pointerEvents='none';
+  aiStage.style.display="block";
+  requestAnimationFrame(()=>aiStage.classList.add("show"));
+  setTimeout(()=>{
+    currentExercises=generateExercises();
+    aiStage.classList.remove("show");
+    setTimeout(()=>{aiStage.style.display="none";actionsArea.classList.remove("faded");renderPreviewCard();goPreview();},250);
+  },900);
+}
+
+function generateExercises(){
+  const cats=wizBodyType==="upper"?UPPER_CATS:wizBodyType==="lower"?LOWER_CATS:FULL_CATS;
+  let pool=[];
+  const PROB_W={high:3,med:2,low:1};
+  cats.forEach(cat=>{(library[cat]||[]).filter(e=>!e.hidden).forEach(e=>{
+    const w=PROB_W[e.prob||'high'];
+    for(let i=0;i<w;i++) pool.push({name:e.name,tag:cat,weightable:!!e.weightable});
+  });});
+  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+  const minCount=3, maxCount=5;
+  const count=Math.min(pool.length, minCount+Math.floor(Math.random()*(maxCount-minCount+1)));
+  let selected=[],usedNames=new Set();
+  cats.forEach(cat=>{if(selected.length>=count)return;const pick=pool.find(e=>e.tag===cat&&!usedNames.has(e.name));if(pick){selected.push(pick);usedNames.add(pick.name);}});
+  pool.forEach(e=>{if(selected.length>=count)return;if(!usedNames.has(e.name)){selected.push(e);usedNames.add(e.name);}});
+  const exercises=selected.slice(0,count).map(e=>({name:e.name,tag:e.tag,weight:null,target:0,repsLogged:0,done:false,baselineReps:0,weightable:!!e.weightable}));
+  // assign weight to at most 1 exercise — only weightable exercises eligible
+  if(wizWeighted){
+    const weightable=exercises.filter(e=>e.weightable);
+    if(weightable.length>0){
+      const pick=weightable[Math.floor(Math.random()*weightable.length)];
+      pick.weight=WEIGHTS[Math.floor(Math.random()*WEIGHTS.length)];
+    }
+  }
+  return exercises;
+}
+
+function renderPreviewCard(){
+  const bodyLabel=wizBodyType==="upper"?"Upper Body":wizBodyType==="lower"?"Lower Body":"Full Body";
+  cardTitle.textContent=bodyLabel;
+  cardSubtitle.textContent=wizWeighted?"Some exercises will be weighted · Find your baseline to begin":"Bodyweight · Find your baseline, then hit your targets";
+  previewRows.innerHTML="";
+  currentExercises.forEach(ex=>{
+    const row=document.createElement("div");row.className="preview-row";
+    const tags=`<span class="pill ${PILL_MAP[ex.tag]||''}">${ex.tag}</span>${ex.weight?`<span class="pill pill-weight">${ex.weight}kg</span>`:""}`;
+    row.innerHTML=`<div class="preview-name">${ex.name}</div><div class="preview-tags">${tags}</div>`;
+    previewRows.appendChild(row);
+  });
+}
+
+/* ── BASELINE ── */
+function showBaselineStep(){
+  const ex=currentExercises[baselineIndex];
+  blStepLabel.textContent=`Exercise ${baselineIndex+1} of ${currentExercises.length}`;
+  blExName.textContent=ex.name;
+  if(ex.weight){
+    blWeightPill.textContent=`${ex.weight}kg`;
+    blWeightPill.classList.add("visible");
+  } else {
+    blWeightPill.textContent="";
+    blWeightPill.classList.remove("visible");
+  }
+  blExSub.textContent=ex.weight?`Add ${ex.weight}kg. Do as many reps as you can.`:"Do as many reps as you can.";
+  pinValue="";updatePin();
+}
+function updatePin(){
+  if(!pinValue||pinValue==="0"){
+    pinDisplay.textContent="0";
+    pinDisplay.className="pin-display zero";
+    blConfirmBtn.disabled=true;
+    blConfirmBtn.classList.remove("active");
+  } else {
+    pinDisplay.textContent=pinValue;
+    pinDisplay.className="pin-display has-value";
+    blConfirmBtn.disabled=false;
+  }
+}
+
+document.querySelector('.numpad').addEventListener("click",e=>{
+  const btn=e.target.closest(".numpad-btn");if(!btn)return;
+  const v=btn.dataset.v;
+  if(v==="del"){pinValue=pinValue.slice(0,-1);}
+  else{if(!pinValue||pinValue==="0")pinValue=v;else if(pinValue.length<3)pinValue+=v;}
+  updatePin();
+});
+
+blConfirmBtn.addEventListener("click",()=>confirmBaseline());
+
+function confirmBaseline(){
+  initAudio();
+  const reps=parseInt(pinValue||"0",10);
+  currentExercises[baselineIndex].baselineReps=reps;
+  const multiplier = currentExercises.length <= 3 ? 5 : currentExercises.length === 4 ? 4 : 3;
+  currentExercises[baselineIndex].target=Math.max(1,reps*multiplier);
+  baselineIndex++;
+  if(baselineIndex<currentExercises.length){
+    baselineView.style.opacity="0";baselineView.style.transform="translateY(-20px)";
+    setTimeout(()=>{
+      baselineView.style.transition="none";
+      baselineView.style.opacity="0";baselineView.style.transform="translateY(20px)";
+      showBaselineStep();
+      requestAnimationFrame(()=>{
+        baselineView.style.transition="opacity .35s ease,transform .35s ease";
+        baselineView.style.opacity="1";baselineView.style.transform="none";
+      });
+    },280);
+  } else {
+    baselineView.style.opacity="0";baselineView.style.transform="translateY(-20px)";
+    setTimeout(()=>{baselineView.style.opacity="";baselineView.style.transform="";goWorkout();},320);
+  }
+}
+
+/* ── WORKOUT SCREEN (ACCORDION + SHARED NUMPAD) ── */
+const wsAccordionList=$('#wsAccordionList');
+const wsSharedLog=$('#wsSharedLog');
+const wsNumpad=$('#wsNumpad');
+
+let wsInputs=[];
+let openAccIdx=0;
+
+function buildAccordions(){
+  wsAccordionList.innerHTML="";
+  wsInputs=currentExercises.map(()=>"");
+  currentExercises.forEach((_,i)=>wsAccordionList.appendChild(makeAccordion(i)));
+  openAcc(0,false);
+}
+
+function makeAccordion(i){
+  const ex=currentExercises[i];
+  const meta=ex.weight?`${ex.target} reps · ${ex.weight}kg`:`${ex.target} reps`;
+
+  const card=document.createElement("div");
+  card.className="ws-acc";
+  card.id=`wsAcc${i}`;
+  card.innerHTML=`
+    <div class="ws-acc-header" data-i="${i}">
+      <div class="ws-acc-left">
+        <div class="ws-acc-icon" id="wsAccIcon${i}">${i+1}</div>
+        <div class="ws-acc-info">
+          <div class="ws-acc-name">${ex.name}</div>
+          <div class="ws-acc-meta">${meta}</div>
+        </div>
+      </div>
+      <div class="ws-acc-right">
+        <div class="ws-acc-tally" id="wsAccTally${i}">0</div>
+        <div class="ws-acc-check" id="wsAccCheck${i}"></div>
+      </div>
+    </div>
+    <div class="ws-acc-body">
+      <div class="ws-acc-inner">
+        <div class="ws-acc-bignum" id="wsAccNum${i}">0</div>
+        <div class="ws-acc-sublabel" id="wsAccSub${i}">${ex.target} reps left</div>
+        <div class="ws-acc-bar-wrap"><div class="ws-acc-bar" id="wsAccBar${i}" style="width:0%"></div></div>
+      </div>
+    </div>`;
+
+  card.querySelector('.ws-acc-header').addEventListener("click",()=>{
+    if(openAccIdx===i){
+      animateAccBody(card, false);
+      openAccIdx=null;
+      return;
+    }
+    openAcc(i,true);
+  });
+
+  return card;
+}
+
+function animateAccBody(card, open){
+  const body=card.querySelector(".ws-acc-body");
+  if(!body) return;
+  if(open){
+    body.style.transition="height .55s cubic-bezier(.25,.1,.1,1), opacity .45s cubic-bezier(.25,.1,.1,1)";
+    body.style.height="0px";
+    body.style.opacity="0";
+    card.classList.add("open");
+    const target=body.scrollHeight;
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      body.style.height=target+"px";
+      body.style.opacity="1";
+    }));
+    body.addEventListener("transitionend",function h(e){
+      if(e.propertyName!=="height") return;
+      body.style.height="auto";
+      body.removeEventListener("transitionend",h);
+    },{once:false});
+  } else {
+    body.style.transition="height .45s cubic-bezier(.4,0,.2,1), opacity .3s cubic-bezier(.4,0,.2,1)";
+    const current=body.scrollHeight;
+    body.style.height=current+"px";
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      body.style.height="0px";
+      body.style.opacity="0";
+    }));
+    body.addEventListener("transitionend",function h(e){
+      if(e.propertyName!=="height") return;
+      card.classList.remove("open");
+      body.removeEventListener("transitionend",h);
+    },{once:false});
+  }
+}
+
+function openAcc(i, animate){
+  if(openAccIdx!==null && openAccIdx!==i){
+    const prev=$(`#wsAcc${openAccIdx}`);
+    if(prev) animateAccBody(prev, false);
+  }
+  openAccIdx=i;
+  const card=$(`#wsAcc${i}`);
+  if(!card) return;
+  animateAccBody(card, true);
+  if(animate){
+    setTimeout(()=>card.scrollIntoView({behavior:"smooth",block:"nearest"}),80);
+  }
+  refreshSharedControls();
+}
+
+function refreshSharedControls(){
+  const i=openAccIdx;
+  if(i===null) return;
+  refreshAcc(i);
+}
+
+function refreshAcc(i){
+  const ex=currentExercises[i];
+  const input=wsInputs[i]||"";
+  const logged=ex.repsLogged, target=ex.target||1;
+  const left=Math.max(0,target-logged);
+  const pct=Math.min(100,Math.round((logged/target)*100));
+
+  const numEl=$(`#wsAccNum${i}`);
+  const barEl=$(`#wsAccBar${i}`);
+  const subEl=$(`#wsAccSub${i}`);
+  const tallyEl=$(`#wsAccTally${i}`);
+  const checkEl=$(`#wsAccCheck${i}`);
+  const card=$(`#wsAcc${i}`);
+
+  // big number: show input buffer or logged total
+  const display=input||String(logged);
+  if(numEl){ numEl.textContent=display; numEl.classList.toggle("typing",input.length>0); }
+  if(barEl) barEl.style.width=pct+"%";
+
+  // sublabel
+  if(subEl){
+    if(ex.done) subEl.textContent="✓ Complete!";
+    else if(input){
+      const pending=parseInt(input,10)||0;
+      const newLeft=Math.max(0,left-pending);
+      subEl.textContent=newLeft===0?"Hits target!":`${newLeft} left after log`;
+    } else {
+      subEl.textContent=left===0?"✓ Complete!":`${left} reps left`;
+    }
+  }
+
+  if(tallyEl){ tallyEl.textContent=logged; tallyEl.className="ws-acc-tally"+(ex.done?" done-tally":""); }
+  if(checkEl) checkEl.textContent=ex.done?"✓":"";
+  if(card) card.classList.toggle("done",!!ex.done);
+
+  // shared log button
+  const hasInput=input.length>0&&parseInt(input,10)>0;
+  wsSharedLog.disabled=!hasInput||ex.done;
+}
+
+function checkAccDone(i){
+  const ex=currentExercises[i];
+  if(ex.repsLogged>=ex.target){
+    ex.done=true;
+    refreshAcc(i);
+    setTimeout(()=>{
+      const next=currentExercises.findIndex((e,j)=>j>i&&!e.done);
+      const any=currentExercises.findIndex(e=>!e.done);
+      if(next!==-1) openAcc(next,true);
+      else if(any!==-1) openAcc(any,true);
+      else{
+        const card=$(`#wsAcc${i}`);if(card)card.classList.remove("open");
+        openAccIdx=null;
+        wsSharedLog.disabled=true;
+        updateSlideVisibility();
+      }
+    },300);
+  }
+  updateSlideVisibility();
+}
+
+/* shared numpad */
+wsNumpad.addEventListener("click",e=>{
+  const btn=e.target.closest(".ws-nk,.nk-confirm");if(!btn)return;
+  const i=openAccIdx;if(i===null)return;
+  const ex=currentExercises[i];if(ex.done)return;
+  const v=btn.dataset.v;
+  if(v==="confirm"){
+    const n=parseInt(wsInputs[i],10);if(!n||n<=0)return;
+    initAudio();
+    ex.repsLogged+=n;
+    wsInputs[i]="";
+    const numEl=$(`#wsAccNum${i}`);
+    if(numEl){numEl.classList.remove("bump");requestAnimationFrame(()=>numEl.classList.add("bump"));setTimeout(()=>numEl.classList.remove("bump"),200);}
+    refreshAcc(i);
+    checkAccDone(i);
+  } else if(v==="del") wsInputs[i]=wsInputs[i].slice(0,-1);
+  else if(v==="clear") wsInputs[i]="";
+  else{ if(!wsInputs[i]&&v==="0")return; if(wsInputs[i].length<3)wsInputs[i]+=v; }
+  if(v!=="confirm") refreshAcc(i);
+});
+
+// keep aliases for goWorkout/completeWorkout compatibility
+function renderWsPanel(){ buildAccordions(); }
+function switchExercise(idx){ openAcc(idx,true); }
+function updateWsDisplay(){ if(openAccIdx!==null) refreshAcc(openAccIdx); }
+
+function updateSlideVisibility(){
+  if(currentExercises.every(e=>e.done)){
+    setTimeout(()=>completeWorkout(), 600);
+  }
+}
+
+/* ── TIMER ── */
+function startTimer(){
+  timerSec=0;wsTimer.textContent="0:00";
+  timerInterval=setInterval(()=>{timerSec++;wsTimer.textContent=fmtTime(timerSec);},1000);
+}
+function stopTimer(){clearInterval(timerInterval);timerInterval=null;}
+
+/* ── SLIDER ── */
+let sliding=false,startX=0,curW=52,rafPend=false,pendW=52;
+function applySlideT(on){if(on){slideKnob.style.transition="width .2s ease-out";slideWhite.style.transition="clip-path .2s ease-out";}else{slideKnob.style.transition="none";slideWhite.style.transition="none";}}
+function setSlide(w){const cw=slideWrap.getBoundingClientRect().width;w=Math.max(52,Math.min(w,cw));curW=w;slideKnob.style.width=`${w}px`;slideWhite.style.clipPath=`inset(0 ${100-(w/cw)*100}% 0 0)`;}
+function applySlide(px){pendW=px;if(rafPend)return;rafPend=true;requestAnimationFrame(()=>{rafPend=false;setSlide(pendW);});}
+slideKnob.addEventListener("pointerdown",e=>{sliding=true;slideKnob.setPointerCapture(e.pointerId);applySlideT(false);startX=e.clientX;if(navigator.vibrate)navigator.vibrate(10);});
+slideKnob.addEventListener("pointermove",e=>{if(!sliding)return;const d=e.clientX-startX;if(d<0)return;applySlide(52+d);});
+function finishSlide(e){if(!sliding)return;sliding=false;try{slideKnob.releasePointerCapture(e.pointerId);}catch{}const cw=slideWrap.getBoundingClientRect().width;if(curW>cw*.9){applySlideT(true);setSlide(cw);completeWorkout();}else{applySlideT(true);setSlide(52);}}
+slideKnob.addEventListener("pointerup",finishSlide);slideKnob.addEventListener("pointercancel",finishSlide);
+window.addEventListener("pointerup",finishSlide,{passive:true});window.addEventListener("pointercancel",finishSlide,{passive:true});
+
+/* ── COMPLETE ── */
+let workoutCompleted=false;
+function completeWorkout(){
+  if(workoutCompleted)return;
+  workoutCompleted=true;
+  stopTimer();initAudio();playCelebration();
+  summaryList.innerHTML="";summaryTime.textContent=fmtTime(timerSec);
+  let hasPB=false;
+  currentExercises.forEach((ex,i)=>{
+    const key=ex.weight?`${ex.name}_${ex.weight}kg`:ex.name;
+    const prev=pbStore[key]||0,cur=ex.repsLogged,isPB=cur>prev;
+    if(isPB){pbStore[key]=cur;hasPB=true;}
+    const el=document.createElement("div");el.className="result-item";el.style.animationDelay=(i*.12)+"s";
+    const ws=ex.weight?` @ ${ex.weight}kg`:"";
+    el.innerHTML=`<div><div class="r-name">${ex.name}${ws}</div>${isPB?`<div style="font-size:12px;color:var(--sub);margin-top:2px">Prev best: ${prev}</div>`:""}</div><div class="r-tags"><span class="pill ${PILL_MAP[ex.tag]||''}">${ex.tag}</span>${isPB?'<span class="pill pill-pb">PB 🏆</span>':""}<div class="r-reps">${cur}</div></div>`;
+    summaryList.appendChild(el);
+  });
+  saveJSON(LS.pbStore,pbStore);
+  workoutHistory.push({date:todayKey(),type:wizBodyType==="upper"?"Upper Body":wizBodyType==="lower"?"Lower Body":"Full Body",weighted:wizWeighted,durationSec:timerSec,exercises:currentExercises.map(e=>({name:e.name,tag:e.tag,weight:e.weight||null,baseline:e.baselineReps,target:e.target,reps:e.repsLogged}))});
+  saveJSON(LS.history,workoutHistory);
+  ensureWeekState();incrementStreak();
+  summaryOverlay.classList.add("show");
+  requestAnimationFrame(()=>fireConfetti());
+}
+summaryDoneBtn.addEventListener("click",()=>{
+  summaryOverlay.classList.remove("show");
+  workoutScreen.classList.remove("visible");
+  goHome(true);
+});
+
+/* ── BUTTONS ── */
+mainBtn.addEventListener("click",()=>{if(appState==="home")openWizard();});
+findBaselineBtn.addEventListener("click",()=>goBaseline());
+backBtn.addEventListener("click",()=>goHome());
+blQuitBtn.addEventListener("click",()=>{
+  if(appState==="baseline"){showConfirm("Quit baseline?","Your baseline won't be saved.",()=>goHome(),"Quit");}
+  else{goHome();}
+});
+wsQuitBtn.addEventListener("click",()=>{
+  showConfirm("Quit workout?","Your progress won't be saved.",()=>{stopTimer();workoutScreen.classList.remove("visible");goHome();},"Quit");
+});
+
+/* ── HISTORY PANEL SWIPE ── */
+const historyPanel=$('#historyPanel');
+const historyPanelCount=$('#historyPanelCount');
+const pagesTrack=$('#pagesTrack');
+
+function setDots(historyActive){
+  $('#dotHistory').classList.toggle("active", historyActive);
+  $('#dotHome').classList.toggle("active", !historyActive);
+}
+
+
+
+function openHistory(){
+  // close any open overlays first
+  wizardOverlay.classList.remove("show");
+  renderHistory();
+  $('#hTabHistory').classList.add("active");
+  $('#hTabRecords').classList.remove("active");
+  $('#historyList').style.display="";
+  $('#recordsList').style.display="none";
+  pagesTrack.classList.add("show-history");
+  setDots(true);
+}
+function closeHistory(){
+  pagesTrack.classList.remove("show-history");
+  setDots(false);
+}
+
+$('#hTabHistory').addEventListener("click",()=>{
+  $('#hTabHistory').classList.add("active");
+  $('#hTabRecords').classList.remove("active");
+  $('#historyList').style.display="";
+  $('#recordsList').style.display="none";
+  renderHistory();
+});
+$('#hTabRecords').addEventListener("click",()=>{
+  $('#hTabRecords').classList.add("active");
+  $('#hTabHistory').classList.remove("active");
+  $('#recordsList').style.display="";
+  $('#historyList').style.display="none";
+  renderRecords();
+});
+
+// swipe to open/close history — iOS Home Screen style
+let swipeStartX=0,swipeStartY=0,swipeDx=0,swipeLocked=false,swipeActive=false;
+
+function trackPx(){
+  // 0 = home, -innerWidth = history
+  return pagesTrack.classList.contains("show-history") ? -window.innerWidth : 0;
+}
+function snapTrack(toHistory){
+  pagesTrack.style.transition="";
+  pagesTrack.style.transform="";
+  if(toHistory){
+    pagesTrack.classList.add("show-history");
+    renderHistory();
+  } else {
+    pagesTrack.classList.remove("show-history");
+  }
+  setDots(toHistory);
+}
+
+document.addEventListener("touchstart",e=>{
+  if(appState!=="home") return;
+  if(wizardOverlay.classList.contains("show")) return;
+  if(exerciseModal.classList.contains("show")) return;
+  swipeStartX=e.touches[0].clientX;
+  swipeStartY=e.touches[0].clientY;
+  swipeDx=0; swipeLocked=false; swipeActive=true;
+},{passive:true});
+
+document.addEventListener("touchmove",e=>{
+  if(!swipeActive||appState!=="home") return;
+  const dx=e.touches[0].clientX-swipeStartX;
+  const dy=e.touches[0].clientY-swipeStartY;
+  if(!swipeLocked){
+    if(Math.abs(dx)<5&&Math.abs(dy)<5) return;
+    if(Math.abs(dy)>=Math.abs(dx)){swipeActive=false;return;} // vertical scroll, ignore
+    swipeLocked=true;
+  }
+  swipeDx=dx;
+  const base=trackPx();
+  const clamped=Math.min(0,Math.max(-window.innerWidth, base+dx));
+  pagesTrack.style.transition="none";
+  pagesTrack.style.transform=`translateX(${clamped}px)`;
+},{passive:true});
+
+document.addEventListener("touchend",()=>{
+  if(!swipeActive||!swipeLocked){swipeActive=false;return;}
+  swipeActive=false;
+  const isOpen=pagesTrack.classList.contains("show-history");
+  const threshold=window.innerWidth*0.25;
+  if(!isOpen && swipeDx<-threshold) snapTrack(true);   // swipe left → open history
+  else if(isOpen && swipeDx>threshold) snapTrack(false); // swipe right → close history
+  else snapTrack(isOpen); // rubber-band back
+},{passive:true});
+
+function renderHistory(){
+  historyList.innerHTML="";
+  historyPanelCount.textContent=workoutHistory.length?`${workoutHistory.length} session${workoutHistory.length===1?"":"s"}`:"";
+
+  // build true PBs: highest reps ever per exercise key
+  const truePB={};
+  workoutHistory.forEach(s=>{
+    (s.exercises||[]).forEach(x=>{
+      const key=x.weight?`${x.name}_${x.weight}kg`:x.name;
+      if((x.reps||0)>(truePB[key]||0)) truePB[key]=x.reps||0;
+    });
+  });
+
+  if(!workoutHistory.length){
+    historyList.innerHTML=`<div class="h-empty">No workouts yet.<br>Complete your first session to see it here.</div>`;
+    return;
+  }
+  workoutHistory.slice().reverse().forEach((session,i)=>{
+    const orig=workoutHistory.length-1-i;
+    const dur=session.durationSec?fmtTime(session.durationSec):"";
+    const totalReps=session.exercises?session.exercises.reduce((s,x)=>s+(x.reps||0),0):0;
+    const card=document.createElement("div");
+    card.className="h-card";
+    const exRows=session.exercises?session.exercises.map(x=>{
+      const key=x.weight?`${x.name}_${x.weight}kg`:x.name;
+      const isPB=(x.reps||0)>0&&(x.reps||0)===truePB[key];
+      const weightPill=x.weight?`<span class="pill pill-weight">${x.weight}kg</span>`:"";
+      const pb=isPB?`<span class="h-trophy">🏆</span>`:"";
+      return `<div class="h-ex-row">
+        <div class="h-ex-reps">${x.reps||0}</div>
+        <span class="h-ex-name">${x.name}</span>
+        ${x.weight?`<span class="pill pill-weight" style="font-size:11px;">${x.weight}kg</span>`:""}
+        <span class="pill ${PILL_MAP[x.tag]||''} h-ex-pill">${x.tag}</span>
+      </div>`;
+    }).join(""):"";
+    card.innerHTML=`
+      <div class="h-card-head">
+        <div>
+          <div class="h-card-label">Workout</div>
+          <div class="h-card-title">${session.type||"Workout"}</div>
+          <div class="h-card-meta">${formatDate(session.date)}${dur?" · "+dur:""}${session.weighted?" · Weighted":""}</div>
+        </div>
+        <div class="h-card-total">
+          <div class="h-card-total-num">${totalReps}</div>
+          <div class="h-card-total-label">total reps</div>
+        </div>
+      </div>
+      <div class="h-ex-list">${exRows}</div>
+      <div class="h-card-footer"><button class="h-del-btn" data-idx="${orig}">Delete</button></div>`;
+    historyList.appendChild(card);
+  });
+}
+
+function renderRecords(){
+  const recordsList=$('#recordsList');
+  recordsList.innerHTML="";
+
+  // build records per category
+  const cats=["push","pull","legs","shoulders","abs","cardio"];
+  const records={}; // {cat: [{name, key, reps}]}
+  workoutHistory.forEach(s=>{
+    (s.exercises||[]).forEach(x=>{
+      const br=x.baseline||0;
+      if(!x.tag||!(br>0)) return;
+      const key=x.weight?`${x.name}_${x.weight}kg`:x.name;
+      if(!records[x.tag]) records[x.tag]={};
+      if(br>(records[x.tag][key]?.reps||0)){
+        records[x.tag][key]={name:x.name,weight:x.weight,reps:br};
+      }
+    });
+  });
+
+  const hasSomething=cats.some(c=>records[c]&&Object.keys(records[c]).length);
+  if(!hasSomething){
+    recordsList.innerHTML=`<div class="h-empty">No baseline records yet.<br>Run "Find Your Baseline" to set your first records.</div>`;
+    return;
+  }
+
+  cats.forEach(cat=>{
+    const entries=records[cat];
+    if(!entries||!Object.keys(entries).length) return;
+    const card=document.createElement("div");
+    card.className="h-card";
+    const rows=Object.values(entries).sort((a,b)=>b.reps-a.reps).map(e=>{
+      return `<div class="h-ex-row">
+        <div class="h-ex-reps">${e.reps}</div>
+        <span class="h-ex-name">${e.name}</span>
+        ${e.weight?`<span class="pill pill-weight" style="font-size:11px;">${e.weight}kg</span>`:""}
+      </div>`;
+    }).join("");
+    card.innerHTML=`
+      <div class="h-card-head" style="padding-bottom:10px;">
+        <div>
+          <div class="h-card-label">Personal Records</div>
+          <div class="h-card-title" style="text-transform:capitalize;">${cat}</div>
+        </div>
+      </div>
+      <div class="h-ex-list">${rows}</div>`;
+    recordsList.appendChild(card);
+  });
+}
+historyList.addEventListener("click",e=>{
+  const btn=e.target.closest(".h-del-btn");if(!btn)return;
+  const idx=parseInt(btn.dataset.idx,10);
+  showConfirm("Delete this session?","This can't be undone.",()=>{workoutHistory.splice(idx,1);saveJSON(LS.history,workoutHistory);renderHome();renderHistory();},"Delete");
+});
+
+/* ── INIT ── */
+/* ── EXERCISE MODAL ── */
+const exerciseModal=$('#exerciseModal');
+const closeExerciseModal=$('#closeExerciseModal');
+const exTabs=$('#exTabs');
+const exList=$('#exList');
+const exAddName=$('#exAddName');
+const exAddBtn=$('#exAddBtn');
+
+const EX_TAB_ORDER=["push","pull","legs","shoulders","abs","cardio"];
+let exActiveTab="push";
+
+function openExerciseModal(){
+  exActiveTab="push";
+  renderExTabs();renderExList();
+  exerciseModal.classList.add("show");
+}
+function closeExerciseModalFn(){
+  exerciseModal.classList.remove("show");
+  exList.classList.remove("editing");
+  if($('#editExBtn')){$('#editExBtn').textContent="Edit";$('#editExBtn').style.color="";}
+  saveJSON(LS.library,library);
+}
+
+exercisesBtn.addEventListener("click",openExerciseModal);
+closeExerciseModal.addEventListener("click",closeExerciseModalFn);
+const editExBtn=$('#editExBtn');
+editExBtn.addEventListener("click",()=>{
+  const editing=exList.classList.toggle("editing");
+  editExBtn.textContent=editing?"Done Editing":"Edit";
+  editExBtn.style.color=editing?"var(--brand)":"";
+});
+exerciseModal.addEventListener("click",e=>{if(e.target===exerciseModal)closeExerciseModalFn();});
+
+function renderExTabs(){
+  exTabs.innerHTML="";
+  EX_TAB_ORDER.forEach(k=>{
+    const b=document.createElement("button");
+    b.className="ex-tab"+(k===exActiveTab?" active":"");
+    b.textContent=k.charAt(0).toUpperCase()+k.slice(1);
+    b.addEventListener("click",()=>{exActiveTab=k;renderExTabs();renderExList();});
+    exTabs.appendChild(b);
+  });
+}
+
+function renderExList(){
+  exList.innerHTML="";
+  if(!library[exActiveTab])library[exActiveTab]=[];
+  library[exActiveTab].forEach((item,idx)=>{
+    const wrap=document.createElement("div");
+    wrap.className="ex-item"+(item.hidden?" ex-hidden":"");
+
+    const nameIn=document.createElement("input");nameIn.className="ex-item-name";nameIn.value=item.name||"";
+    nameIn.addEventListener("input",()=>{library[exActiveTab][idx].name=nameIn.value;saveJSON(LS.library,library);});
+
+    const eyeBtn=document.createElement("button");eyeBtn.className="ex-vis-btn";
+    eyeBtn.innerHTML=item.hidden
+      ?`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`
+      :`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+    eyeBtn.addEventListener("click",e=>{e.stopPropagation();item.hidden=!item.hidden;saveJSON(LS.library,library);renderExList();});
+
+    // long press = toggle ALL in category
+    let lpTimer=null;
+    eyeBtn.addEventListener("pointerdown",()=>{
+      lpTimer=setTimeout(()=>{
+        lpTimer=null;
+        const allHidden=library[exActiveTab].every(ex=>ex.hidden);
+        library[exActiveTab].forEach(ex=>ex.hidden=!allHidden);
+        saveJSON(LS.library,library);
+        if(navigator.vibrate)navigator.vibrate(40);
+        renderExList();
+      },500);
+    });
+    const cancelLp=()=>{if(lpTimer){clearTimeout(lpTimer);lpTimer=null;}};
+    eyeBtn.addEventListener("pointerup",cancelLp);
+    eyeBtn.addEventListener("pointerleave",cancelLp);
+
+    const delBtn=document.createElement("button");delBtn.className="ex-del-btn";delBtn.textContent="×";
+    delBtn.addEventListener("click",e=>{
+      e.stopPropagation();
+      showConfirm("Delete Exercise",`Remove "${item.name}" from your library?`,()=>{
+        library[exActiveTab].splice(idx,1);
+        saveJSON(LS.library,library);
+        renderExList();
+      });
+    });
+
+    const kgBtn=document.createElement("button");
+    kgBtn.className="ex-kg-btn"+(item.weightable?" active":"");
+    kgBtn.textContent="KG";
+    kgBtn.title="Toggle weighted";
+    kgBtn.addEventListener("click",e=>{e.stopPropagation();item.weightable=!item.weightable;saveJSON(LS.library,library);renderExList();});
+
+    const PROB_CYCLE={high:'med',med:'low',low:'high'};
+    const PROB_LABEL={high:'HIGH',med:'MED',low:'LOW'};
+    const prob=item.prob||'high';
+    const probBtn=document.createElement("button");
+    probBtn.className=`ex-prob-btn ${prob}`;
+    probBtn.textContent=PROB_LABEL[prob];
+    probBtn.addEventListener("click",e=>{
+      e.stopPropagation();
+      item.prob=PROB_CYCLE[item.prob||'high'];
+      saveJSON(LS.library,library);renderExList();
+    });
+
+    wrap.appendChild(nameIn);wrap.appendChild(eyeBtn);wrap.appendChild(kgBtn);wrap.appendChild(probBtn);wrap.appendChild(delBtn);
+    exList.appendChild(wrap);
+  });
+}
+
+const checkExAdd=()=>{exAddBtn.disabled=!exAddName.value.trim();};
+exAddName.addEventListener("input",checkExAdd);
+exAddBtn.addEventListener("click",()=>{
+  const n=exAddName.value.trim();
+  if(!n)return;
+  if(!library[exActiveTab])library[exActiveTab]=[];
+  library[exActiveTab].unshift({name:n,hidden:false});
+  exAddName.value="";exAddBtn.disabled=true;
+  saveJSON(LS.library,library);renderExList();
+});
+
+ensureWeekState();renderHome();goHome();
+</script>
+
+</body>
+</html>
