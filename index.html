@@ -270,7 +270,9 @@ body{
 }
 .baseline-view.visible{opacity:1;pointer-events:auto;transform:none;}
 .baseline-view.visible{opacity:1;pointer-events:auto;transform:none;}
-.bl-step{font-size:12px;font-weight:600;color:#c0c8d8;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;}
+.bl-back{background:none;border:none;font-size:13px;font-weight:600;color:var(--brand);cursor:pointer;padding:0 0 12px;text-align:left;opacity:1;transition:opacity .15s;}
+.bl-back:disabled{opacity:.25;pointer-events:none;}
+
 
 .bl-name-row{display:flex;align-items:center;gap:12px;margin-bottom:4px;}
 .bl-weight-pill{display:none;}
@@ -325,10 +327,16 @@ body{
 }
 .workout-screen.visible{opacity:1;pointer-events:auto;transform:none;visibility:visible;transition:opacity .4s cubic-bezier(.16,1,.3,1),transform .4s cubic-bezier(.16,1,.3,1),visibility 0s 0s;}
 
-.ws-topbar{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:16px 24px 10px;flex-shrink:0;
-}
+.ws-circuit-toggle{display:flex;align-items:center;gap:6px;}
+.ws-circuit-label{font-size:12px;font-weight:600;color:#94a3b8;transition:color .2s;}
+.ws-circuit-toggle.on .ws-circuit-label{color:var(--brand);}
+.ws-toggle{width:36px;height:20px;border-radius:999px;background:#e2e8f0;position:relative;cursor:pointer;transition:background .25s;flex-shrink:0;}
+.ws-toggle.active{background:var(--brand);}
+.ws-toggle-knob{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.15);transition:transform .25s cubic-bezier(.34,1.56,.64,1);}
+.ws-toggle.active .ws-toggle-knob{transform:translateX(16px);}
+
+.ws-topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 24px 10px;flex-shrink:0;}
+.ws-topbar-left{display:flex;align-items:center;gap:14px;}
 .ws-timer{font-size:13px;font-weight:600;color:#c0c8d8;font-variant-numeric:tabular-nums;letter-spacing:.02em;}
 .ws-quit{background:none;border:none;font-size:14px;font-weight:500;color:#ef4444;cursor:pointer;padding:0;transition:opacity .15s;}
 .ws-quit:active{opacity:.4;}
@@ -555,6 +563,37 @@ body{
 .ex-del-btn{height:44px;width:44px;border:none;border-radius:12px;background:#ffe0e0;color:#dc2626;font-weight:900;font-size:18px;cursor:pointer;display:none;}
 .ex-list.editing .ex-del-btn{display:block;}
 .ex-item.ex-hidden .ex-item-name{opacity:.45;background:#f8fafc;}
+
+/* ── REST TIMER ── */
+.rest-screen{
+  position:fixed;inset:0;background:#f8f9fb;z-index:55;
+  display:flex;flex-direction:column;
+  padding:calc(env(safe-area-inset-top)+24px) 0 0;
+  opacity:0;pointer-events:none;visibility:hidden;
+  transform:translateY(20px);
+  transition:opacity .4s cubic-bezier(.16,1,.3,1),transform .4s cubic-bezier(.16,1,.3,1),visibility 0s .4s;
+}
+.rest-screen.visible{opacity:1;pointer-events:auto;visibility:visible;transform:none;transition:opacity .4s cubic-bezier(.16,1,.3,1),transform .4s cubic-bezier(.16,1,.3,1),visibility 0s 0s;}
+.rest-footer{padding:12px 1.25rem calc(24px + env(safe-area-inset-bottom));flex-shrink:0;position:fixed;bottom:0;left:0;right:0;background:#f8f9fb;}
+.rest-label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#c0c8d8;margin-bottom:20px;padding:0 1.25rem;}
+.rest-summary-card{background:#fff;border-radius:20px;box-shadow:0 2px 12px rgba(15,23,42,.07);padding:18px 20px;margin:20px 1.25rem 0;}
+.rest-summary-title{font-size:13px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;}
+.rest-ex-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(15,23,42,.05);}
+.rest-ex-row:last-child{border-bottom:none;}
+.rest-ex-left{display:flex;align-items:center;gap:8px;}
+.rest-ex-name{font-size:15px;font-weight:500;color:var(--ink);}
+.rest-ex-target{font-size:15px;font-weight:500;color:var(--ink);letter-spacing:-.02em;flex-shrink:0;}
+.rest-ex-mult{font-size:12px;color:var(--sub);font-weight:500;}
+.rest-timer-wrap{display:flex;flex-direction:column;align-items:center;padding:24px 0 20px;}
+.rest-ring{position:relative;width:140px;height:140px;}
+.rest-ring svg{transform:rotate(-90deg);}
+.rest-ring circle{fill:none;stroke-width:8;}
+.rest-ring .bg{stroke:#f0f2f5;}
+.rest-ring .prog{stroke:var(--brand);stroke-linecap:round;transition:stroke-dashoffset .1s linear;}
+.rest-countdown{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;}
+.rest-countdown-num{font-size:44px;font-weight:400;letter-spacing:-.04em;color:var(--ink);font-variant-numeric:tabular-nums;}
+.rest-countdown-lbl{font-size:12px;color:var(--sub);font-weight:500;margin-top:2px;}
+
 </style>
 </head>
 <body>
@@ -584,7 +623,6 @@ body{
 
     <!-- PREVIEW CARD -->
     <div class="workout-card hidden" id="workoutCard">
-      <div class="card-label">Today's Workout</div>
       <div class="card-title" id="cardTitle"></div>
       <div class="card-subtitle" id="cardSubtitle"></div>
       <div id="previewRows"></div>
@@ -592,6 +630,7 @@ body{
 
     <!-- BASELINE -->
     <div class="baseline-view" id="baselineView">
+      <button class="bl-back" id="blBackBtn">Back</button>
       <div class="bl-step" id="blStepLabel">Exercise 1 of 4</div>
       <div class="bl-name-row">
         <div class="bl-name" id="blExName"></div>
@@ -700,10 +739,38 @@ body{
   </div>
 </div>
 
+
+<!-- REST TIMER SCREEN -->
+<div class="rest-screen" id="restScreen">
+
+  <div class="rest-timer-wrap">
+    <div class="rest-ring">
+      <svg width="140" height="140">
+        <circle class="bg" cx="70" cy="70" r="60" stroke-dasharray="376.99" stroke-dashoffset="0"/>
+        <circle class="prog" id="restProg" cx="70" cy="70" r="60" stroke-dasharray="376.99" stroke-dashoffset="0"/>
+      </svg>
+      <div class="rest-countdown">
+        <div class="rest-countdown-num" id="restCountdown">3:00</div>
+        <div class="rest-countdown-lbl">until workout</div>
+      </div>
+    </div>
+  </div>
+  <div class="rest-summary-card">
+    <div id="restExList"></div>
+  </div>
+  <div class="rest-footer"><button class="btn" id="restSkipBtn">Skip Rest</button></div>
+</div>
+
 <!-- WORKOUT SCREEN — fixed full-screen, outside track so it covers everything -->
 <div class="workout-screen" id="workoutScreen">
   <div class="ws-topbar">
-    <div class="ws-timer" id="wsTimer">0:00</div>
+    <div class="ws-topbar-left">
+      <div class="ws-timer" id="wsTimer">0:00</div>
+      <div class="ws-circuit-toggle" id="circuitToggleWrap">
+        <span class="ws-circuit-label" id="circuitLabel">Circuit</span>
+        <div class="ws-toggle active" id="circuitToggle"><div class="ws-toggle-knob"></div></div>
+      </div>
+    </div>
     <button class="ws-quit" id="wsQuitBtn">Quit</button>
   </div>
   <div class="ws-accordion-list" id="wsAccordionList"></div>
@@ -1002,6 +1069,70 @@ function goBaseline(){
   requestAnimationFrame(()=>baselineView.classList.add("visible"));
 }
 
+/* ── REST TIMER ── */
+let restInterval=null;
+function playRestDone(){
+  try{
+    initAudio();
+    const now=audioCtx.currentTime;
+    // three ascending tones
+    [[440,.0],[554,.25],[659,.5]].forEach(([freq,delay])=>{
+      const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+      o.connect(g);g.connect(audioCtx.destination);
+      o.type='sine';o.frequency.value=freq;
+      g.gain.setValueAtTime(0,now+delay);
+      g.gain.linearRampToValueAtTime(.35,now+delay+.04);
+      g.gain.exponentialRampToValueAtTime(.001,now+delay+.6);
+      o.start(now+delay);o.stop(now+delay+.65);
+    });
+  }catch(e){}
+}
+
+function goRest(){
+  clearInterval(restInterval);
+  // build summary card
+  const list=document.getElementById('restExList');
+  const totalReps=currentExercises.reduce((s,e)=>s+(e.target||0),0);
+  list.innerHTML=`<div class="rest-summary-title">Today's targets <span style="color:var(--brand);font-size:14px;font-weight:800;letter-spacing:-.01em">${totalReps}</span> <span style="font-weight:800;font-size:11px;color:var(--brand)">reps</span></div>`;
+  currentExercises.forEach(ex=>{
+    const row=document.createElement('div');row.className='rest-ex-row';
+    const base=ex.baselineReps||ex.target;
+    const total=ex.target;
+    const mult=ex.multiplier&&ex.multiplier>1?`<span class="rest-ex-mult">${base} ×${ex.multiplier}</span>`:'';
+    row.innerHTML=`<span class="rest-ex-left"><span class="rest-ex-target">${total}</span><span class="rest-ex-name">${ex.name}</span></span>${mult}`;
+    list.appendChild(row);
+  });
+  // start countdown
+  const TOTAL=180;let remaining=TOTAL;
+  const circ=2*Math.PI*60; // r=60
+  const prog=document.getElementById('restProg');
+  const countdown=document.getElementById('restCountdown');
+  function updateRest(){
+    const m=Math.floor(remaining/60);
+    countdown.textContent=`${m}:${String(remaining%60).padStart(2,'0')}`;
+    prog.style.strokeDashoffset=String(circ*(1-remaining/TOTAL));
+  }
+  updateRest();
+  restInterval=setInterval(()=>{
+    remaining--;
+    updateRest();
+    if(remaining<=0){
+      clearInterval(restInterval);
+      playRestDone();
+      setTimeout(()=>startWorkoutFromRest(),800);
+    }
+  },1000);
+  document.getElementById('restScreen').classList.add('visible');
+}
+
+function startWorkoutFromRest(){
+  clearInterval(restInterval);
+  document.getElementById('restScreen').classList.remove('visible');
+  goWorkout();
+}
+
+document.getElementById('restSkipBtn').addEventListener('click',startWorkoutFromRest);
+
 function goWorkout(){
   workoutCompleted=false;
   appState="workout";
@@ -1064,9 +1195,30 @@ function generateExercises(){
   // shuffle pool
   for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
 
-  // pick 3 or 4 exercises — no duplicate names, but same category is fine
+  // pick 3 or 4 exercises — enforce at least 1 push + 1 pull for upper/full
   const count=3+Math.floor(Math.random()*2); // 3 or 4
   let selected=[],usedNames=new Set();
+
+  function pickOne(cat){
+    // pick a random exercise from the pool matching cat, not already used
+    const options=pool.filter(p=>p.tag===cat&&!usedNames.has(p.name));
+    if(!options.length) return null;
+    const pick=options[Math.floor(Math.random()*options.length)];
+    usedNames.add(pick.name);
+    return pick;
+  }
+
+  if(wizBodyType==="upper"||wizBodyType==="full"){
+    const push=pickOne("push");
+    const pull=pickOne("pull");
+    if(push) selected.push(push);
+    if(pull) selected.push(pull);
+  } else if(wizBodyType==="lower"){
+    const legs=pickOne("legs");
+    if(legs) selected.push(legs);
+  }
+
+  // fill remaining slots from shuffled pool
   for(let i=0;i<pool.length&&selected.length<count;i++){
     if(!usedNames.has(pool[i].name)){
       selected.push(pool[i]);
@@ -1104,6 +1256,7 @@ function renderPreviewCard(){
 function showBaselineStep(){
   const ex=currentExercises[baselineIndex];
   blStepLabel.textContent=`Exercise ${baselineIndex+1} of ${currentExercises.length}`;
+  blBackBtn.disabled=(baselineIndex===0);
   blExName.textContent=ex.name;
   if(ex.weight){
     blWeightPill.textContent=`${ex.weight}kg`;
@@ -1136,13 +1289,27 @@ document.querySelector('.numpad').addEventListener("click",e=>{
   updatePin();
 });
 
+const blBackBtn=$('#blBackBtn');
+blBackBtn.addEventListener('click',()=>{
+  if(baselineIndex>0){
+    baselineIndex--;
+    pinValue="";
+    showBaselineStep();
+  }
+});
 blConfirmBtn.addEventListener("click",()=>confirmBaseline());
 
+
 function confirmBaseline(){
+  if(!currentExercises[baselineIndex]) return;
   initAudio();
   const reps=parseInt(pinValue||"0",10);
   currentExercises[baselineIndex].baselineReps=reps;
-  currentExercises[baselineIndex].target=Math.max(1,reps*10);
+  // weighted random multiplier: x1=10%, x2=20%, x3=30%, x4=20%, x5=10%, x10=1% (remainder x3)
+  const multRoll=Math.random()*100;
+  const multiplier=multRoll<12?2:multRoll<37?3:multRoll<87?4:multRoll<99?5:10;
+  currentExercises[baselineIndex].multiplier=multiplier;
+  currentExercises[baselineIndex].target=Math.max(1,reps*multiplier);
   baselineIndex++;
   if(baselineIndex<currentExercises.length){
     baselineView.style.opacity="0";baselineView.style.transform="translateY(-20px)";
@@ -1157,7 +1324,7 @@ function confirmBaseline(){
     },280);
   } else {
     baselineView.style.opacity="0";baselineView.style.transform="translateY(-20px)";
-    setTimeout(()=>{baselineView.style.opacity="";baselineView.style.transform="";goWorkout();},320);
+    setTimeout(()=>{baselineView.style.opacity="";baselineView.style.transform="";goRest();},320);
   }
 }
 
@@ -1166,7 +1333,15 @@ const wsAccordionList=$('#wsAccordionList');
 const wsSharedLog=$('#wsSharedLog');
 const wsNumpad=$('#wsNumpad');
 
-let wsInputs=[];
+let circuitMode=true;
+const circuitToggle=$('#circuitToggle');
+circuitToggle.addEventListener('click',()=>{
+  circuitMode=!circuitMode;
+  circuitToggle.classList.toggle('active',circuitMode);
+  document.getElementById('circuitLabel').style.color=circuitMode?'var(--brand)':'#94a3b8';
+});
+
+
 let openAccIdx=0;
 
 function buildAccordions(){
@@ -1178,7 +1353,8 @@ function buildAccordions(){
 
 function makeAccordion(i){
   const ex=currentExercises[i];
-  const meta=ex.weight?`${ex.target} reps · ${ex.weight}kg`:`${ex.target} reps`;
+  const multLabel=ex.multiplier?` · ×${ex.multiplier}`:'';
+  const meta=ex.weight?`${ex.target} reps · ${ex.weight}kg${multLabel}`:`${ex.target} reps${multLabel}`;
 
   const card=document.createElement("div");
   card.className="ws-acc";
@@ -1349,6 +1525,12 @@ wsNumpad.addEventListener("click",e=>{
     if(numEl){numEl.classList.remove("bump");requestAnimationFrame(()=>numEl.classList.add("bump"));setTimeout(()=>numEl.classList.remove("bump"),200);}
     refreshAcc(i);
     checkAccDone(i);
+    // circuit mode: advance to next undone exercise after every log
+    if(circuitMode && !currentExercises[i].done){
+      const next=currentExercises.findIndex((e,j)=>j>i&&!e.done);
+      const wrap=next!==-1?next:currentExercises.findIndex((e,j)=>j!==i&&!e.done);
+      if(wrap!==-1) setTimeout(()=>openAcc(wrap,true),300);
+    }
   } else if(v==="del") wsInputs[i]=wsInputs[i].slice(0,-1);
   else if(v==="clear") wsInputs[i]="";
   else{ if(!wsInputs[i]&&v==="0")return; if(wsInputs[i].length<3)wsInputs[i]+=v; }
