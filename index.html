@@ -406,7 +406,12 @@ body{
 
 .ws-acc-sublabel{font-size:13px;color:#94a3b8;font-weight:400;}
 
-.ws-acc-bar-wrap{width:100%;height:2px;background:#e8edf8;border-radius:999px;overflow:hidden;}
+.ws-set-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-start;margin-top:8px;min-height:0;width:100%;}
+.ws-set-chip{display:flex;align-items:center;gap:5px;background:#f0f2f5;color:var(--ink);font-size:13px;font-weight:600;border-radius:999px;padding:4px 10px 4px 12px;cursor:pointer;transition:background .15s;}
+.ws-set-chip:active{background:#e2e8f0;}
+.ws-set-chip-x{font-size:11px;color:#ef4444;font-weight:700;line-height:1;}
+
+.ws-acc-bar-wrap{width:100%;height:4px;background:#e8edf8;border-radius:999px;overflow:hidden;}
 .ws-acc-bar{height:100%;background:var(--brand);border-radius:999px;transition:width .5s cubic-bezier(.16,1,.3,1);}
 
 /* fixed bottom panel */
@@ -1353,8 +1358,15 @@ function buildAccordions(){
 
 function makeAccordion(i){
   const ex=currentExercises[i];
-  const multLabel=ex.multiplier?` · ×${ex.multiplier}`:'';
-  const meta=ex.weight?`${ex.target} reps · ${ex.weight}kg${multLabel}`:`${ex.target} reps${multLabel}`;
+  function midDivisor(n){
+    if(!n||n<=1)return n;
+    const divs=[];for(let i=1;i<=n;i++)if(n%i===0)divs.push(i);
+    const inner=divs.filter(d=>d>1&&d<n);
+    if(!inner.length)return n;
+    return inner[Math.floor((inner.length-1)/2)];
+  }
+  const circuitHint=circuitMode&&ex.multiplier>1?` · sets of ${midDivisor(ex.target)} reps`:(ex.multiplier?` · ×${ex.multiplier}`:'');
+  const meta=ex.weight?`${ex.target} reps · ${ex.weight}kg${circuitHint}`:`${ex.target} reps${circuitHint}`;
 
   const card=document.createElement("div");
   card.className="ws-acc";
@@ -1378,6 +1390,7 @@ function makeAccordion(i){
         <div class="ws-acc-bignum" id="wsAccNum${i}">0</div>
         <div class="ws-acc-sublabel" id="wsAccSub${i}">${ex.target} reps left</div>
         <div class="ws-acc-bar-wrap"><div class="ws-acc-bar" id="wsAccBar${i}" style="width:0%"></div></div>
+        <div class="ws-set-chips" id="wsChips${i}"></div>
       </div>
     </div>`;
 
@@ -1448,6 +1461,28 @@ function refreshSharedControls(){
   refreshAcc(i);
 }
 
+function refreshChips(i){
+  const ex=currentExercises[i];
+  const wrap=document.getElementById(`wsChips${i}`);
+  if(!wrap) return;
+  wrap.innerHTML='';
+  (ex.sets||[]).forEach((s,si)=>{
+    const chip=document.createElement('div');
+    chip.className='ws-set-chip';
+    chip.innerHTML=`${s}<span class="ws-set-chip-x">×</span>`;
+    chip.addEventListener('click',()=>{
+      showConfirm(`Remove ${s} reps?`, 'This set will be deleted.', ()=>{
+        ex.sets.splice(si,1);
+        ex.repsLogged=ex.sets.reduce((a,b)=>a+b,0);
+        refreshChips(i);
+        refreshAcc(i);
+        checkAccDone(i);
+      }, 'Delete');
+    });
+    wrap.appendChild(chip);
+  });
+}
+
 function refreshAcc(i){
   const ex=currentExercises[i];
   const input=wsInputs[i]||"";
@@ -1490,6 +1525,12 @@ function refreshAcc(i){
 
 function checkAccDone(i){
   const ex=currentExercises[i];
+  if(ex.repsLogged<ex.target){
+    ex.done=false;
+    refreshAcc(i);
+    updateSlideVisibility();
+    return;
+  }
   if(ex.repsLogged>=ex.target){
     ex.done=true;
     refreshAcc(i);
@@ -1524,6 +1565,7 @@ wsNumpad.addEventListener("click",e=>{
     const numEl=$(`#wsAccNum${i}`);
     if(numEl){numEl.classList.remove("bump");requestAnimationFrame(()=>numEl.classList.add("bump"));setTimeout(()=>numEl.classList.remove("bump"),200);}
     refreshAcc(i);
+    refreshChips(i);
     checkAccDone(i);
     // circuit mode: advance to next undone exercise after every log
     if(circuitMode && !currentExercises[i].done){
