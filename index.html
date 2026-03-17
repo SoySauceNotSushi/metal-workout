@@ -818,7 +818,70 @@ function fireConfetti(){const canvas=document.getElementById('confettiCanvas');c
 </script>
 <script>
 const LS={library:"jy_library_v4",history:"jy_wh_v4",streak:"jy_streak_v1",weekKey:"jy_weekKey_v1",weekCount:"jy_weekCount_v1",weekCounted:"jy_week_counted_v1",pbStore:"jy_pb_v1"};
-const DEFAULT_LIBRARY={push:[{name:"Push-Ups"},{name:"Diamond Push-Ups"},{name:"Wide Push-Ups"},{name:"Decline Push-Ups"},{name:"Incline Push-Ups"},{name:"Archer Push-Ups"},{name:"Dips"},{name:"Korean Dips"},{name:"Close Grip Push-Ups"},{name:"Pseudo Planche Push-Ups"},{name:"Pike Push-Ups"},{name:"Dolphin Push-Ups"},{name:"Wall Handstand Push-Ups"}],pull:[{name:"Pull-Ups"},{name:"Chin-Ups"},{name:"Wide Pull-Ups"},{name:"Neutral Grip Pull-Ups"},{name:"Australian Rows"},{name:"Archer Pull-Ups"},{name:"Commando Pull-Ups"},{name:"Typewriter Pull-Ups"},{name:"Scapular Pull-Ups"},{name:"Inverted Rows"}],legs:[{name:"Squats"},{name:"Bulgarian Split Squats"},{name:"Lunges"},{name:"Jump Squats"},{name:"Pistol Squats"},{name:"Step-Ups"},{name:"Glute Bridges"},{name:"Nordic Curls"},{name:"Calf Raises"}],shoulders:[{name:"Handstand Push-Ups"},{name:"Pike Hold"},{name:"Lateral Raises"},{name:"Pike Roll-Outs"}],abs:[{name:"Knee Raises"},{name:"Leg Raises"},{name:"Toes to Bar"},{name:"V-Ups"},{name:"Hollow Body Hold"},{name:"Plank"},{name:"L-Sit Hold"},{name:"Ab Wheel Roll-Outs"},{name:"Dragon Flag Negatives"}],cardio:[{name:"Burpees"},{name:"Jumping Jacks"},{name:"Mountain Climbers"},{name:"High Knees"},{name:"Box Jumps"},{name:"Bear Crawl"}]};
+const DEFAULT_LIBRARY={
+  pull:[
+    {name:"Muscle Ups",hidden:false},
+    {name:"Pull-Ups",hidden:false},
+    {name:"Wide Pull-Ups",hidden:false},
+    {name:"Narrow Pull-Ups",hidden:false},
+    {name:"Explosive Pull-Ups",hidden:false},
+    {name:"Chin-Ups",hidden:false},
+    {name:"Wide Chin-Ups",hidden:false},
+    {name:"Narrow Chin-Ups",hidden:false},
+    {name:"Explosive Chin-Ups",hidden:false},
+    {name:"Neutral Grip Pull-Ups",hidden:false},
+    {name:"Arched Neutral Grip Pull-Ups",hidden:false},
+    {name:"Australian Pull-Ups",hidden:false},
+    {name:"Wide Australian Pull-Ups",hidden:false},
+    {name:"Narrow Australian Pull-Ups",hidden:false},
+    {name:"Australian Chin-Ups",hidden:false},
+    {name:"Wide Australian Chin-Ups",hidden:false},
+    {name:"Narrow Australian Chin-Ups",hidden:false},
+    {name:"Commando Pull-Ups",hidden:false},
+    {name:"Typewriter Pull-Ups",hidden:false},
+    {name:"Archer Pull-Ups",hidden:false},
+  ],
+  push:[
+    {name:"Push-Ups",hidden:false},
+    {name:"Wide Push-Ups",hidden:false},
+    {name:"Diamond Push-Ups",hidden:false},
+    {name:"Incline Push-Ups",hidden:false},
+    {name:"Decline Push-Ups",hidden:false},
+    {name:"Explosive Push-Ups",hidden:false},
+    {name:"Clapping Push-Ups",hidden:false},
+    {name:"Dips",hidden:false},
+    {name:"Straight Bar Dips",hidden:false},
+    {name:"Archer Push-Ups",hidden:false},
+  ],
+  legs:[
+    {name:"Jump Squats",hidden:false},
+    {name:"Jumping Lunges",hidden:false},
+    {name:"Calf Raises",hidden:false},
+    {name:"Tuck Jumps",hidden:false},
+  ],
+  abs:[
+    {name:"Crunches",hidden:false},
+    {name:"Iron Cross",hidden:false},
+    {name:"Sit-Ups",hidden:false},
+    {name:"Reverse Crunches",hidden:false},
+    {name:"Bar Leg Raises",hidden:false},
+    {name:"Bar Toes to Bar",hidden:false},
+    {name:"Bar Windshield Wipers",hidden:false},
+    {name:"Jack Knives",hidden:false},
+  ],
+  cardio:[
+    {name:"Burpees",hidden:false},
+    {name:"High Knees",hidden:false},
+    {name:"Star Jumps",hidden:false},
+  ],
+  shoulders:[
+    {name:"Handstand Push-Ups",hidden:false},
+    {name:"Pike Push-Ups",hidden:false},
+    {name:"Elevated Pike Push-Ups",hidden:false},
+    {name:"Explosive Pike Push-Ups",hidden:false},
+    {name:"Dolphin Push-Ups",hidden:false},
+  ],
+}
 const UPPER_CATS=["push","pull","shoulders"],LOWER_CATS=["legs","abs","cardio"],FULL_CATS=["push","pull","legs","shoulders","abs","cardio"];
 const WEIGHTS=[5,10,15,20],PILL_MAP={push:"pill-push",pull:"pill-pull",legs:"pill-legs",shoulders:"pill-shoulders",abs:"pill-abs",cardio:"pill-cardio"};
 const PROB_W={high:3,med:2,low:1},PROB_CYCLE={high:"med",med:"low",low:"high"},PROB_LABEL={high:"HIGH",med:"MED",low:"LOW"};
@@ -971,9 +1034,15 @@ function triggerGeneration(){
   aiStage.style.display="block";requestAnimationFrame(()=>aiStage.classList.add("show"));
   setTimeout(()=>{currentExercises=generateExercises();aiStage.classList.remove("show");setTimeout(()=>{aiStage.style.display="none";actionsArea.classList.remove("faded");renderPreviewCard();goPreview();},250);},900);
 }
-function buildPool(cats){
+function buildPool(cats,catBoost={}){
   let pool=[];
-  cats.forEach(cat=>{(library[cat]||[]).filter(e=>!e.hidden).forEach(e=>{const w=PROB_W[e.prob||"high"];for(let i=0;i<w;i++)pool.push({name:e.name,tag:cat,weightable:!!e.weightable});});});
+  cats.forEach(cat=>{
+    const boost=catBoost[cat]||1;
+    (library[cat]||[]).filter(e=>!e.hidden).forEach(e=>{
+      const w=(PROB_W[e.prob||"high"])*boost;
+      for(let i=0;i<w;i++)pool.push({name:e.name,tag:cat,weightable:!!e.weightable});
+    });
+  });
   for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
   return pool;
 }
@@ -984,7 +1053,8 @@ function assignWeights(exercises){
 function generateExercises(){
   compMode=false;compCards=[];
   const cats=wizBodyType==="upper"?UPPER_CATS:wizBodyType==="lower"?LOWER_CATS:FULL_CATS;
-  const pool=buildPool(cats);
+  const catBoost=wizBodyType==="full"?{push:3,pull:3}:{};
+  const pool=buildPool(cats,catBoost);
   const usedNames=new Set();
   function pickOne(cat){const opts=pool.filter(p=>p.tag===cat&&!usedNames.has(p.name));if(!opts.length)return null;const pick=opts[Math.floor(Math.random()*opts.length)];usedNames.add(pick.name);return pick;}
   function pickRandom(){for(let i=0;i<pool.length;i++){if(!usedNames.has(pool[i].name)){usedNames.add(pool[i].name);return pool[i];}}return null;}
@@ -1011,9 +1081,15 @@ function generateExercises(){
   // Normal mode
   let selected=[];
   if(wizBodyType==="full"){
-    ["push","pull","legs","abs"].forEach(cat=>{const p=pickOne(cat);if(p)selected.push(p);});
-    const extras=Math.floor(Math.random()*3);
-    ["shoulders","cardio"].sort(()=>Math.random()-.5).slice(0,extras).forEach(cat=>{const p=pickOne(cat);if(p)selected.push(p);});
+    const count=3;
+    const catCount={};
+    for(let i=0;i<pool.length&&selected.length<count;i++){
+      const cat=pool[i].tag;
+      if(!usedNames.has(pool[i].name)&&(catCount[cat]||0)<2){
+        selected.push(pool[i]);usedNames.add(pool[i].name);
+        catCount[cat]=(catCount[cat]||0)+1;
+      }
+    }
   } else if(wizBodyType==="upper"){
     const push=pickOne("push");const pull=pickOne("pull");if(push)selected.push(push);if(pull)selected.push(pull);
     const count=3+Math.floor(Math.random()*2);for(let i=0;i<pool.length&&selected.length<count;i++){if(!usedNames.has(pool[i].name)){selected.push(pool[i]);usedNames.add(pool[i].name);}}
@@ -1022,7 +1098,28 @@ function generateExercises(){
     const count=3+Math.floor(Math.random()*2);for(let i=0;i<pool.length&&selected.length<count;i++){if(!usedNames.has(pool[i].name)){selected.push(pool[i]);usedNames.add(pool[i].name);}}
   }
   const exercises=selected.map(e=>({name:e.name,tag:e.tag,weight:null,target:0,repsLogged:0,sets:[],done:false,baselineReps:0,weightable:!!e.weightable}));
-  return assignWeights(exercises);
+
+  // Pairing rule: Muscle Ups ↔ Straight Bar Dips always together, within the 3 count
+  const hasMU=exercises.some(e=>e.name==="Muscle Ups");
+  const hasSBD=exercises.some(e=>e.name==="Straight Bar Dips");
+  if(hasMU&&!hasSBD){
+    // replace last exercise with SBD if at 3, or just add if under
+    const sbd=pool.find(p=>p.name==="Straight Bar Dips");
+    if(sbd){if(exercises.length>=3)exercises.splice(exercises.length-1,1);exercises.push({name:sbd.name,tag:sbd.tag,weight:null,target:0,repsLogged:0,sets:[],done:false,baselineReps:0,weightable:!!sbd.weightable});}
+  } else if(hasSBD&&!hasMU){
+    const muLib=(library.pull||[]).find(e=>e.name==="Muscle Ups");
+    if(muLib){if(exercises.length>=3)exercises.splice(exercises.length-1,1);exercises.push({name:"Muscle Ups",tag:"pull",weight:null,target:0,repsLogged:0,sets:[],done:false,baselineReps:0,weightable:!!muLib.weightable});}
+  }
+
+  // Muscle Ups always before Straight Bar Dips
+  const muIdx=exercises.findIndex(e=>e.name==="Muscle Ups");
+  const sbdIdx=exercises.findIndex(e=>e.name==="Straight Bar Dips");
+  if(muIdx!==-1&&sbdIdx!==-1&&muIdx>sbdIdx){
+    [exercises[muIdx],exercises[sbdIdx]]=[exercises[sbdIdx],exercises[muIdx]];
+  }
+
+  // ensure max 3
+  return assignWeights(exercises.slice(0,3));
 }
 function renderPreviewCard(){
   const bodyLabel=wizBodyType==="upper"?"Upper Body":wizBodyType==="lower"?"Lower Body":"Full Body";
@@ -1119,7 +1216,7 @@ function makeAccordion(i){
   const ex=currentExercises[i];
   const hint="";
   const meta=ex.weight?ex.target+" reps · "+ex.weight+"kg"+hint:ex.target+" reps"+hint;
-  const setSize=!compMode&&circuitMode&&ex.multiplier>1?midDivisor(ex.target):null;
+  const setSize=!compMode&&circuitMode&&ex.multiplier>1&&ex.baselineReps>0?(()=>{const h=ex.baselineReps/2;return Math.max(2,Math.round(h)%2===0?Math.round(h):Math.round(h)+1);})():null;
   const card=document.createElement("div");card.className="ws-acc";card.id="wsAcc"+i;
   card.innerHTML='<div class="ws-acc-header"><div class="ws-acc-left"><div class="ws-acc-icon">'+(i+1)+'</div><div class="ws-acc-info"><div class="ws-acc-name">'+ex.name+'</div><div class="ws-acc-meta">'+meta+' · <span id="wsAccLeft'+i+'">'+ex.target+' left</span></div></div></div><div class="ws-acc-right"><div class="ws-acc-tally" id="wsAccTally'+i+'">0</div><div class="ws-acc-check" id="wsAccCheck'+i+'"></div></div></div><div class="ws-acc-body"><div class="ws-acc-inner"><div class="ws-acc-bignum" id="wsAccNum'+i+'">0</div>'+(setSize?'<button class="ws-set-btn" id="wsSetBtn'+i+'">'+setSize+' reps</button>':'<div style="height:8px"></div>')+'<div class="ws-acc-sublabel" id="wsAccSub'+i+'"></div><div class="ws-acc-bar-wrap"><div class="ws-acc-bar" id="wsAccBar'+i+'" style="width:0%"></div></div><div class="ws-set-chips" id="wsChips'+i+'"></div></div></div>';
   if(setSize){
